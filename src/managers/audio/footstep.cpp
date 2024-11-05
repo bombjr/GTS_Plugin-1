@@ -28,6 +28,23 @@ namespace {
 	const float limit_x96 = 96.0f;
 	const float limit_mega = 106.0f;
 
+	std::string GetFootstepName(Actor* giant, bool right) {
+		std::string tag;
+		if (!giant->AsActorState()->IsSneaking()) {
+			if (right) {
+				tag = "FootScuffRight";
+			} else {
+				tag = "FootScuffLeft";
+			}
+		} else {
+			if (right) {
+				tag = "FootRight";
+			} else {
+				tag = "FootLeft";
+			}
+		}
+		return tag;
+	}
 
 	BSSoundHandle get_sound(float movement_mod, NiAVObject* foot, const float& scale, const float& scale_limit, BSISoundDescriptor* sound_descriptor, const VolumeParams& params, const VolumeParams& blend_with, std::string_view tag, float mult, bool blend) {
 		BSSoundHandle result = BSSoundHandle::BSSoundHandle();
@@ -311,5 +328,44 @@ namespace Gts {
 			modifier *= 1.0 + (Potion_GetMightBonus(actor) * 0.33);
 		}
 		return modifier;
+	}
+
+	void FootStepManager::PlayVanillaFootstepSounds(Actor* giant, bool right) {
+		if (get_visual_scale(giant) > 2.05) { // No need to play it past this size
+			return;
+		}
+
+		ActorHandle giantHandle = giant->CreateRefHandle();
+		std::string tag = GetFootstepName(giant, right);
+
+		BSTEventSource<BGSFootstepEvent>* eventSource;
+		auto foot_event = BGSFootstepEvent();
+
+		foot_event.actor = giantHandle;
+		foot_event.pad04 = 10000001; // Filter it out, we don't want it to deal damage/do dust clouds and such
+		foot_event.tag = tag;
+
+
+		BGSImpactManager::GetSingleton()->ProcessEvent(&foot_event, eventSource);
+	}
+
+	void FootStepManager::DoStrongSounds(Actor* giant, float animspeed, std::string_view feet) {
+		float scale = get_visual_scale(giant);
+		float bonus = 1.0;
+		
+
+		if (HasSMT(giant)) {
+			bonus = 8.0;
+			scale += 0.6;
+		}
+
+		if (scale > 1.25) {
+			float volume = 0.14 * bonus * (scale - 1.10) * animspeed;
+			if (volume > 0.05) {
+				Runtime::PlaySoundAtNode("HeavyStompSound", giant, volume, 1.0, feet);
+				Runtime::PlaySoundAtNode("xlFootstep", giant, volume, 1.0, feet);
+				Runtime::PlaySoundAtNode("xlRumble", giant, volume, 1.0, feet);
+			}
+		}
 	}
 }

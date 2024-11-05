@@ -103,7 +103,7 @@ namespace {
             if (tiny) {
                 bool OnCooldown = IsActionOnCooldown(player, Source);
                 if (!OnCooldown) {
-                    if (Runtime::HasPerk(player, perk)) {
+                    if (Runtime::HasPerkTeam(player, perk)) {
                         float HpThreshold = (GetHugCrushThreshold(player, tiny, false) * 1.5) + GetMasteryReduction(player);
                         float health = GetHealthPercentage(tiny);
                         if (health <= HpThreshold) {
@@ -120,7 +120,7 @@ namespace {
                             }
                             std::string message = std::format("{} is too healthy for {}", tiny->GetDisplayFullName(), cooldown_msg);
                             shake_camera(player, 0.45, 0.30);
-                            TiredSound(player, message);
+                            NotifyWithSound(player, message);
 
                             Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0, HpThreshold * 100.0);
                             return false;
@@ -129,7 +129,7 @@ namespace {
                 } else {
                     std::string message = std::format("{} is on a cooldown: {:.1f} sec", cooldown_msg, GetRemainingCooldown(player, Source));
                     shake_camera(player, 0.45, 0.30);
-                    TiredSound(player, message);
+                    NotifyWithSound(player, message);
                     return false;
                 }
             }
@@ -150,10 +150,11 @@ namespace {
     }
 
     void CleavageEnterEvent(const InputEventData& data) {
-        Actor* giant = PlayerCharacter::GetSingleton();
+        Actor* giant = GetPlayerOrControlled();
         if (giant) {
             Actor* tiny = Grab::GetHeldActor(giant);
             if (tiny && IsBetweenBreasts(tiny)) {
+                Utils_UpdateHighHeelBlend(giant, false);
                 PassAnimation("Cleavage_EnterState", false);
                 AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
             }

@@ -3,6 +3,7 @@
 #include "managers/audio/footstep.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "managers/PerkHandler.hpp"
 #include "utils/papyrusUtils.hpp"
 #include "managers/explosion.hpp"
 #include "utils/papyrusUtils.hpp"
@@ -95,7 +96,7 @@ namespace Gts {
 		}
 	}
 
-	void KillActor(Actor* giant, Actor* tiny, bool silent) {
+	void KillActor(Actor* giant, Actor* tiny) {
 		if (tiny && tiny->Is3DLoaded() && !tiny->IsDead()) {
 			StartCombat(tiny, giant);
 		}
@@ -109,7 +110,6 @@ namespace Gts {
 		}
 
 		SendDeathEvent(giant, tiny);
-	
 		Task_InitHavokTask(tiny);
 	}
 
@@ -224,6 +224,11 @@ namespace Gts {
 
 			auto tinyRef = tinyHandle.get().get();
 			auto giantRef = giantHandle.get().get();
+
+			if (!tinyRef || !tinyRef->Is3DLoaded()) {
+				SetAV(tinyRef, ActorValue::kConfidence, oldConfidence);
+				return false;
+			}
 
 			if (tinyRef->IsDead()) {
 				SetAV(tinyRef, ActorValue::kConfidence, oldConfidence);

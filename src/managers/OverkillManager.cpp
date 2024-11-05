@@ -1,6 +1,7 @@
 #include "managers/OverkillManager.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "magic/effects/common.hpp"
+#include "managers/PerkHandler.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "utils/looting.hpp"
@@ -70,8 +71,10 @@ namespace Gts {
 			} else if (data.state == OverkillState::Overkilling) {
 				if (data.delay.ShouldRun()) {
                     if (tiny->Is3DLoaded() && !tiny->IsDead()) {
-                        KillActor(giant, tiny, false);
+                        KillActor(giant, tiny);
                     }
+
+					PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
                     ActorHandle giantHandle = giant->CreateRefHandle();
                     ActorHandle tinyHandle = tiny->CreateRefHandle();
@@ -81,7 +84,7 @@ namespace Gts {
                     PrintDeathSource(giant, tiny, DamageSource::Overkill);
 
                     if (tiny->formID != 0x14) {
-                        Disintegrate(tiny, true); // Set critical stage 4 on actors
+                        Disintegrate(tiny); // Set critical stage 4 on actors
                     } else if (tiny->formID == 0x14) {
                         TriggerScreenBlood(50);
                         tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible

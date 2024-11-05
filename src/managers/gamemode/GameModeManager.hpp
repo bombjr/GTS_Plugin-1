@@ -13,6 +13,12 @@ using namespace std;
 using namespace RE;
 
 namespace Gts {
+	enum class BalanceModeInfo {
+		SizeGain_Penalty,
+		ShrinkRate_Base,
+		ShrinkRate_Combat,
+	};
+
 	enum class ChosenGameMode {
 		None = 0,
 		Grow = 1,
@@ -28,6 +34,7 @@ namespace Gts {
 			[[nodiscard]] static GameModeManager& GetSingleton() noexcept;
 			virtual std::string DebugName() override;
 
+			float GetBalanceModeInfo(BalanceModeInfo info);
 			void ApplyGameMode(Actor* actor, const ChosenGameMode& game_mode, const float& GrowthRate, const float& ShrinkRate);
 			void GameMode(Actor* actor);
 	};

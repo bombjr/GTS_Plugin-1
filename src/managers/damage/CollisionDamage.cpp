@@ -129,6 +129,11 @@ namespace {
 	void ModVulnerability(Actor* giant, Actor* tiny, float damage) {
 		if (Runtime::HasPerkTeam(giant, "GrowingPressure")) {
 			auto& sizemanager = SizeManager::GetSingleton();
+
+			if (Runtime::HasPerkTeam(giant, "RavagingInjuries") && giant->AsActorState()->IsSprinting() && !IsGtsBusy(giant)) {
+				damage *= 3.0; // x3 stronger during sprint
+			}
+
 			sizemanager.ModSizeVulnerability(tiny, damage * 0.0010);
 		}
 	}
@@ -230,7 +235,7 @@ namespace Gts {
 									if (!StopDamageLookup) {
 										VisitNodes(model, [&nodeCollisions, &Calamity, &DoDamage, SMT, point, maxFootDistance, &StopDamageLookup](NiAVObject& a_obj) {
 											float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
-											if (distance < maxFootDistance) {
+											if (distance <= maxFootDistance) {
 												StopDamageLookup = true;
 												nodeCollisions += 1;
 												return false;
@@ -341,7 +346,7 @@ namespace Gts {
 					}
 				}
 				if (apply_damage) {
-					SizeHitEffects::GetSingleton().BreakBones(giant, tiny, damage_result * bbmult, random);
+					SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, tiny, damage_result * bbmult, random);
 
 					ModVulnerability(giant, tiny, damage_result);
 					InflictSizeDamage(giant, tiny, damage_result);

@@ -22,6 +22,7 @@ namespace Gts {
 			float target_scale = actor_data->target_scale * natural_scale;
 
 			scale /= natural_scale;
+
 			if (scale < (actor_data->max_scale + EPS)) { // If new value is below max: allow it
 				actor_data->target_scale = scale;
 			} else if (target_scale < (actor_data->max_scale - EPS)) { // If we are below max currently and we are trying to scale over max: make it max

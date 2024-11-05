@@ -23,5 +23,6 @@ namespace Gts {
 		private:
 			float power = 0.0;
 			float efficiency = 0.0;
+			float time_mult = 1.0;
 	};
 }

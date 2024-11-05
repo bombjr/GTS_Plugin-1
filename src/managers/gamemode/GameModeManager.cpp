@@ -1,8 +1,8 @@
 #include "managers/animation/Utils/AnimationUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/gamemode/GameModeManager.hpp"
-#include "magic/effects/TinyCalamity.hpp"
 #include "managers/damage/CollisionDamage.hpp"
+#include "magic/effects/TinyCalamity.hpp"
 #include "managers/RipClothManager.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
@@ -35,7 +35,8 @@ namespace {
 			.s = 0.70,
 			.a = 0.0,
 		};
-		float power = soft_power(size, launch);
+		float balance = GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::ShrinkRate_Base) * 1.6;
+		float power = soft_power(size, launch) * balance;
 		return power;
 	}
 
@@ -46,7 +47,6 @@ namespace {
 		float s = 1.0;
 		// https://www.desmos.com/calculator/ygoxbe7hjg
 		float result = k*pow(s*(aspect-a), n);
-		//log::info("Result: {}, aspect {}", result, aspect);
 		return result;
 	}
 }
@@ -62,13 +62,30 @@ namespace Gts {
 		return "GameModeManager";
 	}
 
+	float GameModeManager::GetBalanceModeInfo(BalanceModeInfo info) {
+		auto& Persist = Persistent::GetSingleton();
+		switch (info) {
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0
+				return Persist.BalanceMode_SizeGain_Penalty;
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0
+				return Persist.BalanceMode_ShrinkRate_Base;
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
+				return Persist.BalanceMode_ShrinkRate_Combat;
+			break;
+		}
+			
+		return 1.0;
+	}
+
 	void GameModeManager::ApplyGameMode(Actor* actor, const ChosenGameMode& game_mode, const float& GrowthRate, const float& ShrinkRate)  {
 		auto profiler = Profilers::Profile("Manager: ApplyGameMode");
 		const float EPS = 1e-7;
 		if (game_mode != ChosenGameMode::None) {
 			auto player = PlayerCharacter::GetSingleton();
 			float natural_scale = get_natural_scale(actor, true);
+
 			float Scale = std::clamp(get_visual_scale(actor) * 0.25f, 1.0f, 10.0f);
+			
 			float targetScale = get_target_scale(actor);
 			float maxScale = get_max_scale(actor);
 			
@@ -188,7 +205,7 @@ namespace Gts {
 						float Aspect = Ench_Aspect_GetPower(actor);
 						float gigantism = Aspect_GetEfficiency(Aspect) * 0.5;
 						float default_scale = natural_scale * (1.0 + gigantism);
-
+						
 						if ((targetScale + modAmount) > default_scale) {
 							update_target_scale(actor, modAmount, SizeEffectType::kShrink);
 						} else if (targetScale > default_scale) {
@@ -217,7 +234,7 @@ namespace Gts {
 		float bonus = 1.0;
 		
 		if (BalanceMode >= 2.0) {
-			BonusShrink *= GetShrinkPenalty(scale) * 1.6;
+			BonusShrink *= GetShrinkPenalty(scale);
 		}
 
 		if (QuestStage < 100.0 || BalanceMode >= 2.0) {
@@ -245,7 +262,7 @@ namespace Gts {
 				} else if (SizeManager::GetSingleton().GetGrowthSpurt(actor) > 0.01) {
 					shrinkRate = 0.0;
 				} else if (actor->IsInCombat() && BalanceMode >= 2.0) {
-					shrinkRate *= 0.06; // shrink at 6% rate
+					shrinkRate *= GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::ShrinkRate_Combat); // shrink at 6% rate
 				}
 
 				if (fabs(shrinkRate) <= 1e-6) {
@@ -274,6 +291,9 @@ namespace Gts {
 		if (game_mode_int >=0 && game_mode_int <= 6) {
 			gameMode = static_cast<ChosenGameMode>(game_mode_int);
 		}
+
+		shrinkRate *= Perk_GetSprintShrinkReduction(actor); // up to 20% reduction
+
 		GameModeManager::GetSingleton().ApplyGameMode(actor, gameMode, growthRate/2, shrinkRate);
 	}
 }

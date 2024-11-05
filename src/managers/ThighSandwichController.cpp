@@ -25,6 +25,13 @@ namespace {
 	const float MINIMUM_SANDWICH_DISTANCE = 70.0;
 	const float SANDWICH_ANGLE = 60;
 	const float PI = 3.14159;
+
+	void CantThighSandwichPlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
+		if (sizedifference < Action_Sandwich) {
+			std::string message = std::format("Player is too big to be sandwiched: x{:.2f}/{:.2f}", sizedifference, Action_Sandwich);
+			NotifyWithSound(tiny, message);
+		}
+	}
 }
 
 
@@ -308,10 +315,14 @@ namespace Gts {
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
-		if (pred->formID == 0x14 && prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_SANDWICH_SCALE) {
-			std::string_view message = std::format("{} is too big to be smothered between thighs: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_SANDWICH_SCALE);
-			shake_camera(pred, 0.45, 0.30);
-			TiredSound(pred, message);
+		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_SANDWICH_SCALE) {
+			if (pred->formID == 0x14) {
+				std::string_view message = std::format("{} is too big to be smothered between thighs: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_SANDWICH_SCALE);
+				shake_camera(pred, 0.45, 0.30);
+				NotifyWithSound(pred, message);
+			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
+				CantThighSandwichPlayerMessage(pred, prey, sizedifference);
+			}
 			return false;
 		}
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference > MINIMUM_SANDWICH_SCALE) {
@@ -381,5 +392,9 @@ namespace Gts {
 		this->data.try_emplace(giant->formID, giant);
 
 		return this->data.at(giant->formID);
+	}
+
+	void ThighSandwichController::AllowMessage(bool allow) {
+		this->allow_message = allow;
 	}
 }

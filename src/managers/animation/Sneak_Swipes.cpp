@@ -93,23 +93,19 @@ namespace {
 	////////////////light
 
 	void GTS_Sneak_Swipe_On_R(AnimationEventData& data) {
-		//ManageCamera(&data.giant, true, 7.0);
 		TriggerHandCollision_Right(&data.giant, Damage_Sneak_HandSwipe, 1.8, Push_Sneak_HandSwipe);
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0);
 	}
 	void GTS_Sneak_Swipe_On_L(AnimationEventData& data) {
-		//ManageCamera(&data.giant, true, 4.0);
 		TriggerHandCollision_Left(&data.giant, Damage_Sneak_HandSwipe, 1.8, Push_Sneak_HandSwipe);
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0);
 	}
 	void GTS_Sneak_Swipe_Off_R(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0);
-		//DisableCameraTracking(&data.giant);
 		DisableHandCollisions(&data.giant);
 	}
 	void GTS_Sneak_Swipe_Off_L(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0);
-		//DisableCameraTracking(&data.giant);
 		DisableHandCollisions(&data.giant);
 	}
 
@@ -118,21 +114,17 @@ namespace {
 	void GTS_Sneak_Swipe_Power_On_R(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0);
 		TriggerHandCollision_Right(&data.giant, Damage_Sneak_HandSwipe_Strong, 1.4, Push_Sneak_HandSwipe_Strong);
-		//ManageCamera(&data.giant, true, 4.0);
 	}
 	void GTS_Sneak_Swipe_Power_On_L(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0);
 		TriggerHandCollision_Left(&data.giant, Damage_Sneak_HandSwipe_Strong, 1.4, Push_Sneak_HandSwipe_Strong);
-		//ManageCamera(&data.giant, true, 7.0);
 	}
 	void GTS_Sneak_Swipe_Power_Off_R(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0);
-		//DisableCameraTracking(&data.giant);
 		DisableHandCollisions(&data.giant);
 	}
 	void GTS_Sneak_Swipe_Power_Off_L(AnimationEventData& data) {
 		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0);
-		//DisableCameraTracking(&data.giant);
 		DisableHandCollisions(&data.giant);
 	}
 }

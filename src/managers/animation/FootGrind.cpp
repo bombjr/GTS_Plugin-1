@@ -60,7 +60,6 @@ namespace {
 			} 
 			auto giantref = gianthandle.get().get();
 			if (!IsFootGrinding(giantref)) {
-				log::info("Isn't foot grinding anymore");
 				return false; 
 			}
 			Laugh_Chance(giantref, 2.2, "FootGrind");
@@ -104,8 +103,9 @@ namespace {
 		if (HasSMT(giant)) {
 			shake_power *= 1.5;
 		}
-
+		
 		Rumbling::Once(rumble, giant, shake_power, 0.05, Node, 0.0);
+		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
 	void CancelGrindTasks(Actor* giant) {

@@ -63,6 +63,7 @@ namespace Gts {
 	bool IsInCleavageState(Actor* actor);
 	bool IsCleavageZIgnored(Actor* actor);
 	bool IsInsideCleavage(Actor* actor);
+	bool IsKicking(Actor* actor);
 	bool IsTrampling(Actor* actor);
 
 	bool CanDoCombo(Actor* actor);
@@ -139,6 +140,8 @@ namespace Gts {
 	float Ench_Aspect_GetPower(Actor* giant);
 	float Ench_Hunger_GetPower(Actor* giant);
 
+	float Perk_GetSprintShrinkReduction(Actor* actor);
+
 	float GetDamageResistance(Actor* actor);
 	float GetDamageMultiplier(Actor* actor);
 	float Damage_CalculateSizeDamage(Actor* giant, Actor* tiny);
@@ -174,7 +177,7 @@ namespace Gts {
 	// GTS State Controllers end
 	void PlayAnimation(Actor* actor, std::string_view animName);
 
-	void Disintegrate(Actor* actor, bool script);
+	void Disintegrate(Actor* actor);
 	void UnDisintegrate(Actor* actor);
 
 	void SetRestrained(Actor* actor);
@@ -225,7 +228,7 @@ namespace Gts {
 
 	float GetRandomBoost();
 	
-	float GetButtCrushCost(Actor* actor);
+	float GetButtCrushCost(Actor* actor, bool DoomOnly);
 	float Perk_GetCostReduction(Actor* giant);
 	float GetAnimationSlowdown(Actor* giant);
 
@@ -256,10 +259,11 @@ namespace Gts {
 	void LaunchImmunityTask(Actor* giant, bool Balance);
 
 	bool HasSMT(Actor* giant);
-	void TiredSound(Actor* player, std::string_view message);
+	void NotifyWithSound(Actor* actor, std::string_view message);
 
 	hkaRagdollInstance* GetRagdoll(Actor* actor);
 
+	void DisarmActor(Actor* tiny, bool drop);
 	void ManageRagdoll(Actor* tinyref, float deltaLength, NiPoint3 deltaLocation, NiPoint3 targetLocation);
 	void ChanceToScare(Actor* giant, Actor* tiny, float duration, int random, bool apply_sd);
 	void StaggerActor(Actor* receiver, float power);
@@ -293,7 +297,7 @@ namespace Gts {
 	float GetQuestProgression(int stage);
 	void ResetQuest();
 
-	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale);
+	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs);
 	void SpawnCustomParticle(Actor* actor, ParticleType Type, NiPoint3 spawn_at_point, std::string_view spawn_at_node, float scale_mult);
 
 	void InflictSizeDamage(Actor* attacker, Actor* receiver, float value);

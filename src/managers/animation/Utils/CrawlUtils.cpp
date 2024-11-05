@@ -160,8 +160,8 @@ namespace Gts {
 
 						if (model) {
 							VisitNodes(model, [&nodeCollisions, &force, NodePosition, maxDistance](NiAVObject& a_obj) {
-								float distance = (NodePosition - a_obj.world.translate).Length();
-								if (distance < maxDistance) {
+								float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
+								if (distance <= maxDistance) {
 									nodeCollisions += 1;
 									force = 1.0 - distance / maxDistance;
 									return false;
@@ -170,10 +170,9 @@ namespace Gts {
 							});
 						}
 						if (nodeCollisions > 0) {
-							//damage /= nodeCollisions;
 							Utils_PushCheck(giant, otherActor, Get_Bone_Movement_Speed(giant, Cause)); 
 
-							if (IsButtCrushing(giant) && GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, true) > 1.2) {
+							if (IsButtCrushing(giant) && !IsBeingEaten(otherActor) && GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, true) > 1.2) {
 								PushActorAway(giant, otherActor, 1.0);
 							}
 							

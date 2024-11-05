@@ -4,6 +4,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "magic/effects/common.hpp"
+#include "managers/PerkHandler.hpp"
 #include "utils/SurvivalMode.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -43,6 +44,13 @@ namespace {
 			for (auto prey: preys) {
 				VoreManager.StartVore(pred, prey);
 			}
+		}
+	}
+
+	void CantVorePlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
+		if (sizedifference < Action_Vore) {
+			std::string message = std::format("Player is too big to be eaten: x{:.2f}/{:.2f}", sizedifference, Action_Vore);
+			NotifyWithSound(tiny, message);
 		}
 	}
 
@@ -295,18 +303,18 @@ namespace Gts {
 				SetBeingHeld(tiny, false);
 				AddSMTDuration(giantref.get().get(), 6.0);
 				if (tiny->formID != 0x14) {
-					KillActor(giantref.get().get(), tiny, false);
-					Disintegrate(tiny, true);
+					KillActor(giantref.get().get(), tiny);
+					PerkHandler::UpdatePerkValues(giantref.get().get(), PerkUpdate::Perk_LifeForceAbsorption);
 				} else if (tiny->formID == 0x14) {
 					InflictSizeDamage(giantref.get().get(), tiny, 900000);
-					KillActor(giantref.get().get(), tiny, false);
+					KillActor(giantref.get().get(), tiny);
 					TriggerScreenBlood(50);
 					tiny->SetAlpha(0.0); // Player can't be disintegrated: simply nothing happens. So we Just make player Invisible instead.
 				}
 
 				Vore_AdvanceQuest(giantref.get().get(), tiny, IsDragon(tiny), IsGiant(tiny)); // Progress quest
 
-				std::string taskname = std::format("VoreAbsorb {}", tiny->formID);
+				std::string taskname = std::format("VoreAbsorb_{}", tiny->formID);
 
 				TaskManager::RunOnce(taskname, [=](auto& update) {
 					if (!tinyref) {
@@ -317,6 +325,10 @@ namespace Gts {
 					}
 					auto giant = giantref.get().get();
 					auto smoll = tinyref.get().get();
+
+					if (smoll->formID != 0x14) {
+						Disintegrate(smoll);
+					}
 					TransferInventory(smoll, giant, 1.0, false, true, DamageSource::Vored, true);
 				});
 			}
@@ -662,7 +674,7 @@ namespace Gts {
 
 		if (IsInsect(prey, true) || IsBlacklisted(prey) || IsUndead(prey, true)) {
 			std::string_view message = std::format("{} has no desire to eat {}", pred->GetDisplayFullName(), prey->GetDisplayFullName());
-			TiredSound(pred, message);
+			NotifyWithSound(pred, message);
 			return false;
 		}
 
@@ -670,7 +682,9 @@ namespace Gts {
 			if (pred->formID == 0x14) {
 				std::string_view message = std::format("{} is too big to be eaten: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_VORE_SCALE);
 				shake_camera(pred, 0.45, 0.30);
-				TiredSound(pred, message);
+				NotifyWithSound(pred, message);
+			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
+				CantVorePlayerMessage(pred, prey, sizedifference);
 			}
 			return false;
 		}
@@ -764,18 +778,39 @@ namespace Gts {
 
 	void Vore::ShrinkOverTime(Actor* giant, Actor* tiny, float over_time) {
 		if (tiny) {
-			
-			float Adjustment_Gts = GetSizeFromBoundingBox(giant);
 			float Adjustment_Tiny = GetSizeFromBoundingBox(tiny);
+			float preyscale = get_visual_scale(tiny) * Adjustment_Tiny;
+			float targetScale = std::clamp(preyscale/12.0f * Adjustment_Tiny, 0.01f, 999999.0f);
 
-			float predscale = get_visual_scale(giant) * Adjustment_Gts;
-			float preyscale = get_target_scale(tiny) * Adjustment_Tiny;
-			float targetScale = predscale/(40.0 * Adjustment_Tiny);
+			float shrink_magnitude = -targetScale;
+
+			ActorHandle tinyHandle = tiny->CreateRefHandle();
+
+			std::string name = std::format("ShrinkTo_{}", tiny->formID);
 
 			if (preyscale > targetScale) {
 				Vore::GetSingleton().RecordOriginalScale(tiny); // We're shrinking the tiny which affects effectiveness of vore bonuses, this fixes it
-				Task_AdjustHalfLifeTask(tiny, over_time, 1.0);
-				set_target_scale(tiny, targetScale);
+				TaskManager::Run(name, [=](auto& progressData) {
+					Actor* actor = tinyHandle.get().get();
+					if (!actor) {
+						return false;
+					}
+
+					float scale = get_visual_scale(actor);
+
+					if (scale > targetScale) {
+						override_actor_scale(actor, shrink_magnitude * 0.225 * TimeScale(), SizeEffectType::kNeutral);
+						if (get_target_scale(actor) < targetScale) {
+							set_target_scale(actor, targetScale);
+							return false;
+						}
+						return true;
+					} else {
+						return false;
+					}
+
+					return false;
+				});
 			}
 		}
 	}
@@ -808,5 +843,9 @@ namespace Gts {
 		this->data.try_emplace(giant->formID, giant);
 
 		return this->data.at(giant->formID);
+	}
+
+	void Vore::AllowMessage(bool allow) {
+		this->allow_message = allow;
 	}
 }

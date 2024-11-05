@@ -3,15 +3,16 @@
 #include "managers/animation/StrongStomp.hpp"
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/damage/LaunchActor.hpp"
+#include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
-#include "managers/audio/footstep.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "managers/tremor.hpp"
 #include "ActionSettings.hpp"
+#include "data/transient.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "node.hpp"
@@ -81,17 +82,6 @@ namespace {
 		Rumbling::Once(name, giant, shake_power * smt, 0.0, node, 1.25);
 	}
 
-	void DoSounds(Actor* giant, float animspeed, std::string_view feet) {
-		float bonus = 1.0;
-		if (HasSMT(giant)) {
-			bonus = 8.0;
-		}
-		float scale = get_visual_scale(giant);
-		Runtime::PlaySoundAtNode("HeavyStompSound", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-		Runtime::PlaySoundAtNode("xlFootstep", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-		Runtime::PlaySoundAtNode("xlRumble", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-	}
-
 	void StrongStomp_DoEverything(Actor* giant, float animSpeed, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
 		float SMT = 1.0;
@@ -126,9 +116,9 @@ namespace {
 
 				LaunchTask(giant, 1.05 * perk, 3.6 + animSpeed/2, Event);
 
-				DoSounds(giant, 1.15 + animSpeed/20, Node);
+				FootStepManager::DoStrongSounds(giant, 1.15 + animSpeed/20, Node);
+				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 
-				
 				return false;
 			}
 			return true;
@@ -244,7 +234,7 @@ namespace {
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StrongStompRight", player);
 		} else {
-			TiredSound(player, "You're too tired to perform heavy stomp");
+			NotifyWithSound(player, "You're too tired to perform heavy stomp");
 		}
 	}
 
@@ -258,7 +248,7 @@ namespace {
 			//BlockFirstPerson(player, true);
 			AnimationManager::StartAnim("StrongStompLeft", player);
 		} else {
-			TiredSound(player, "You're too tired to perform heavy stomp");
+			NotifyWithSound(player, "You're too tired to perform heavy stomp");
 		}
 	}
 }

@@ -177,7 +177,7 @@ namespace Gts {
         if (Runtime::HasPerkTeam(pred, "ButtCrush_NoEscape") && rng > 2) {
             auto& ButtCrush = ButtCrushController::GetSingleton();
 
-            ButtCrush.StartButtCrush(pred, prey); // attaches actors to AnimObjectB
+            ButtCrush.StartButtCrush(pred, prey); // attaches actors to AnimObjectB, CanButtCrush check is done inside the function
             Task_ButtCrushLogicTask(pred);
         } else {
             AnimationManager::StartAnim("ButtCrush_StartFast", pred);

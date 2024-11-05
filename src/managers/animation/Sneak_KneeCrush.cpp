@@ -39,7 +39,7 @@ namespace {
     void TrackKnee(Actor* giant, bool enable) {
 		if (AllowCameraTracking()) {
 			auto& sizemanager = SizeManager::GetSingleton();
-			sizemanager.SetTrackedBone(giant, enable, CameraTracking::Knees);
+			sizemanager.SetTrackedBone(giant, enable, CameraTracking::ObjectB);
 		}
 	}
 
@@ -76,6 +76,8 @@ namespace {
             DoDustExplosion(giant, dust * power, FootEvent::Left, LNode);
             DoLaunch(giant, 0.65 * perk * power, 1.35 * power, FootEvent::Left);
         }
+
+		FootStepManager::PlayVanillaFootstepSounds(giant, right);
     }
 
 

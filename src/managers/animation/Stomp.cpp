@@ -199,6 +199,8 @@ namespace {
 
 				DelayedLaunch(giant, 0.80 * perk, 2.0* animSpeed, Event);
 
+				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+
 				return false;
 			}
 			return true;
@@ -238,6 +240,8 @@ namespace {
 				DoFootstepSound(giant, 1.0 + animSpeed/14, Event, RNode);
 
 				LaunchTask(giant, 0.90 * perk, 3.2 + animSpeed/2, Event);
+
+				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 				return false;
 			}
 			return true;
@@ -317,7 +321,7 @@ namespace {
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StompRight", player);
 		} else {
-			TiredSound(player, "You're too tired to perform stomp");
+			NotifyWithSound(player, "You're too tired to perform stomp");
 		}
 	}
 
@@ -333,7 +337,7 @@ namespace {
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StompLeft", player);
 		} else {
-			TiredSound(player, "You're too tired to perform stomp");
+			NotifyWithSound(player, "You're too tired to perform stomp");
 		}
 	}
 }

@@ -33,6 +33,68 @@ namespace {
 		bool busy = IsGtsBusy(actor);
 		return jumping || ragdolled || busy;
 	}
+
+	void CantHugPlayerMessage(Actor* giant, Actor* tiny, float sizedifference, bool allow) {
+		if (allow) {
+			if (sizedifference < Action_Hug) {
+				std::string message = std::format("Player is too big for hugs: x{:.2f}/{:.2f}", sizedifference, Action_Hug);
+				NotifyWithSound(tiny, message);
+			} else if (sizedifference > GetHugShrinkThreshold(giant)) {
+				std::string message = std::format("Player is too small for hugs: x{:.2f}/{:.2f}", sizedifference, GetHugShrinkThreshold(giant));
+				NotifyWithSound(tiny, message);
+			}
+		}
+	}
+
+	bool ShouldAllowWhenTooLarge(Actor* giant, Actor* tiny, float sizedifference, bool allow) {
+		if (giant->formID != 0x14 && IsTeammate(giant) && sizedifference > GetHugShrinkThreshold(giant)) {
+			// Disallow FOLLOWERS to hug someone when size difference is too massive
+			if (tiny->formID == 0x14) {
+				CantHugPlayerMessage(giant, tiny, sizedifference, allow);
+			}
+			return false;
+		}
+		return true;
+	}
+
+	void RecordSneakState(Actor* giant, Actor* tiny) {
+		bool Crawling = IsCrawling(giant);
+		bool Sneaking = giant->IsSneaking();
+
+		tiny->SetGraphVariableBool("GTS_Hug_Sneak_Tny", Sneaking); // Is Sneaking?
+		tiny->SetGraphVariableBool("GTS_Hug_Crawl_Tny", Crawling); // Is Crawling?
+	}
+
+	void Task_PerformHugs(Actor* giant, Actor* tiny) {
+		std::string taskname = std::format("PerformHugs_{}_{}", giant->formID, tiny->formID);
+		ActorHandle giantHandle = giant->CreateRefHandle();
+		ActorHandle tinyHandle = tiny->CreateRefHandle();
+		TaskManager::RunOnce(taskname, [=](auto& update){
+			if (!tinyHandle) {
+				return;
+			}
+			if (!giantHandle) {
+				return;
+			}
+
+			auto pred = giantHandle.get().get();
+			auto prey = tinyHandle.get().get();
+			
+			HugShrink::GetSingleton().HugActor(pred, prey);
+			AnimationManager::StartAnim("Huggies_Try", pred);
+
+			if (pred->IsSneaking()) {
+				if (!IsCrawling(pred)) {
+					SetSneaking(pred, true, 0); // If just sneaking, disable sneaking so footstep sounds will work properly
+				}
+				AnimationManager::StartAnim("Huggies_Try_Victim_S", prey); // GTSBEH_HugAbsorbStart_Sneak_V
+			} else {
+				AnimationManager::StartAnim("Huggies_Try_Victim", prey); //   GTSBEH_HugAbsorbStart_V
+			}
+
+			ApplyActionCooldown(pred, CooldownSource::Action_Hugs);
+		});
+	}
 }
 
 namespace Gts {
@@ -50,7 +112,10 @@ namespace Gts {
 		if (giant->formID == 0x14) {
 			std::string message = std::format("Hugs are on a cooldown: {:.1f} sec", cooldown);
 			shake_camera(giant, 0.75, 0.35);
-			TiredSound(giant, message);
+			NotifyWithSound(giant, message);
+		} else if (IsTeammate(giant) && !IsGtsBusy(giant)) {
+			std::string message = std::format("Follower's Hugs are on a cooldown: {:.1f} sec", cooldown);
+			NotifyWithSound(giant, message);
 		}
 	}
 	
@@ -147,7 +212,7 @@ namespace Gts {
 		if (prey->formID == 0x14 && !Persistent::GetSingleton().vore_allowplayervore) {
 			return false;
 		}
-		if (IsCrawling(pred) || IsTransitioning(pred) || IsBeingHeld(pred, prey)) {
+		if (IsTransitioning(pred) || IsBeingHeld(pred, prey)) {
 			return false;
 		}
 		if (DisallowHugs(pred) || DisallowHugs(prey)) {
@@ -168,7 +233,11 @@ namespace Gts {
 		float MINIMUM_HUG_SCALE = Action_Hug;
 
 		if (pred->IsSneaking()) {
-			MINIMUM_DISTANCE *= 1.5;
+			if (IsCrawling(pred)) {
+				MINIMUM_DISTANCE *= 2.25;
+			} else {
+				MINIMUM_DISTANCE *= 1.6;
+			}
 		}
 
 		if (HasSMT(pred)) {
@@ -178,7 +247,7 @@ namespace Gts {
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
-		
+
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale)) {
 			if (sizedifference > MINIMUM_HUG_SCALE) {
 				if ((prey->formID != 0x14 && !CanPerformAnimationOn(pred, prey, true))) {
@@ -187,17 +256,19 @@ namespace Gts {
 				if (!IsHuman(prey)) { // Allow hugs with humanoids only
 					if (pred->formID == 0x14) {
 						std::string_view message = std::format("You have no desire to hug {}", prey->GetDisplayFullName());
-						TiredSound(pred, message); // Just no. We don't have Creature Anims.
+						NotifyWithSound(pred, message); // Just no. We don't have Creature Anims.
 						shake_camera(pred, 0.45, 0.30);
 					}
 					return false;
 				}
-				return true;
+				return ShouldAllowWhenTooLarge(pred, prey, sizedifference, this->allow_message);
 			} else {
 				if (pred->formID == 0x14) {
 					std::string_view message = std::format("{} is too big to be hugged: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_HUG_SCALE);
 					shake_camera(pred, 0.45, 0.30);
-					TiredSound(pred, message);
+					NotifyWithSound(pred, message);
+				} else if (prey->formID == 0x14 && IsTeammate(pred)) {
+					CantHugPlayerMessage(pred, prey, sizedifference, this->allow_message);
 				}
 				return false;
 			}
@@ -211,31 +282,25 @@ namespace Gts {
 		if (!hugging.CanHug(pred, prey)) {
 			return;
 		}
-		static Timer HugTimer = Timer(12.0);
 
 		if (IsActionOnCooldown(pred, CooldownSource::Action_Hugs)) {
 			HugAnimationController::Hugs_OnCooldownMessage(pred);
 			return;
 		}
 
-		UpdateFriendlyHugs(pred, prey, false);
-
-		HugShrink::GetSingleton().HugActor(pred, prey);
-		
-		
-		AnimationManager::StartAnim("Huggies_Try", pred);
-
-		RecordSneaking(pred); // store previous sneak value
-
-		if (pred->IsSneaking() && !IsCrawling(pred)) {
-
-			SetSneaking(pred, true, 0); // disable sneaking so HH footstep sounds will work properly
-
-			AnimationManager::StartAnim("Huggies_Try_Victim_S", prey); // GTSBEH_HugAbsorbStart_Sneak_V
-		} else {
-			AnimationManager::StartAnim("Huggies_Try_Victim", prey); //   GTSBEH_HugAbsorbStart_V
+		if (IsCrawling(pred)) {
+			DamageAV(pred, ActorValue::kMagicka, 225 * Perk_GetCostReduction(pred));
 		}
 
-		ApplyActionCooldown(pred, CooldownSource::Action_Hugs);
+		UpdateFriendlyHugs(pred, prey, false);
+		RecordSneakState(pred, prey); // Helps to determine which hugs to play: normal or crawl ones
+		RecordSneaking(pred); // store previous sneak value, used to fix missing footstep sounds in sneak later
+		DisarmActor(prey, false);
+
+		Task_PerformHugs(pred, prey); // Start hugs
+	}
+
+	void HugAnimationController::AllowMessage(bool allow) {
+		this->allow_message = allow;
 	}
 }

@@ -1,12 +1,14 @@
+#include "managers/animation/Controllers/HugController.hpp"
 #include "managers/animation/Utils/CooldownManager.hpp"
 #include "managers/animation/Utils/AnimationUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
-#include "managers/animation/Controllers/HugController.hpp"
 #include "managers/emotions/EmotionManager.hpp"
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/damage/SizeHitEffects.hpp"
-#include "managers/damage/LaunchActor.hpp"
 #include "managers/animation/HugShrink.hpp"
+#include "managers/damage/TinyCalamity.hpp"
+#include "managers/damage/LaunchActor.hpp"
+#include "colliders/charcontroller.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/CrushManager.hpp"
@@ -25,7 +27,7 @@
 #include "events.hpp"
 #include "timer.hpp"
 #include "node.hpp"
-#include "colliders/charcontroller.hpp"
+
 
 #include <random>
 
@@ -36,11 +38,45 @@ using namespace std;
 
 
 namespace {
+	void Task_FixTinyPosition(Actor* giant, Actor* tiny) {
+		std::string name = std::format("Reattach_{}_{}", giant->formID, tiny->formID);
+		ActorHandle gianthandle = giant->CreateRefHandle();
+		ActorHandle tinyhandle = tiny->CreateRefHandle();
+
+		float Start = Time::WorldTimeElapsed();
+		NiPoint3 LastPos = tiny->GetPosition();
+
+		TaskManager::Run(name, [=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+			if (!tinyhandle) {
+				return false;
+			}
+			float Finish = Time::WorldTimeElapsed();
+			auto giantref = gianthandle.get().get();
+			auto tinyref = tinyhandle.get().get();
+
+			//NiPoint3 newPos = LastPos;
+			
+			//newPos.z += (Finish - Start) * (25 * get_visual_scale(giantref));
+
+			//AttachTo(giantref, tinyref, newPos);
+
+			if (Finish - Start > 0.25) {
+				Attachment_SetTargetNode(giantref, AttachToNode::None);
+				return false;
+			}
+
+			return true;
+		});
+	}
+
 	bool CanHugCrush(Actor* giant, Actor* huggedActor) {
 		bool ForceCrush = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles");
 		float staminapercent = GetStaminaPercentage(giant);
 		float stamina = GetAV(giant, ActorValue::kStamina);
-		if (ForceCrush && staminapercent >= 0.50) {
+		if (ForceCrush && staminapercent >= 0.75) {
 			AnimationManager::StartAnim("Huggies_HugCrush", giant);
 			AnimationManager::StartAnim("Huggies_HugCrush_Victim", huggedActor);
 			DamageAV(giant, ActorValue::kStamina, stamina * 1.10);
@@ -204,6 +240,98 @@ namespace {
 		SetSneaking(&data.giant, false, 0); // Go back into sneaking if Actor was sneaking
 	}
 
+	void GTS_Hug_SwitchToObjectA(AnimationEventData& data) {
+		Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectA);
+	}
+
+	void GTS_Hug_SwitchToDefault(AnimationEventData& data) {
+		/*Actor* giant = &data.giant;
+		Actor* tiny = HugShrink::GetHuggiesActor(giant);
+
+		if (IsHugCrushing(giant)) {
+			Attachment_SetTargetNode(giant, AttachToNode::None);
+		} else {
+			if (tiny) {
+				Task_FixTinyPosition(giant, tiny);
+			}
+		}*/
+	}
+
+	void GTS_CH_Tiny_FXStart(AnimationEventData& data) { // Spawn Runes on Tiny
+		float scale = get_visual_scale(&data.giant) * 0.33;
+		for (std::string_view nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]", "NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
+			auto node = find_node(&data.giant, nodes);
+			if (node) {
+				NiPoint3 position = node->world.translate;
+				SpawnParticle(&data.giant, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), position, scale, 7, node); 
+			}
+		}
+
+		std::string name = std::format("HugTrap_{}", data.giant.formID);
+		ActorHandle gianthandle = data.giant.CreateRefHandle();
+		float Start = Time::WorldTimeElapsed();
+		TaskManager::Run(name, [=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+			Actor* giantref = gianthandle.get().get();
+			float Finish = Time::WorldTimeElapsed();
+			bool CanCast = (Finish - Start) > (3.2 / AnimationManager::GetAnimSpeed(giantref));
+			if (CanCast && !IsActionOnCooldown(giantref, CooldownSource::Misc_ShrinkParticle_Animation)) {
+				for (std::string_view nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]", "NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
+					auto node = find_node(giantref, nodes);
+					if (node) {
+						NiPoint3 position = node->world.translate;
+						SpawnParticle(giantref, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), position, get_visual_scale(giantref) * 0.16, 7, node); 
+					}
+				}
+				ApplyActionCooldown(giantref, CooldownSource::Misc_ShrinkParticle_Animation);
+			}
+
+			if (!IsGtsBusy(giantref)) {
+				return false;
+			}
+			return true;
+		});
+	}
+
+	void GTS_CH_RuneStart(AnimationEventData& data) { // GTS rune
+		auto huggedActor = HugShrink::GetHuggiesActor(&data.giant);
+		if (huggedActor) {
+			auto ObjectB = find_node(huggedActor, "AnimObjectB");
+			if (ObjectB) {
+				NiPoint3 position = ObjectB->world.translate;
+				SpawnParticle(huggedActor, 3.00, "GTS/gts_chugrune.nif", NiMatrix3(), position, get_visual_scale(huggedActor), 7, ObjectB); 
+			}
+		}
+	}
+
+	void GTS_CH_RuneEnd(AnimationEventData& data) { // Empty
+	}
+
+	void GTS_CH_BoobCameraOn(AnimationEventData& data) {
+		ManageCamera(&data.giant, true, CameraTracking::Breasts_02);
+		if (data.giant.formID == 0x14) {
+			std::string name = std::format("ChangeCamera_{}", data.giant.formID);
+			ActorHandle gianthandle = data.giant.CreateRefHandle();
+			TaskManager::Run(name, [=](auto& progressData) {
+				if (!gianthandle) {
+					return false;
+				}
+				Actor* giantref = gianthandle.get().get();
+				if (!IsHugging(giantref) && !IsHugCrushing(giantref) && !IsGtsBusy(giantref)) {
+					ManageCamera(giantref, false, CameraTracking::None);
+					return false;
+				}
+				return true;
+			});
+		}
+	}
+	void GTS_CH_BoobCameraOff(AnimationEventData& data) {
+		//ManageCamera(&data.giant, false, CameraTracking::None);
+	}
+
+	
 
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,10 +347,7 @@ namespace {
 		if (IsGtsBusy(player)) {
 			return;
 		}
-		if (IsCrawling(player)) {
-			return;
-		}
-		if (CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player)) {
+		if ((CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player))) {
 			auto& Hugging = HugAnimationController::GetSingleton();
 
 			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1.0);
@@ -240,6 +365,7 @@ namespace {
 	void HugCrushEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
+
 		if (huggedActor) {
 			if (!IsActionOnCooldown(player, CooldownSource::Action_AbsorbOther)) {
 				float health = GetHealthPercentage(huggedActor);
@@ -260,14 +386,14 @@ namespace {
 					}
 					std::string message = std::format("{} is too healthy to be hug crushed", huggedActor->GetDisplayFullName());
 					shake_camera(player, 0.45, 0.30);
-					TiredSound(player, message);
+					NotifyWithSound(player, message);
 
 					Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0, HpThreshold * 100.0);
 				}
 			} else {
 				float cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
                 std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
-				TiredSound(player, message);
+				NotifyWithSound(player, message);
 			}
 		}
 	}
@@ -278,9 +404,10 @@ namespace {
 		if (!huggedActor) {
 			return;
 		}
-		if (get_target_scale(player)/get_target_scale(huggedActor) > GetHugShrinkThreshold(player)) {
+		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
-				AbortHugAnimation(player, huggedActor);
+				NotifyWithSound(player, "All available size was drained");
+				shake_camera(player, 0.45, 0.30);
 			}
 			return;
 		}
@@ -296,9 +423,10 @@ namespace {
 			return;
 		}
 
-		if (get_target_scale(player)/get_target_scale(huggedActor) > GetHugShrinkThreshold(player)) {
+		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
-				AbortHugAnimation(player, huggedActor);
+				NotifyWithSound(player, "All available size was drained");
+				shake_camera(player, 0.45, 0.30);
 			}
 			return;
 		}
@@ -377,23 +505,20 @@ namespace Gts {
 			}
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
-			float sizedifference = get_target_scale(giantref)/get_target_scale(tinyref);
-			float threshold = GetHugShrinkThreshold(giantref);
+			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, false, true);
 			float steal = GetHugStealRate(giantref) * 0.85;
 			
 			float stamina = 0.35;
-			float shrink = 13.6;
+			float shrink = 14.0;
 			if (Runtime::HasPerkTeam(giantref, "HugCrush_Greed")) {
 				shrink *= 1.25;
 				stamina *= 0.75;
 			}
 			stamina *= Perk_GetCostReduction(giantref);
 
-			if (sizedifference >= threshold) {
-				SetBeingHeld(tinyref, false);
-				std::string_view message = std::format("{} can't shrink {} any further", giantref->GetDisplayFullName(), tinyref->GetDisplayFullName());
+			if (sizedifference >= GetHugShrinkThreshold(giantref)) {
+				std::string_view message = std::format("{} stole all available size", giantref->GetDisplayFullName());
 				Notify(message);
-				AbortHugAnimation(giantref, tinyref);
 				return false;
 			}
 			DamageAV(tinyref, ActorValue::kStamina, (0.60 * TimeScale())); // Drain Stamina
@@ -443,7 +568,6 @@ namespace Gts {
 				DrainReduction *= 1.5; // less stamina drain for friendlies
 			}
 
-			float threshold = GetHugShrinkThreshold(giantref);
 			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, false, true);
 
 			ShutUp(tinyref);
@@ -468,6 +592,9 @@ namespace Gts {
 			giantref->GetGraphVariableBool("GTS_TinyAbsorbed", TinyAbsorbed);
 
 			float stamina = GetAV(giantref, ActorValue::kStamina);
+
+			/*log::info("----{} Is Hugging {}", giantref->GetDisplayFullName(), tinyref->GetDisplayFullName());
+			log::info("Anim Speed: GTS: {}, Tiny: {}", AnimationManager::GetAnimSpeed(giantref), AnimationManager::GetAnimSpeed(tinyref));*/
 
 			Utils_UpdateHugBehaviors(giantref, tinyref); // Record GTS/Tiny Size-Difference value for animation blending
 			Anims_FixAnimationDesync(giantref, tinyref, false); // Share GTS Animation Speed with hugged actor to avoid de-sync
@@ -504,9 +631,19 @@ namespace Gts {
 			}
 			// Ensure they are NOT in ragdoll
 			ForceRagdoll(tinyref, false);
-			if (!HugAttach(gianthandle, tinyhandle)) {
-				AbortHugAnimation(giantref, tinyref);
-				return false;
+			if (IsCrawling(giantref)) { // Always attach to ObjectA during Crawling (Crawl anims are configured for ObjectA)
+				float Difference = std::clamp(GetSizeDifference(giantref, tinyref, SizeType::VisualScale, true, false), 1.0f, 10.0f);
+				float ManaDrain = (1.6 * Perk_GetCostReduction(giantref) / Difference);
+				DamageAV(giantref, ActorValue::kMagicka, ManaDrain);
+
+				if (!AttachToObjectA(giantref, tinyref)) {
+					return false;
+				}
+			} else {
+				if (!HugAttach(gianthandle, tinyhandle)) { // Else use default hug attach logic
+					AbortHugAnimation(giantref, tinyref);
+					return false;
+				}
 			}
 
 			// All good try another frame
@@ -595,6 +732,17 @@ namespace Gts {
 		AnimationManager::RegisterEvent("GTSBeh_HugCrushEnd", "Hugs", GTSBeh_HugCrushEnd);
 
 		AnimationManager::RegisterEvent("GTSBEH_HugAbsorbAtk", "Hugs", GTSBEH_HugAbsorbAtk);
+
+		AnimationManager::RegisterEvent("GTS_Hug_SwitchToObjectA", "Hugs", GTS_Hug_SwitchToObjectA);
+		AnimationManager::RegisterEvent("GTS_Hug_SwitchToDefault", "Hugs", GTS_Hug_SwitchToDefault);
+
+
+		AnimationManager::RegisterEvent("GTS_CH_Tiny_FXStart", "Hugs", GTS_CH_Tiny_FXStart);
+		AnimationManager::RegisterEvent("GTS_CH_RuneStart", "Hugs", GTS_CH_RuneStart);
+		AnimationManager::RegisterEvent("GTS_CH_RuneEnd", "Hugs", GTS_CH_RuneEnd);
+
+		AnimationManager::RegisterEvent("GTS_CH_BoobCameraOn", "Hugs", GTS_CH_BoobCameraOn);
+		AnimationManager::RegisterEvent("GTS_CH_BoobCameraOff", "Hugs", GTS_CH_BoobCameraOff);
 	}
 
 	void HugShrink::RegisterTriggers() {

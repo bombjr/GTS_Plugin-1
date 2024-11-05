@@ -175,6 +175,12 @@ Function SetAlternativeSneakTransition(bool enable) global native
 
 ; Toggle On/Off Heart Effects during some animations (healing hugs, some breast anims)
 Function PreventHeartEffects(bool enable) global native
+
+; Adjusts balance mode parameters
+; 0 = BalanceModeInfo::SizeGain_Penalty
+; 1 = BalanceModeInfo::ShrinkRate_Base
+; 2 = BalanceModeInfo::ShrinkRate_Combat
+Function AdjustBalanceMode(int parameter, float modifier) global native 
     
 ;======================================================================================
 ;======================================================================================

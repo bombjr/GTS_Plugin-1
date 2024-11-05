@@ -12,18 +12,20 @@ namespace Hooks {
 		static FunctionHook<float(TESObjectREFR* a_this)> GetScaledBoundSize(
 			RELOCATION_ID(36448, 37444),
 			[](auto* a_this) {
-			float result = GetScaledBoundSize(a_this);
-			if (a_this) {
-				Actor* actor = skyrim_cast<Actor*>(a_this);
-				if (actor) {
-					float scale = get_visual_scale(actor);
-					if (scale > 1e-4) {
-						result *= scale;
+				float result = GetScaledBoundSize(a_this);
+					if (a_this) {
+						Actor* actor = skyrim_cast<Actor*>(a_this);
+						if (actor) {
+							if (actor->Get3D1(false) && actor->Is3DLoaded()) {
+								float scale = get_visual_scale(actor);
+								if (scale > 1e-4) {
+									result *= scale;
+								}
+							}
+						}
 					}
+					return result;
 				}
-			}
-			return result;
-			}
 			);
 
 		// Enable this for stopping swiiming after a size

@@ -22,6 +22,7 @@ namespace Gts {
 	enum class SizeType {
 		GiantessScale,
 		VisualScale,
+		TargetScale,
 	};
 	enum class ParticleType {
 		Red,
@@ -180,6 +181,12 @@ namespace Gts {
 		RightKnee,
 		LeftHand,
 		RightHand,
+	};
+
+	enum class PerkUpdate {
+		Perk_Acceleration,
+		Perk_LifeForceAbsorption,
+		Perk_None,
 	};
 
 	struct Impact {

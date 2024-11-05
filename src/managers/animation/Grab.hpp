@@ -36,6 +36,7 @@ namespace Gts {
 			virtual void ResetActor(Actor* actor) override;
 			// Streangth is meant to be for a calculation of
 			// escape chance currently unused
+			static void ExitGrabState(Actor* giant);
 			static void GrabActor(Actor* giant, TESObjectREFR* tiny, float strength);
 			static void GrabActor(Actor* giant, TESObjectREFR* tiny);
 			static void Release(Actor* giant);

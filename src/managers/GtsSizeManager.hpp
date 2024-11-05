@@ -8,7 +8,8 @@ using namespace RE;
 
 namespace Gts {
 	struct SizeManagerData {
-		float enchantmentBonus = 0.0;
+		float AspectOfGiantess = 0.0;
+
 		float SizeHungerBonus = 0.0;
 		float HitGrowth = 0.0;
 		float GrowthTimer = 0.0;
@@ -21,6 +22,7 @@ namespace Gts {
 		float SizeVulnerability = 0.0;
 
 		CameraTracking TrackedBone = CameraTracking::None;
+		CameraTracking PreviousBone = CameraTracking::None;
 		float Camera_HalfLife = 0.05;
 	};
 
@@ -57,6 +59,9 @@ namespace Gts {
 			float GetHitGrowth(Actor* actor);
 			void SetHitGrowth(Actor* actor, float allow);
 
+			CameraTracking GetPreviousBone(Actor* actor);
+			void SetPreviousBone(Actor* actor);
+		
 			void SetTrackedBone(Actor* actor, bool enable, CameraTracking Bone);
 			CameraTracking GetTrackedBone(Actor* actor);
 

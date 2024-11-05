@@ -118,7 +118,6 @@ namespace Gts {
 		float ceiling = *std::min_element(ceiling_heights.begin(), ceiling_heights.end());
 
 		// Floor
-		//log::info("Casting floor rays");
 		std::vector<float>  floor_heights = {};
 		for (const auto& ray: rays) {
 			NiPoint3 ray_start = ray.first;
@@ -154,30 +153,15 @@ namespace Gts {
 		float stateScale = GetRoomStateScale(giant);
 
 		float room_height_m = GetCeilingHeight(giant);
-		/*if (giant->formID == 0x14) {
-			log::info("room_height_m (pre spring): {}", room_height_m);
-		}*/
 
 		// Spring
 		auto& dynamicData = DynamicScale::GetData(giant);
 		dynamicData.roomHeight.halflife = 0.85;
-		/*if (giant->formID == 0x14) {
-			log::info(
-				"Spring State: taget: {}, value: {}, velocity: {:.16f}, hl: {}",
-				dynamicData.roomHeight.target,
-				dynamicData.roomHeight.value,
-				dynamicData.roomHeight.velocity,
-				dynamicData.roomHeight.halflife
-				);
-		}*/
 		if (!std::isinf(room_height_m)) {
 			// Under roof
 			if (std::isinf(dynamicData.roomHeight.target)) {
 				// Last check was infinity so we just went under a roof
 				// Snap current value to new roof
-				/*if (giant->formID == 0x14) {
-					log::info("Entered roof");
-				}*/
 				dynamicData.roomHeight.value = room_height_m;
 				dynamicData.roomHeight.velocity = 0.0;
 			}
@@ -188,26 +172,14 @@ namespace Gts {
 			// No roof, set roomHeight to infinity so we know that we left the roof
 			// then continue as normal
 			if (!std::isinf(dynamicData.roomHeight.target)) {
-				//if (giant->formID == 0x14) {
-					//log::info("Left roof");
-				//}
 				dynamicData.roomHeight.target = room_height_m;
 				dynamicData.roomHeight.value = room_height_m;
 				dynamicData.roomHeight.velocity = 0.0;
 			}
 		}
 
-		/*if (giant->formID == 0x14) {
-			log::info("room_height_m (post spring): {}", room_height_m);
-		}*/
-
 		float room_height_s = room_height_m/1.82; // / height by 1.82 (default character height)
 		float max_scale = (room_height_s * 0.78) / stateScale; // Define max scale, make avalibale space seem bigger when prone etc
-		/*if (giant->formID == 0x14) {
-			log::info("State scale: {}", stateScale);
-			log::info("room_height_m: {}", room_height_m);
-			log::info("max_scale: {}", max_scale);
-		}*/
 
 		return max_scale;
 	}

@@ -4,6 +4,8 @@
 #include "managers/ThighSandwichController.hpp"
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
+#include "managers/animation/BoobCrush.hpp"
+#include "managers/PerkHandler.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
@@ -34,6 +36,7 @@ namespace Gts {
 	void RegisterManagers() {
 		EventDispatcher::AddListener(&GameModeManager::GetSingleton()); // Manages Game Modes
 		EventDispatcher::AddListener(&GtsManager::GetSingleton()); // Manages smooth size increase and animation & movement speed
+		EventDispatcher::AddListener(&PerkHandler::GetSingleton()); // Manages some perk updates
 		EventDispatcher::AddListener(&SizeManager::GetSingleton()); // Manages Max Scale of everyone
 		EventDispatcher::AddListener(&HighHeelManager::GetSingleton()); // Applies high heels
 		EventDispatcher::AddListener(&CameraManager::GetSingleton()); // Edits the camera
@@ -59,6 +62,7 @@ namespace Gts {
 
 		EventDispatcher::AddListener(&Grab::GetSingleton()); // Manages grabbing
 		EventDispatcher::AddListener(&ThighSandwichController::GetSingleton()); // Manages Thigh Sandwiching
+		EventDispatcher::AddListener(&AnimationBoobCrush::GetSingleton());
 
 		EventDispatcher::AddListener(&AiManager::GetSingleton()); // Rough AI controller for GTS-actions
 		EventDispatcher::AddListener(&Headtracking::GetSingleton()); // Headtracking fixes

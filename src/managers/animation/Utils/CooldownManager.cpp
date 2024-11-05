@@ -48,6 +48,9 @@ namespace {
     const double AI_GROWTH_COOLDOWN = 2.0f;
     const double SHRINK_OUTBURST_COOLDOWN = 18.0f;
     const double SHRINK_OUTBURST_COOLDOWN_FORCED = 180.0f;
+    const double SHRINK_PARTICLE_COOLDOWN = 0.25f;
+    const double SHRINK_PARTICLE_COOLDOWN_ANIM = 1.5f;
+    const double SHRINK_TINYCALAMITY_RAGE = 60.0f;
 
     float Calculate_BreastActionCooldown(Actor* giant, int type) {
         float Cooldown = 1.0;
@@ -78,9 +81,6 @@ namespace {
     float Calculate_AbsorbCooldown(Actor* giant) {
         float mastery = std::clamp(GetGtsSkillLevel(giant) * 0.01f, 0.0f, 1.0f) * 0.73;
         float reduction = 1.0 - mastery; // Up to 8.1 seconds at level 100
-
-        log::info("Mastery of {} is {}", giant->GetDisplayFullName(), mastery); 
-        log::info("Total Cooldown: {}", ABSORB_OTHER_COOLDOWN * reduction);
 
         return ABSORB_OTHER_COOLDOWN * reduction;
     }
@@ -204,6 +204,15 @@ namespace Gts {
             case CooldownSource::Misc_ShrinkOutburst_Forced:
                 data.lastForceOutburstTime = Time::WorldTimeElapsed();
                 break;
+            case CooldownSource::Misc_ShrinkParticle:
+                data.lastShrinkParticleTime = Time::WorldTimeElapsed();
+                break;
+            case CooldownSource::Misc_ShrinkParticle_Animation:
+                data.lastAnimShrinkParticleTime = Time::WorldTimeElapsed();
+                break;
+            case CooldownSource::Misc_TinyCalamityRage:
+                data.lastTinyCalamityTime = Time::WorldTimeElapsed();
+                break;
             case CooldownSource::Footstep_Right:
                 data.lastFootstepTime_R = Time::WorldTimeElapsed();
                 break;
@@ -258,6 +267,12 @@ namespace Gts {
                 return (data.lastOutburstTime + Calculate_ShrinkOutbirstTimer(giant)) - time; 
             case CooldownSource::Misc_ShrinkOutburst_Forced:
                 return (data.lastForceOutburstTime + SHRINK_OUTBURST_COOLDOWN_FORCED) - time; 
+            case CooldownSource::Misc_ShrinkParticle:
+                return (data.lastShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN) - time;
+            case CooldownSource::Misc_ShrinkParticle_Animation:
+                return (data.lastAnimShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_ANIM) - time;
+            case CooldownSource::Misc_TinyCalamityRage:
+                return (data.lastTinyCalamityTime + SHRINK_TINYCALAMITY_RAGE) - time;
             case CooldownSource::Footstep_Right:
                 return (data.lastFootstepTime_R + Calculate_FootstepTimer(giant)) - time;   
             case CooldownSource::Footstep_Left:
@@ -311,6 +326,12 @@ namespace Gts {
                 return time <= (data.lastOutburstTime + Calculate_ShrinkOutbirstTimer(giant));   
             case CooldownSource::Misc_ShrinkOutburst_Forced:
                 return time <= (data.lastForceOutburstTime + SHRINK_OUTBURST_COOLDOWN_FORCED);   
+            case CooldownSource::Misc_ShrinkParticle:
+                return time <= (data.lastShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN); 
+            case CooldownSource::Misc_ShrinkParticle_Animation:
+                return time <= (data.lastAnimShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_ANIM);
+            case CooldownSource::Misc_TinyCalamityRage:
+                return time <= (data.lastTinyCalamityTime + SHRINK_TINYCALAMITY_RAGE); 
             case CooldownSource::Footstep_Right:
                 return time <= (data.lastFootstepTime_R + Calculate_FootstepTimer(giant));    
             case CooldownSource::Footstep_Left:

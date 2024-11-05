@@ -161,6 +161,12 @@ namespace {
 		SetProneState(giant, false);
 	}
 
+	void GTS_Prone_EnterSneak(AnimationEventData& data) {
+		Actor* giant = &data.giant;
+		SetSneaking(giant, true, 1);
+		giant->SetGraphVariableInt("iIsInSneak", 1);
+	}
+
 	void SBOProneOnEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		AnimationManager::StartAnim("SBO_ProneOn", player);
@@ -168,17 +174,30 @@ namespace {
 
 	void SBOProneOffEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (player->IsSneaking()) {
+
+		bool prone = false;
+		player->GetGraphVariableBool("GTS_IsProne", prone);
+		
+		if (prone) {
 			AnimationManager::StartAnim("SBO_ProneOff", player);
 		}
 	}
 
-	void SBODiveEvent(const InputEventData& data) {
+	void SBODiveEvent_Standing(const InputEventData& data) {
+		auto player = PlayerCharacter::GetSingleton();
+		if (!player->IsSneaking()) {
+			AnimationManager::StartAnim("SBO_Dive", player);
+		}
+	}
+
+	void SBODiveEvent_Sneak(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		if (player->IsSneaking()) {
 			AnimationManager::StartAnim("SBO_Dive", player);
 		}
 	}
+
+
 }
 
 namespace Gts
@@ -186,12 +205,14 @@ namespace Gts
 	void AnimationProning::RegisterEvents() {
 		InputManager::RegisterInputEvent("SBO_ToggleProne", SBOProneOnEvent);
 		InputManager::RegisterInputEvent("SBO_DisableProne", SBOProneOffEvent);
-		InputManager::RegisterInputEvent("SBO_ToggleDive", SBODiveEvent);
+		InputManager::RegisterInputEvent("SBO_ToggleDive_Standing", SBODiveEvent_Standing);
+		InputManager::RegisterInputEvent("SBO_ToggleDive_Sneak", SBODiveEvent_Sneak);
 
 		AnimationManager::RegisterEvent("GTS_DiveSlide_ON", "Proning", GTS_DiveSlide_ON);
 		AnimationManager::RegisterEvent("GTS_DiveSlide_OFF", "Proning", GTS_DiveSlide_OFF);
 		AnimationManager::RegisterEvent("GTS_BodyDamage_ON", "Proning", GTS_BodyDamage_ON);
 		AnimationManager::RegisterEvent("GTS_BodyDamage_Off", "Proning", GTS_BodyDamage_Off);
+		AnimationManager::RegisterEvent("GTS_Prone_EnterSneak", "Pronong", GTS_Prone_EnterSneak);
 	}
 
 	void  AnimationProning::RegisterTriggers() {

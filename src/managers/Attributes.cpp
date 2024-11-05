@@ -67,7 +67,7 @@ namespace {
 		}
 
 		///Sprint Damage
-		if (Runtime::HasPerkTeam(actor, "SprintDamageMult1")) {
+		if (Runtime::HasPerkTeam(actor, "QuickApproach")) {
 			ExpectedSprintDamage += 0.25/BalancedMode;
 		}
 		///Fall Damage
@@ -116,9 +116,9 @@ namespace Gts {
 	}
 
 	void AttributeManager::Update() {
-		static Timer timer = Timer(0.25);
+		static Timer timer = Timer(0.5);
 
-		if (timer.ShouldRunFrame()) { // Run once per 0.25 sec
+		if (timer.ShouldRunFrame()) { // Run once per 0.5 sec
 			for (auto actor: find_actors()) {
 				UpdateActors(actor);
 			}
@@ -159,7 +159,7 @@ namespace Gts {
 					if (HasSMT(actor)) {
 						scale += 1.0;
 					}
-					if (actor->AsActorState()->IsSprinting() && Runtime::HasPerk(actor, "SprintDamageMult1")) {
+					if (actor->AsActorState()->IsSprinting() && Runtime::HasPerk(actor, "QuickApproach")) {
 						scale *= 1.30;
 					}
 				}

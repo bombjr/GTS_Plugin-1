@@ -93,6 +93,54 @@ namespace Gts {
 		return false;
 	}
 
+	void ForceThirdPerson(Actor* giant) {
+		if (giant->formID == 0x14) {
+			auto camera = RE::PlayerCamera::GetSingleton();
+			if (camera) {
+				camera->ForceThirdPerson();
+				auto playerCamera = RE::PlayerCamera::GetSingleton();
+				auto thirdPersonState = reinterpret_cast<RE::ThirdPersonState*>(playerCamera->cameraStates[RE::CameraState::kThirdPerson].get());
+				auto isInThirdPerson = playerCamera->currentState->id == RE::CameraState::kThirdPerson;
+
+				TaskManager::RunOnce([=](auto& update){
+					log::info("Running Camera Task Once");
+					if (thirdPersonState && isInThirdPerson) {
+						log::info("Applying zoom offset");
+						thirdPersonState->currentZoomOffset = 0.50;
+						thirdPersonState->targetZoomOffset = 0.50;
+					}
+				});
+				
+				ActorHandle giantHandle = giant->CreateRefHandle();
+
+				float start = Time::WorldTimeElapsed();
+
+				TaskManager::Run([=](auto& update) {
+					if (!giantHandle) {
+						return false;
+					}
+					Actor* giantref = giantHandle.get().get();
+					bool Busy = IsGtsBusy(giantref);
+					if (!Busy) {
+						if (Time::WorldTimeElapsed() - start < 0.15) {
+							return true;
+						}
+						if (thirdPersonState && !IsFirstPerson()) {
+							camera->ForceFirstPerson();
+							thirdPersonState->currentZoomOffset = 0.0;
+							thirdPersonState->targetZoomOffset = 0.0;
+							return false;
+						} else {
+							return true;
+						}
+						return false;
+					}
+					return true;
+				});
+			}
+		}
+	}
+
 	bool IsFreeCamera() {
 		auto playercamera = PlayerCamera::GetSingleton();
 		if (!playercamera) {

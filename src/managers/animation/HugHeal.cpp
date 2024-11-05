@@ -77,7 +77,7 @@ namespace {
 		bool Healing = IsHugHealing(giantref);
 		
 		if (Healing && HeartTimer.ShouldRunFrame()) {
-			SpawnHearts(giantref, tinyref, 0.0, 2.4);
+			SpawnHearts(giantref, tinyref, 0.0, 2.4, true);
 		}
 
 		if (!Healing && hp >= maxhp) {
@@ -132,7 +132,7 @@ namespace {
 			}
 			stamina *= Perk_GetCostReduction(giantref);
 
-			if (sizedifference >= threshold || sizedifference < Action_Hug) {
+			if (!IsHugHealing(giantref) && (sizedifference >= threshold || sizedifference < Action_Hug)) {
 				SetBeingHeld(tinyref, false);
 				AbortHugAnimation(giantref, tinyref);
 				if (giantref->formID == 0x14) {

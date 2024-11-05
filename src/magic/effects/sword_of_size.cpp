@@ -77,7 +77,7 @@ namespace Gts {
 		if (!Target) {
 			return;
 		}
-		Task_TrackSizeTask(Caster, Target, "Sword");
+		Task_TrackSizeTask(Caster, Target, "Sword", false, 1.0);
 	}
 }
 

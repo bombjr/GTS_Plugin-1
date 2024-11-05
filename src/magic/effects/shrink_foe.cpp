@@ -66,10 +66,12 @@ namespace Gts {
 			// ShrinkBolt
 			this->power = SHRINK_BOLT_POWER;
 			this->efficiency = SHRINK_BOLT_EFFIC;
+			this->time_mult = 0.2;
 		} else if (base_spell == Runtime::GetMagicEffect("ShrinkStorm")) {
 			// ShrinkBolt
 			this->power = SHRINK_STORM_POWER;
 			this->efficiency = SHRINK_STORM_EFFIC;
+			this->time_mult = 0.2;
 		}
 	}
 
@@ -142,13 +144,18 @@ namespace Gts {
 		float HealthPercent = std::clamp(GetHealthPercentage(target), 0.25f, 1.0f);
 		shrink /= HealthPercent;
 
-		TransferSize(caster, target, IsDualCasting(), shrink * SizeDifference * bonus, gainpower * balancemodebonus, false, ShrinkSource::Magic);
+		
 
 		Attacked(target, caster); // make it work like a hostile spell
 
 		ChanceToScare(caster, target, 5.0, 1200, true);
 
-		if (ShrinkToNothing(caster, target)) { // STN when size difference is met
+		if (ShrinkToNothing(caster, target, true, this->time_mult)) { // STN when size difference is met and when time ticks allow to
+
+		} else {
+			if (get_target_scale(target) >= SHRINK_TO_NOTHING_SCALE / GetSizeFromBoundingBox(target)) {
+				TransferSize(caster, target, IsDualCasting(), shrink * SizeDifference * bonus, gainpower * balancemodebonus, false, ShrinkSource::Magic);
+			}
 		}
 	}
 
@@ -163,7 +170,7 @@ namespace Gts {
 			return;
 		}
 
-		Task_TrackSizeTask(Caster, Target, "Spell");
+		Task_TrackSizeTask(Caster, Target, "Spell", true, this->time_mult);
 		ResetMovementSlowdown(Target);
 	}
 }

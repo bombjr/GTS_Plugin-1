@@ -42,30 +42,25 @@ namespace {
 		int growth_roll = static_cast<int>(GetGrowthType(giant));
 		float multiplier = 1.0;
 
-		if (Runtime::HasPerk(giant, "RandomGrowthTerror")) {
+		if (Runtime::HasPerkTeam(giant, "RandomGrowthTerror")) {
 			multiplier = 1.3;
 		}
 
 		switch (growth_roll) {
 			case 1:
-				return 0.38 * multiplier * 1.25; // ~62% without * 1.25
+				return 0.38 * multiplier * 1.45; // ~62% without * 1.25
 			case 5:
 			case 2:
-			 	return 0.26 * multiplier * 1.25; // ~40% without * 1.25
+			 	return 0.26 * multiplier * 1.40; // ~40% without * 1.25
 			case 6:
 			case 3:
-				return 0.28 * multiplier * 1.25; // ~42% without * 1.25
+				return 0.28 * multiplier * 1.35; // ~42% without * 1.25
 			case 4:
 				return 0.34 * multiplier * 1.25; // ~62% without * 1.25
 			break;
 		}
 
-		// x1.05 >
-		// 	1: 2.30   (0.7)   (119%)
-		// 	2: 2.23   (0.75)  (112%)
-		// 	3: 2.30   (1.0)   (119%)
-		// 	4: 2.41   (0.65)  (129%)
-		return 0.8 * multiplier;
+		return 0.9 * multiplier;
 	}
 
 	float get_growth_formula(Actor* giant, float elapsed, GrowthAnimation anim) {
@@ -153,7 +148,7 @@ namespace {
 		PlayMoanSound(giant, 1.0);
 		Task_FacialEmotionTask_Moan(giant, 2.0, "RandomGrow");
 
-		if (Runtime::HasPerk(giant, "RandomGrowthTerror")) {
+		if (Runtime::HasPerkTeam(giant, "RandomGrowthTerror")) {
 			for (auto tiny: find_actors()) {
 				if (tiny && tiny != giant) {
 					if (IsHostile(giant, tiny) || IsHostile(tiny, giant)) {

@@ -70,10 +70,10 @@ namespace Gts {
 
 	std::vector<NiPoint3> GetThighCoordinates(Actor* giant, std::string_view calf, std::string_view feet, std::string_view thigh);
 	std::vector<NiPoint3> GetFootCoordinates(Actor* actor, bool Right, bool ignore_rotation);
-	NiPoint3 GetHeartPosition(Actor* giant, Actor* tiny);
+	NiPoint3 GetHeartPosition(Actor* giant, Actor* tiny, bool hugs);
 
 	void AbsorbShout_BuffCaster(Actor* giantref, Actor* tinyref);
-	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming);
+	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming, bool check_ticks, float time_mult);
 	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming);
 	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming);
 	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming);

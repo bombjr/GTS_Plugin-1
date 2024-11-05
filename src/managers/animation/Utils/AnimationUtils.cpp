@@ -12,6 +12,7 @@
 #include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "managers/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/MovementForce.hpp"
 #include "utils/papyrusUtils.hpp"
@@ -117,11 +118,12 @@ namespace Gts {
 		if (transient) {
 			float& animspeed = transient->Hug_AnimSpeed;
 			if (!reset) {
-				animspeed = AnimationManager::GetAnimSpeed(giant);
+				animspeed = AnimationManager::GetAnimSpeed(giant); 
+				// Make DLL use animspeed of GTS on Tiny
 			} else {
 				animspeed = 1.0; // 1.0 makes dll use GetAnimSpeed of tiny
 			}
-			// Fix hug and boob attacks anim de-sync
+			// Fixes hug and boob attack states anim de-sync
 		}
 	}
 
@@ -135,86 +137,83 @@ namespace Gts {
 		auto& Sandwich =    ThighSandwichController::GetSingleton();
 
 		switch (Type) {
+			// xxx.AllowMessage(true/false) are used to allow info messages when Follower can't do something with player
+			// They're all false by default
 			case FollowerAnimType::ButtCrush: {
 				for (auto new_gts: FindTeammates()) {
 					if (IsTeammate(new_gts)) {
+						ButtCrush.AllowMessage(true);
 						for (auto new_tiny: ButtCrush.GetButtCrushTargets(new_gts, numberOfPrey)) { 
 							if (new_tiny->formID == 0x14) {
-								if (ButtCrush.CanButtCrush(new_gts, new_tiny)) {
-									ButtCrush.StartButtCrush(new_gts, new_tiny);
-									ControlAnother(new_gts, false);
-									return;
-								}
+								ButtCrush.StartButtCrush(new_gts, new_tiny);
+								ControlAnother(new_gts, false);
 							}
 						}
 					}
 				}
-			break;	
+				ButtCrush.AllowMessage(false);
+				break;	
 			}
 		 	case FollowerAnimType::Hugs: {
 				for (auto new_gts: FindTeammates()) {
 					if (IsTeammate(new_gts)) {
+						Hugs.AllowMessage(true);
 						for (auto new_tiny: Hugs.GetHugTargetsInFront(new_gts, numberOfPrey)) { 
 							if (new_tiny->formID == 0x14) {
-								float sizedifference = GetSizeDifference(new_gts, new_tiny, SizeType::VisualScale, true, true);
-								bool allow = (sizedifference >= Action_Hug && sizedifference < GetHugShrinkThreshold(new_gts));
-								if (allow && Hugs.CanHug(new_gts, new_tiny)) {
-									Hugs.StartHug(new_gts, new_tiny);
-									ControlAnother(new_gts, false);
-									return;
-								}
+								Hugs.StartHug(new_gts, new_tiny);
+								ControlAnother(new_gts, false);
 							}
 						}
 					}
 				}
-			break;
+				Hugs.AllowMessage(false);
+				break;
 			}
 		 	case FollowerAnimType::Grab: {
 				for (auto new_gts: FindTeammates()) {
 					if (IsTeammate(new_gts)) {
+						Grabs.AllowMessage(true);
 						std::vector<Actor*> FindTiny = Grabs.GetGrabTargetsInFront(new_gts, numberOfPrey);
 						for (auto new_tiny: FindTiny) { 
-							if (new_tiny->formID == 0x14 && Grabs.CanGrab(new_gts, new_tiny)) {
+							if (new_tiny->formID == 0x14) {
 								Grabs.StartGrab(new_gts, new_tiny);
 								ControlAnother(new_gts, false);
-								return;
 							}
 						}
 					}
 				}
+				Grabs.AllowMessage(false);
 				break;	
 			}
 		 	case FollowerAnimType::Vore: {	
 				for (auto new_gts: FindTeammates()) {
 					if (IsTeammate(new_gts)) {
+						Vore.AllowMessage(true);
 						for (auto new_tiny: Vore.GetVoreTargetsInFront(new_gts, numberOfPrey)) { 
 							if (new_tiny->formID == 0x14) {
-								if (Vore.CanVore(new_gts, new_tiny)) {
-									Vore.StartVore(new_gts, new_tiny);
-									ControlAnother(new_gts, false);
-									return;
-								}
+								Vore.StartVore(new_gts, new_tiny);
+								ControlAnother(new_gts, false);
 							}
 						}
 					}
 				}
-			break;
+				Vore.AllowMessage(false);
+				break;
 			} 
 		 	case FollowerAnimType::ThighSandwich: {
 				for (auto new_gts: FindTeammates()) {
 					if (IsTeammate(new_gts)) {
+						Sandwich.AllowMessage(true);
 						for (auto new_tiny: Sandwich.GetSandwichTargetsInFront(new_gts, numberOfPrey)) { 
 							if (new_tiny->formID == 0x14) {
-								if (Sandwich.CanSandwich(new_gts, new_tiny)) {
-									Sandwich.StartSandwiching(new_gts, new_tiny);
-									ControlAnother(new_gts, false);
-									return;
-								}
+								Sandwich.StartSandwiching(new_gts, new_tiny);
+								ControlAnother(new_gts, false);
 							}
 						}
 					}
 				} 
-			break;
+				Sandwich.AllowMessage(false);
+				break;
 			}
 		}
 	}
@@ -288,7 +287,13 @@ namespace Gts {
 		Attacked(tiny, giant);
 
 		ModSizeExperience(giant, 0.22); // Adjust Size Matter skill
-		KillActor(giant, tiny, false);
+
+		auto Node = find_node(giant, "NPC Spine2 [Spn2]"); 
+		if (!Node) {
+			Notify("Error: Spine2 [Spn2] node not found");
+			return;
+		}
+		Runtime::PlaySoundAtNode("ShrinkToNothingSound", giant, 1.0, 1.0, "NPC Spine2 [Spn2]");
 
 		if (!IsLiving(tiny)) {
 			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);
@@ -309,8 +314,15 @@ namespace Gts {
 		}
 
 		AddSMTDuration(giant, 5.0);
-
 		ApplyShakeAtNode(tiny, 3, "NPC Root [Root]");
+
+		if (tiny->formID != 0x14) {
+			Disintegrate(tiny); // Set critical stage 4 on actor
+            SendDeathEvent(giant, tiny);
+		} else {
+			TriggerScreenBlood(50);
+			tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+		}
 
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
@@ -323,25 +335,14 @@ namespace Gts {
 			if (!giantHandle) {
 				return;
 			}
-			auto giant = giantHandle.get().get();
-			auto tiny = tinyHandle.get().get();
+			auto giantref = giantHandle.get().get();
+			auto tinyref = tinyHandle.get().get();
 
-			float scale = get_visual_scale(tiny) * GetSizeFromBoundingBox(tiny);
-			TransferInventory(tiny, giant, scale, false, true, DamageSource::Crushed, true);
+			float scale = get_visual_scale(tinyref) * GetSizeFromBoundingBox(tinyref);
+			KillActor(giantref, tinyref);
+			PerkHandler::UpdatePerkValues(giantref, PerkUpdate::Perk_LifeForceAbsorption);
+			TransferInventory(tinyref, giantref, scale, false, true, DamageSource::Crushed, true);
 		});
-
-		if (tiny->formID != 0x14) {
-			Disintegrate(tiny, true); // Set critical stage 4 on actor
-		} else {
-			TriggerScreenBlood(50);
-			tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
-		}
-		auto Node = find_node(giant, "NPC Spine2 [Spn2]"); 
-		if (!Node) {
-			Notify("Error: Spine2 [Spn2] node not found");
-			return;
-		}
-		Runtime::PlaySoundAtNode("ShrinkToNothingSound", giant, 1.0, 1.0, "NPC Spine2 [Spn2]");
 	}
 
 	// Cancels all hug-related things
@@ -358,7 +359,11 @@ namespace Gts {
 
 		AnimationManager::StartAnim("Huggies_Spare", giant); // Start "Release" animation on Giant
 
-		if (Friendly) { // If friendly, we don't want to push/release actor
+		if (Friendly && !IsCrawling(giant) && tiny) { // If friendly, we don't want to push/release actor
+			EnableCollisions(tiny);
+			SetBeingHeld(tiny, false);
+			UpdateFriendlyHugs(giant, tiny, true); // set GTS_IsFollower (tiny) and GTS_HuggingTeammate (GTS) bools to false
+			Anims_FixAnimationDesync(giant, tiny, true); // reset anim speed override so .dll won't use it
 			AnimationManager::StartAnim("Huggies_Spare", tiny);
 			return; // GTS_Hug_Release event (HugHeal.cpp) handles it instead.
 		}
@@ -821,9 +826,9 @@ namespace Gts {
 							auto model = otherActor->GetCurrent3D();
 							if (model) {
 								VisitNodes(model, [&nodeCollisions, NodePosition, maxDistance](NiAVObject& a_obj) {
-									float distance = (NodePosition - a_obj.world.translate).Length();
+									float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
 		
-									if (distance - Collision_Distance_Override < maxDistance) {
+									if (distance <= maxDistance) {
 										nodeCollisions += 1;
 										return false;
 									}
@@ -887,9 +892,9 @@ namespace Gts {
 							if (model) {
 								for (auto point: CoordsToCheck) {
 									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
-										float distance = (point - a_obj.world.translate).Length();
+										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
 
-										if (distance - Collision_Distance_Override <= maxFootDistance) {
+										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
 											force = 1.0 - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
@@ -996,8 +1001,8 @@ namespace Gts {
 
 						if (model) {
 							VisitNodes(model, [&nodeCollisions, &force, NodePosition, maxDistance](NiAVObject& a_obj) {
-								float distance = (NodePosition - a_obj.world.translate).Length();
-								if (distance < maxDistance) {
+								float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
+								if (distance <= maxDistance) {
 									nodeCollisions += 1;
 									force = 1.0 - distance / maxDistance;
 									return false;
@@ -1119,8 +1124,8 @@ namespace Gts {
 							if (model) {
 								for (auto point: ThighPoints) {
 									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
-										float distance = (point - a_obj.world.translate).Length();
-										if (distance - Collision_Distance_Override < maxFootDistance) {
+										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
+										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
 											force = 1.0 - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
@@ -1205,8 +1210,8 @@ namespace Gts {
 
 							if (model) {
 								VisitNodes(model, [&nodeCollisions, NodePosition, maxDistance](NiAVObject& a_obj) {
-									float distance = (NodePosition - a_obj.world.translate).Length();
-									if (distance - Collision_Distance_Override < maxDistance) {
+									float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
+									if (distance <= maxDistance) {
 										nodeCollisions += 1;
 										return false;
 									}
@@ -1364,7 +1369,7 @@ namespace Gts {
 		return footPoints;
 	}
 
-	NiPoint3 GetHeartPosition(Actor* giant, Actor* tiny) { // It is used to spawn Heart Particles during healing hugs
+	NiPoint3 GetHeartPosition(Actor* giant, Actor* tiny, bool hugs) { // It is used to spawn Heart Particles during healing hugs
 
 		NiPoint3 TargetA = NiPoint3();
 		NiPoint3 TargetB = NiPoint3();
@@ -1383,7 +1388,7 @@ namespace Gts {
 			}
 			TargetA += (bone->world.translate) * (1.0/bone_count);
 		}
-		for (auto bone_name_B: bone_names) {
+		/*for (auto bone_name_B: bone_names) {
 			auto bone = find_node(tiny, bone_name_B);
 			if (!bone) {
 				Notify("Error: Breast Nodes could not be found.");
@@ -1392,10 +1397,22 @@ namespace Gts {
 				return NiPoint3();
 			}
 			TargetB += (bone->world.translate) * (1.0/bone_count);
-		}
+		}*/
 
-		auto targetPoint = (TargetA + TargetB) / 2;
-		targetPoint.z += 45.0 * get_visual_scale(giant);
+		TargetB += tiny->GetPosition();
+
+		auto targetPoint = TargetA;
+		float adjustment = 45.0 * get_visual_scale(giant);
+		//bool hugs = IsHugging(giant);
+		if (hugs) {
+			if (IsCrawling(giant)) { // if doing healing crawl hugs
+				targetPoint = TargetA; // just target the breasts
+			} else {
+				adjustment = 85 * get_visual_scale(giant);
+				targetPoint = (TargetA + TargetB) / 2; // else Breasts + TinyPos
+			}
+		}
+		targetPoint.z += adjustment;
 		return targetPoint;
 	}
 
@@ -1418,7 +1435,7 @@ namespace Gts {
 		}
 	}
 
-	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming) { 
+	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming, bool check_ticks, float time_mult) { 
 		// A fail-safe task. The goal of it is to kill actor
 		// if half-life puts actor below shrink to nothing threshold, so we won't have < x0.01 actors
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -1438,7 +1455,7 @@ namespace Gts {
 			auto tinyref = tinyHandle.get().get();
 
 			float size = get_visual_scale(tinyref);
-			if (ShrinkToNothing(giantref, tinyref)) {
+			if (ShrinkToNothing(giantref, tinyref, check_ticks, time_mult)) {
 				if (naming == "Absorb") {
 					AbsorbShout_BuffCaster(giantref, tinyref);
 				}
@@ -1604,10 +1621,10 @@ namespace Gts {
 
 	float GetHugShrinkThreshold(Actor* actor) {
 		float threshold = 2.5;
-		if (Runtime::HasPerk(actor, "HugCrush")) {
+		if (Runtime::HasPerkTeam(actor, "HugCrush")) {
 			threshold *= 1.25;
 		}
-		if (Runtime::HasPerk(actor, "HugCrush_Greed")) {
+		if (Runtime::HasPerkTeam(actor, "HugCrush_Greed")) {
 			threshold *= 1.35;
 		}
 		if (HasGrowthSpurt(actor)) {

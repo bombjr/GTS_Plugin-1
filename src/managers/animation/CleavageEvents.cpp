@@ -16,6 +16,7 @@
 #include "managers/InputManager.hpp"
 #include "utils/DifficultyUtils.hpp"
 #include "managers/CrushManager.hpp"
+#include "managers/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "managers/explosion.hpp"
 #include "managers/highheel.hpp"
@@ -38,11 +39,18 @@ using namespace Gts;
 
 
 namespace {
+    void Absorb_GrowInSize(Actor* giant, Actor* tiny, float multiplier) {
+        float grow_value = Vore::ReadOriginalScale(tiny) * multiplier;
+        update_target_scale(giant, grow_value, SizeEffectType::kGrow);
+        //mod_target_scale(giant, grow_value);
+    }
+
     void CancelAnimation(Actor* giant) {
         auto tiny = Grab::GetHeldActor(giant);
         giant->SetGraphVariableBool("GTS_OverrideZ", false);
         if (tiny) {
-            KillActor(giant, tiny, false);
+            KillActor(giant, tiny);
+            PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
             DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75);
             tiny->SetGraphVariableBool("GTSBEH_T_InStorage", false);
             SetBetweenBreasts(tiny, false);
@@ -82,7 +90,7 @@ namespace {
                 DamageAV(tiny, ActorValue::kStamina, stamina_damage);
             }
             if (hearts) {
-                SpawnHearts(giant, tiny, 35, 0.5);
+                SpawnHearts(giant, tiny, 35, 0.5, false);
             }
         }
     }
@@ -139,7 +147,7 @@ namespace {
     void PrintBreastAbsorbed(Actor* giant, Actor* tiny) {
         int random = rand() % 5;
         if (random <= 1) {
-            Cprint("{} suddenly disappeared between the breasts of {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
+            Cprint("{} suddenly disappeared between the breasts of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
         } else if (random == 2) {
             Cprint("Mountains of {} greedily absorbed {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
         } else if (random == 3) {
@@ -181,8 +189,8 @@ namespace {
 
                 TinyCalamity_ShrinkActor(giant, tiny, damage * 0.20 * GetDamageSetting());
 
-                SizeHitEffects::GetSingleton().BreakBones(giant, tiny, 0.15, 6);
-                if (!IsTeammate(tiny)) {
+                SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, tiny, damage * 0.15, 6);
+                if (!IsTeammate(tiny) || IsHostile(giant, tiny)) {
                     InflictSizeDamage(giant, tiny, damage);
                     DamageAV(tiny, ActorValue::kStamina, damage * 0.25);
                 } else {
@@ -320,6 +328,11 @@ namespace {
     void GTS_BS_AbsorbStart(const AnimationEventData& data) {
         Task_FacialEmotionTask_Smile(&data.giant, 3.2 / AnimationManager::GetAnimSpeed(&data.giant), "AbsorbStart");
         Task_ApplyAbsorbCooldown(&data.giant);
+
+        auto tiny = Grab::GetHeldActor(&data.giant);
+		if (tiny) {
+            Vore::RecordOriginalScale(tiny);
+        }
     }
 
     void GTS_BS_AbsorbPulse(const AnimationEventData& data) {
@@ -341,6 +354,8 @@ namespace {
 
             ShrinkTinyWithCleavage(giant, 0.010, 0.66, 45.0, true, true);
             RecoverAttributes(giant, ActorValue::kHealth, 0.025);
+
+            Absorb_GrowInSize(giant, tiny, 0.075);
         }
     }
 
@@ -349,8 +364,9 @@ namespace {
         Task_FacialEmotionTask_Moan(giant, 1.1 / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
         auto tiny = Grab::GetHeldActor(giant);
 		if (tiny) {
-            SpawnHearts(giant, tiny, 35, 0.75);
+            SpawnHearts(giant, tiny, 35, 0.75, false);
             PlayMoanSound(giant, 0.8);
+            Attacked(tiny, giant);
 
             AdvanceQuestProgression(giant, tiny, QuestStage::HugSteal, 1.0, false);
 
@@ -358,11 +374,19 @@ namespace {
             Rumbling::Once("AbsorbTiny_L", giant, 0.8, 0.05, "R Breast02", 0.0);
 
             DamageAV(giant, ActorValue::kHealth, -30); // Heal GTS
+            Absorb_GrowInSize(giant, tiny, 0.5);
             PrintBreastAbsorbed(giant, tiny);
             AdjustSizeReserve(giant, 0.04);
-            
 
-            std::string taskname = std::format("MergeWithTiny{}", tiny->formID);
+            if (tiny->formID != 0x14) {
+                Disintegrate(tiny);
+                SendDeathEvent(giant, tiny);
+            } else {
+                DamageAV(tiny, ActorValue::kHealth, 999999);
+                tiny->KillImpl(giant, 1, true, true);
+            }
+            
+            std::string taskname = std::format("MergeWithTiny_{}", tiny->formID);
             ActorHandle giantHandle = giant->CreateRefHandle();
             ActorHandle tinyHandle = tiny->CreateRefHandle();
             TaskManager::RunOnce(taskname, [=](auto& update){
@@ -373,15 +397,18 @@ namespace {
                     return;
                 }
 
-                auto giant = giantHandle.get().get();
-                auto tiny = tinyHandle.get().get();
-                TransferInventory(tiny, giant, get_visual_scale(tiny) * GetSizeFromBoundingBox(tiny), false, true, DamageSource::Vored, true);
+                auto giantref = giantHandle.get().get();
+                auto tinyref = tinyHandle.get().get();
+
+                KillActor(giantref, tinyref);
+                PerkHandler::UpdatePerkValues(giantref, PerkUpdate::Perk_LifeForceAbsorption);
+
+                TransferInventory(tinyref, giantref, get_visual_scale(tinyref) * GetSizeFromBoundingBox(tinyref), false, true, DamageSource::Vored, true);
                 // Actor Reset is done inside TransferInventory:StartResetTask!
             });
             
             RecoverAttributes(giant, ActorValue::kHealth, 0.05);
             ModSizeExperience(giant, 0.235);
-            Disintegrate(tiny, false);  
         }
     }
     void GTS_BS_GrowBoobs(const AnimationEventData& data) {
@@ -398,7 +425,7 @@ namespace {
         if (tiny) {
             SuffocateTinyFor(&data.giant, tiny, 0.10, 0.85, 25.0);
             Task_RunSuffocateTask(giant, tiny);
-            SpawnHearts(giant, tiny, 35, 0.35);
+            SpawnHearts(giant, tiny, 35, 0.35, false);
         }
         Task_FacialEmotionTask_Smile(&data.giant, 1.8 / AnimationManager::GetAnimSpeed(&data.giant), "SufoStart");
     }
@@ -414,7 +441,7 @@ namespace {
         if (tiny) {
             RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.035);
             SuffocateTinyFor(&data.giant, tiny, 0.35, 0.85, 25.0);
-            SpawnHearts(&data.giant, tiny, 35, 0.50);
+            SpawnHearts(&data.giant, tiny, 35, 0.50, false);
         }
         Task_FacialEmotionTask_Smile(&data.giant, 1.2 / AnimationManager::GetAnimSpeed(&data.giant), "SufoPress");
     }
@@ -429,7 +456,7 @@ namespace {
             Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectL);
 
             ManageCamera(&data.giant, true, CameraTracking::ObjectB);
-            SpawnHearts(&data.giant, tiny, 35, 0.50);
+            SpawnHearts(&data.giant, tiny, 35, 0.50, false);
         }
     }
 
@@ -464,13 +491,13 @@ namespace {
     void GTS_BS_Poke(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            SpawnHearts(&data.giant, tiny, 35, 0.4);
+            SpawnHearts(&data.giant, tiny, 35, 0.4, false);
         }
     }
     void GTS_BS_Pat(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            SpawnHearts(&data.giant, tiny, 35, 0.4);
+            SpawnHearts(&data.giant, tiny, 35, 0.4, false);
 
             if (IsHostile(&data.giant, tiny)) {
 				AnimationManager::StartAnim("Breasts_Idle_Unwilling", tiny);
@@ -478,6 +505,24 @@ namespace {
 				AnimationManager::StartAnim("Breasts_Idle_Willing", tiny);
 			}
         }
+    }
+
+    void GTSBEH_Boobs_StartTransition(const AnimationEventData& data) {
+        Actor* giant = &data.giant;
+        Actor* tiny = Grab::GetHeldActor(giant);
+        if (tiny) {
+            tiny->SetGraphVariableBool("GTSBEH_T_InStorage", false);
+            SetBetweenBreasts(tiny, false);
+            SetBeingEaten(tiny, false);
+            SetBeingHeld(tiny, false);
+        }
+
+        DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75);
+        giant->SetGraphVariableInt("GTS_GrabbedTiny", 0); // Tell behaviors 'we have nothing in our hands'. A must.
+        giant->SetGraphVariableInt("GTS_Grab_State", 0);
+        giant->SetGraphVariableInt("GTS_Storing_Tiny", 0);
+        Grab::DetachActorTask(giant);
+        Grab::Release(giant);
     }
 
     ///===================================================================
@@ -523,6 +568,8 @@ namespace Gts
         AnimationManager::RegisterEvent("GTS_BS_HandsLand", "Cleavage", GTS_BS_HandsLand);
         AnimationManager::RegisterEvent("GTS_BS_Poke", "Cleavage", GTS_BS_Poke);
         AnimationManager::RegisterEvent("GTS_BS_Pat", "Cleavage", GTS_BS_Pat);
+
+        AnimationManager::RegisterEvent("GTSBEH_Boobs_StartTransition", "Cleavage", GTSBEH_Boobs_StartTransition);
 	}
 } 
  

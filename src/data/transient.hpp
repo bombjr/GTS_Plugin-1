@@ -36,6 +36,12 @@ namespace Gts {
 		float ShrinkResistance;
 		float MightValue;
 
+		float Shrink_Ticks;
+
+		float Perk_BonusActionSpeed;
+		float Perk_lifeForceStolen;
+		int   Perk_lifeForceStacks;
+
 		int CrushedTinies;
 
 		NiPoint3 BoundingBox_Cache;

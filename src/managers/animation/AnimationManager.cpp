@@ -32,13 +32,25 @@
 #include "managers/animation/Kicks.hpp"
 #include "managers/animation/Stomp.hpp"
 #include "managers/animation/Grab.hpp"
+#include "managers/PerkHandler.hpp"
 #include "utils/InputFunctions.hpp"
 #include "data/persistent.hpp"
 #include "scale/scale.hpp"
+#include "data/time.hpp"
 
 using namespace RE;
 using namespace Gts;
 using namespace std;
+
+namespace {
+	bool IsInRaceMenu() {
+		auto ui = UI::GetSingleton();
+		if (ui->GetMenu("RaceSex Menu")) {
+			return true; // Disallow to do animations in RaceMenu
+		}
+		return false;
+	}
+}
 
 namespace Gts {
 	AnimationEventData::AnimationEventData(Actor& giant, TESObjectREFR* tiny) : giant(giant), tiny(tiny) {
@@ -143,8 +155,6 @@ namespace Gts {
 
 		Grab::RegisterEvents();
 		Grab::RegisterTriggers();
-
-
 	}
 
 	void AnimationManager::Update() {
@@ -254,20 +264,18 @@ namespace Gts {
 	}
 
 	void AnimationManager::StartAnim(std::string_view trigger, Actor& giant, TESObjectREFR* tiny) {
-		if (giant.formID == 0x14 && IsFirstPerson()) {
+		if (IsInRaceMenu()) {
+			return;
+		}
+		if (giant.formID == 0x14 && IsFirstPerson()) { //Time::WorldTimeElapsed() > 1.0
+			//ForceThirdPerson(&giant);
+			// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.
+			// Better to wait for full support someday
 			return; // Don't start animations in FP, it's not supported.
 		}
 		try {
 			auto& me = AnimationManager::GetSingleton();
 			// Find the behavior for this trigger exit on catch if not
-			/*bool Busy = IsGtsBusy(&giant);
-			if (Busy) {
-				log::info("GTS is currently busy");
-				return; // < fixes an issue with animations that repeat self if we spam animations 
-				// (press stomp, hold kick = perform stomps for example).
-				// Current downside: this method breaks most anims that depend on that bool/set it to True (Hugs, Thigh Sandwich, Trampling, etc)
-				// TO-DO: somehow fix it
-			}*/
 
 			auto& behavorToPlay = me.triggers.at(std::string(trigger));
 			auto& group = behavorToPlay.group;
@@ -280,6 +288,8 @@ namespace Gts {
 			//log::info("Playing Trigger {} for {}", trigger, giant.GetDisplayFullName());
 			//log::info("Playing {}", behavorToPlay.behavors[0]);
 			giant.NotifyAnimationGraph(behavorToPlay.behavors[0]);
+
+			PerkHandler::UpdatePerkValues(&giant, PerkUpdate::Perk_Acceleration); // Currently used for Anim Speed buff only
 		} catch (std::out_of_range) {
 			log::error("Requested play of unknown animation named: {}", trigger);
 			return;

@@ -2,11 +2,15 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/highheel.hpp"
 #include "scale/modscale.hpp"
-#include "scale/scale.hpp"
+#include "rays/raycast.hpp"
 #include "data/runtime.hpp"
+#include "scale/scale.hpp"
+
 #include "node.hpp"
 
+
 using namespace RE;
+using namespace Gts;
 
 namespace {
 	enum class CameraDataMode {
@@ -16,46 +20,57 @@ namespace {
 
 	const CameraDataMode currentMode = CameraDataMode::State;
 
-	void CAMERA_ASM_TEST(float value) { // Crashes / doesn't work. 
-		//FactorCameraOffset = 49866 ; 50799
+	void PerformRaycastOnCamera(NiPoint3& LocalCoords, PlayerCamera* playerCamera) {
+		// Get our computed local-space xyz offset.
+		const auto cameraLocal = LocalCoords;
+		// Get the base world position for the camera which we will offset with the local-space values.
 
-		// sE: 14084B430 - 14084b448 = 0x18
-		// ASM Attempt, doesn't work properly.
+		bool success = false;
+		NiPoint3 endpos = NiPoint3();
+		NiPoint3 ray_start = playerCamera->cameraRoot->world.translate;
+		const std::vector<NiPoint3> directions = {
+			{0,0, -1},
+			{0,0, 1},
+			{0,-1,0},
+			{0,1,0},
+			{-1,0,0},
+			{1,0,0},
+		};
 
-		constexpr REL::Offset FloatA_GetOffset_SE(0x84b430); // 14084b430 - 1404f54b5: 0x18
-		constexpr REL::Offset FloatA_GetOffset_AE(50799); // 14084b430 - 14050e5f5: 0x95
-
-		// 0x14084b430 - 0x14084b440 : 0x10  (value 1)
-		// 0x14084b430 - 0x14084b454 : 0x1c  (value 2)
-		// 0x14084b430 - 0x14084b459 : 0x29  (value 3)
-		// 0x14084b430 - 0x14084f9f1 : 0x45C1  (in_RDX[2] (1))
-		// 0x14084b430 - 0x14084f977 : 0x4547  (in_RDX[2] (2))
-		// 0x14084b430 - 0x14084f9fb : 0x45CB  (in_RDX[1])
-		// 0x1404f5420 - 0x14084f97e : 0x35A55E
-		//REL::Relocation<std::uintptr_t> FloatA_SE_Hook(FloatA_GetOffset_SE, 0x18);
-		//REL::Relocation<std::uintptr_t> FloatA_AE_Hook(FloatA_GetOffset_AE, 0x18);
-
-		//REL::safe_write(ShakeCamera_GetOffset_SE_Hook.address(), targets);
-		if (REL::Module::IsSE()) {
-			log::info("SE Patched!");
-			log::info("Value: {}", value);
-			const float& pass = value;
-
-			REL::safe_write(FloatA_GetOffset_SE.address() + 0x10, &pass, 8);
-			REL::safe_write(FloatA_GetOffset_SE.address() + 0x1C, &pass, 8);
-			REL::safe_write(FloatA_GetOffset_SE.address() + 0x29, &pass, 8);
-			// ^ Do not work
-			REL::safe_write(FloatA_GetOffset_SE.address() + 0x45C1, &value, 8);
-			//REL::safe_write(FloatA_GetOffset_SE.address() + 0x45CB, &value, sizeof(float));
-			//REL::safe_write(FloatA_GetOffset_SE.address() + 0x35A55E, &value, sizeof(float));
-			// ^ Crash the game
-			
-		} else if (REL::Module::IsAE()) {
-			log::info("AE Patched!");
-			//REL::safe_write(FloatA_AE_Hook.address(), &targets, sizeof(float));
+		float ray_length = 30 * get_visual_scale(PlayerCharacter::GetSingleton());
+		for (auto Directions: directions) {
+			NiPoint3 endpos = CastRayStatics(PlayerCharacter::GetSingleton(), ray_start, Directions, ray_length, success);
+		}
+		if (success) {
+			log::info("Raycast is true");
+			LocalCoords = endpos;
+			// I can't get the logic for it right, behaves incorrectly.
 		}
 	}
 
+	void CameraTest(NiPoint3 coords) {
+		auto player = PlayerCharacter::GetSingleton();
+		auto playerCamera = RE::PlayerCamera::GetSingleton();
+		auto thirdPersonState = reinterpret_cast<RE::ThirdPersonState*>(playerCamera->cameraStates[RE::CameraState::kThirdPerson].get());
+		auto isInThirdPerson = playerCamera->currentState->id == RE::CameraState::kThirdPerson;
+		//log::info("Current Zoom Offset: {}", thirdPersonState->currentZoomOffset);
+		if (isInThirdPerson) {
+
+			float shift = 100 * (get_visual_scale(player) - get_natural_scale(player));
+
+			if (coords.Length() <= 0) {
+				coords = {0, -shift, shift}; // If no Bone Tracking mode is selected, just scale the camera up and backwards
+			}
+			
+			// Else apply bone tracking offsets
+ 			//NiPoint3& expected_pos = thirdPersonState->posOffsetExpected;
+			//expected_pos = coords;
+			// Problems:
+			    // 
+				// -1: When looking above the character, camera moves forward despite offsetting it backwards based on size
+				// -2: rotating the camera around the player results in weird distance shifts
+		}
+	}
 }
 
 namespace Gts {
@@ -402,8 +417,6 @@ namespace Gts {
 
 		float value = Runtime::GetFloatOr("cameraAlternateX", 1.0);
 
-		//CAMERA_ASM_TEST(value);
-
 		if (cameraRoot) {
 			if (currentState) {
 				auto cameraWorldTranform = GetCameraWorldTransform();
@@ -440,6 +453,9 @@ namespace Gts {
 							auto localShifted = transform * worldShifted;
 							auto targetLocationLocalShifted = localShifted;
 
+							//PerformRaycastOnCamera(targetLocationLocalShifted, camera); // Doesn't work as intended
+							//CameraTest(targetLocationLocalShifted);
+
 							UpdatePlayerCamera(targetLocationLocalShifted);
 							UpdateNiCamera(targetLocationLocalShifted);
 
@@ -451,5 +467,4 @@ namespace Gts {
 			}
 		}
 	}
-
 }

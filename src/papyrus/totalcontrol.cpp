@@ -177,7 +177,6 @@ namespace {
 		float Volume = std::clamp(scale * 0.10f, 0.10f, 1.0f);
 		float falloff = 0.11 * scale;
 
-		log::info("Shrinking Player Total Control");
 		Runtime::PlaySoundAtNode_FallOff("shrinkSound", casterRef, Volume, 1.0, "NPC Pelvis [Pelv]", falloff);
 	
 		// Thread safe handles
@@ -220,7 +219,7 @@ namespace {
 		float target = get_target_scale(player);
 		float max_scale = get_max_scale(player);// * get_natural_scale(player);
 		if (target >= max_scale) {
-			TiredSound(player, "You can't grow any further");
+			NotifyWithSound(player, "You can't grow any further");
 			shake_camera(player, 0.45, 0.30);
 			return;
 		}
@@ -231,7 +230,7 @@ namespace {
 		auto player = PlayerCharacter::GetSingleton();
 		float target = get_target_scale(player);
 		if (target <= Minimum_Actor_Scale) {
-			TiredSound(player, "You can't shrink any further");
+			NotifyWithSound(player, "You can't shrink any further");
 			shake_camera(player, 0.45, 0.30);
 			return;
 		}

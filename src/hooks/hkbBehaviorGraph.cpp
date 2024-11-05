@@ -2,6 +2,7 @@
 #include "hooks/hkbBehaviorGraph.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/transient.hpp"
+#include "data/runtime.hpp"
 
 
 using namespace RE;
@@ -18,6 +19,19 @@ namespace {
 			return AnimationManager::GetAnimSpeed(actor);
 		} 
 		return AnimationManager::GetAnimSpeed(actor);
+	}
+
+	void AffectByPerk(Actor* giant, float& anim_speed) {
+		auto data = Transient::GetSingleton().GetActorData(giant);
+		if (data) {
+			float speed = data->Perk_BonusActionSpeed;
+			if (speed > 1.0) {
+				bool CanApply = IsStomping(giant) || IsFootGrinding(giant) || IsVoring(giant) || IsTrampling(giant);
+				if (CanApply) {
+					anim_speed *= speed;
+				}
+			}
+		}
 	}
 }
 
@@ -39,6 +53,7 @@ namespace Hooks
 					if (graph) {
 						if (a_this == graph->behaviorGraph) {
 							float multi = Animation_GetSpeedCorrection(actor);
+							AffectByPerk(actor, anim_speed);
 							anim_speed *= multi;
 						}
 					}

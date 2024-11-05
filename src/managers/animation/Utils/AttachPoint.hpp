@@ -293,6 +293,10 @@ namespace Gts {
 			DebugAPI::DrawSphere(glm::vec3(targetPoint.x, targetPoint.y, targetPoint.z), 2.0, 40, {0.0, 0.0, 1.0, 1.0});
 		}
 
+		/*if (Attachment_GetTargetNode(giant) == AttachToNode::ObjectA) {
+			return AttachToObjectA(giant, tiny);
+		}*/
+
 		return AttachTo(anyGiant, anyTiny, targetPoint);
 	}
 

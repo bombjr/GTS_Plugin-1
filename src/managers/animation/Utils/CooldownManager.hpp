@@ -29,6 +29,9 @@ namespace Gts {
         Misc_AiGrowth,
         Misc_ShrinkOutburst,
         Misc_ShrinkOutburst_Forced,
+        Misc_ShrinkParticle,
+        Misc_ShrinkParticle_Animation,
+        Misc_TinyCalamityRage,
         Footstep_Right,
         Footstep_Left,
     };
@@ -58,6 +61,9 @@ namespace Gts {
         double lastGrowthTime = -1.0e8;
         double lastOutburstTime = -1.0e8;
         double lastForceOutburstTime = -1.0e8;
+        double lastShrinkParticleTime = -1.0e8;
+        double lastAnimShrinkParticleTime = -1.0e8;
+        double lastTinyCalamityTime = -1.0e8;
 
         double lastFootstepTime_R = -1.0e8;
         double lastFootstepTime_L = -1.0e8;

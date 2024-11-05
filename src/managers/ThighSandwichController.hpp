@@ -69,5 +69,8 @@ namespace Gts {
 			SandwichingData& GetSandwichingData(Actor* giant);
 
 			std::unordered_map<FormID, SandwichingData> data;
+			void AllowMessage(bool allow);
+		private:
+			bool allow_message = false;
 	};
 }

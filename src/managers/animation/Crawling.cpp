@@ -280,7 +280,7 @@ namespace {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeLight_Left", player);
 			} else {
-				TiredSound(player, "You're too tired for hand swipe");
+				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
 		}
 	}
@@ -295,7 +295,7 @@ namespace {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeLight_Right", player);
 			} else {
-				TiredSound(player, "You're too tired for hand swipe");
+				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
 		}
 	}
@@ -311,7 +311,7 @@ namespace {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeHeavy_Left", player);
 			} else {
-				TiredSound(player, "You're too tired for hand swipe");
+				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
 		}
 	}
@@ -326,7 +326,7 @@ namespace {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeHeavy_Right", player);
 			} else {
-				TiredSound(player, "You're too tired for hand swipe");
+				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
 		}
 	}

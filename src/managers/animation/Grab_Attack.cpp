@@ -73,7 +73,7 @@ namespace {
 
                 TinyCalamity_ShrinkActor(giant, grabbedActor, damage * 0.10 * GetDamageSetting());
 
-                SizeHitEffects::GetSingleton().BreakBones(giant, grabbedActor, 0.15, 6);
+                SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, grabbedActor, damage*0.15, 6);
                 InflictSizeDamage(giant, grabbedActor, damage);
             }
 			
@@ -96,8 +96,7 @@ namespace {
 		if (!grabbedActor) {
 			giant->SetGraphVariableInt("GTS_GrabbedTiny", 0);
 			giant->SetGraphVariableInt("GTS_Grab_State", 0);
-			AnimationManager::StartAnim("GrabAbort", giant);
-			AnimationManager::StartAnim("TinyDied", giant);
+			Grab::ExitGrabState(giant);
 			Grab::DetachActorTask(giant);
 			Grab::Release(giant);
 		}

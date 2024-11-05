@@ -136,6 +136,12 @@ namespace Gts {
 		if (a_event) {
 			auto profiler = Profilers::Profile("Impact: HookProcess");
 			auto actor = a_event->actor.get().get();
+
+			auto id = a_event->pad04;
+			if (id == 10000001) { // If it passes the check - it means we sent fake footstep event.
+				// So just do nothing in that case, we don't want it to deal damage/do dust clouds and such
+				return;
+			}
 			
 			std::string tag = a_event->tag.c_str();
 			auto event_manager = ModEventManager::GetSingleton();
@@ -167,7 +173,7 @@ namespace Gts {
 			}
 			if (actor->AsActorState()->IsSprinting()) {
 				bonus *= 1.15;
-				if (Runtime::HasPerkTeam(actor, "LethalSprint")) {
+				if (Runtime::HasPerkTeam(actor, "DevastatingSprint")) {
 					bonus *= 1.25;
 				}
 			}

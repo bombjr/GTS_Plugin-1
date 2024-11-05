@@ -11,7 +11,7 @@ namespace Gts {
 	float GetScareThreshold(Actor* giant);
 	void Task_InitHavokTask(Actor* tiny);
 	void SendDeathEvent(Actor* giant, Actor* tiny);
-	void KillActor(Actor* giant, Actor* tiny, bool silent);
+	void KillActor(Actor* giant, Actor* tiny);
 
 	float GetGrowthCount(Actor* giant);
 	float GetGrowthLimit(Actor* actor);

@@ -121,6 +121,11 @@ namespace Gts {
 			float MovementSlowdown = 1.0;
 			float ShrinkResistance = 0.0;
 			float MightValue = 0.0;
+			float Shrink_Ticks = 0.0;
+
+			float Perk_BonusActionSpeed = 1.0;
+			float Perk_lifeForceStolen = 0.0;
+			int Perk_lifeForceStacks = 0;
 
 			int CrushedTinies = 0;
 
@@ -176,6 +181,11 @@ namespace Gts {
 			result.MovementSlowdown = MovementSlowdown;
 			result.ShrinkResistance = ShrinkResistance;
 			result.MightValue = MightValue;
+			result.Shrink_Ticks = Shrink_Ticks;
+
+			result.Perk_BonusActionSpeed = Perk_BonusActionSpeed;
+			result.Perk_lifeForceStolen = Perk_lifeForceStolen;
+			result.Perk_lifeForceStacks = Perk_lifeForceStacks;
 
 			result.CrushedTinies = CrushedTinies;
 
@@ -203,7 +213,6 @@ namespace Gts {
 			result.POS_Last_Hand_R = POS_Last_Hand_R;
 
 			result.shrinkies = shrinkies;
-
 			result.shrink_until = shrink_until;
 
 			result.IsInControl = IsInControl;

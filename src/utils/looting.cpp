@@ -168,7 +168,7 @@ namespace Gts {
 			auto giant = gianthandle.get().get();
 
 			if (tiny && !tiny->IsDead()) {
-				KillActor(giant, tiny, false); // just to make sure
+				KillActor(giant, tiny); // just to make sure
 			}
 
 			float hp = GetAV(tiny, ActorValue::kHealth);

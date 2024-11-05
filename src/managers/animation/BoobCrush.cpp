@@ -196,7 +196,7 @@ namespace {
 			auto giantref = gianthandle.get().get();
 
 			float stamina = GetAV(giantref, ActorValue::kStamina);
-			DamageAV(giantref, ActorValue::kStamina, 0.12 * GetButtCrushCost(giant));
+			DamageAV(giantref, ActorValue::kStamina, 0.12 * GetButtCrushCost(giant, false));
 
 			if (!IsButtCrushing(giantref)) {
 				return false;
@@ -226,6 +226,10 @@ namespace {
 
 	void InflictBreastDamage(Actor* giant) {
 		float damage = GetBoobCrushDamage(giant);
+		Actor* victim = AnimationBoobCrush::GetSingleton().GetBoobCrushVictim(giant);
+		if (victim) {
+			SetBeingEaten(victim, false); // Allow to be staggered
+		}
 
 		float perk = GetPerkBonus_Basics(giant);
 		float dust = 1.0;
@@ -306,10 +310,10 @@ namespace {
 
 	void GTS_BoobCrush_TrackBody(AnimationEventData& data) {
 		RecordStartButtCrushSize(&data.giant);
-		ManageCamera(&data.giant, true, CameraTracking::Breasts_02);
+		ManageCamera(&data.giant, true, CameraTracking::ObjectB);
 	}
 	void GTS_BoobCrush_UnTrackBody(AnimationEventData& data) {
-		ManageCamera(&data.giant, false, CameraTracking::Breasts_02);
+		ManageCamera(&data.giant, false, CameraTracking::ObjectB);
 	}
 	void GTS_BoobCrush_BreastImpact(AnimationEventData& data) {
 		InflictBreastDamage(&data.giant);
@@ -334,7 +338,7 @@ namespace {
 		SetButtCrushSize(giant, bonus, false);
 		SpringGrow(giant, bonus, 0.3 / GetAnimationSlowdown(giant), "BreastCrushGrowth", false);
 
-		float WasteStamina = 100.0 * GetButtCrushCost(giant);
+		float WasteStamina = 100.0 * GetButtCrushCost(giant, false);
 		DamageAV(giant, ActorValue::kStamina, WasteStamina);
 		
 		Runtime::PlaySoundAtNode("growthSound", giant, 1.0, 1.0, "NPC Pelvis [Pelv]");
@@ -352,7 +356,38 @@ namespace {
 }
 
 namespace Gts
-{
+{	
+
+	AnimationBoobCrush& AnimationBoobCrush::GetSingleton() noexcept {
+		static AnimationBoobCrush instance;
+		return instance;
+	}
+
+	std::string AnimationBoobCrush::DebugName() {
+		return "AnimationBoobCrush";
+	}
+
+	void AnimationBoobCrush::AttachActor(Actor* giant, Actor* tiny) {
+		AnimationBoobCrush::GetSingleton().data.try_emplace(giant, tiny);
+	}
+
+	void AnimationBoobCrush::Reset() {
+		this->data.clear();
+	}
+
+	void AnimationBoobCrush::ResetActor(Actor* actor) {
+		this->data.erase(actor);
+	}
+
+	Actor* AnimationBoobCrush::GetBoobCrushVictim(Actor* giant) {
+		try {
+			auto& me = AnimationBoobCrush::GetSingleton();
+			return me.data.at(giant).tiny;
+		} catch (std::out_of_range e) {
+			return nullptr;
+		}
+	}
+
 	void AnimationBoobCrush::RegisterEvents() {
 		AnimationManager::RegisterEvent("GTS_BoobCrush_DOT_Start_Loop", "BoobCrush", GTS_BoobCrush_DOT_Start_Loop);
 		AnimationManager::RegisterEvent("GTS_BoobCrush_Smile_On", "BoobCrush", GTS_BoobCrush_Smile_On);
@@ -365,5 +400,8 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTS_BoobCrush_Grow_Start", "BoobCrush", GTS_BoobCrush_Grow_Start);
 		AnimationManager::RegisterEvent("GTS_BoobCrush_Grow_Stop", "BoobCrush", GTS_BoobCrush_Grow_Stop);
 		AnimationManager::RegisterEvent("GTS_BoobCrush_LoseSize", "BoobCrush", GTS_BoobCrush_LoseSize);
+	}
+
+	BoobCrushData::BoobCrushData(Actor* tiny) : tiny(tiny) {
 	}
 }

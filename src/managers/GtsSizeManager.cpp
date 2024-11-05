@@ -54,6 +54,15 @@ namespace {
 			return 0.05;
 		}
 	}
+
+	float Get_LifeForceBonus(Actor* giant) {
+		float bonus = 0.0;
+		auto data = Transient::GetSingleton().GetActorData(giant);
+		if (data) {
+			bonus = data->Perk_lifeForceStolen;
+		}
+		return bonus;
+	}
 }
 
 namespace Gts {
@@ -70,14 +79,16 @@ namespace Gts {
 		if (!actor) {
 			return;
 		}
-		this->GetData(actor).enchantmentBonus = amt;
+		this->GetData(actor).AspectOfGiantess = amt;
 	}
 
 	float SizeManager::GetEnchantmentBonus(Actor* actor) {
 		if (!actor) {
 			return 0.0;
 		}
-		float EB = std::clamp(this->GetData(actor).enchantmentBonus, 0.0f, 1000.0f);
+		float EB = std::clamp(this->GetData(actor).AspectOfGiantess, 0.0f, 1000.0f);
+		EB += Get_LifeForceBonus(actor);
+
 		return EB;
 	}
 
@@ -85,7 +96,7 @@ namespace Gts {
 		if (!actor) {
 			return;
 		}
-		this->GetData(actor).enchantmentBonus += amt;
+		this->GetData(actor).AspectOfGiantess += amt;
 	}
 
 	//=================Size Hunger
@@ -260,6 +271,12 @@ namespace Gts {
 	//===============Size-Vulnerability
 
 	//===============Camera Stuff
+	CameraTracking SizeManager::GetPreviousBone(Actor* actor) {
+		return this->GetData(actor).PreviousBone;
+	}
+	void SizeManager::SetPreviousBone(Actor* actor) {
+		this->GetData(actor).PreviousBone = this->GetData(actor).TrackedBone;
+	}
 	void SizeManager::SetTrackedBone(Actor* actor, bool enable, CameraTracking Bone) {
 		if (!enable) {
 			Bone = CameraTracking::None;

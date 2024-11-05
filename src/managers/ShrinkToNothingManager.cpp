@@ -1,5 +1,6 @@
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/ai/aifunctions.hpp"
+#include "managers/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -26,6 +27,60 @@ namespace {
 		}
 		
 		return mult;
+	}
+
+	void SpawnDeathEffects(Actor* tiny) {
+		if (!IsLiving(tiny)) {
+			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);
+		} else {
+			if (!LessGore()) {
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_real_distribution<float> dis(-0.2, 0.2);
+				auto root = find_node(tiny, "NPC Root [Root]");
+				if (root) {
+					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
+					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
+					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
+					SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
+				}
+				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
+				Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
+			} else {
+				Runtime::PlaySound("BloodGushSound", tiny, 1.0, 1.0);
+			}
+		}
+	}
+
+	void TransferInventoryTask(Actor* giant, Actor* tiny) {
+		ActorHandle giantHandle = giant->CreateRefHandle();
+		ActorHandle tinyHandle = tiny->CreateRefHandle();
+		std::string taskname = std::format("STN {}", tiny->formID);
+
+		float currentSize = get_visual_scale(tiny);
+
+		if (tinyHandle) {
+			Runtime::PlaySound("ShrinkToNothingSound", tinyHandle.get().get(), 1.0, 1.0);
+		}
+
+		TaskManager::RunOnce(taskname, [=](auto& update){
+			if (!tinyHandle) {
+				return;
+			}
+			if (!giantHandle) {
+				return;
+			}
+			auto giant = giantHandle.get().get();
+			auto tiny = tinyHandle.get().get();
+			TransferInventory(tiny, giant, currentSize * GetSizeFromBoundingBox(tiny), false, true, DamageSource::Crushed, true);
+			// Actor reset is done within TransferInventory
+		});
+		if (tiny->formID != 0x14) {
+			Disintegrate(tiny); // Set critical stage 4 on actors
+		} else {
+			TriggerScreenBlood(50);
+			tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+		}
 	}
 }
 
@@ -58,74 +113,22 @@ namespace Gts {
 			if (data.state == ShrinkState::Healthy) {
 				SetReanimatedState(tiny);
 				data.state = ShrinkState::Shrinking;
-				log::info("Set state to shrinking");
 			} else if (data.state == ShrinkState::Shrinking) {
 				ModSizeExperience(giant, 0.24 * GetXPModifier(tiny)); // Adjust Size Matter skill
 				Attacked(tiny, giant);
 				if (giant->formID == 0x14 && IsDragon(tiny)) {
 					CompleteDragonQuest(tiny, ParticleType::Red, tiny->IsDead());
 				}
-				// Do shrink
-				float currentSize = get_visual_scale(tiny);
-				// Fully shrunk
-				
-				KillActor(giant, tiny, false);
 
-				if (!IsLiving(tiny)) {
-					SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);
-				} else {
-					if (!LessGore()) {
-						std::random_device rd;
-						std::mt19937 gen(rd());
-						std::uniform_real_distribution<float> dis(-0.2, 0.2);
-						auto root = find_node(tiny, "NPC Root [Root]");
-						if (root) {
-							SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-							SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-							SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-							SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
-						}
-						Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
-						Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSetVoreMedium", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, true);
-					} else {
-						Runtime::PlaySound("BloodGushSound", tiny, 1.0, 1.0);
-					}
-				}
+				SpawnDeathEffects(tiny);
+				KillActor(giant, tiny);
+
+				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
 				AddSMTDuration(giant, 5.0);
 
-				ActorHandle giantHandle = giant->CreateRefHandle();
-				ActorHandle tinyHandle = tiny->CreateRefHandle();
-				std::string taskname = std::format("STN {}", tiny->formID);
+				TransferInventoryTask(giant, tiny); // Also plays STN sound
 
-				log::info("Creating transfer task");
-
-				TaskManager::RunOnce(taskname, [=](auto& update){
-					if (!tinyHandle) {
-						return;
-					}
-					if (!giantHandle) {
-						return;
-					}
-					auto giant = giantHandle.get().get();
-					auto tiny = tinyHandle.get().get();
-					TransferInventory(tiny, giant, currentSize * GetSizeFromBoundingBox(tiny), false, true, DamageSource::Crushed, true);
-					log::info("Transfer task succeeded");
-					// Actor reset is done within TransferInventory
-				});
-				if (tiny->formID != 0x14) {
-					Disintegrate(tiny, true); // Set critical stage 4 on actors
-					log::info("SetCritStage 4");
-				} else {
-					TriggerScreenBlood(50);
-					tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
-					log::info("Setting alpha to 0");
-				}
-
-				if (tinyHandle) {
-					Runtime::PlaySound("ShrinkToNothingSound", tinyHandle.get().get(), 1.0, 1.0);
-				}
-				log::info("Shrinking finished");
 				data.state = ShrinkState::Shrinked;
 			}
 		}

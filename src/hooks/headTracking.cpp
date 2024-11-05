@@ -62,7 +62,7 @@ namespace {
 	float affect_by_scale(TESObjectREFR* ref, float original) {
 		Actor* giant = skyrim_cast<Actor*>(ref);
 		if (giant) {
-			if (giant->formID == 0x14 && HasHeadTrackingTarget(giant)) { // Apply it ONLY when targeting someone (when locking on Enemy with TDM for example)
+			if (HasHeadTrackingTarget(giant)) { // Apply it ONLY when targeting someone (when locking on Enemy with TDM for example)
 				//|| giant->formID != 0x14 && !HasHeadTrackingTarget(giant)) { 
 				// ^ needs to be enabled if experimenting with ForceLookAtCleavage() function, else they double-apply
 				if (IsinRagdollState(giant) || IsDragon(giant)) {  // Dragons seem to behave funny if we edit them...sigh...

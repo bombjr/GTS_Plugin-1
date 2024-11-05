@@ -39,16 +39,13 @@ namespace {
 
 	void AI_PerformRandomVore(Actor* pred) {
 		if (IsGtsBusy(pred)) {
-			log::info("{} Is Gts Busy", pred->GetDisplayFullName());
 			return; // No Vore attempts if in GTS_Busy
 		}
 
 		if (GetAV(pred, ActorValue::kHealth) < 0) {
-			log::info("{} Health is < 0", pred->GetDisplayFullName());
 			return;
 		}
 		
-		log::info("PerformRandomVore started");
 		auto& VoreManager = Vore::GetSingleton();
 
 		for (auto actor: find_actors()) {
@@ -59,11 +56,9 @@ namespace {
 					int random = rand() % Requirement;
 					int trigger_threshold = 2;
 					if (random <= trigger_threshold) {
-						log::info("Random < threshold");
 						std::vector<Actor*> preys = VoreManager.GetVoreTargetsInFront(pred, 1);
 						for (auto prey: preys) {
 							VoreManager.StartVore(pred, prey);
-							log::info("StartVore called, can vore: {}", VoreManager.CanVore(pred, prey));
 						}
 					}
 				}

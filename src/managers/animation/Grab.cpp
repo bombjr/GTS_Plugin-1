@@ -59,6 +59,27 @@ using namespace std;
 
 namespace {
 
+	void PrintCancelReason(Actor* giant, Actor* tiny, float sizedifference, float Action_Grab) {
+		log::info("Canceled Grab on {}. Reasons below", tiny->GetDisplayFullName());
+		bool GiantDead = giant->IsDead();
+		bool TinyDead = tiny->IsDead();
+		if (GiantDead) {
+			log::info("---Giant Has Died");
+		}
+		if (TinyDead) {
+			log::info("---Tiny Has Died");
+		}
+		if (GetAV(tiny, ActorValue::kHealth) <= 0.0) {
+			log::info("---Tiny health is < 0: {}", GetAV(tiny, ActorValue::kHealth) <= 0.0);
+		}
+		if (GetAV(giant, ActorValue::kStamina) < 2.0) {
+			log::info("---Giant stamina is < 2: {}", GetAV(giant, ActorValue::kStamina) < 2.0);
+		}
+		if (sizedifference < Action_Grab) {
+			log::info("---SizeDifference < Threshold: {}, Difference: {}", sizedifference < Action_Grab, sizedifference);
+		}
+	}
+
 	const std::vector<std::string_view> RHAND_RUMBLE_NODES = { // used for hand rumble
 		"NPC R UpperarmTwist1 [RUt1]",
 		"NPC R UpperarmTwist2 [RUt2]",
@@ -211,7 +232,6 @@ namespace {
 		auto grabbedActor = Grab::GetHeldActor(giant);
 		ManageCamera(&data.giant, false, CameraTracking::Grab_Left);
 		AnimationManager::StartAnim("TinyDied", giant);
-		//BlockFirstPerson(giant, false);
 		if (grabbedActor) {
 			SetBetweenBreasts(grabbedActor, false);
 			PushActorAway(giant, grabbedActor, 1.0);
@@ -356,7 +376,7 @@ namespace {
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim("GrabDamageAttack", player);
 			} else {
-				TiredSound(player, "You're too tired to perform hand attack");
+				NotifyWithSound(player, "You're too tired to perform hand attack");
 			}
 		}
 	}
@@ -400,7 +420,7 @@ namespace {
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim("GrabThrowSomeone", player);
 			} else {
-				TiredSound(player, "You're too tired to throw that actor");
+				NotifyWithSound(player, "You're too tired to throw that actor");
 			}
 		}
 	}
@@ -415,8 +435,10 @@ namespace {
 		if (IsGtsBusy(player) && !IsUsingThighAnimations(player) || IsTransitioning(player)) {
 			return;
 		}
-		Utils_UpdateHighHeelBlend(player, false);
-		AnimationManager::StartAnim("GrabReleasePunies", player);
+		if (!player->AsActorState()->IsWeaponDrawn()) {
+			Utils_UpdateHighHeelBlend(player, false);
+			AnimationManager::StartAnim("GrabReleasePunies", player);
+		}
 	}
 
 	void BreastsPutEvent(const InputEventData& data) {
@@ -546,7 +568,7 @@ namespace Gts {
 
                 TinyCalamity_ShrinkActor(giant, grabbed, damage * 0.10 * GetDamageSetting());
 
-                SizeHitEffects::GetSingleton().BreakBones(giant, grabbed, 0.15, 6);
+                SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, grabbed, damage*0.15, 6);
                 InflictSizeDamage(giant, grabbed, damage);
             }
 			
@@ -661,22 +683,24 @@ namespace Gts {
 			Grab::ReattachTiny(giantref, tinyref);
 
 			ShutUp(tinyref);
+			ShutUp(giantref);	
 
 			bool Attacking = false;
 			giantref->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
-			if (!Attacking || IsBeingEaten(tinyref)) {
-				if (giantref->IsDead() || tinyref->IsDead() 
-					|| GetAV(tinyref, ActorValue::kHealth) <= 0.0 
-					|| sizedifference < Action_Grab 
+
+			bool Dead = (giantref->IsDead() || tinyref->IsDead());
+			bool CanCancel = (Dead || !IsVoring(giantref)) && (!Attacking || IsBeingEaten(tinyref));
+			bool small_size = sizedifference < Action_Grab;
+
+			if (CanCancel) {
+				if (Dead || GetAV(tinyref, ActorValue::kHealth) <= 0.0 
+					|| small_size
 					|| (!IsBetweenBreasts(tinyref) 
 					&& GetAV(giantref, ActorValue::kStamina) < 2.0)) {
 
-					log::info("Canceled Grab on {}. Reasons below", tinyref->GetDisplayFullName());
-					log::info("Giant Is Dead: {}", giantref->IsDead());
-					log::info("Tiny is dead {}", tinyref->IsDead());
-					log::info("Tiny health is < 0: {}", GetAV(tinyref, ActorValue::kHealth) <= 0.0);
-					log::info("SizeDifference < Threshold: {}, Difference: {}", sizedifference < Action_Grab, sizedifference);
-					log::info("Giant stamina is < 2: {}", GetAV(giantref, ActorValue::kStamina) < 2.0);
+					PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
+					// For debugging
+
 					PushActorAway(giantref, tinyref, 1.0);
 					tinyref->SetGraphVariableBool("GTSBEH_T_InStorage", false);
 					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
@@ -687,11 +711,9 @@ namespace Gts {
 					giantref->SetGraphVariableInt("GTS_Grab_State", 0);
 					giantref->SetGraphVariableInt("GTS_Storing_Tiny", 0);
 					DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75);
-					AnimationManager::StartAnim("GrabAbort", giantref); // Abort Grab animation
-					AnimationManager::StartAnim("TinyDied", giantref);
+					Grab::ExitGrabState(giantref);
 					ManageCamera(giantref, false, CameraTracking::Grab_Left); // Disable any camera edits
 					Grab::DetachActorTask(giantref);
-					Grab::Release(giantref);
 					return false;
 				}
 			}
@@ -700,6 +722,7 @@ namespace Gts {
 				if (!AttachToObjectA(gianthandle, tinyhandle)) {
 					// Unable to attach
 					log::info("Can't attach to ObjectA");
+					Grab::DetachActorTask(giantref);
 					return false;
 				}
 			} else if (IsBetweenBreasts(tinyref)) {
@@ -712,9 +735,6 @@ namespace Gts {
 
 				Anims_FixAnimationDesync(giantref, tinyref, false);
 
-				ShutUp(tinyref);
-				ShutUp(giantref);	
-
 				float AnimSpeed_GTS = AnimationManager::GetAnimSpeed(giantref);
 				float AnimSpeed_Tiny = AnimationManager::GetAnimSpeed(tinyref);
 
@@ -725,7 +745,7 @@ namespace Gts {
 
 						if (!AttachTo(giantref, tinyref, coords)) {
 							Anims_FixAnimationDesync(giantref, tinyref, true);
-							Grab::Release(giantref);
+							Grab::DetachActorTask(giantref);
 							return false;
 						}
 					}
@@ -741,8 +761,7 @@ namespace Gts {
 					}
 
 					if (!AttachToObjectB(gianthandle, tinyhandle)) { // Attach to ObjectB non stop
-						Attachment_SetTargetNode(giantref, AttachToNode::None);
-						Grab::Release(giantref);
+						Grab::DetachActorTask(giantref);
 						return false;
 					}
 					return true;
@@ -754,7 +773,7 @@ namespace Gts {
 				if (!AttachToCleavage(gianthandle, tinyhandle)) {
 					// Unable to attach
 					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
-					Grab::Release(giantref);
+					Grab::DetachActorTask(giantref);
 					log::info("Can't attach to Cleavage");
 					return false;
 				}
@@ -764,12 +783,11 @@ namespace Gts {
 			} else {
 				if (!AttachToHand(gianthandle, tinyhandle)) {
 					// Unable to attach
-					
-					
+
 					Attachment_SetTargetNode(giantref, AttachToNode::None);
 					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
 					log::info("Can't attach to hand");
-					Grab::Release(giantref);
+					Grab::DetachActorTask(giantref);
 					return false;
 				}
 			}
@@ -778,6 +796,11 @@ namespace Gts {
 			return true;
 		});
 		TaskManager::ChangeUpdate(name, UpdateKind::Havok);
+	}
+
+	void Grab::ExitGrabState(Actor* giant) {
+		AnimationManager::StartAnim("GrabAbort", giant); // Abort Grab animation
+		AnimationManager::StartAnim("TinyDied", giant);
 	}
 
 

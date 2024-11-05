@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "managers/InputManager.hpp"
 #include "events.hpp"
 
 using namespace std;
@@ -10,6 +11,8 @@ using namespace RE;
 using namespace Gts;
 
 namespace Gts {
+    bool TinyCalamity_WrathfulCalamity(Actor* giant);
+    
     void TinyCalamity_ShrinkActor(Actor* giant, Actor* tiny, float shrink);
     void TinyCalamity_SeekForShrink(Actor* giant, Actor* tiny, float damage, float maxFootDistance, DamageSource Cause, bool Right, bool ApplyCooldown, bool ignore_rotation);
     void TinyCalamity_ExplodeActor(Actor* giant, Actor* tiny);

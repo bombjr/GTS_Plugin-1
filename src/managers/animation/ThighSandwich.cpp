@@ -30,6 +30,7 @@
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/ThighSandwichController.hpp"
 #include "managers/animation/ThighSandwich.hpp"
+#include "managers/damage/TinyCalamity.hpp"
 #include "managers/damage/LaunchActor.hpp"
 #include "managers/audio/GoreAudio.hpp"
 #include "managers/cameras/camutil.hpp"
@@ -373,7 +374,7 @@ namespace {
 				AnimationManager::StartAnim("ThighAttack", player);
 			} else {
 				if (IsThighSandwiching(player)) {
-					TiredSound(player, "You're too tired to perform thigh sandwich");
+					NotifyWithSound(player, "You're too tired to perform thigh sandwich");
 				}
 			}
 		}
@@ -390,7 +391,7 @@ namespace {
 				AnimationManager::StartAnim("ThighAttack_Heavy", player);
 			} else {
 				if (IsThighSandwiching(player)) {
-					TiredSound(player, "You're too tired to perform strong thigh sandwich");
+					NotifyWithSound(player, "You're too tired to perform strong thigh sandwich");
 				}
 			}
 		}

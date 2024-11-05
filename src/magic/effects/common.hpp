@@ -1,9 +1,12 @@
 #pragma once
+#include "managers/animation/Utils/CooldownManager.hpp"
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
+#include "data/transient.hpp"
+#include "ActionSettings.hpp"
 #include "data/runtime.hpp"
 #include "scale/height.hpp"
 #include "scale/scale.hpp"
@@ -206,9 +209,11 @@ namespace Gts {
 
 		efficiency *= Potion_GetShrinkResistance(target);
 
+		efficiency *= Perk_GetSprintShrinkReduction(target); // Up to 20% resistance when sprinting
 		efficiency *= Gigantism_Caster * SizeHunger; // amplity it by Aspect Of Giantess (on gts) and size hunger potion bonus
 		efficiency /= Gigantism_Target; // resistance from Aspect Of Giantess (on Tiny)
 		efficiency /= Scale_Resistance;
+		
 
 		efficiency *= Shrink_GetPower(caster, target);// take bounding box of actor into account
 
@@ -277,7 +282,7 @@ namespace Gts {
 		ModSizeExperience(to, 0.14 * scale_factor * visual_scale * SizeSteal_GetPower(to, from));
 
 		update_target_scale(from, -shrink_amount, SizeEffectType::kShrink);
-		update_target_scale(to, growth_amount, SizeEffectType::kGrow);
+		update_target_scale(to, growth_amount, SizeEffectType::kShrink); //kShrink to buff size steal with On The Edge perk
 
 		float XpMult = 1.0;
 
@@ -341,11 +346,31 @@ namespace Gts {
 		Steal(target, caster, power, power * alteration_level_bonus, transfer_effeciency, source);
 	}
 
-	inline bool ShrinkToNothing(Actor* caster, Actor* target) {
-		float bbscale = GetSizeFromBoundingBox(target);
-		float target_scale = get_visual_scale(target);
+	inline bool BlockShrinkToNothing(Actor* giant, Actor* tiny, float time_mult) {
+		auto transient = Transient::GetSingleton().GetData(tiny);
+		if (transient) {
+			float& tick = transient->Shrink_Ticks;
+			tick += 0.0166 * TimeScale();
 
-		float SHRINK_TO_NOTHING_SCALE = 0.06 / bbscale;
+			if (tick > Shrink_To_Nothing_After * time_mult) {
+				tick = 0.0;
+				return false;
+			} else {
+				bool BlockParticle = IsActionOnCooldown(tiny, CooldownSource::Misc_ShrinkParticle);
+				if (!BlockParticle) {
+					float scale = get_visual_scale(tiny) * 6;
+					float ticks = std::clamp(tick, 1.0f, 3.0f);
+
+					SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", scale * ticks);
+					ApplyActionCooldown(tiny, CooldownSource::Misc_ShrinkParticle);
+				}
+				return true;
+			}
+		}
+		return true;
+	}
+
+	inline bool ShrinkToNothing(Actor* caster, Actor* target, bool check_ticks, float time_mult) {
 		if (!caster) {
 			return false;
 		}
@@ -353,9 +378,19 @@ namespace Gts {
 			return false;
 		}
 
-		if (target_scale <= SHRINK_TO_NOTHING_SCALE && !Runtime::HasMagicEffect(target,"ShrinkToNothing") && !IsTeammate(target)) {
+		float bbscale = GetSizeFromBoundingBox(target);
+		float target_scale = get_target_scale(target);
+
+		if (target_scale <= SHRINK_TO_NOTHING_SCALE / bbscale && !Runtime::HasMagicEffect(target, "ShrinkToNothing")) {
+
+			set_target_scale(target, SHRINK_TO_NOTHING_SCALE / bbscale);
+
 			if (!ShrinkToNothingManager::CanShrink(caster, target)) {
 				return false;
+			}
+
+			if (check_ticks && BlockShrinkToNothing(caster, target, time_mult)) {
+				return true;
 			}
 
 			if (!target->IsDead()) {

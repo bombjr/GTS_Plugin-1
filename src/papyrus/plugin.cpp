@@ -5,6 +5,7 @@
 #include "managers/Attributes.hpp"
 #include "managers/GtsManager.hpp"
 #include "managers/animation/AnimationManager.hpp"
+#include "managers/gamemode/GameModeManager.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "utils/ItemDistributor.hpp"
 #include "magic/effects/common.hpp"
@@ -378,6 +379,22 @@ namespace {
 		Persistent::GetSingleton().HeartEffects = enable;
 	}
 
+	void AdjustBalanceMode(StaticFunctionTag*, int parameter, float modifier) {
+		BalanceModeInfo param = static_cast<BalanceModeInfo>(parameter);
+		auto& Persist = Persistent::GetSingleton();
+		switch (param) {
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0
+				Persist.BalanceMode_SizeGain_Penalty = modifier;
+			break;
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0
+				Persist.BalanceMode_ShrinkRate_Base = modifier;
+			break;
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
+				Persist.BalanceMode_ShrinkRate_Combat = modifier;
+			break;
+		}
+	}
+
 	void SetProgressionMultiplier(StaticFunctionTag*, float value) {
 		Persistent::GetSingleton().progression_multiplier = value;
 	}
@@ -421,7 +438,7 @@ namespace {
 
 	void DisintegrateTarget(StaticFunctionTag*, Actor* actor) {
 		if (actor) {
-			Disintegrate(actor, true);
+			Disintegrate(actor);
 		}
 	}
 
@@ -558,6 +575,7 @@ namespace Gts {
 		vm->RegisterFunction("SetAlternativeLightStomp", PapyrusClass, SetAlternativeLightStomp);
 		vm->RegisterFunction("SetAlternativeSneakTransition", PapyrusClass, SetAlternativeSneakTransition);
 		vm->RegisterFunction("PreventHeartEffects", PapyrusClass, PreventHeartEffects);
+		vm->RegisterFunction("AdjustBalanceMode", PapyrusClass, AdjustBalanceMode);
 		vm->RegisterFunction("SetProgressionMultiplier", PapyrusClass, SetProgressionMultiplier);
 		vm->RegisterFunction("SetStompAi", PapyrusClass, SetStompAi);
 		vm->RegisterFunction("SetSandwichAi", PapyrusClass, SetSandwichAi);

@@ -87,8 +87,7 @@ namespace {
 	}
 
 	void FreezeTinies(Actor* giant, float duration) {
-		std::vector<Actor*> tinies = ThighCrushController::GetSingleton().GetThighTargetsInFront(giant, 1000, false);
-		log::info("Found Tinies: {}", tinies.size());
+		std::vector<Actor*> tinies = ThighCrushController::GetSingleton().GetThighTargetsInFront(giant, 1000);
 		if (!tinies.empty()) {
 			for (auto tiny: tinies) {
 				if (tiny) {
@@ -369,7 +368,7 @@ namespace {
 				AnimationManager::StartAnim("ThighLoopAttack", player);
 			} else {
 				if (IsThighCrushing(player)) {
-					TiredSound(player, "You're too tired to perform thighs attack");
+					NotifyWithSound(player, "You're too tired to perform thighs attack");
 				}
 			}
 		}

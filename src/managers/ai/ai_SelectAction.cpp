@@ -25,6 +25,14 @@
 #include "node.hpp"
 
 namespace {
+	void RecordSneakingState(Actor* giant, Actor* tiny) {
+		bool Crawling = IsCrawling(giant);
+		bool Sneaking = giant->IsSneaking();
+
+		tiny->SetGraphVariableBool("GTS_Hug_Sneak_Tny", Sneaking); // Is Sneaking?
+		tiny->SetGraphVariableBool("GTS_Hug_Crawl_Tny", Crawling); // Is Crawling?
+	}
+
 	bool AI_CanHugCrush(Actor* giant, Actor* tiny, int rng) {
 		int crush_rng = rand() % 4;
 
@@ -38,7 +46,7 @@ namespace {
 		float stamina = GetStaminaPercentage(giant);
 		bool Can_Force = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles") && IsHostile(giant, tiny);
 
-		if (Can_Force && crush_rng <= 1 && stamina >= 0.50) {
+		if (Can_Force && crush_rng <= 1 && stamina >= 0.75) {
 			return true;
 		}
 		if (Can_HugCrush) {
@@ -49,10 +57,18 @@ namespace {
 
 	void AI_HealOrShrink(Actor* giant, Actor* tiny, int rng) {
 		bool hostile = IsHostile(giant, tiny);
+		bool IsCrushing = IsHugCrushing(giant);
 		
-		if (hostile || rng <= 1) { // chance to get drained by follower
-			AnimationManager::StartAnim("Huggies_Shrink", giant);
-			AnimationManager::StartAnim("Huggies_Shrink_Victim", tiny);
+		if (!IsCrushing && (hostile || rng <= 1)) { // chance to get drained by follower, it is always 1 without Loving Embrace perk
+
+			float sizedifference = GetSizeDifference(giant, tiny, SizeType::TargetScale, false, true);
+			if (!IsHugHealing(giant) && sizedifference >= GetHugShrinkThreshold(giant)) {
+				AbortHugAnimation(giant, tiny); // Cancel anim if below shrink threshold
+				log::info("Sizediff is > threshold, aborting");
+			} else {
+				AnimationManager::StartAnim("Huggies_Shrink", giant);
+				AnimationManager::StartAnim("Huggies_Shrink_Victim", tiny);
+			}
 		} else { // else heal
 			StartHealingAnimation(giant, tiny);
 		}
@@ -60,7 +76,6 @@ namespace {
 
 	void AI_SelectActionToPlay(Actor* pred, Actor* prey, int rng, int butt_rng, int action_rng) {
 		if (IsGtsBusy(pred)) {
-			log::info("{} Is Gts Busy", pred->GetDisplayFullName());
 			return;
 		}
 
@@ -118,9 +133,7 @@ namespace Gts {
         std::size_t amount = 6;
         std::vector<Actor*> preys = AiManager::GetSingleton().RandomStomp(pred, amount);
         for (auto prey: preys) {
-            if (AiManager::GetSingleton().CanStomp(pred, prey)) {
-                AI_SelectActionToPlay(pred, prey, rng, butt_rng, action_rng);
-            }
+            AI_SelectActionToPlay(pred, prey, rng, butt_rng, action_rng);
         }
     }
 
@@ -148,17 +161,14 @@ namespace Gts {
 			return;
 		}
 		int rng = rand() % 7;
-		if (rng >= 5) {
+		if (rng >= 2) {
 			if (CanDoPaired(pred) && !IsSynced(pred) && !IsTransferingTiny(pred)) {
 				auto& hugs = HugAnimationController::GetSingleton();
 				std::size_t numberOfPrey = 1;
 				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, numberOfPrey);
 				for (auto prey: preys) {
-					float sizedifference = GetSizeDifference(pred, prey, SizeType::VisualScale, false, true);
-					if (sizedifference > Action_Hug && sizedifference < GetHugShrinkThreshold(pred)) {
-						// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
-						AI_StartHugs(pred, prey);
-					}
+					// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
+					AI_StartHugs(pred, prey);
 				}
 			}
 		}
@@ -167,9 +177,6 @@ namespace Gts {
 	void AI_StartHugs(Actor* pred, Actor* prey) {
 		auto& hugging = HugAnimationController::GetSingleton();
 		auto& persist = Persistent::GetSingleton();
-		if (!hugging.CanHug(pred, prey)) {
-			return;
-		}
 		if (!pred->IsInCombat() && persist.vore_combatonly) {
 			return;
 		}
@@ -179,11 +186,14 @@ namespace Gts {
 		if (prey->formID == 0x14 && !persist.vore_allowplayervore) {
 			return;
 		}
+
+		RecordSneakingState(pred, prey); // Needed to determine which hugs to play: sneak or crawl ones (when sneaking)
+		
 		HugShrink::GetSingleton().HugActor(pred, prey);
 
 		AnimationManager::StartAnim("Huggies_Try", pred);
 
-		if (pred->IsSneaking() && !IsCrawling(pred)) {
+		if (pred->IsSneaking()) {
 			AnimationManager::StartAnim("Huggies_Try_Victim_S", prey); // GTSBEH_HugAbsorbStart_Sneak_V
 		} else {
 			AnimationManager::StartAnim("Huggies_Try_Victim", prey); //   GTSBEH_HugAbsorbStart_V
@@ -211,13 +221,11 @@ namespace Gts {
 			tinyref->GetGraphVariableBool("GTS_IsFollower", AllyHugged);
 
 			if (!HugShrink::GetHuggiesActor(giantref)) {
-				if (!AllyHugged) {
-					log::info("Ally isn't hugged, aborting and pushing");
+				if (!AllyHugged && tinyref->formID != 0x14) {
 					PushActorAway(giantref, tinyref, 1.0);
 				}
 				return false;
 			}
-
 			if (ActionTimer.ShouldRunFrame()) {
 				int rng = rand() % 20;
 				if (rng < 12) {
@@ -229,6 +237,7 @@ namespace Gts {
 						AnimationManager::StartAnim("Huggies_HugCrush", giantref);
 						AnimationManager::StartAnim("Huggies_HugCrush_Victim", tinyref);
 					} else {
+						log::info("HealOrShrink");
 						AI_HealOrShrink(giant, tiny, rng);
 					}
 				}
@@ -244,12 +253,11 @@ namespace Gts {
 		if (Persistent::GetSingleton().Thigh_Ai == false) {
 			return;
 		}
-		std::vector<Actor*> tinies = ThighCrushController::GetSingleton().GetThighTargetsInFront(giant, 1, true);
-		log::info("Starting Thigh Crush");
+		std::vector<Actor*> tinies = ThighCrushController::GetSingleton().GetThighTargetsInFront(giant, 1);
 		if (!tinies.empty()) {
 			Actor* tiny = tinies[0];
 			if (tiny) {
-				ThighCrushController::GetSingleton().StartThighCrush(giant, tiny, true);
+				ThighCrushController::GetSingleton().StartThighCrush(giant, tiny);
 			}
 		}
 	}
@@ -269,34 +277,27 @@ namespace Gts {
 
 			if (Finish - Start > 0.10) {
 				if (!IsThighCrushing(giantref)) {
-					log::info("!ThighCrushing");
 					return false;
 				}
 
 				if (ActionTimer.ShouldRunFrame()) {
-					log::info("!CanThighCrush");
 
 					bool ForceAbort = GetAV(giantref, ActorValue::kStamina) <= 2.0;
 					DamageAV(giantref, ActorValue::kStamina, 0.025);
 
 					if (ForceAbort) {
-						log::info("Force Abort");
 						AnimationManager::StartAnim("ThighLoopExit", giantref);
 						return true;
 					}
 
-					std::vector<Actor*> targets = ThighCrushController::GetSingleton().GetThighTargetsInFront(giantref, 1, true);
-					log::info("Seeking Targets");
+					std::vector<Actor*> targets = ThighCrushController::GetSingleton().GetThighTargetsInFront(giantref, 1);
 					if (targets.empty()) {
-						log::info("Is Empty");
 						AnimationManager::StartAnim("ThighLoopExit", giantref);
 						return true;
-					} else if (!targets.empty() && !ThighCrushController::GetSingleton().CanThighCrush(giantref, targets[0], true)) {
-						log::info("Can't Thigh Crush {}", targets[0]->GetDisplayFullName());
+					} else if (!targets.empty() && !ThighCrushController::GetSingleton().CanThighCrush(giantref, targets[0])) {
 						AnimationManager::StartAnim("ThighLoopExit", giantref);
 						return true;
 					} else {
-						log::info("Doing Thigh Attack");
 						AnimationManager::StartAnim("ThighLoopAttack", giantref);
 						return true;
 					}

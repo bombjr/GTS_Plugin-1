@@ -38,7 +38,7 @@ namespace Gts {
 		return "ThighCrushController";
 	}
 
-	std::vector<Actor*> ThighCrushController::GetThighTargetsInFront(Actor* pred, std::size_t numberOfPrey, bool ai_triggered) {
+	std::vector<Actor*> ThighCrushController::GetThighTargetsInFront(Actor* pred, std::size_t numberOfPrey) {
 		// Get vore target for actor
 		auto& sizemanager = SizeManager::GetSingleton();
 		if (!pred) {
@@ -63,9 +63,9 @@ namespace Gts {
 		});
 
 		// Filter out invalid targets
-		preys.erase(std::remove_if(preys.begin(), preys.end(),[pred, this, ai_triggered](auto prey)
+		preys.erase(std::remove_if(preys.begin(), preys.end(),[pred, this](auto prey)
 		{
-			return !this->CanThighCrush(pred, prey, ai_triggered);
+			return !this->CanThighCrush(pred, prey);
 		}), preys.end());
 
 		// Filter out actors not in front
@@ -115,7 +115,7 @@ namespace Gts {
 		return preys;
 	}
 
-	bool ThighCrushController::CanThighCrush(Actor* pred, Actor* prey, bool ai_triggered) {
+	bool ThighCrushController::CanThighCrush(Actor* pred, Actor* prey) {
 		if (pred == prey) {
 			return false;
 		}
@@ -140,16 +140,16 @@ namespace Gts {
 		float sizedifference = GetSizeDifference(pred, prey, SizeType::VisualScale, false, true);
 		
 		float MINIMUM_DISTANCE = MINIMUM_THIGH_DISTANCE + HighHeelManager::GetBaseHHOffset(pred).Length();
-		float MINIMUM_CRUSH_SCALE = Action_ThighCrush;
+		float MINIMUM_THIGHCRUSH_SCALE = Action_AI_ThighCrush;
 
-		if (ai_triggered) {
-			MINIMUM_CRUSH_SCALE = 0.92;
+		if (pred->formID == 0x14) {
+			MINIMUM_THIGHCRUSH_SCALE = 1.5; // Used to freeze tinies, Player Only
 		}
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
 		
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale)) {
-			if (sizedifference > MINIMUM_CRUSH_SCALE) {
+			if (sizedifference > MINIMUM_THIGHCRUSH_SCALE) {
 				if ((prey->formID != 0x14 && !CanPerformAnimationOn(pred, prey, false))) {
 					return false;
 				}
@@ -162,9 +162,9 @@ namespace Gts {
 		return false;
 	}
 
-	void ThighCrushController::StartThighCrush(Actor* pred, Actor* prey, bool ai_triggered) {
+	void ThighCrushController::StartThighCrush(Actor* pred, Actor* prey) {
 		auto& ThighCrush = ThighCrushController::GetSingleton();
-		if (!ThighCrush.CanThighCrush(pred, prey, ai_triggered)) {
+		if (!ThighCrush.CanThighCrush(pred, prey)) {
 			return;
 		}
 		if (IsThighCrushing(pred)) {

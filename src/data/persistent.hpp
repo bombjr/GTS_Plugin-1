@@ -132,6 +132,10 @@ namespace Gts {
 			float stolen_magick = 0.0;
 			float stolen_stamin = 0.0;
 
+			float BalanceMode_SizeGain_Penalty = 1.0;
+			float BalanceMode_ShrinkRate_Base = 1.0;
+			float BalanceMode_ShrinkRate_Combat = 0.08;
+
 			SoftPotential speed_adjustment {
 				.k = 0.125, // 0.125
 				.n = 0.86, // 0.86

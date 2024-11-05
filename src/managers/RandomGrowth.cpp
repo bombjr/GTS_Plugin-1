@@ -16,6 +16,27 @@ using namespace RE;
 using namespace Gts;
 
 namespace {
+	float Get_Breach_Threshold(Actor* actor) {
+		float threshold = 1.65;
+
+		if (Runtime::HasPerkTeam(actor, "RandomGrowthTerror")) {
+			threshold = 1.60;
+		}
+
+		return threshold;
+	}
+
+	float Get_size_penalty(Actor* actor) {
+		float scale = get_visual_scale(actor);
+		float penalty = 1.0;
+
+		if (scale >= 1.5) {
+			penalty = std::clamp(scale - 0.5f, 1.0f, 4.0f);
+		}
+
+		return penalty;
+	}
+
 	bool ShouldGrow(Actor* actor) {
 		float MultiplySlider = Runtime::GetFloat("RandomGrowthMultiplyPC");
 		if (IsTeammate(actor)) {
@@ -36,7 +57,8 @@ namespace {
 			MultiplySlider = 1.0; // Disable effect in Balance Mode, so slider is always 1.0
 		}
 		float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
-		int Requirement = ((500 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
+		int Requirement = ((300 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
+		Requirement *= Get_size_penalty(actor);
 		int random = rand() % Requirement;
 		int chance = 1;
 		if (random <= chance) {
@@ -74,8 +96,9 @@ namespace Gts {
 							float base_power = ((0.00750 * TotalPower * 25) * ProgressionMultiplier);  // The power of it
 							float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
 
-							if (TotalPower >= 1.65 && Runtime::HasPerk(actor, "RandomGrowthAug")) {
+							if (Runtime::HasPerkTeam(actor, "RandomGrowthAug") && TotalPower >= Get_Breach_Threshold(actor) && !IsGtsBusy(actor)) {
 								AnimationManager::StartAnim("StartRandomGrowth", actor);
+								return;
 							} else {
 								ActorHandle gianthandle = actor->CreateRefHandle();
 								std::string name = std::format("RandomGrowth_{}", actor->formID);

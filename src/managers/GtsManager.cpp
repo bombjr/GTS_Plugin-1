@@ -45,6 +45,13 @@ using namespace SKSE;
 using namespace std;
 
 namespace {
+	const float ini_adjustment = 1000000; //1 million units distance
+
+	void FixEmotionsRange() { // Makes facial emotions always enabled at any size
+		EnsureINIFloat("fTalkingDistance:LOD", ini_adjustment);
+		EnsureINIFloat("fLodDistance:LOD", ini_adjustment);
+	}
+
 	void ManageActorControl() { // Rough control other fix
 		auto profiler = Profilers::Profile("Manager: Actor Control");
 		Actor* target = GetPlayerOrControlled();
@@ -92,7 +99,6 @@ namespace {
 		if (get_visual_scale(actor) < 1.5) {
 			reset = true;
 		}
-		
 		if (node) {
 			if (!reset) {
 				node->GetFlags().set(RE::NiAVObject::Flag::kIgnoreFade);
@@ -102,6 +108,20 @@ namespace {
 				node->GetFlags().reset(RE::NiAVObject::Flag::kIgnoreFade);
 				node->GetFlags().reset(RE::NiAVObject::Flag::kAlwaysDraw);
 				node->GetFlags().reset(RE::NiAVObject::Flag::kHighDetail);
+			}
+		}
+	}
+
+	void PerformRoofRaycastAdjustments(Actor* actor, float& target_scale, float currentOtherScale) {
+		if (SizeRaycastEnabled() && !actor->IsDead() && target_scale > 1.025) {
+			float room_scale = GetMaxRoomScale(actor);
+			if (room_scale > (currentOtherScale - 0.05)) {
+				// Only apply room scale if room_scale > natural_scale
+				//   This stops it from working when room_scale < 1.0
+				target_scale = min(target_scale, room_scale);
+			} else {
+				// Else we just scale to natural
+				target_scale = 1.0;
 			}
 		}
 	}
@@ -148,25 +168,8 @@ namespace {
 		// Room Size adjustments
 		// We only do this if they are bigger than 1.05x their natural scale (currentOtherScale)
 		// and if enabled in the mcm
-		if (SizeRaycastEnabled() && !actor->IsDead() && target_scale > 1.025) {
-			float room_scale = GetMaxRoomScale(actor);
-			if (room_scale > (currentOtherScale - 0.05)) {
-				// Only apply room scale if room_scale > natural_scale
-				//   This stops it from working when room_scale < 1.0
-				//if (actor->formID == 0x14) {
-					//log::info("old target_scale: {}", target_scale);
-					//log::info("room_scale: {}", room_scale);
-				//}
-				target_scale = min(target_scale, room_scale);
-				//if (actor->formID == 0x14) {
-					//log::info("new target_scale: {}", target_scale);
-				//}
-			} else {
-				// Else we just scale to natural
-				target_scale = 1.0;
-			}
-		}
-
+		PerformRoofRaycastAdjustments(actor, target_scale, currentOtherScale);
+		
 		if (fabs(target_scale - persi_actor_data->visual_scale) > 1e-5) {
 			float minimum_scale_delta = 0.000005; // 0.00005%
 			if (fabs(target_scale - persi_actor_data->visual_scale) < minimum_scale_delta) {
@@ -179,7 +182,7 @@ namespace {
 					target_scale,
 					persi_actor_data->half_life / TimeScale(),
 					Time::WorldTimeDelta()
-					);
+				);
 			}
 		}
 	}
@@ -254,9 +257,8 @@ namespace {
 		if (scale < 1e-5) {
 			return;
 		}
-		float perkspeed = 1.0;
 		float speedmultcalc = GetAnimationSlowdown(actor); // For all other movement types
-		persi_actor_data->anim_speed = speedmultcalc*perkspeed;
+		persi_actor_data->anim_speed = speedmultcalc;
 	}
 
 	void update_actor(Actor* actor) {
@@ -293,6 +295,7 @@ std::string GtsManager::DebugName() {
 }
 
 void GtsManager::Start() {
+	FixEmotionsRange();
 }
 
 // Poll for updates
@@ -310,7 +313,7 @@ void GtsManager::Update() {
 			auto& sizemanager = SizeManager::GetSingleton();
 
 			if (actor->formID == 0x14 || IsTeammate(actor)) {
-				
+
 				ScareActors(actor);
 				FixActorFade(actor);
 
@@ -335,26 +338,6 @@ void GtsManager::Update() {
 			}
 			update_actor(actor);
 			apply_actor(actor);
-		}
-	}
-}
-
-void GtsManager::OnAddPerk(const AddPerkEvent& evt) {
-	if (evt.actor->formID == 0x14) {
-		if (evt.perk == Runtime::GetPerk("ColossalGrowth")) {
-			CallHelpMessage();
-		}
-		if (evt.perk == Runtime::GetPerk("GrowthDesirePerkAug")) {
-			PrintMessageBox("You're now able to grow and shrink yourself manually at will. By default, press L.Shift + 1 or 2. You can affect followers by pressing L.Shift + Left Arrow + Arrow Up, and can also affect self by pressing Left Arrow + Arrow Up");
-		}
-		if (evt.perk == Runtime::GetPerk("FastShrink") && !Runtime::HasSpell(evt.actor, "ShrinkBolt")) {
-			Runtime::AddSpell(evt.actor, "ShrinkBolt");
-		}
-		if (evt.perk == Runtime::GetPerk("LethalShrink") && !Runtime::HasSpell(evt.actor, "ShrinkStorm")) {
-			Runtime::AddSpell(evt.actor, "ShrinkStorm");
-		}
-		if (evt.perk == Runtime::GetPerk("CalamityPerk")) {
-			AddCalamityPerk();
 		}
 	}
 }

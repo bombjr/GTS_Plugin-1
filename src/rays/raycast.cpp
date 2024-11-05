@@ -6,48 +6,6 @@ using namespace Gts;
 using namespace RE;
 
 namespace {
-
-	std::vector<string> Layers {
-		"kInvalid",
-		"kSphere",
-		"kFirstType",
-		"kCylinder",
-		"kTriangle",
-		"kBox",
-		"kCapsule",
-		"kConvexVertices",
-		"kCollection",
-		"kBVTree",
-		"kList",
-		"kMOPP",
-		"kConvexTranslate",
-		"kConvexTransform",
-		"kSampledHeightField",
-		"kExtendedMesh",
-		"kTransform",
-		"kCompressedMesh",
-		"kCompound",
-		"kTotalSPU",
-		"kConvex",
-		"kMOPPEmbedded",
-		"kConvexPiece",
-		"kMultiSphere",
-		"kConvexList",
-		"kTriangleCollection",
-		"kMultiRay",
-		"kHeightField",
-		"kSphereRep",
-		"kBV",
-		"kPlane",
-		"kPhantomCallback",
-		"kUser0",
-		"kUser1",
-		"kUser2",
-		"kTotal",
-		"kAll",
-	};
-	
-
 	void CastRayImpl(TESObjectREFR* ref, const NiPoint3& in_origin, const NiPoint3& direction, const float& unit_length, AllRayCollector* collector) {
 		float length = unit_to_meter(unit_length);
 		if (!ref) {

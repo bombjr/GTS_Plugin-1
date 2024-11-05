@@ -180,7 +180,7 @@ namespace {
 			float target = get_target_scale(player);
 			float max_scale = get_max_scale(player);// * get_natural_scale(player);
 			if (target >= max_scale) {
-				TiredSound(player, "You can't grow any further");
+				NotifyWithSound(player, "You can't grow any further");
 				Rumbling::Once("CantGrow", player, 0.25, 0.05);
 				return;
 			}
@@ -196,7 +196,7 @@ namespace {
 		if (!IsGtsBusy(player) && !IsChangingSize(player)) {
 			float target = get_target_scale(player);
 			if (target <= Minimum_Actor_Scale) {
-				TiredSound(player, "You can't shrink any further");
+				NotifyWithSound(player, "You can't shrink any further");
 				Rumbling::Once("CantGrow", player, 0.25, 0.05);
 				return;
 			}
@@ -308,7 +308,7 @@ namespace {
 				float cooldown = GetRemainingCooldown(player, CooldownSource::Misc_ShrinkOutburst);
 				std::string message = std::format("Shrink Outburst is on a cooldown: {:.1f} sec", cooldown);
 				shake_camera(player, 0.75, 0.35);
-				TiredSound(player, message);
+				NotifyWithSound(player, message);
 			}
 			return;
 		}

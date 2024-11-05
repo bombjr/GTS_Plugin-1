@@ -41,7 +41,7 @@ namespace {
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim(kick_type, player);
 			} else {
-				TiredSound(player, "You're too tired for a kick");
+				NotifyWithSound(player, "You're too tired for a kick");
 			}
 		}
 	}

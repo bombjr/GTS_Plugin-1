@@ -2,6 +2,7 @@
 #include "magic/effects/TinyCalamity.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/CrushManager.hpp"
+#include "managers/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -163,7 +164,8 @@ namespace Gts {
 				ScareChance(giant);
 
 				// Do crush
-				KillActor(giant, tiny, false);
+				KillActor(giant, tiny);
+				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
 				if (!IsLiving(tiny) || LessGore()) {
 					SpawnDustParticle(giant, tiny, "NPC Root [Root]", 3.0);
@@ -178,7 +180,7 @@ namespace Gts {
 							SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, currentSize * 25, 7, root);
 						}
 						Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4,"BloodExplosion");
-						Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, true);
+						Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
 					}
 				}
 				ActorHandle giantHandle = giant->CreateRefHandle();
@@ -198,7 +200,7 @@ namespace Gts {
 				});
 
 				if (tiny->formID != 0x14) {
-					Disintegrate(tiny, true); // Set critical stage 4 on actors
+					Disintegrate(tiny); // Set critical stage 4 on actors
 				} else if (tiny->formID == 0x14) {
 					TriggerScreenBlood(50);
 					tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible

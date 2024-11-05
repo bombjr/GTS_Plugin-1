@@ -122,7 +122,7 @@ duration = 0.0
 
 [[InputEvent]]
 name = "ThighCrush"
-keys = ["LALT", "S"]
+keys = ["LSHIFT", "W", "C"]
 exclusive = true
 duration = 0.0
 
@@ -483,26 +483,26 @@ exclusive = false
 trigger = "continuous"
 duration = 0.66
 
-[[InputEvent]]
-name = "SBO_DisableProne"
-keys = ["X"]
-exclusive = false
-trigger = "once"
-duration = 0.0
+# When Sneaking or Crawling: enter prone state 
+# You can leave prone state by simply pressing Sneak button, no need for custom leave events anymore
 
 [[InputEvent]]
-name = "SBO_DisableProne"
-keys = ["RMB"]
+name = "SBO_ToggleDive_Standing"
+keys = ["W", "S"]
+exclusive = false
+trigger = "continuous"
+duration = 0.50
+
+# When Standing: perform a Dive that leads to prone state
+
+[[InputEvent]]
+name = "SBO_ToggleDive_Sneak"
+keys = ["W", "S"]
 exclusive = false
 trigger = "continuous"
 duration = 0.5
 
-[[InputEvent]]
-name = "SBO_ToggleDive"
-keys = ["LSHIFT", "W"]
-exclusive = false
-trigger = "continuous"
-duration = 0.20
+# When Sneaking or Crawling: perform a Dive that leads to prone state
 
 
 #========================================================
@@ -556,7 +556,7 @@ name = "GrabRelease"
 keys = ["RMB"]
 exclusive = false
 
-# Release actor from hand.
+# Release actor from hand. Works ONLY when weapon is sheathed!!!!!
 
 [[InputEvent]]
 name = "BreastsPut"

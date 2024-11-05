@@ -102,8 +102,8 @@ namespace Gts
 			void StartVore(Actor* pred, Actor* prey);
 
 
-			void RecordOriginalScale(Actor* tiny);
-			float ReadOriginalScale(Actor* tiny);
+			static void RecordOriginalScale(Actor* tiny);
+			static float ReadOriginalScale(Actor* tiny);
 
 			void ShrinkOverTime(Actor* giant, Actor* tiny, float over_time);
 			
@@ -113,7 +113,10 @@ namespace Gts
 			// Gets the current vore data of a giant
 			VoreData& GetVoreData(Actor* giant);
 
+			void AllowMessage(bool allow);
+
 		private:
 			std::unordered_map<FormID, VoreData> data;
+			bool allow_message = false;
 	};
 }

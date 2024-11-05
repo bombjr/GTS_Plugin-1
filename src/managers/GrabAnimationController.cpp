@@ -25,6 +25,13 @@ namespace {
 	const float MINIMUM_GRAB_DISTANCE = 85.0;
 	const float GRAB_ANGLE = 70;
 	const float PI = 3.14159;
+
+	void CantGrabPlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
+		if (sizedifference < Action_Grab) {
+			std::string message = std::format("Player is too big to be grabbed x{:.2f}/{:.2f}", sizedifference, Action_Grab);
+			NotifyWithSound(tiny, message);
+		}
+	}
 }
 
 namespace Gts {
@@ -109,6 +116,10 @@ namespace Gts {
 			return cosTheta <= cos(GRAB_ANGLE*PI/180.0);
 		}), preys.end());
 
+		if (numberOfPrey == 1) {
+			return Vore_GetMaxVoreCount(pred, preys);
+		}
+
 		// Reduce vector size
 		if (preys.size() > numberOfPrey) {
 			preys.resize(numberOfPrey);
@@ -139,17 +150,21 @@ namespace Gts {
 		float MINIMUM_GRAB_SCALE = Action_Grab;
 		float MINIMUM_DISTANCE = MINIMUM_GRAB_DISTANCE;
 
-		if (HasSMT(pred)) {
-			MINIMUM_DISTANCE *= 1.75;
+		if (HasSMT(pred) || IsCrawling(pred)) {
+			MINIMUM_DISTANCE *= 1.6;
 		}
 
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
-		if (pred->formID == 0x14 && prey_distance <= MINIMUM_DISTANCE * pred_scale && sizedifference < MINIMUM_GRAB_SCALE) {
-			std::string_view message = std::format("{} is too big to be grabbed: x{:.2f}/{:.2f}.", prey->GetDisplayFullName(), sizedifference, MINIMUM_GRAB_SCALE);
-			shake_camera(pred, 0.45, 0.30);
-			TiredSound(pred, message);
+		if (prey_distance <= MINIMUM_DISTANCE * pred_scale && sizedifference < MINIMUM_GRAB_SCALE) {
+			if (pred->formID == 0x14) {
+				std::string_view message = std::format("{} is too big to be grabbed: x{:.2f}/{:.2f}.", prey->GetDisplayFullName(), sizedifference, MINIMUM_GRAB_SCALE);
+				shake_camera(pred, 0.45, 0.30);
+				NotifyWithSound(pred, message);
+			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
+				CantGrabPlayerMessage(pred, prey, sizedifference);
+			}
 			return false;
 		}
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference > MINIMUM_GRAB_SCALE) {
@@ -187,5 +202,9 @@ namespace Gts {
 		
 		Utils_UpdateHighHeelBlend(pred, false);
 		AnimationManager::StartAnim("GrabSomeone", pred);
+	}
+
+	void GrabAnimationController::AllowMessage(bool allow) {
+		this->allow_message = allow;
 	}
 }

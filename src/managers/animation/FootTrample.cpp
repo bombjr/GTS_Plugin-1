@@ -31,17 +31,6 @@ namespace {
 		DamageAV(giant, ActorValue::kStamina, WasteStamina * GetWasteMult(giant));
 	}
 
-	void DoSounds(Actor* giant, float animspeed, std::string_view feet) {
-		float bonus = 1.0;
-		if (HasSMT(giant)) {
-			bonus = 8.0;
-		}
-		float scale = get_visual_scale(giant);
-		Runtime::PlaySoundAtNode("HeavyStompSound", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-		Runtime::PlaySoundAtNode("xlFootstep", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-		Runtime::PlaySoundAtNode("xlRumble", giant, 0.14 * bonus * scale * animspeed, 1.0, feet);
-	}
-
 	void DelayedLaunch(Actor* giant, float radius, float power, FootEvent Event) {
 		std::string taskname = std::format("DelayLaunch_Trample_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -102,13 +91,15 @@ namespace {
 				FootGrindCheck(giant, Radius_Trample, true, right);
 				DelayedLaunch(giant, 0.65 * perk, 1.15 * perk, Event);
 
+				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+
 				return false;
 			}
 			return true;
 		});
 	}
 
-	void FootTrample_Stage2(Actor* giant, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
+	void FootTrample_Stage2(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
 		float dust = 1.15;
 		float smt = 1.0;
@@ -126,9 +117,11 @@ namespace {
 		DoDustExplosion(giant, dust * smt, Event, Node);
 		DoLaunch(giant, 0.85 * perk, 1.85 * perk, Event);
 		DeplenishStamina(giant, 30.0);
+
+		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
-	void FootTrample_Stage3(Actor* giant, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
+	void FootTrample_Stage3(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
 		float dust = 1.65;
 		float smt = 1.0;
@@ -148,7 +141,8 @@ namespace {
 
 		DeplenishStamina(giant, 100.0);
 
-		DoSounds(giant, 1.25, Node);
+		FootStepManager::DoStrongSounds(giant, 1.25, Node);
+		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
 	/////////////////////////////////////////////////////////
@@ -212,7 +206,7 @@ namespace {
 	}
 
 	void GTS_Trample_Impact_L(AnimationEventData& data) { // Stage 2 repeating footsteps
-		FootTrample_Stage2(&data.giant, FootEvent::Left, DamageSource::CrushedLeft, LNode, "Trample2_L");
+		FootTrample_Stage2(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "Trample2_L");
 
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
@@ -222,7 +216,7 @@ namespace {
 	}
 
 	void GTS_Trample_Impact_R(AnimationEventData& data) { // Stage 2 repeating footsteps
-		FootTrample_Stage2(&data.giant, FootEvent::Right, DamageSource::CrushedRight, RNode, "Trample2_R");
+		FootTrample_Stage2(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "Trample2_R");
 
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
@@ -233,11 +227,11 @@ namespace {
 
 	void GTS_Trample_Finisher_L(AnimationEventData& data) { // last hit that deals huge chunk of damage
 		//Rumbling::Stop("Trample2_L", &data.giant);
-		FootTrample_Stage3(&data.giant, FootEvent::Left, DamageSource::CrushedLeft, LNode, "Trample2_L");
+		FootTrample_Stage3(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "Trample2_L");
 	}
 	void GTS_Trample_Finisher_R(AnimationEventData& data) { // last hit that deals huge chunk of damage
 		//Rumbling::Stop("Trample2_R", &data.giant);
-		FootTrample_Stage3(&data.giant, FootEvent::Right, DamageSource::CrushedRight, RNode, "Trample2_R");
+		FootTrample_Stage3(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "Trample2_R");
 	}
 
 	/////////////////////////////////////////////////////////// Triggers
@@ -255,7 +249,7 @@ namespace {
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("TrampleL", player);
 		} else {
-			TiredSound(player, "You're too tired to perform trample");
+			NotifyWithSound(player, "You're too tired to perform trample");
 		}
 	}
 
@@ -271,7 +265,7 @@ namespace {
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("TrampleR", player);
 		} else {
-			TiredSound(player, "You're too tired to perform trample");
+			NotifyWithSound(player, "You're too tired to perform trample");
 		}
 	}
 }

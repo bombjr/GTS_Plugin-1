@@ -1,13 +1,15 @@
 #pragma once
+#include "managers/animation/AnimationManager.hpp"
 #include "managers/damage/SizeHitEffects.hpp"
+#include "managers/damage/TinyCalamity.hpp"
 #include "managers/hitmanager.hpp"
 #include "managers/Attributes.hpp"
 #include "utils/actorUtils.hpp"
-#include "data/runtime.hpp"
 #include "data/persistent.hpp"
+#include "data/runtime.hpp"
+#include "scale/scale.hpp"
 #include "data/plugin.hpp"
 #include "events.hpp"
-#include "scale/scale.hpp"
 #include "timer.hpp"
 
 using namespace RE;
@@ -27,6 +29,26 @@ namespace {
 		actor->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
 
 		return Attacking;
+	}
+	bool AllowToPerformSneak(RE::IDEvent* id) {
+		bool allow = true;
+		if (id) {
+			auto player = PlayerCharacter::GetSingleton();
+			if (player) {
+				auto as_str = id->userEvent;
+				if (as_str == "Sneak" && IsProning(player)) {
+					if (player->IsSneaking()) {
+						allow = false;
+						AnimationManager::StartAnim("SBO_ProneOff", player);
+					}
+				} else if (as_str == "Activate") {
+					if (TinyCalamity_WrathfulCalamity(player)) {
+						allow = false;
+					}
+				}
+			}
+		}
+		return allow;
 	}
 
     bool CanMove() {
@@ -75,9 +97,14 @@ namespace Hooks
 	template <class T>
 	inline bool Hook_Controls<T>::HookMovement(RE::InputEvent* a_event) {
 		if (!CanMove()) {
-			//log::info("Movement Disabled");
 			return false;
 		}
+
+		auto id = a_event->AsIDEvent();
+		if (!AllowToPerformSneak(id)) {
+			return false;
+		}
+
 		return _CanProcess(this, a_event);
 	}
 

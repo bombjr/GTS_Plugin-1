@@ -16,7 +16,7 @@ namespace {
 		float npc;
 
 		InitialScales() {
-		throw std::exception("Cannot init a InitialScales without an actor");
+			throw std::exception("Cannot init a InitialScales without an actor");
 		}
 
 		InitialScales(Actor* actor) {
@@ -34,7 +34,8 @@ namespace {
 
 	InitialScales& GetActorInitialScales(Actor* actor) {
 		if (!actor) {
-		throw std::exception("Actor must exist for GetInitialScale");
+			log::info("GetActorInitialScales: Actor Doesn't Exist");
+			throw std::exception("Actor must exist for GetInitialScale");
 		}
 		auto& initScales = GetInitialScales();
 		auto id = actor->formID;
@@ -100,18 +101,18 @@ namespace Gts {
   }
 
   float GetInitialScale(Actor* actor) {
-    auto& initScale = GetActorInitialScales(actor);
-    auto& size_method = Persistent::GetSingleton().size_method;
+		auto& initScale = GetActorInitialScales(actor);
+		auto& size_method = Persistent::GetSingleton().size_method;
 		switch (size_method) {
-      // Only initial scales for these two methods since the racemenu
-      // and refscale one can edit on the character edit menu and setscale
+			// Only initial scales for these two methods since the racemenu
+			// and refscale one can edit on the character edit menu and setscale
 			case SizeMethod::ModelScale:
 				return initScale.model;
 			case SizeMethod::RootScale:
-        return initScale.npc;
-      default:
-        return 1.0;
-    }
+				return initScale.npc;
+		default:
+			return 1.0;
+		}
   }
 
 	void RefreshInitialScales(Actor* actor) {

@@ -51,6 +51,10 @@ namespace {
 
 	inline const auto Heart_Effects = _byteswap_ulong('HEFS');
 
+	inline const auto Balance_SGP = _byteswap_ulong('BMSP');
+	inline const auto Balance_SRB = _byteswap_ulong('BMSB');
+	inline const auto Balance_SRC = _byteswap_ulong('BMSC');
+
 	inline const auto EnableIconsRecord = _byteswap_ulong('EIRC');
 	inline const auto AllowWeightGainRecord = _byteswap_ulong('AWGR');
 
@@ -581,6 +585,18 @@ namespace Gts {
 				bool HeartEffects;
 				serde->ReadRecordData(&HeartEffects, sizeof(HeartEffects));
 				GetSingleton().HeartEffects = HeartEffects;
+			} else if (type == Balance_SGP) {
+				float BalanceMode_SizeGain_Penalty;
+				serde->ReadRecordData(&BalanceMode_SizeGain_Penalty, sizeof(BalanceMode_SizeGain_Penalty));
+				GetSingleton().BalanceMode_SizeGain_Penalty = BalanceMode_SizeGain_Penalty;
+			} else if (type == Balance_SRB) {
+				float BalanceMode_ShrinkRate_Base;
+				serde->ReadRecordData(&BalanceMode_ShrinkRate_Base, sizeof(BalanceMode_ShrinkRate_Base));
+				GetSingleton().BalanceMode_ShrinkRate_Base = BalanceMode_ShrinkRate_Base;
+			} else if (type == Balance_SRC) {
+				float BalanceMode_ShrinkRate_Combat;
+				serde->ReadRecordData(&BalanceMode_ShrinkRate_Combat, sizeof(BalanceMode_ShrinkRate_Combat));
+				GetSingleton().BalanceMode_ShrinkRate_Combat = BalanceMode_ShrinkRate_Combat;
 			} else if (type == NPC_EffectImmunity) {
 				bool NPCEffectImmunity;
 				serde->ReadRecordData(&NPCEffectImmunity, sizeof(NPCEffectImmunity));
@@ -968,6 +984,30 @@ namespace Gts {
 
 		bool HeartEffects = GetSingleton().HeartEffects;
 		serde->WriteRecordData(&HeartEffects, sizeof(HeartEffects));
+
+		if (!serde->OpenRecord(Balance_SGP, 1)) {
+			log::error("Unable to open Balance Mode: Size Gain penalty record to write cosave data");
+			return;
+		}
+
+		float BalanceMode_SizeGain_Penalty = GetSingleton().BalanceMode_SizeGain_Penalty;
+		serde->WriteRecordData(&BalanceMode_SizeGain_Penalty, sizeof(BalanceMode_SizeGain_Penalty));
+
+		if (!serde->OpenRecord(Balance_SRB, 1)) {
+			log::error("Unable to open Balance Mode: Shrink Rate Base record to write cosave data");
+			return;
+		}
+
+		float BalanceMode_ShrinkRate_Base = GetSingleton().BalanceMode_ShrinkRate_Base;
+		serde->WriteRecordData(&BalanceMode_ShrinkRate_Base, sizeof(BalanceMode_ShrinkRate_Base));
+
+		if (!serde->OpenRecord(Balance_SRC, 1)) {
+			log::error("Unable to open Balance Mode: Shrink Rate Combat record to write cosave data");
+			return;
+		}
+
+		float BalanceMode_ShrinkRate_Combat = GetSingleton().BalanceMode_ShrinkRate_Combat;
+		serde->WriteRecordData(&BalanceMode_ShrinkRate_Combat, sizeof(BalanceMode_ShrinkRate_Combat));
 
 		if (!serde->OpenRecord(NPC_EffectImmunity, 1)) {
 			log::error("Unable to open NPC Effect Immunity record to write cosave data");
