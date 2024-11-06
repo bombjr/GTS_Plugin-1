@@ -12,6 +12,8 @@
 #include "scale/scale.hpp"
 #include "data/time.hpp"
 
+#include "utils/random.hpp"
+
 #include "events.hpp"
 #include "node.hpp"
 // Module that handles various magic effects
@@ -417,7 +419,7 @@ namespace Gts {
 	inline void CrushBonuses(Actor* caster, Actor* target) {
 		float target_scale = get_visual_scale(target) * GetSizeFromBoundingBox(target);
 
-		int Random = rand() % 8;
+		int Random = RandomInt(1, 8);
 		if (Random >= 8 && Runtime::HasPerk(caster, "GrowthDesirePerk")) {
 			PlayMoanSound(caster, 1.0);
 		}

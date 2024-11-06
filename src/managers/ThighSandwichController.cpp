@@ -67,7 +67,7 @@ namespace Gts {
 
 	void SandwichingData::ManageAi(Actor* giant) {
 		if (this->tinies.size() > 0) {
-			int random = rand() % 20;
+			int random = RandomInt( 0, 20);
 			if (random < 9) {
 				AnimationManager::StartAnim("ThighAttack", giant);
 			} else if (random < 12) {

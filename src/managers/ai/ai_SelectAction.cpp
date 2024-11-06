@@ -18,6 +18,7 @@
 #include "managers/tremor.hpp"
 #include "managers/Rumble.hpp"
 #include "ActionSettings.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "profiler.hpp"
@@ -34,7 +35,7 @@ namespace {
 	}
 
 	bool AI_CanHugCrush(Actor* giant, Actor* tiny, int rng) {
-		int crush_rng = rand() % 4;
+		int crush_rng = RandomInt(0, 4);
 
 		float health = GetHealthPercentage(tiny);
 		float HpThreshold = GetHugCrushThreshold(giant, tiny, true);
@@ -107,7 +108,7 @@ namespace Gts {
 			return;
 		}
 		if (!IsGtsBusy(actor)) {
-			int rng = rand() % 100;
+			int rng = RandomInt(0, 100);
 			if (rng > 7 && rng < 33 * scale) {
 				AI_DoStomp_Kick_ButtCrush(actor);
 				return;
@@ -115,7 +116,7 @@ namespace Gts {
 				AI_DoSandwich(actor);
 				return;
 			} else if (rng <= 3) {
-				int HugsOrThigh = rand()% 10;
+				int HugsOrThigh = RandomInt(0, 10);
 				if (HugsOrThigh > 5) {
 					AI_DoHugs(actor);
 				} else {
@@ -127,9 +128,9 @@ namespace Gts {
 	}
 
 	void AI_DoStomp_Kick_ButtCrush(Actor* pred) {
-		int rng = rand() % 10;
-        int butt_rng = rand() % 10;
-        int action_rng = rand() % 10;
+		int rng = RandomInt(0,10);
+        int butt_rng = RandomInt(0,10);
+        int action_rng = RandomInt(0, 10);
         std::size_t amount = 6;
         std::vector<Actor*> preys = AiManager::GetSingleton().RandomStomp(pred, amount);
         for (auto prey: preys) {
@@ -160,12 +161,11 @@ namespace Gts {
 		if (!Persistent::GetSingleton().Hugs_Ai || IsCrawling(pred)) {
 			return;
 		}
-		int rng = rand() % 7;
+		int rng = RandomInt(0, 7);
 		if (rng >= 2) {
 			if (CanDoPaired(pred) && !IsSynced(pred) && !IsTransferingTiny(pred)) {
 				auto& hugs = HugAnimationController::GetSingleton();
-				std::size_t numberOfPrey = 1;
-				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, numberOfPrey);
+				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, 1);
 				for (auto prey: preys) {
 					// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
 					AI_StartHugs(pred, prey);
@@ -227,7 +227,7 @@ namespace Gts {
 				return false;
 			}
 			if (ActionTimer.ShouldRunFrame()) {
-				int rng = rand() % 20;
+				int rng = RandomInt(0, 20);
 				if (rng < 12) {
 					if (!Runtime::HasPerkTeam(giantref, "HugCrush_LovingEmbrace")) {
 						rng = 1; // always force crush and always shrink

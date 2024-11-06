@@ -5,7 +5,7 @@
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "magic/effects/common.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "managers/Attributes.hpp"
 #include "utils/MovementForce.hpp"
 #include "managers/highheel.hpp"
@@ -31,7 +31,7 @@ using namespace Gts;
 
 namespace {
     void ScareEnemies(Actor* giant)  {
-		int FearChance = rand() % 2;
+		int FearChance = RandomInt(0, 2);
 		if (FearChance <= 0) {
 			Runtime::CastSpell(giant, giant, "GtsVoreFearSpell");
 		}

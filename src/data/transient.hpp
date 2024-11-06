@@ -37,6 +37,7 @@ namespace Gts {
 		float MightValue;
 
 		float Shrink_Ticks;
+		float Shrink_Ticks_Calamity;
 
 		float Perk_BonusActionSpeed;
 		float Perk_lifeForceStolen;

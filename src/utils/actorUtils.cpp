@@ -2098,7 +2098,7 @@ namespace Gts {
 			float& stamin = Persistent->stolen_stamin;
 
 			if (Storage > 0.0) {
-				int Boost = rand() % 3;
+				int Boost = RandomInt(0, 3);
 				if (Boost == 0) {
 					health += (value * 4);
 					if (health >= limit) {
@@ -2124,7 +2124,7 @@ namespace Gts {
 	}
 
 	float GetRandomBoost() {
-		float rng = (rand()% 150 + 1);
+		float rng = (RandomInt(0, 150));
 		float random = rng/100;
 		return random;
 	}
@@ -2278,7 +2278,7 @@ namespace Gts {
 		float sizedifference = giantSize/tinySize;
 		float sizedifference_tinypov = tinySize/giantSize;
 
-		int ragdollchance = rand() % 30 + 1.0;
+		int ragdollchance = RandomInt(0, 30);
 		if ((giantSize > 1.25 || IsBeingGrinded(tiny)) && !IsRagdolled(tiny) && sizedifference > 2.8 && ragdollchance < 4.0 * sizedifference) { // Chance for ragdoll. Becomes 100% at high scales
 			PushActorAway(giant, tiny, 1.0); // Ragdoll
 			return;
@@ -2822,7 +2822,7 @@ namespace Gts {
 		}
 		float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, true);
 		if (sizedifference > 1.15 && !tiny->IsDead()) {
-			int rng = rand() % random;
+			int rng = RandomInt(0, random);
 			if (apply_sd) {
 				rng /= sizedifference;
 			}
@@ -2939,8 +2939,8 @@ namespace Gts {
 	}
 
 	void DragonAbsorptionBonuses() { // The function is ugly but im a bit lazy to make it look pretty
-		int rng = rand() % 5 + 1;
-		int dur_rng = rand() % 3;
+		int rng = RandomInt(0, 6);
+		int dur_rng = RandomInt(0, 3);
 
 		Actor* player = PlayerCharacter::GetSingleton();
 
@@ -2985,14 +2985,15 @@ namespace Gts {
 		}
 	}
 
-	void AddSMTDuration(Actor* actor, float duration) {
+	void AddSMTDuration(Actor* actor, float duration, bool perk_check) {
 		if (!HasSMT(actor)) {
 			return;
 		}
-		if (Runtime::HasPerk(actor, "EternalCalamity")) {
+		if (!perk_check || Runtime::HasPerk(actor, "EternalCalamity")) {
 			auto transient = Transient::GetSingleton().GetData(actor);
 			if (transient) {
 				transient->SMT_Bonus_Duration += duration;
+				log::info("Adding perk duration");
 			}
 		}
 	}
@@ -3009,7 +3010,7 @@ namespace Gts {
 	}
 
 	void PrintSuffocate(Actor* pred, Actor* prey) {
-		int random = rand() % 6;
+		int random = RandomInt(0, 5);
 		if (random <= 1) {
 			Cprint("{} was slowly smothered between {} thighs", prey->GetDisplayFullName(), pred->GetDisplayFullName());
 		} else if (random == 2) {

@@ -122,6 +122,7 @@ namespace Gts {
 			float ShrinkResistance = 0.0;
 			float MightValue = 0.0;
 			float Shrink_Ticks = 0.0;
+			float Shrink_Ticks_Calamity = 0.0;
 
 			float Perk_BonusActionSpeed = 1.0;
 			float Perk_lifeForceStolen = 0.0;
@@ -182,6 +183,7 @@ namespace Gts {
 			result.ShrinkResistance = ShrinkResistance;
 			result.MightValue = MightValue;
 			result.Shrink_Ticks = Shrink_Ticks;
+			result.Shrink_Ticks_Calamity = Shrink_Ticks_Calamity;
 
 			result.Perk_BonusActionSpeed = Perk_BonusActionSpeed;
 			result.Perk_lifeForceStolen = Perk_lifeForceStolen;

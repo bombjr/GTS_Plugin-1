@@ -179,7 +179,7 @@ namespace {
 	}
 
 	void GTS_Hug_PullBack(AnimationEventData& data) { // When we pull actor back to chest, used to play laugh
-		int Random = rand() % 5 + 1;
+		int Random = RandomInt(0, 5);
 		if (Random >= 4) {
 			PlayLaughSound(&data.giant, 1.0, 1);
 			Task_FacialEmotionTask_Smile(&data.giant, 2.25, "HugSmile");
@@ -259,40 +259,21 @@ namespace {
 
 	void GTS_CH_Tiny_FXStart(AnimationEventData& data) { // Spawn Runes on Tiny
 		float scale = get_visual_scale(&data.giant) * 0.33;
-		for (std::string_view nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]", "NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
-			auto node = find_node(&data.giant, nodes);
+		for (std::string_view hand_nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]"}) {
+			auto node = find_node(&data.giant, hand_nodes);
 			if (node) {
 				NiPoint3 position = node->world.translate;
-				SpawnParticle(&data.giant, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), position, scale, 7, node); 
+				SpawnParticle(&data.giant, 6.00, "GTS/gts_tinyrune_bind.nif", NiMatrix3(), position, scale, 7, node); 
 			}
 		}
 
-		std::string name = std::format("HugTrap_{}", data.giant.formID);
-		ActorHandle gianthandle = data.giant.CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
-		TaskManager::Run(name, [=](auto& progressData) {
-			if (!gianthandle) {
-				return false;
+		for (std::string_view leg_nodes: {"NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
+			auto node = find_node(&data.giant, leg_nodes);
+			if (node) {
+				NiPoint3 position = node->world.translate;
+				SpawnParticle(&data.giant, 6.00, "GTS/gts_tinyrune_bind_leg.nif", NiMatrix3(), position, scale, 7, node); 
 			}
-			Actor* giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
-			bool CanCast = (Finish - Start) > (3.2 / AnimationManager::GetAnimSpeed(giantref));
-			if (CanCast && !IsActionOnCooldown(giantref, CooldownSource::Misc_ShrinkParticle_Animation)) {
-				for (std::string_view nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]", "NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
-					auto node = find_node(giantref, nodes);
-					if (node) {
-						NiPoint3 position = node->world.translate;
-						SpawnParticle(giantref, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), position, get_visual_scale(giantref) * 0.16, 7, node); 
-					}
-				}
-				ApplyActionCooldown(giantref, CooldownSource::Misc_ShrinkParticle_Animation);
-			}
-
-			if (!IsGtsBusy(giantref)) {
-				return false;
-			}
-			return true;
-		});
+		}
 	}
 
 	void GTS_CH_RuneStart(AnimationEventData& data) { // GTS rune
@@ -347,7 +328,7 @@ namespace {
 		if (IsGtsBusy(player)) {
 			return;
 		}
-		if ((CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player))) {
+		if (CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player)) {
 			auto& Hugging = HugAnimationController::GetSingleton();
 
 			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1.0);

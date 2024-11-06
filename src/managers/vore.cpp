@@ -4,7 +4,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "magic/effects/common.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "utils/SurvivalMode.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -99,7 +99,7 @@ namespace {
 		if (giant) {
 			if (Runtime::HasPerk(giant, "SoulVorePerk")) { // Permamently increases random AV after eating someone
 				float TotalMod = 0.33;
-				int Boost = rand() % 3;
+				int Boost = RandomInt(0, 3);
 				if (Boost == 0) {
 					AddStolenAttributesTowards(giant, ActorValue::kHealth, TotalMod);
 				} else if (Boost == 1) {
@@ -113,7 +113,7 @@ namespace {
 
 	void VoreMessage_SwallowedAbsorbing(Actor* pred, Actor* prey) {
 		if (pred) {
-			int random = rand() % 4;
+			int random = RandomInt(0, 3);
 			if (!prey->IsDead() && !Runtime::HasPerk(pred, "SoulVorePerk") || random <= 1) {
 				Cprint("{} was Swallowed and is now being slowly absorbed by {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
 			} else if (random == 2) {
@@ -126,7 +126,7 @@ namespace {
 
 	void VoreMessage_Absorbed(Actor* pred, std::string_view prey) {
 		if (pred) {
-			int random = rand() % 3;
+			int random = RandomInt(0, 3);
 			if (!Runtime::HasPerk(pred, "SoulVorePerk") || random == 0) {
 				Cprint("{} was absorbed by {}", prey, pred->GetDisplayFullName());
 			} else if (Runtime::HasPerk(pred, "SoulVorePerk") && random == 1) {

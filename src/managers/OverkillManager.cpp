@@ -1,7 +1,7 @@
 #include "managers/OverkillManager.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "magic/effects/common.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "utils/looting.hpp"

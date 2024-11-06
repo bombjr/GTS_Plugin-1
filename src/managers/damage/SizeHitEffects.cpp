@@ -109,8 +109,8 @@ namespace {
 	void HitGrowth(Actor* receiver, Actor* attacker, float GrowthValue, float SizeDifference, float BalanceMode) {
 		//log::info("Growth Value: {}", GrowthValue);
 
-		int LaughChance = rand() % 12;
-		int ShrinkChance = rand() % 5;
+		int LaughChance = RandomInt(0, 12);
+		int ShrinkChance = RandomInt(0, 5);
 
 		float particlescale = 1.0;
 		float shrinkmult = 1.0;
@@ -243,7 +243,7 @@ namespace Gts {
 					random = 1; // always apply
 				}
 
-				int rng = (rand()% random + 1);
+				int rng = (RandomInt(0, random));
 				if (rng <= 2) {
 					float sizediff = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, true);
 					if (sizediff < 3.0) {

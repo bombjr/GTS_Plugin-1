@@ -18,6 +18,7 @@
 #include "data/persistent.hpp"
 #include "managers/tremor.hpp"
 #include "managers/Rumble.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "profiler.hpp"
@@ -69,10 +70,9 @@ namespace {
             
             if (CanGrow && IsButtCrushing(giantref) && !IsChangingSize(giantref) && Runtime::HasPerkTeam(giantref, "ButtCrush_GrowingDisaster")) {
                 ApplyActionCooldown(giantref, CooldownSource::Misc_AiGrowth);
-                int rng = rand()% 10;
+                int rng = RandomInt(0, 10);
                 if (rng <= 6) {
                     AnimationManager::StartAnim("ButtCrush_Growth", giantref);
-                    //log::info("Growing");
                 }
             } else if (!CanGrow && !IsChangingSize(giantref)) { // Can't grow any further
                 AnimationManager::StartAnim("ButtCrush_Attack", giantref);
@@ -87,24 +87,16 @@ namespace {
     
 
     void AI_Heavy_Kicks(Actor* pred) {
-        int rng = rand() % 4;
-        int limit = 3;
+        int rng = RandomInt(0, 4);
         if (IsCrawling(pred)) {
-            limit = 1;
-            rng = rand() % 2;
+            rng = RandomInt(0, 2);
         }  
-        if (rng > limit) {
-            rng = limit; // fail-safe thingie
-        }
         log::info("Heavy Kicks rng for {} is {}", pred->GetDisplayFullName(), rng);
         AnimationManager::StartAnim(heavy_kicks[rng], pred);
     }
     void AI_Light_Kicks(Actor* pred) {
-        int rng = rand() % 2;
+        int rng = RandomInt(0, 4);
         int limit = 1;
-        if (rng > limit) {
-            rng = limit; // fail-safe thingie
-        }
         //log::info("Light Kicks rng for {} is {}", pred->GetDisplayFullName(), rng);
         AnimationManager::StartAnim(light_kicks[rng], pred);
     }
@@ -173,7 +165,7 @@ namespace Gts {
             return;
         }
 
-        int rng = rand() % 10;
+        int rng = RandomInt(0, 10);
         if (Runtime::HasPerkTeam(pred, "ButtCrush_NoEscape") && rng > 2) {
             auto& ButtCrush = ButtCrushController::GetSingleton();
 

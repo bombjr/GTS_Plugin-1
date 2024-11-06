@@ -12,7 +12,7 @@
 #include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/CrushManager.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/MovementForce.hpp"
 #include "utils/papyrusUtils.hpp"
@@ -27,6 +27,7 @@
 #include "data/transient.hpp"
 #include "utils/looting.hpp"
 #include "managers/vore.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "data/time.hpp"
@@ -1027,7 +1028,7 @@ namespace Gts {
 								float difference = giantScale / tinyScale;
 								float Threshold = GetStaggerThreshold(Cause);
 
-								int Random = rand() % 100 + 1;
+								int Random = RandomInt(0, 100);
 								int RagdollChance = (-32 + (32 / Threshold) * difference);
 								bool roll = RagdollChance > Random;
 								//log::info("Roll: {}, RandomChance {}, Threshold: {}", roll, RagdollChance, Random);
@@ -1418,7 +1419,7 @@ namespace Gts {
 
 	void AbsorbShout_BuffCaster(Actor* giantref, Actor* tinyref) {
 		static Timer MoanTimer = Timer(10.0);
-		auto random = rand() % 8;
+		auto random = RandomInt(0, 8);
 		if (random <= 4) {
 			if (MoanTimer.ShouldRunFrame()) {
 				ApplyShakeAtNode(giantref, 6.0, "NPC COM [COM ]");
@@ -1541,7 +1542,7 @@ namespace Gts {
 		AdjustFacialExpression(giant, 0, 0.40, "modifier"); // blink L
 		AdjustFacialExpression(giant, 1, 0.40, "modifier"); // blink R
 
-		float random = (rand()% 25) * 0.01;
+		float random = (RandomInt(0, 25)) * 0.01;
 		float smile = 0.25 + random; // up to +0.50 to open mouth
 
 		AdjustFacialExpression(giant, 3, random, "phenome"); // Slightly open mouth
@@ -1577,9 +1578,9 @@ namespace Gts {
 	void Laugh_Chance(Actor* giant, Actor* otherActor, float multiply, std::string_view name) {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
-			int rng = rand() % 2 + 1;
+			int rng = RandomInt(0, 3);
 			if (rng <= 1.0) {
-				float duration = 1.5 + ((rand() % 100) * 0.01);
+				float duration = 1.5 + ((RandomInt(0, 100)) * 0.01);
 				duration *= multiply;
 
 				ApplyActionCooldown(giant, CooldownSource::Emotion_Laugh);
@@ -1587,7 +1588,6 @@ namespace Gts {
 				if (!otherActor->IsDead()) {
 					PlayLaughSound(giant, 1.0, 1);
 					Task_FacialEmotionTask_Smile(giant, duration, name);
-					
 				}
 			}
 		}
@@ -1596,9 +1596,9 @@ namespace Gts {
 	void Laugh_Chance(Actor* giant, float multiply, std::string_view name) {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
-			int rng = rand() % 2 + 1;
+			int rng = RandomInt(0, 3);
 			if (rng <= 1.0) {
-				float duration = 1.5 + ((rand() % 100) * 0.01);
+				float duration = 1.5 + ((RandomInt(0, 100)) * 0.01);
 				duration *= multiply;
 
 				PlayLaughSound(giant, 1.0, 1);

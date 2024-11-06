@@ -5,7 +5,7 @@
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/animation/BoobCrush.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"

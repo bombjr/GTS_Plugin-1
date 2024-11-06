@@ -1,5 +1,6 @@
 #include "utils/DeathReport.hpp"
 #include "managers/highheel.hpp"
+#include "utils/random.hpp"
 
 using namespace RE;
 using namespace Gts;
@@ -429,7 +430,7 @@ namespace Gts {
 	}
 
 	void ReportDeath(Actor* giant, Actor* tiny, DamageSource cause) {
-		int random = rand()% 8;
+		int random = RandomInt(0, 8);
 
 		std::string_view TinyName = tiny->GetDisplayFullName();
 		std::string_view GiantName = giant->GetDisplayFullName();

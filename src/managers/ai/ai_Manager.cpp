@@ -17,6 +17,7 @@
 #include "data/persistent.hpp"
 #include "ActionSettings.hpp"
 #include "managers/vore.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "profiler.hpp"
@@ -53,7 +54,7 @@ namespace {
 				if (!actor->IsDead()) {
 					int Requirement = 14 * SizeManager::GetSingleton().BalancedMode();
 
-					int random = rand() % Requirement;
+					int random = RandomInt(0, Requirement);
 					int trigger_threshold = 2;
 					if (random <= trigger_threshold) {
 						std::vector<Actor*> preys = VoreManager.GetVoreTargetsInFront(pred, 1);
@@ -79,7 +80,7 @@ namespace {
 			}
 		}
 		if (!AbleToVore.empty()) {
-			int idx = rand() % AbleToVore.size();
+			int idx = RandomInt(0, AbleToVore.size() -1);
 			Actor* voreActor = AbleToVore[idx];
 			if (voreActor) {
 				AI_PerformRandomVore(voreActor);
@@ -120,7 +121,7 @@ namespace Gts {
 					}
 				}
 				if (!AbleToAct.empty()) {
-					int idx = rand() % AbleToAct.size();
+					int idx = RandomInt(0, AbleToAct.size() - 1);
 					Actor* Performer = AbleToAct[idx];
 					if (Performer) {
 						AI_TryAction(Performer);
@@ -222,25 +223,24 @@ namespace Gts {
 		if (prey->formID == 0x14 && !Persistent::GetSingleton().vore_allowplayervore || !CanPerformAnimationOn(pred, prey, false)) {
 			return false;
 		}
-		float pred_scale = get_visual_scale(pred) * GetSizeFromBoundingBox(pred);
-		float prey_scale = get_visual_scale(prey) * GetSizeFromBoundingBox(prey);
+
+		float pred_scale = get_visual_scale(pred);
+		float sizedifference = GetSizeDifference(pred, prey, SizeType::VisualScale, true, false);
 
 		float bonus = 1.0;
 		if (IsCrawling(pred)) {
 			bonus = 2.0; // +100% stomp distance
 		}
-		if (prey->IsDead() && pred_scale/prey_scale < Action_Crush) {
+		if (prey->IsDead() && sizedifference < Action_Crush) { // We don't want the follower to be stuck stomping corpses that can't be crushed.
 			return false;
 		}
 
-		float sizedifference = pred_scale/prey_scale;
-
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
-		if (pred->formID == 0x14 && prey_distance <= (MINIMUM_STOMP_DISTANCE * pred_scale * bonus) && pred_scale/prey_scale < MINIMUM_STOMP_SCALE_RATIO) {
+		if (pred->formID == 0x14 && prey_distance <= (MINIMUM_STOMP_DISTANCE * pred_scale * bonus) && sizedifference < MINIMUM_STOMP_SCALE_RATIO) {
 			return false;
 		}
 		if (prey_distance <= (MINIMUM_STOMP_DISTANCE * pred_scale * bonus)
-		    && pred_scale/prey_scale > MINIMUM_STOMP_SCALE_RATIO
+		    && sizedifference > MINIMUM_STOMP_SCALE_RATIO
 		    && prey_distance > 25.0) { // We don't want the Stomp to be too close
 			return true;
 		} else {

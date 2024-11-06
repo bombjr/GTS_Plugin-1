@@ -277,7 +277,7 @@ namespace Gts {
 
 	void DragonAbsorptionBonuses();
 
-	void AddSMTDuration(Actor* actor, float duration);
+	void AddSMTDuration(Actor* actor, float duration, bool perk_check = true);
 	void AddSMTPenalty(Actor* actor, float penalty);
 
 	void PrintDeathSource(Actor* giant, Actor* tiny, DamageSource cause);

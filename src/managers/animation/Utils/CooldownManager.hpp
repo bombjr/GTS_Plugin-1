@@ -31,6 +31,7 @@ namespace Gts {
         Misc_ShrinkOutburst_Forced,
         Misc_ShrinkParticle,
         Misc_ShrinkParticle_Animation,
+        Misc_ShrinkParticle_Gaze,
         Misc_TinyCalamityRage,
         Footstep_Right,
         Footstep_Left,
@@ -63,6 +64,7 @@ namespace Gts {
         double lastForceOutburstTime = -1.0e8;
         double lastShrinkParticleTime = -1.0e8;
         double lastAnimShrinkParticleTime = -1.0e8;
+        double lastGazeShrinkParticleTime = -1.0e8;
         double lastTinyCalamityTime = -1.0e8;
 
         double lastFootstepTime_R = -1.0e8;

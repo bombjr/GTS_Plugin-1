@@ -1,6 +1,6 @@
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/ai/aifunctions.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -59,9 +59,7 @@ namespace {
 
 		float currentSize = get_visual_scale(tiny);
 
-		if (tinyHandle) {
-			Runtime::PlaySound("ShrinkToNothingSound", tinyHandle.get().get(), 1.0, 1.0);
-		}
+		Runtime::PlaySound("ShrinkToNothingSound", giant, 1.0, 1.0);
 
 		TaskManager::RunOnce(taskname, [=](auto& update){
 			if (!tinyHandle) {

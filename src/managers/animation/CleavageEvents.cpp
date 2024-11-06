@@ -16,7 +16,7 @@
 #include "managers/InputManager.hpp"
 #include "utils/DifficultyUtils.hpp"
 #include "managers/CrushManager.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "managers/explosion.hpp"
 #include "managers/highheel.hpp"
@@ -145,7 +145,7 @@ namespace {
     }
 
     void PrintBreastAbsorbed(Actor* giant, Actor* tiny) {
-        int random = rand() % 5;
+        int random = RandomInt(0, 4);
         if (random <= 1) {
             Cprint("{} suddenly disappeared between the breasts of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
         } else if (random == 2) {

@@ -3,7 +3,7 @@
 #include "managers/audio/footstep.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/GtsSizeManager.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "utils/papyrusUtils.hpp"
 #include "managers/explosion.hpp"
 #include "utils/papyrusUtils.hpp"
@@ -11,6 +11,7 @@
 #include "utils/findActor.hpp"
 #include "data/persistent.hpp"
 #include "data/transient.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "timer.hpp"
@@ -239,7 +240,7 @@ namespace Gts {
 
 			float timepassed = Finish - Start;
 			if (IsMoving(tinyRef)) {
-				int FallChance = rand() % 6000;// Chance to Trip
+				int FallChance = RandomInt(0, 6000);// Chance to Trip
 				if (FallChance <= 2 && !IsRagdolled(tinyRef)) {
 					PushActorAway(giantRef, tinyRef, 1.0);
 				}

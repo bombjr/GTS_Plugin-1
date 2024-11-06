@@ -102,8 +102,8 @@ namespace {
 	const std::string_view LNode = "NPC L Foot [Lft ]";
 
 	bool Escaped(Actor* giant, Actor* tiny, float strength) {
-		float tiny_chance = ((rand() % 100000) / 100000.0f) * get_visual_scale(tiny);
-		float giant_chance = ((rand() % 100000) / 100000.0f) * strength * get_visual_scale(giant);
+		float tiny_chance = ((RandomInt(0, 100000)) / 100000.0f) * get_visual_scale(tiny);
+		float giant_chance = ((RandomInt(0, 100000)) / 100000.0f) * strength * get_visual_scale(giant);
 		return (tiny_chance > giant_chance);
 	}
 

@@ -340,7 +340,7 @@ namespace Gts {
 
 				auto giantref = giantHandle.get().get();
 				DamageAV(giantref, ActorValue::kMagicka, 180 * GetButtCrushCost(giantref, true));
-				DamageAV(pred, ActorValue::kStamina, WasteStamina);
+				DamageAV(giantref, ActorValue::kStamina, WasteStamina);
 			});
 			
 

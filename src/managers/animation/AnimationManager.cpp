@@ -32,7 +32,7 @@
 #include "managers/animation/Kicks.hpp"
 #include "managers/animation/Stomp.hpp"
 #include "managers/animation/Grab.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "utils/InputFunctions.hpp"
 #include "data/persistent.hpp"
 #include "scale/scale.hpp"
@@ -264,14 +264,13 @@ namespace Gts {
 	}
 
 	void AnimationManager::StartAnim(std::string_view trigger, Actor& giant, TESObjectREFR* tiny) {
-		if (IsInRaceMenu()) {
-			return;
-		}
-		if (giant.formID == 0x14 && IsFirstPerson()) { //Time::WorldTimeElapsed() > 1.0
-			//ForceThirdPerson(&giant);
-			// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.
-			// Better to wait for full support someday
-			return; // Don't start animations in FP, it's not supported.
+		if (giant.formID == 0x14) {
+			if (IsFirstPerson() || IsInRaceMenu()) { //Time::WorldTimeElapsed() > 1.0
+				//ForceThirdPerson(&giant);
+				// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.
+				// Better to wait for full support someday
+				return; // Don't start animations in FP, it's not supported.
+			}
 		}
 		try {
 			auto& me = AnimationManager::GetSingleton();

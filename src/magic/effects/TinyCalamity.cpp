@@ -1,11 +1,15 @@
+#include "managers/animation/Utils/AnimationUtils.hpp"
+#include "managers/perks/ShrinkingGaze.hpp"
 #include "magic/effects/TinyCalamity.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "data/transient.hpp"
 #include "data/runtime.hpp"
+#include "UI/DebugAPI.hpp"
 #include "magic/magic.hpp"
 #include "scale/scale.hpp"
+#include "data/time.hpp"
 #include "node.hpp"
 
 namespace {
@@ -47,12 +51,17 @@ namespace Gts {
 		if (!caster) {
 			return;
 		}
+		
+		
 		Runtime::PlaySoundAtNode("TinyCalamitySound", caster, 1.0, 1.0, "NPC COM [COM ]");
 		auto node = find_node(caster, "NPC Root [Root]");
+		StartShrinkingGaze(caster);
+
 		if (node) {
-			float scale = get_visual_scale(caster);
 			NiPoint3 position = node->world.translate;
+			float scale = get_visual_scale(caster);
 			TinyCalamityExplosion(caster, 84);
+
 			SpawnParticle(caster, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0, 7, nullptr); // Spawn
 			Rumbling::For("TinyCalamity", caster, 4.0, 0.14, "NPC COM [COM ]", 0.10, 0.0);
 		}

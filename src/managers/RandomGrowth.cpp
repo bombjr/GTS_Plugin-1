@@ -59,7 +59,7 @@ namespace {
 		float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
 		int Requirement = ((300 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
 		Requirement *= Get_size_penalty(actor);
-		int random = rand() % Requirement;
+		int random = RandomInt(1, Requirement);
 		int chance = 1;
 		if (random <= chance) {
 			return true;
@@ -91,7 +91,7 @@ namespace Gts {
 						if (get_target_scale(actor) < get_max_scale(actor)) {
 							float scale = get_visual_scale(actor);
 							float ProgressionMultiplier = Persistent::GetSingleton().progression_multiplier;
-							int random = rand()% 79 + 1;
+							int random = RandomInt(0, 80);
 							float TotalPower = (100.0 + random)/100.0;
 							float base_power = ((0.00750 * TotalPower * 25) * ProgressionMultiplier);  // The power of it
 							float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);

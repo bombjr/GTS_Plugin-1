@@ -2,7 +2,7 @@
 #include "magic/effects/TinyCalamity.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/CrushManager.hpp"
-#include "managers/PerkHandler.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -34,9 +34,9 @@ namespace {
 	}
 
 	void ScareChance(Actor* actor) {
-		int voreFearRoll = rand() % 5;
+		int voreFearRoll = RandomInt(0, 5);
 		if (HasSMT(actor)) {
-			voreFearRoll = rand() % 2;
+			voreFearRoll = RandomInt(0, 2);
 			shake_camera(actor, 0.4, 0.25);
 		}
 
@@ -52,7 +52,7 @@ namespace {
 		if (MaxValue <= 3 || HasSMT(giant)) {
 			MaxValue = 3;
 		}
-		int FearChance = rand() % MaxValue;
+		int FearChance = RandomInt(0, MaxValue);
 		if (FearChance <= 0) {
 			Runtime::CastSpell(giant, giant, "GtsVoreFearSpell");
 			// Should cast fear
@@ -60,7 +60,7 @@ namespace {
 	}
 
 	void PleasureText(Actor* actor) {
-		int Pleasure = rand() % 5;
+		int Pleasure = RandomInt(0, 5);
 		if (Pleasure <= 0) {
 			if (actor->formID == 0x14) {
 				Notify("Crushing your foes feels good and makes you bigger");
@@ -84,8 +84,8 @@ namespace {
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
 		static Timer voicetimer = Timer(2.4);
-		auto randomInt = rand() % 16;
-		auto select = rand() % 3;
+		auto randomInt = RandomInt(0, 16);
+		auto select = RandomInt(0, 2);
 		if (randomInt <= 3.0) {
 			if (voicetimer.ShouldRun()) {
 				if (select >= 2.0) {

@@ -40,7 +40,7 @@ namespace {
 	void ActivateEmotions(Actor* actor, bool toggle) {
 		float p_1 = 1.0;
 		float p_2 = 0.75;
-		int rng = rand()% 8;
+		int rng = RandomInt(0, 8);
 		if (!toggle) {
 			p_1 = 0.0;
 			p_2 = 0.0;

@@ -10,6 +10,7 @@
 #include "data/persistent.hpp"
 #include "managers/Rumble.hpp"
 #include "data/transient.hpp"
+#include "utils/random.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "utils/debug.hpp"
@@ -164,10 +165,10 @@ namespace Gts {
 						float GtsSkillLevel = GetGtsSkillLevel(actor);                                                   // Based on GTS skill level
 						float MaxSize = Runtime::GetFloat("CurseOfGrowthMaxSize");                                       // Slider that determines max size cap.
 						float sizelimit = std::clamp(1.0f * (GtsSkillLevel/100.0f * MaxSize), 1.0f, MaxSize);            // Size limit between 1 and [Slider]], based on GTS Skill. Cap is Slider value.
-						int Random = rand() % 20;                                                                        // Randomize power
-						int GrowthTimer = rand() % 6 + 1;                                                                // Randomize 're-trigger' delay, kinda
-						int StrongGrowthChance = rand() % 20;                                                            // Self-explanatory
-						int MegaGrowth = rand() % 20;                                                                    // A chance to multiply growth again
+						int Random = RandomInt(0, 20);                                                                   // Randomize power
+						int GrowthTimer = RandomInt(0, 6);                                                               // Randomize 're-trigger' delay, kinda
+						int StrongGrowthChance = RandomInt(0, 6);                                                        // Self-explanatory
+						int MegaGrowth = RandomInt(0, 20);                                                               // A chance to multiply growth again
 						float GrowthPower = GtsSkillLevel*0.00240 / Random;                                              // Randomized strength of growth
 						static Timer timer = Timer(1.40 * GrowthTimer);                                                  // How often it procs
 						if (targetScale >= sizelimit || Random <= 0 || GrowthTimer <= 0) {

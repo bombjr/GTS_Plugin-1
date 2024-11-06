@@ -49,6 +49,7 @@ namespace {
     const double SHRINK_OUTBURST_COOLDOWN = 18.0f;
     const double SHRINK_OUTBURST_COOLDOWN_FORCED = 180.0f;
     const double SHRINK_PARTICLE_COOLDOWN = 0.25f;
+    const double SHRINK_PARTICLE_COOLDOWN_GAZE = 0.25f;
     const double SHRINK_PARTICLE_COOLDOWN_ANIM = 1.5f;
     const double SHRINK_TINYCALAMITY_RAGE = 60.0f;
 
@@ -210,6 +211,9 @@ namespace Gts {
             case CooldownSource::Misc_ShrinkParticle_Animation:
                 data.lastAnimShrinkParticleTime = Time::WorldTimeElapsed();
                 break;
+            case CooldownSource::Misc_ShrinkParticle_Gaze:
+                data.lastGazeShrinkParticleTime = Time::WorldTimeElapsed();
+                break;
             case CooldownSource::Misc_TinyCalamityRage:
                 data.lastTinyCalamityTime = Time::WorldTimeElapsed();
                 break;
@@ -271,6 +275,8 @@ namespace Gts {
                 return (data.lastShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN) - time;
             case CooldownSource::Misc_ShrinkParticle_Animation:
                 return (data.lastAnimShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_ANIM) - time;
+            case CooldownSource::Misc_ShrinkParticle_Gaze:
+                return (data.lastGazeShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_GAZE) - time;
             case CooldownSource::Misc_TinyCalamityRage:
                 return (data.lastTinyCalamityTime + SHRINK_TINYCALAMITY_RAGE) - time;
             case CooldownSource::Footstep_Right:
@@ -330,6 +336,8 @@ namespace Gts {
                 return time <= (data.lastShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN); 
             case CooldownSource::Misc_ShrinkParticle_Animation:
                 return time <= (data.lastAnimShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_ANIM);
+            case CooldownSource::Misc_ShrinkParticle_Gaze:
+                return time <= (data.lastGazeShrinkParticleTime + SHRINK_PARTICLE_COOLDOWN_GAZE);
             case CooldownSource::Misc_TinyCalamityRage:
                 return time <= (data.lastTinyCalamityTime + SHRINK_TINYCALAMITY_RAGE); 
             case CooldownSource::Footstep_Right:
