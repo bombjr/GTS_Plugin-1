@@ -30,6 +30,13 @@ namespace {
 	const float STOMP_ANGLE = 50;
 	const float PI = 3.14159;
 
+	bool CanStompDead(Actor* tiny, float sizedifference) {
+		if (prey->IsDead() && sizedifference < Action_Crush) {
+			return false;
+		}
+		return true;
+	}
+
 	bool ProtectFollowers(Actor* giant, Actor* tiny) {
 		bool NPC = Persistent::GetSingleton().FollowerProtection;
 		if (tiny->formID != 0x14 && NPC && (IsTeammate(giant)) && (IsTeammate(tiny))) {
@@ -231,7 +238,7 @@ namespace Gts {
 		if (IsCrawling(pred)) {
 			bonus = 2.0; // +100% stomp distance
 		}
-		if (prey->IsDead() && sizedifference < Action_Crush) { // We don't want the follower to be stuck stomping corpses that can't be crushed.
+		if (!CanStompDead(prey, sizedifference)) { // We don't want the follower to be stuck stomping corpses that can't be crushed.
 			return false;
 		}
 

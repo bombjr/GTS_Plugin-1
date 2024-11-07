@@ -37,17 +37,23 @@ namespace Gts {
 	}
 
 	//https://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-	//Example RandomIntWeighted(30,1,150) -> 
-	// Adds all argumetns together then calculates odds given example numbers this will have a...
-	// 30 in 181 chance to return 0,
-	// 1 in 181 chance to return 1
-	// 150 in 181 chance to return 2
-	// x in nSum chance to return n[i]
-	template <typename... Args>
-	[[nodiscard]] inline int RandomIntWeighted(Args... a_weights) {
-		std::discrete_distribution<> dist({ a_weights... });
-		return dist(generator);
-	}
+    //Example RandomIntWeighted(30,1,150) -> 
+    // Adds all argumetns together then calculates odds given example numbers this will have a...
+    // 30 in 181 chance to return 0,
+    // 1 in 181 chance to return 1
+    // 150 in 181 chance to return 2
+    // x in nSum chance to return n[i]
+    [[nodiscard]] inline int _RandomIntWeighted(std::initializer_list<int> a_weights) {
+        std::discrete_distribution<> dist(a_weights.begin(), a_weights.end());
+        return dist(generator);
+    }
+
+    //Wrapped in a template so we dont have to pass {} in the arguments
+    template <typename... Args>
+    [[nodiscard]] inline int RandomIntWeighted(Args... a_weights) {
+        //std::discrete_distribution<> dist({ a_weights... });
+        return _RandomIntWeighted({ a_weights... });
+    }
 
 	// -------------------
 	// Random Bool Chance
@@ -56,9 +62,9 @@ namespace Gts {
 	//Returns a boolean based on the percentage chance of the value being true
 	//ie. RandomPercent(70) -> 70% Chance of returning true
 	[[nodiscard]] inline bool RandomPercent(float a_chance) {
-		std::uniform_real_distribution<> dist(0.f, 100.f);
-		return dist(generator) - a_chance >= -std::numeric_limits<float>::epsilon();
-	}
+        std::uniform_real_distribution<> dist(0.f, 100.f);
+        return a_chance - dist(generator) >= -std::numeric_limits<float>::epsilon();
+    }
 
 	// -------------------
 	//  Gaussian
