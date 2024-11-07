@@ -759,6 +759,9 @@ namespace Gts {
 		return blacklist;
 	}
 
+	bool IsGtsTeammate(Actor* actor) {
+		return Runtime::HasKeyword(actor, "GtsTeammateKeyword");
+	}
 
 	void Potion_SetMightBonus(Actor* giant, float value, bool add) {
 		auto transient = Transient::GetSingleton().GetData(giant);
@@ -1905,7 +1908,7 @@ namespace Gts {
 		if (!actor) {
 			return false;
 		}
-		if (Runtime::InFaction(actor, "FollowerFaction") || actor->IsPlayerTeammate()) { 
+		if (Runtime::InFaction(actor, "FollowerFaction") || actor->IsPlayerTeammate() || IsGtsTeammate(actor)) {
 			return true;
 		}
 		return false;
