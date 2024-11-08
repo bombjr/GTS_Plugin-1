@@ -91,63 +91,67 @@ namespace {
 		
 			NiPoint3 NodePosition = data->collisionPoint;
 
-			if (IsDebugEnabled() && (giant->formID == 0x14)) {
-				DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance);
-			}
+			if (NodePosition.Length() > 0.0) {
 
-			if (NodePosition.Length() > 0) {
-				NiPoint3 giantLocation = giant->GetPosition();
-				for (auto otherActor: find_actors()) {
-					if (otherActor != giant && IsHostile(giant, otherActor)) {
-						auto data = Transient::GetSingleton().GetActorData(otherActor);
-						if (data) {
-							NiPoint3 actorLocation = otherActor->GetPosition();
-							if ((actorLocation-giantLocation).Length() <= checkDistance) {
-								int nodeCollisions = 0;
+				if (IsDebugEnabled() && (giant->formID == 0x14)) {
+					DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance);
+				}
 
-								float bb = std::clamp(GetSizeFromBoundingBox(otherActor), 1.0f, 100.0f);
-								auto model = otherActor->GetCurrent3D();
-								
-								if (model) {
-									VisitNodes(model, [&nodeCollisions, &data, NodePosition, maxDistance, bb](NiAVObject& a_obj) {
-										float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override * 20 * bb;
-			
-										if (distance <= maxDistance) {
-											data->Shrink_Ticks_Calamity += 0.0166 * TimeScale();
-											if (data->MovementSlowdown > 0.33) {
-												data->MovementSlowdown -= 0.0032 * TimeScale();
-											}
-											nodeCollisions += 1;
-											return false;
-										} else {
-											if (data->Shrink_Ticks_Calamity > 0) {
-												data->Shrink_Ticks_Calamity -= 0.0166 * 0.20 * TimeScale();
-											}
-											data->MovementSlowdown = 1.0; // Reset it
-										}
-										return true;
-									});
-								}
-								if (nodeCollisions > 0) {
-									float difference = GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, false);
-									float stare_threshold_s = std::clamp(3.25f * get_visual_scale(otherActor), 0.25f, 6.0f);
-									float tiny_size = get_visual_scale(otherActor);
+				if (NodePosition.Length() > 0) {
+					NiPoint3 giantLocation = giant->GetPosition();
+					for (auto otherActor: find_actors()) {
+						if (otherActor != giant && IsHostile(giant, otherActor)) {
+							auto data = Transient::GetSingleton().GetActorData(otherActor);
+							if (data) {
+								NiPoint3 actorLocation = otherActor->GetPosition();
+								if ((actorLocation-giantLocation).Length() <= checkDistance) {
+									int nodeCollisions = 0;
 
-									if (data->Shrink_Ticks_Calamity >= stare_threshold_s) {
-										Laugh_Chance(giant, 1.25, "CalamityShrink");
-										if (!ShrinkToNothing(giant, otherActor, true, 1.50)) {
-											ShrinkTheTargetOr(giant, otherActor, stare_threshold_s, tiny_size, difference, data);
-										} else {
-											if (!IsActionOnCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze)) {
-												SpawnParticle(otherActor, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), otherActor->GetPosition(), tiny_size * 4.5, 7, nullptr); 
-												Runtime::PlaySoundAtNode("Magic_ProtectTinies", otherActor, 0.5, 0.5, "NPC Root [Root]");
-												ApplyActionCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze);
+									float bb = std::clamp(GetSizeFromBoundingBox(otherActor), 1.0f, 100.0f);
+									auto model = otherActor->GetCurrent3D();
+									
+									if (model) {
+										VisitNodes(model, [&nodeCollisions, &data, NodePosition, maxDistance, bb](NiAVObject& a_obj) {
+											float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override * 20 * bb;
+				
+											if (distance <= maxDistance) {
+												data->Shrink_Ticks_Calamity += 0.0166 * TimeScale();
+												if (data->MovementSlowdown > 0.33) {
+													data->MovementSlowdown -= 0.0032 * TimeScale();
+												}
+												nodeCollisions += 1;
+												return false;
+											} else {
+												if (data->Shrink_Ticks_Calamity > 0) {
+													data->Shrink_Ticks_Calamity -= 0.0166 * 0.20 * TimeScale();
+												}
+												data->MovementSlowdown = 1.0; // Reset it
 											}
-											data->MovementSlowdown = 1.0;
-											MoanOr(giant);
-										}
+											return true;
+										});
 									}
-									return;
+									if (nodeCollisions > 0) {
+										float difference = GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, false);
+										float stare_threshold_s = std::clamp(3.25f * get_visual_scale(otherActor), 0.25f, 6.0f);
+										float tiny_size = get_visual_scale(otherActor);
+
+										if (data->Shrink_Ticks_Calamity >= stare_threshold_s) {
+											Laugh_Chance(giant, 1.25, "CalamityShrink");
+											if (!ShrinkToNothing(giant, otherActor, true, 1.50)) {
+												ShrinkTheTargetOr(giant, otherActor, stare_threshold_s, tiny_size, difference, data);
+												AdjustMassLimit(tiny_size * 0.0075, giant);
+											} else {
+												if (!IsActionOnCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze)) {
+													SpawnParticle(otherActor, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), otherActor->GetPosition(), tiny_size * 4.5, 7, nullptr); 
+													Runtime::PlaySoundAtNode("Magic_ProtectTinies", otherActor, 0.5, 0.5, "NPC Root [Root]");
+													ApplyActionCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze);
+												}
+												data->MovementSlowdown = 1.0;
+												MoanOr(giant);
+											}
+										}
+										return;
+									}
 								}
 							}
 						}

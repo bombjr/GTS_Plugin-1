@@ -470,7 +470,7 @@ VampireKeyword = "Skyrim.esm|0A82BB"
 AnimalKeyword = "Skyrim.esm|013798"
 CreatureKeyword = "Skyrim.esm|013795"
 BlackListKeyword = "GTS.esp|6A85AF"
-GtsTeammateKeyword = "GTS.esp|000000"
+CountAsFollower = "GTS.esp|88E644"
 
 DarkSouls = "Skyrim.esm|0C1E8F"
 SummonUndead = "Skyrim.esm|02482B"

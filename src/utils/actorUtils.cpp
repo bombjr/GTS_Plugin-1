@@ -760,7 +760,7 @@ namespace Gts {
 	}
 
 	bool IsGtsTeammate(Actor* actor) {
-		return Runtime::HasKeyword(actor, "GtsTeammateKeyword");
+		return Runtime::HasKeyword(actor, "CountAsFollower");
 	}
 
 	void Potion_SetMightBonus(Actor* giant, float value, bool add) {
@@ -1367,6 +1367,9 @@ namespace Gts {
 										NiPoint3 Position = node->world.translate;
 										float bounding_z = get_bounding_box_z(otherActor);
 										if (bounding_z > 0.0) {
+											if (IsCrawling(giant) && IsBeingHugged(otherActor)) {
+												bounding_z *= 0.15; // Move the icon down
+											}
 											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35); // 2.25 to be slightly above the head
 											//log::info("For Actor: {}", otherActor->GetDisplayFullName());
 											//log::info("---	Position: {}", Vector2Str(Position));
