@@ -363,6 +363,16 @@ namespace Gts {
 							stolen_stamin = 0.0;
 						}
 
+						float rip_offset;
+						if (version >= 9) {
+							serde->ReadRecordData(&rip_offset, sizeof(rip_offset));
+						}
+						else {
+							rip_offset = 0.0;
+						}
+						if (std::isnan(rip_offset)) {
+							rip_offset = 0.0;
+						}
 
 						ActorData data = ActorData();
 						//log::info("Loading Actor {:X} with data, native_scale: {}, visual_scale: {}, visual_scale_v: {}, target_scale: {}, max_scale: {}, half_life: {}, anim_speed: {}, bonus_hp: {}, bonus_carry: {}", newActorFormID, native_scale, visual_scale, visual_scale_v, target_scale, max_scale, half_life, anim_speed, bonus_hp, bonus_carry);
@@ -392,6 +402,8 @@ namespace Gts {
 						data.stolen_health = stolen_health;
 						data.stolen_magick = stolen_magick;
 						data.stolen_stamin = stolen_stamin;
+
+						data.rip_offset = rip_offset;
 
 						TESForm* actor_form = TESForm::LookupByID<Actor>(newActorFormID);
 						if (actor_form) {
@@ -680,7 +692,7 @@ namespace Gts {
 	void Persistent::OnGameSaved(SerializationInterface* serde) {
 		std::unique_lock lock(GetSingleton()._lock);
 
-		if (!serde->OpenRecord(ActorDataRecord, 8)) {
+		if (!serde->OpenRecord(ActorDataRecord, 9)) {
 			log::error("Unable to open actor data record to write cosave data.");
 			return;
 		}
@@ -716,6 +728,8 @@ namespace Gts {
 			float stolen_magick = data.stolen_magick;
 			float stolen_stamin = data.stolen_stamin;
 
+			float rip_offset = data.rip_offset;
+
 			//log::info("Saving Actor {:X} with data, native_scale: {}, visual_scale: {}, visual_scale_v: {}, target_scale: {}, max_scale: {}, half_life: {}, anim_speed: {}, effective_multi: {}, effective_multi: {}, bonus_hp: {}, bonus_carry: {}, bonus_max_size: {}", form_id, native_scale, visual_scale, visual_scale_v, target_scale, max_scale, half_life, anim_speed, effective_multi, effective_multi, bonus_hp, bonus_carry, bonus_max_size);
 			serde->WriteRecordData(&form_id, sizeof(form_id));
 			serde->WriteRecordData(&native_scale, sizeof(native_scale));
@@ -746,6 +760,8 @@ namespace Gts {
 			serde->WriteRecordData(&stolen_health, sizeof(stolen_health));
 			serde->WriteRecordData(&stolen_magick, sizeof(stolen_magick));
 			serde->WriteRecordData(&stolen_stamin, sizeof(stolen_stamin));
+
+			serde->WriteRecordData(&rip_offset, sizeof(rip_offset));
 		}
 
 		if (!serde->OpenRecord(ScaleMethodRecord, 0)) {
@@ -1193,6 +1209,7 @@ namespace Gts {
 		this->stolen_health = 0.0;
 		this->stolen_magick = 0.0;
 		this->stolen_stamin = 0.0;
+		this->rip_offset = 0.0;
 	}
 
 	ActorData* Persistent::GetActorData(Actor* actor) {
@@ -1270,6 +1287,7 @@ namespace Gts {
 			data->stolen_health = 0.0;
 			data->stolen_magick = 0.0;
 			data->stolen_stamin = 0.0;
+			data->rip_offset = 0.0;
 		}
     ResetToInitScale(actor);
 	}

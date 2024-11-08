@@ -43,6 +43,8 @@ namespace Gts {
 		float stolen_magick;
 		float stolen_stamin;
 
+		float rip_offset;
+
 		ActorData();
 		ActorData(Actor* actor);
 	};

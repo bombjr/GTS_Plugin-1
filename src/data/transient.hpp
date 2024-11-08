@@ -89,6 +89,8 @@ namespace Gts {
 		TESObjectREFR* Throw_Offender;
 
 		AttachToNode AttachmentNode;
+		
+		float rip_lastScale;
 	};
 
 	class Transient : public EventListener {

@@ -97,6 +97,8 @@ namespace Gts {
 
 			float IsNotImmune = 1.0;
 
+			float rip_lastScale = 1.0;
+
 			NiPoint3 POS_Last_Leg_L = NiPoint3(0.0, 0.0, 0.0);
 			NiPoint3 POS_Last_Leg_R = NiPoint3(0.0, 0.0, 0.0);
 			NiPoint3 POS_Last_Hand_L = NiPoint3(0.0, 0.0, 0.0);
@@ -220,6 +222,7 @@ namespace Gts {
 			result.IsInControl = IsInControl;
 
 			result.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
+			result.rip_lastScale = rip_lastScale;
 
 			this->_actor_data.try_emplace(key, result);
 		}
