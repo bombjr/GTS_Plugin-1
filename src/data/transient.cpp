@@ -3,8 +3,6 @@
 #include "data/runtime.hpp"
 #include "spring.hpp"
 #include "node.hpp"
-#include "managers/RipClothManager.hpp"
-
 
 using namespace SKSE;
 using namespace RE;
@@ -224,6 +222,8 @@ namespace Gts {
 
 			result.IsInControl = IsInControl;
 			
+			result.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
+
 			result.rip_lastScale = rip_initScale;
 			result.rip_offset = rip_initScale;
 
