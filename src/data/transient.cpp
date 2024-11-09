@@ -221,9 +221,7 @@ namespace Gts {
 			result.shrink_until = shrink_until;
 
 			result.IsInControl = IsInControl;
-			
-			result.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
-
+		
 			result.rip_lastScale = rip_initScale;
 			result.rip_offset = rip_initScale;
 
