@@ -3,7 +3,7 @@
 #include "data/runtime.hpp"
 #include "spring.hpp"
 #include "node.hpp"
-
+#include "managers/RipClothManager.hpp"
 
 
 using namespace SKSE;
@@ -125,6 +125,7 @@ namespace Gts {
 			float MightValue = 0.0;
 			float Shrink_Ticks = 0.0;
 			float Shrink_Ticks_Calamity = 0.0;
+			
 
 			float Perk_BonusActionSpeed = 1.0;
 			float Perk_lifeForceStolen = 0.0;
@@ -137,6 +138,8 @@ namespace Gts {
 			// Volume scales cubically
 			float base_volume = bound_values[0] * bound_values[1] * bound_values[2] * scale * scale * scale;
 			float base_volume_meters = unit_to_meter(base_volume);
+
+			const float rip_initScale = -1.0;
 
 			result.base_height = base_height_meters;
 			result.base_volume = base_volume_meters;
@@ -220,9 +223,9 @@ namespace Gts {
 			result.shrink_until = shrink_until;
 
 			result.IsInControl = IsInControl;
-
-			result.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
-			result.rip_lastScale = rip_lastScale;
+			
+			result.rip_lastScale = rip_initScale;
+			result.rip_offset = rip_initScale;
 
 			this->_actor_data.try_emplace(key, result);
 		}

@@ -18,7 +18,7 @@ using namespace Gts;
 
 namespace Gts {
 
-    #define RANDOM_OFFSET (RandomFloat(0.01, 0.09))
+    #define RANDOM_OFFSET RandomFloat(0.01, rip_randomOffsetMax - 0.01)
 	static bool RipClothManagerActive;
 
 	// List of keywords (Editor ID's) we want to ignore when stripping
@@ -96,7 +96,28 @@ namespace Gts {
 		}
 	}
 
+	float ClothManager::ReConstructOffset(Actor* a_actor, float scale) {
 
+		if (!a_actor) {
+			return 0.0;
+		}
+		float offset = 0.0;
+
+		if (scale < 0.0) return -1.0;
+
+		if (scale >= rip_tooBig) {
+			offset = rip_tooBig - rip_threshold + rip_randomOffsetMax;
+		}
+		else if (scale >= rip_threshold) {
+			offset = scale - rip_threshold + rip_randomOffsetMax;
+		}
+		else {
+			offset = 0.0;
+		}
+
+		//log::info("ReConstructOffset on: {} with offset {}", a_actor->formID, offset);
+		return offset;
+	}
 
 	//Have We Shrinked Since The Last Update?
 	bool IsShrinking(Actor* a_actor, float Scale) {
@@ -105,7 +126,6 @@ namespace Gts {
 
 		auto transient = Transient::GetSingleton().GetActorData(a_actor);
 		if (!transient) return false;
-		//Add this to transient
 		// If Current Scale is Equal or Larger, we either growed or stayed the same so no shriking happened
 		bool Shrinking = !(Scale >= transient->rip_lastScale);
 		transient->rip_lastScale = Scale;
@@ -214,13 +234,20 @@ namespace Gts {
 		static Timer timer = Timer(1.2);
 		if (!timer.ShouldRunFrame()) return;
 
-		auto actordata = Persistent::GetSingleton().GetActorData(a_actor);
+		auto actordata = Transient::GetSingleton().GetActorData(a_actor);
 		if (!actordata) return;
 
 		float CurrentScale = get_visual_scale(a_actor);
 
+		if (actordata->rip_lastScale < 0 || actordata->rip_offset < 0) {
+			log::info("CheckClothingRip: Values were invallid, Resetting...");
+			actordata->rip_lastScale = CurrentScale;
+			actordata->rip_offset = ReConstructOffset(a_actor, CurrentScale);
+			return;
+		}
+
 		if (CurrentScale < rip_threshold) {
-			//If Smaller than rip_threshold but offset was > 0 means we shrunk back down, so reset the offset
+			//If Smaller than rip_Threshold but offset was > 0 means we shrunk back down, so reset the offset
 			if (actordata->rip_offset > 0.0f) {
 				actordata->rip_offset = 0.0f;
 
@@ -234,7 +261,7 @@ namespace Gts {
 
 		//Rip Immediatly if too big.
 		//Its a bit wastefull but allows us to imediatly unequip if the player equips something again
-		if (CurrentScale > rip_toobig) {
+		if (CurrentScale > rip_tooBig) {
 			RipAllClothing(a_actor);
 			return;
 		}
@@ -246,10 +273,9 @@ namespace Gts {
 			return;
 		}
 
-		
-
 		float Offs = RANDOM_OFFSET;
 		//if we meet scale conditions
+		//log::info("Offset Before Rip {}", actordata->rip_offset);
 		if (CurrentScale >= (rip_threshold + actordata->rip_offset + Offs)) {
 			actordata->rip_offset = CurrentScale - rip_threshold + Offs;
 			//log::info("Offset After Rip {}", actordata->rip_offset);
@@ -258,13 +284,14 @@ namespace Gts {
 		}
 	}
 
+
 	bool ClothManager::ShouldPreventReEquip(Actor* a_actor, RE::TESBoundObject* a_object) {
 		//If anthing is invallid let the native code handle it.
 		if (!a_actor || !a_object) return false;
 
-		//Cached value instead of getting the variable directly. 
+		//Cached offset instead of getting the variable directly. 
 		//The Check can get spammed by the Equip hook when a lot of actors are around.
-		//If clothing rip is disabled or is not a follower always allow
+		//If clothing rip is disabled or is not a follower, allow re-equip
 		if (!RipClothManagerActive || (!IsTeammate(a_actor) && a_actor->formID != 0x14)) return false;
 
 		//if smaller than rip_threhsold or target actor is the player allow re-equip
@@ -277,10 +304,10 @@ namespace Gts {
 		//if the item is not an armor, allow it
 		if (!tesarmo) return false;
 		for (auto Slot : VallidSlots) {
-			//For each vallid slot check if the to be equiped cotains said slot
+			//For each vallid slot check if the to be equiped slot cotains said slot
 			if (tesarmo->bipedModelData.bipedObjectSlots.any(Slot)) {
 
-				//if it does check the keywords as a last resort
+				//if it does, check the keywords as a last resort
 				for (const auto& BKwd : KeywordBlackList) {
 					if (tesarmo->HasKeywordString(BKwd)) {
 						return false; //If blacklisted keyword is found do not strip

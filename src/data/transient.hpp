@@ -91,6 +91,7 @@ namespace Gts {
 		AttachToNode AttachmentNode;
 		
 		float rip_lastScale;
+		float rip_offset;
 	};
 
 	class Transient : public EventListener {
