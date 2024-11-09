@@ -94,6 +94,26 @@ namespace {
 			set_target_scale(tiny, min_scale);
 		}
 	}
+
+	void ShrinkPulse_GainSize(Actor* giant, Actor* tiny, bool task) {
+		if (!task) {
+			float steal = get_visual_scale(tiny) * 0.065;
+			mod_target_scale(giant, steal);
+		} else {
+			ActorHandle gianthandle = giant->CreateRefHandle();
+			std::string name = std::format("HugCrushGrowth_{}", giant->formID);
+			TaskManager::RunFor(name, 1.6, [=](auto& progressData) {
+				if (!gianthandle) {
+					return false;
+				}
+				float grow = 0.001 * TimeScale();
+				auto giantref = gianthandle.get().get();
+				update_target_scale(giantref, grow, SizeEffectType::kGrow);
+				return true;
+			});
+		}
+	}
+
 	void Hugs_ShakeCamera(Actor* giant) {
 		if (giant->formID == 0x14) {
 			shake_camera(giant, 0.75, 0.35);
@@ -198,8 +218,8 @@ namespace {
 			Attacked(huggedActor, giant);
 
 			ShrinkPulse_DecreaseSize(huggedActor, scale);
+			ShrinkPulse_GainSize(giant, huggedActor, false);
 
-			
 			Rumbling::For("ShrinkPulse", giant, Rumble_Hugs_Shrink, 0.10, "NPC COM [COM ]", 0.50 / AnimationManager::GetAnimSpeed(giant), 0.0);
 			ModSizeExperience(giant, scale/6);
 		}
@@ -225,6 +245,7 @@ namespace {
 		AdjustFacialExpression(giant, 1, 0.0, "modifier");
 
 		Task_ApplyAbsorbCooldown(giant); // Start Cooldown right after crush
+		ShrinkPulse_GainSize(giant, huggedActor, true);
 
 		if (giant->formID == 0x14) {
 			auto caster = giant;

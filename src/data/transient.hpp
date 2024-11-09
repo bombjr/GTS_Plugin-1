@@ -48,7 +48,6 @@ namespace Gts {
 		NiPoint3 BoundingBox_Cache;
 		
 		bool Throw_WasThrown;
-		bool is_teammate;
 		bool can_do_vore;
 		bool can_be_crushed;
 		bool being_held;

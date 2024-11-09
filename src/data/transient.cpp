@@ -219,8 +219,6 @@ namespace Gts {
 
 			result.IsInControl = IsInControl;
 
-			result.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
-
 			this->_actor_data.try_emplace(key, result);
 		}
 		return &this->_actor_data[key];
@@ -261,8 +259,6 @@ namespace Gts {
 				data.shoe_weight = shoe_weight;
 
 				data.char_weight = actor->GetWeight();
-
-				data.is_teammate = actor->formID != 0x14 && actor->IsPlayerTeammate();
 
 
 			} catch (const std::out_of_range& oor) {
