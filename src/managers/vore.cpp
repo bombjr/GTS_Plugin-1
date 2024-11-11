@@ -30,23 +30,6 @@ namespace {
 	const float VORE_ANGLE = 76;
 	const float PI = 3.14159;
 
-	void VoreInputEvent(const InputEventData& data) {
-		static Timer voreTimer = Timer(0.25);
-		auto pred = PlayerCharacter::GetSingleton();
-		if (IsGtsBusy(pred)) {
-			return;
-		}
-
-		if (voreTimer.ShouldRunFrame()) {
-			auto& VoreManager = Vore::GetSingleton();
-
-			std::vector<Actor*> preys = VoreManager.GetVoreTargetsInFront(pred, 1);
-			for (auto prey: preys) {
-				VoreManager.StartVore(pred, prey);
-			}
-		}
-	}
-
 	void CantVorePlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Vore) {
 			std::string message = std::format("Player is too big to be eaten: x{:.2f}/{:.2f}", sizedifference, Action_Vore);
@@ -54,41 +37,40 @@ namespace {
 		}
 	}
 
-	void VoreInputEvent_Follower(const InputEventData& data) {
-		Actor* player = PlayerCharacter::GetSingleton();
-		ForceFollowerAnimation(player, FollowerAnimType::Vore);
-	}
-
 	VoreInformation GetVoreInfo(Actor* giant, Actor* tiny, float growth_mult) {
 		float recorded_scale = Vore::GetSingleton().ReadOriginalScale(tiny);
 		float restore_power = 0.0;
-		float mealEffiency = 0.2; // Normal pred has 20% efficent stomach
-		float growth = 2.0;
+		float mealEfficiency = 0.2; // Normal pred has 20% efficent stomach
+		float duration = 80.0; // 80 seconds duration by default
+		float growth = 2.0; // Default power of gaining size
 
 		std::string_view tiny_name = tiny->GetDisplayFullName();
 
+		if (Runtime::HasPerkTeam(giant, "VorePerk")) {
+			restore_power = GetMaxAV(tiny, ActorValue::kHealth) * mealEfficiency; // Default hp/sp regen
+		}
+
 		if (Runtime::HasPerkTeam(giant, "Gluttony")) {
-			restore_power = GetMaxAV(tiny, ActorValue::kHealth) * 4 * mealEffiency;
-			mealEffiency += 0.2;
+			restore_power = GetMaxAV(tiny, ActorValue::kHealth) * 4 * mealEfficiency; // 4 times stronger hp/sp regen
+			mealEfficiency += 0.2; // 100% more growth
+			duration *= 0.5; // 50% faster vore
 		}
 		if (Runtime::HasPerkTeam(giant, "AdditionalGrowth")) {
-			growth *= 1.25;
+			growth *= 1.25; // 25% stronger growth
 		}
 			
 		float bounding_box = GetSizeFromBoundingBox(tiny);
-		float gain_power = recorded_scale * mealEffiency * growth * growth_mult * bounding_box; // power of most buffs that we start
-		//gain_power *= 1.25; // To compensate Shrinking a bit
+		float gain_power = recorded_scale * mealEfficiency * growth * growth_mult * bounding_box; // power of most buffs that we start
+		// ^ power of gaining size, it is further reduced by player size during OnUpdate() func below
 
 		VoreInformation VoreInfo = VoreInformation { // Create Vore Info
 			.giantess = giant,
-			.WasGiant = IsGiant(tiny),
-			.WasDragon = IsDragon(tiny),
-			.WasMammoth = IsMammoth(tiny),
 			.WasLiving = IsLiving(tiny),
 			.Scale = recorded_scale,
 			.Vore_Power = gain_power,
 			.Restore_Power = restore_power,
 			.Natural_Scale = bounding_box,
+			.Duration = duration,
 			.Tiny_Name = tiny->GetDisplayFullName(),
 		};
 
@@ -155,9 +137,6 @@ namespace {
 
 		Actor* giant = VoreInfo.giantess;
 
-		bool WasGiant = VoreInfo.WasGiant;
-		bool WasDragon = VoreInfo.WasDragon;
-		bool WasMammoth = VoreInfo.WasMammoth;
 		bool WasLiving = VoreInfo.WasLiving;
 
 		float tinySize = VoreInfo.Scale;
@@ -171,10 +150,12 @@ namespace {
 		if (Devourment) {
 			multiplier = 0.5;
 		}
-		
+
 		if (!Devourment || Allow_Devourment) {
 			if (giant) {
-				update_target_scale(giant, sizePower * 0.32, SizeEffectType::kGrow);
+				float tinySize_Grow = std::clamp(tinySize, 1.0f, 10000.0f);
+				float reduction = std::clamp(get_visual_scale(giant) / tinySize_Grow, 1.0f, 10.0f);
+				update_target_scale(giant, (sizePower/reduction) * 0.52, SizeEffectType::kGrow);
 				GainWeight(giant, 3.0 * tinySize * amount_of_tinies * multiplier);
 				ModSizeExperience(giant, 0.20 * multiplier + (tinySize * 0.02));
 				VoreMessage_Absorbed(giant, tiny_name);
@@ -197,42 +178,41 @@ namespace {
 
 	void Task_Vore_StartVoreBuff(Actor* giant, Actor* tiny, float amount_of_tinies) {
 		if (!AllowDevourment()) {
-			float start_time = Time::WorldTimeElapsed();
-			float default_duration = 80.0;
-
-			std::string_view tiny_name = tiny->GetDisplayFullName();
-
-			if (Runtime::HasPerkTeam(giant, "Gluttony")) {
-				default_duration *= 0.5;
-			}
-
 			std::string name = std::format("Vore_Buff_{}_{}", giant->formID, tiny->formID);
-
 			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0);
 			ActorHandle gianthandle = giant->CreateRefHandle();
+			float start_time = Time::WorldTimeElapsed();
 
 			float Regeneration = VoreInfo.Restore_Power;
+			float Recorded_Scale = VoreInfo.Scale;
 			float Growth = VoreInfo.Vore_Power;
-			
+			float Duration = VoreInfo.Duration;
+
+			float tinySize_Grow = std::clamp(Recorded_Scale, 1.0f, 10000.0f);
+
 			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
 				float timepassed = Time::WorldTimeElapsed() - start_time;
-				
-				float regenlimit = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006; // Limit it per frame
-				float healthToApply = std::clamp(Regeneration/4000.0f, 0.0f, regenlimit);
-				float sizeToApply = Growth/6000;
 
-				DamageAV(giantref, ActorValue::kHealth, -healthToApply * TimeScale());
-				DamageAV(giantref, ActorValue::kStamina, -healthToApply * TimeScale()); 
+				float reduction = std::clamp(get_visual_scale(giantref) / tinySize_Grow, 1.0f, 10.0f);
+				float regen_attributes = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006;
+				float health = std::clamp(Regeneration/4000.0f, 0.0f, regen_attributes);
+
+				float sizeToApply = Growth/5000;
+
+				DamageAV(giantref, ActorValue::kHealth, -health * TimeScale());
+				DamageAV(giantref, ActorValue::kStamina, -health * TimeScale()); 
 				// Restore HP and Stamina for GTS
 
-				update_target_scale(giantref, sizeToApply * TimeScale(), SizeEffectType::kGrow);
-				AddStolenAttributes(giantref, sizeToApply * TimeScale());
+				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03
+					update_target_scale(giantref, (sizeToApply / reduction) * TimeScale(), SizeEffectType::kGrow);
+					AddStolenAttributes(giantref, sizeToApply * TimeScale());
+				}
 
-				if (timepassed >= default_duration) {
+				if (timepassed >= Duration) {
 					Task_Vore_FinishVoreBuff(VoreInfo, amount_of_tinies, false);
 					if (giantref->formID == 0x14) {
 						shake_camera(giantref, 0.50, 0.75);
@@ -399,11 +379,6 @@ namespace Gts {
 
 	std::string Vore::DebugName() {
 		return "Vore";
-	}
-
-	void Vore::DataReady() {
-		InputManager::RegisterInputEvent("Vore", VoreInputEvent);
-		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower);
 	}
 
 	void Vore::Update() {

@@ -15,6 +15,7 @@
 #include "managers/Rumble.hpp"
 #include "ActionSettings.hpp"
 #include "data/transient.hpp"
+#include "managers/vore.hpp"
 #include "data/runtime.hpp"
 #include "data/plugin.hpp"
 #include "scale/scale.hpp"
@@ -116,7 +117,6 @@ namespace {
 			static Timer timergrowth = Timer(2.00);
 			if (timergrowth.ShouldRun()) {
 				Runtime::PlaySound("shrinkSound", player, Volume, 1.0);
-				log::info("TotalControlShrink");
 			}
 		}
 	}
@@ -186,7 +186,6 @@ namespace {
 			}
 			AnimationManager::StartAnim("TriggerGrowth", player);
 		}
-		
 	}
 	void RapidShrinkEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
@@ -334,6 +333,28 @@ namespace {
 	void AnimMaxSpeedEvent(const InputEventData& data) {
 		AnimationManager::AdjustAnimSpeed(0.090); // Strongest attack speed buff
 	}
+
+	void VoreInputEvent(const InputEventData& data) {
+		static Timer voreTimer = Timer(0.25);
+		auto pred = PlayerCharacter::GetSingleton();
+		if (IsGtsBusy(pred)) {
+			return;
+		}
+
+		if (voreTimer.ShouldRunFrame()) {
+			auto& VoreManager = Vore::GetSingleton();
+
+			std::vector<Actor*> preys = VoreManager.GetVoreTargetsInFront(pred, 1);
+			for (auto prey: preys) {
+				VoreManager.StartVore(pred, prey);
+			}
+		}
+	}
+
+	void VoreInputEvent_Follower(const InputEventData& data) {
+		Actor* player = PlayerCharacter::GetSingleton();
+		ForceFollowerAnimation(player, FollowerAnimType::Vore);
+	}
 }
 
 namespace Gts
@@ -355,5 +376,8 @@ namespace Gts
 		InputManager::RegisterInputEvent("TotalControlShrink", TotalControlShrinkEvent);
 		InputManager::RegisterInputEvent("TotalControlGrowOther", TotalControlGrowOtherEvent);
 		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent);
+
+		InputManager::RegisterInputEvent("Vore", VoreInputEvent);
+		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower);
 	}
 }

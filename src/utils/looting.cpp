@@ -261,12 +261,7 @@ namespace Gts {
 			return;
 		}
 		float Start = Time::WorldTimeElapsed();
-		dropbox->SetDisplayName(name, false); // Rename container to match chosen name
-		if (IsDragon(actor) && !actor->IsDead()) {
-			TESObjectREFR* ref = skyrim_cast<TESObjectREFR*>(actor);
-			//ref->GetInventoryChanges()->InitLeveledItems();
-			log::info("{} Isn't dead, initiating leveled items", actor->GetDisplayFullName());
-		}
+		dropbox->SetDisplayName(name, true); // Rename container to match chosen name
 
 		ObjectRefHandle dropboxHandle = dropbox->CreateRefHandle();
 
