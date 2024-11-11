@@ -222,7 +222,7 @@ namespace {
 		if (!current3D) {
 			return; // Retry next frame
 		}
-		current3D->SetMotionType(7, true, true, true);
+		current3D->SetMotionType(hkpMotion::MotionType::kCharacter, true, true, true);
 		current3D->SetCollisionLayer(COL_LAYER::kCharController);
 	}
 	void DisableCollisionLayerAndMotion(StaticFunctionTag*, TESObjectREFR* ref) {
@@ -233,7 +233,7 @@ namespace {
 		if (!current3D) {
 			return; // Retry next frame
 		}
-		current3D->SetMotionType(4, true, true, true);
+		current3D->SetMotionType(hkpMotion::MotionType::kKeyframed, true, true, true);
 		current3D->SetCollisionLayer(COL_LAYER::kNonCollidable);
 	}
 

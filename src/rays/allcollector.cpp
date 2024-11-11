@@ -44,11 +44,6 @@ hkpClosestRayHitCollector::~hkpClosestRayHitCollector() {
 	// Dummy
 }
 
-hkpRayHitCollector::~hkpRayHitCollector() {
-	// Dummy
-}
-
-
 ExtraDataList::ExtraDataList() {
 	// Dummy
 }

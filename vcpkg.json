@@ -1,18 +1,34 @@
 {
   "name": "gtsplugin",
-  "version-string": "1.0.0",
+  "version-string": "2.0.0",
   "description": "Common Lib SSE plugin for Size Matters.",
   "features": {
     "plugin": {
       "description": "Build the SKSE plugin.",
       "dependencies": [
-        "commonlibsse-ng",
+	    "xbyak",
+		"catch2",
+		"fmt",
+		"directxtk",
+		"rapidcsv",
+		"spdlog",
+		{
+			"name": "imgui",
+			"features": ["dx11-binding", "win32-binding", "docking-experimental"]
+		},
         "glm",
         "toml11",
         "nlohmann-json",
-		    "gluino"
+		"gluino",
+		"clib-util"
       ]
     }
   },
-  "default-features": ["plugin"]
+  "default-features": ["plugin"],
+  "overrides": [
+    {
+      "name" : "imgui",
+      "version": "1.90"
+    }
+  ]
 }

@@ -58,7 +58,7 @@ namespace {
 				"Global", std::make_shared <spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
 
-		log->set_level(spdlog::level::level_enum::info);
+		log->set_level(spdlog::level::level_enum::trace);
 		log->flush_on(spdlog::level::level_enum::trace);
 		log->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
 		log->info("Logging started");
@@ -193,7 +193,7 @@ void InitializeEventSystem() {
  * tasks.
  * </p>
  */
-SKSEPluginLoad(const LoadInterface * skse)
+SKSEPluginLoad(const LoadInterface * a_skse)
 {
 	InitializeLogging();
 
@@ -203,7 +203,7 @@ SKSEPluginLoad(const LoadInterface * skse)
 	auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
 	log::info("{} {} {} is loading...", plugin->GetName(), version, gitData);
 
-	Init(skse);
+	Init(a_skse);
 	InitializeMessaging();
 	Hooks::Install();
 	InitializePapyrus();
@@ -211,5 +211,16 @@ SKSEPluginLoad(const LoadInterface * skse)
 	InitializeEventSystem();
 
 	log::info("{} has finished loading.", plugin->GetName());
+
 	return(true);
 }
+
+SKSEPluginInfo(
+	.Version = REL::Version{ 2, 0, 0, 0 },
+	.Name = "GtsPlugin",
+	.Author = "Sermit",
+	.StructCompatibility = SKSE::StructCompatibility::Dependent,
+	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
+);
+
+
