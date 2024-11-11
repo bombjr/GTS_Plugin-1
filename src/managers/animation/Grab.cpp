@@ -698,7 +698,7 @@ namespace Gts {
 					|| (!IsBetweenBreasts(tinyref) 
 					&& GetAV(giantref, ActorValue::kStamina) < 2.0)) {
 
-					PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
+					//PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
 					// For debugging
 
 					PushActorAway(giantref, tinyref, 1.0);

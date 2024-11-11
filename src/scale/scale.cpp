@@ -6,6 +6,7 @@
 #include "data/transient.hpp"
 #include "data/runtime.hpp"
 #include "scale/height.hpp"
+#include "timer.hpp"
 
 using namespace Gts;
 
@@ -136,8 +137,9 @@ namespace Gts {
 	float get_natural_scale(Actor& actor, bool game_scale) {
 		auto actor_data = Transient::GetSingleton().GetData(&actor);
 		if (actor_data) {
+			//static Timer timer = Timer(5.0);
 		    float initialScale = GetInitialScale(&actor);
-			/*if (actor.formID == 0x14) {
+			/*if (actor.formID == 0x14 && timer.ShouldRunFrame()) {
 				log::info("Initial Scale: {}", initialScale);
 				log::info("Other Scales: {}", actor_data->otherScales);
 				log::info("gamescale: {}", game_getactorscale(&actor));

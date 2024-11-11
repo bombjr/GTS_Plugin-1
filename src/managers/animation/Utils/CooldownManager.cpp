@@ -72,7 +72,8 @@ namespace {
         }
 
         if (Runtime::HasPerk(giant, "Breasts_Mastery")) {
-            mastery = std::clamp(GetGtsSkillLevel(giant) * 0.01f, 0.0f, 1.0f) * 0.6;
+            float level = GetGtsSkillLevel(giant) - 40.0; // Start past level 40
+            mastery = std::clamp(level * 0.01f, 0.0f, 0.6f);
         }
         float reduction = 1.0 - mastery;
 

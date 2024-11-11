@@ -38,40 +38,6 @@ using namespace std;
 
 
 namespace {
-	void Task_FixTinyPosition(Actor* giant, Actor* tiny) {
-		std::string name = std::format("Reattach_{}_{}", giant->formID, tiny->formID);
-		ActorHandle gianthandle = giant->CreateRefHandle();
-		ActorHandle tinyhandle = tiny->CreateRefHandle();
-
-		float Start = Time::WorldTimeElapsed();
-		NiPoint3 LastPos = tiny->GetPosition();
-
-		TaskManager::Run(name, [=](auto& progressData) {
-			if (!gianthandle) {
-				return false;
-			}
-			if (!tinyhandle) {
-				return false;
-			}
-			float Finish = Time::WorldTimeElapsed();
-			auto giantref = gianthandle.get().get();
-			auto tinyref = tinyhandle.get().get();
-
-			//NiPoint3 newPos = LastPos;
-			
-			//newPos.z += (Finish - Start) * (25 * get_visual_scale(giantref));
-
-			//AttachTo(giantref, tinyref, newPos);
-
-			if (Finish - Start > 0.25) {
-				Attachment_SetTargetNode(giantref, AttachToNode::None);
-				return false;
-			}
-
-			return true;
-		});
-	}
-
 	bool CanHugCrush(Actor* giant, Actor* huggedActor) {
 		bool ForceCrush = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles");
 		float staminapercent = GetStaminaPercentage(giant);
@@ -96,20 +62,44 @@ namespace {
 	}
 
 	void ShrinkPulse_GainSize(Actor* giant, Actor* tiny, bool task) {
+		float increase = 1.0;
+		if (Runtime::HasPerkTeam(giant, "HugCrush_Greed")) {
+			increase = 1.15;
+		}
+
 		if (!task) {
-			float steal = get_visual_scale(tiny) * 0.065;
+			float steal = get_visual_scale(tiny) * 0.035 * increase * 0.6;
+			if (IsCrawling(giant)) {
+				steal *= 0.8; // Crawl has one more shrink event so we compensate
+			}
 			mod_target_scale(giant, steal);
 		} else {
+			float Start = Time::WorldTimeElapsed();
 			ActorHandle gianthandle = giant->CreateRefHandle();
-			std::string name = std::format("HugCrushGrowth_{}", giant->formID);
-			TaskManager::RunFor(name, 1.6, [=](auto& progressData) {
+			float original_scale = Vore::ReadOriginalScale(tiny);
+			std::string name = std::format("HugCrushGrowth_{}_{}", giant->formID, tiny->formID);
+			
+			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
-				float grow = 0.001 * TimeScale();
+
 				auto giantref = gianthandle.get().get();
-				update_target_scale(giantref, grow, SizeEffectType::kGrow);
-				return true;
+
+				float Elapsed = Time::WorldTimeElapsed() - Start;
+				float formula = bezier_curve(Elapsed, 0.2, 1.9, 0, 0, 3.0, 4.0); // Reuse formula from GrowthAnimation::Growth_2/5
+				// https://www.desmos.com/calculator/reqejljy19
+				if (formula >= 1.0) {
+					formula = 1.0;
+				}
+				
+				float grow = 0.000235 * 8 * original_scale * increase * TimeScale() * formula * 0.6;
+
+				if (Elapsed <= 0.95) {
+					override_actor_scale(giantref, grow, SizeEffectType::kNeutral);
+					return true;
+				} 
+				return false;
 			});
 		}
 	}
@@ -149,6 +139,7 @@ namespace {
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
 		if (huggedActor) {
 			DisableCollisions(huggedActor, giant);
+			Vore::RecordOriginalScale(huggedActor);
 		}
 	} // Used for Sneak Hugs only
 
@@ -250,7 +241,7 @@ namespace {
 		if (giant->formID == 0x14) {
 			auto caster = giant;
 			float target_scale = get_visual_scale(huggedActor);
-			AdjustSizeReserve(caster, target_scale/10);
+			AdjustSizeReserve(caster, 0.0225);
 			AdjustSizeLimit(0.0060, caster);
 			AdjustMassLimit(0.0060, caster);
 		}
@@ -634,10 +625,6 @@ namespace Gts {
 			// Ensure they are NOT in ragdoll
 			ForceRagdoll(tinyref, false);
 			if (IsCrawling(giantref)) { // Always attach to ObjectA during Crawling (Crawl anims are configured for ObjectA)
-				float Difference = std::clamp(GetSizeDifference(giantref, tinyref, SizeType::VisualScale, true, false), 1.0f, 10.0f);
-				float ManaDrain = (1.6 * Perk_GetCostReduction(giantref) / Difference);
-				DamageAV(giantref, ActorValue::kMagicka, ManaDrain);
-
 				if (!AttachToObjectA(giantref, tinyref)) {
 					return false;
 				}

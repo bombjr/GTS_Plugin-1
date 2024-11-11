@@ -59,9 +59,9 @@ namespace {
 		}
 	}
 
-	void PleasureText(Actor* actor) {
-		int Pleasure = RandomInt(0, 5);
-		if (Pleasure <= 0) {
+	void GrowthText(Actor* actor) {
+		int Random = RandomInt(0, 5);
+		if (Random <= 0) {
 			if (actor->formID == 0x14) {
 				Notify("Crushing your foes feels good and makes you bigger");
 			} else {
@@ -79,16 +79,16 @@ namespace {
 				Rate *= 2.0;
 			}
 			CrushGrow(caster, 0, Rate * SizeSteal_GetPower(caster, target));
-			PleasureText(caster);
+			GrowthText(caster);
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
 		static Timer voicetimer = Timer(2.4);
 		auto randomInt = RandomInt(0, 16);
 		auto select = RandomInt(0, 2);
-		if (randomInt <= 3.0) {
+		if (randomInt <= 3) {
 			if (voicetimer.ShouldRun()) {
-				if (select >= 2.0) {
+				if (select >= 2) {
 					PlayMoanSound(giant, 1.0);
 					GrowAfterTheKill(giant, target);
 					Task_FacialEmotionTask_Moan(giant, 2.0, "Crush");
