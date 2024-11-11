@@ -592,7 +592,7 @@ void DebugOverlayMenu::Init() {
 	});
 	this->inited = true;
 
-	log::error("Gts: initialize scale forms");
+	log::info("Gts: initialize scale forms");
 }
 
 DebugOverlayMenu& DebugOverlayMenu::GetSingleton() noexcept {
