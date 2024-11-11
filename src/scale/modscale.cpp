@@ -44,9 +44,13 @@ namespace {
 	}
 
 	void UpdateInitScale(Actor* actor) {
-		GetActorInitialScales(actor); // It's enough just to call this
+		try {
+			GetActorInitialScales(actor); // It's enough just to call this
+		} catch (exception e){
+			logger::error("UpdateInitScale Failed {}",e.what());
+		}
+		
 	}
-
 }
 
 namespace Gts {
@@ -90,30 +94,40 @@ namespace Gts {
 		return allScale / ourScale;
 	}
 
-  void ResetToInitScale(Actor* actor) {
-	if (actor) {
-		if (actor->Is3DLoaded()) {
-			auto& initScale = GetActorInitialScales(actor);
-			set_model_scale(actor, initScale.model);
-			set_npcnode_scale(actor, initScale.npc);
+	void ResetToInitScale(Actor* actor) {
+		try {
+			if (actor) {
+				if (actor->Is3DLoaded()) {
+					auto& initScale = GetActorInitialScales(actor);
+					set_model_scale(actor, initScale.model);
+					set_npcnode_scale(actor, initScale.npc);
+				}
+			}
+		}catch (exception e) {
+			logger::error("ResetToInitScale Failed {}",e.what());
 		}
 	}
-  }
 
-  float GetInitialScale(Actor* actor) {
-		auto& initScale = GetActorInitialScales(actor);
-		auto& size_method = Persistent::GetSingleton().size_method;
-		switch (size_method) {
-			// Only initial scales for these two methods since the racemenu
-			// and refscale one can edit on the character edit menu and setscale
-			case SizeMethod::ModelScale:
-				return initScale.model;
-			case SizeMethod::RootScale:
-				return initScale.npc;
-		default:
-			return 1.0;
+	float GetInitialScale(Actor* actor) {
+		try {
+			auto& initScale = GetActorInitialScales(actor);
+			auto& size_method = Persistent::GetSingleton().size_method;
+			switch (size_method) {
+				// Only initial scales for these two methods since the racemenu
+				// and refscale one can edit on the character edit menu and setscale
+				case SizeMethod::ModelScale:
+					return initScale.model;
+				case SizeMethod::RootScale:
+					return initScale.npc;
+				default:
+					return 1.0;
+				}
+			}
+		catch (exception e) {
+			logger::error("GetInitialScale Failed {}", e.what());
+		return 1.0;
 		}
-  }
+	}
 
 	void RefreshInitialScales(Actor* actor) {
 		std::string name = std::format("UpdateRace_{}", actor->formID);
