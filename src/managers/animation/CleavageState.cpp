@@ -80,12 +80,13 @@ namespace {
     }
 
     float GetMasteryReduction(Actor* giant) {
-        float cooldown = 0.0;
-        if (Runtime::HasPerk(giant, "Breasts_MasteryPart2")) {
-            cooldown = GetGtsSkillLevel(giant) * 0.006;
+        float hp_reduction = 0.0;
+        if (Runtime::HasPerk(giant, "Breasts_Predominance")) {
+            float level = GetGtsSkillLevel(giant) - 60.0;
+            hp_reduction = std::clamp(level * 0.015f, 0.0f, 0.6f);
         }
 
-        return cooldown;
+        return hp_reduction;
     }
     void AttemptBreastActionOnTiny(std::string pass_anim) {
         Actor* player = GetPlayerOrControlled();
@@ -246,17 +247,5 @@ namespace Gts
 
         AnimationManager::RegisterTrigger("Cleavage_Vore_Tiny", "Cleavage", "GTSBEH_T_Boobs_Vore");
         AnimationManager::RegisterTrigger("Cleavage_Vore", "Cleavage", "GTSBEH_Boobs_Vore");
-
-
-        /* Tiny Events:
-        GTSBEH_T_Boobs_Enter
-        GTSBEH_T_Boobs_Exit
-        GTSBEH_T_Boobs_Crush_Light
-        GTSBEH_T_Boobs_Crush_Heavy
-        GTSBEH_T_Boobs_Vore
-        GTSBEH_T_Boobs_Absorb
-        GTSBEH_T_Boobs_SufoStart
-        GTSBEH_T_Boobs_SufoStop
-        */
 	}
 }

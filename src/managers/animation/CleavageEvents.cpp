@@ -40,9 +40,12 @@ using namespace Gts;
 
 namespace {
     void Absorb_GrowInSize(Actor* giant, Actor* tiny, float multiplier) {
-        float grow_value = Vore::ReadOriginalScale(tiny) * multiplier;
-        update_target_scale(giant, grow_value, SizeEffectType::kGrow);
-        //mod_target_scale(giant, grow_value);
+        if (Runtime::HasPerkTeam(giant, "HugCrush_Greed")) {
+			multiplier *= 1.15;
+		}
+        float grow_value = 0.08 * multiplier * 0.845;
+        float original = Vore::ReadOriginalScale(tiny) + 0.875; // Compensate
+        update_target_scale(giant, grow_value * original, SizeEffectType::kGrow);
     }
 
     void CancelAnimation(Actor* giant) {
@@ -69,7 +72,7 @@ namespace {
         float Percent = GetMaxAV(giant, Attribute);
         float value = Percent * percentage;
 
-        if (Runtime::HasPerk(giant, "Breasts_MasteryPart2")) {
+        if (Runtime::HasPerk(giant, "Breasts_Predominance")) {
             value *= 1.5;
         }
 
@@ -319,7 +322,6 @@ namespace {
 			Grab::DetachActorTask(giant);
 			Grab::Release(giant);
 		}
-
         Animation_Cleavage::LaunchCooldownFor(&data.giant, CooldownSource::Action_Breasts_Vore);
     }
 
@@ -338,6 +340,9 @@ namespace {
     void GTS_BS_AbsorbPulse(const AnimationEventData& data) {
         auto giant = &data.giant;
 		auto tiny = Grab::GetHeldActor(&data.giant);
+
+        float growth = 0.0625;
+
 		if (tiny) {
             Rumbling::Once("AbsorbPulse_R", giant, 0.45, 0.0, "L Breast02", 0.0);
             Rumbling::Once("AbsorbPulse_L", giant, 0.45, 0.0, "R Breast02", 0.0);
@@ -355,7 +360,7 @@ namespace {
             ShrinkTinyWithCleavage(giant, 0.010, 0.66, 45.0, true, true);
             RecoverAttributes(giant, ActorValue::kHealth, 0.025);
 
-            Absorb_GrowInSize(giant, tiny, 0.075);
+            Absorb_GrowInSize(giant, tiny, growth);
         }
     }
 
@@ -363,6 +368,8 @@ namespace {
         Actor* giant = &data.giant;
         Task_FacialEmotionTask_Moan(giant, 1.1 / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
         auto tiny = Grab::GetHeldActor(giant);
+        float growth = 0.95;
+
 		if (tiny) {
             SpawnHearts(giant, tiny, 35, 0.75, false);
             PlayMoanSound(giant, 0.8);
@@ -374,9 +381,12 @@ namespace {
             Rumbling::Once("AbsorbTiny_L", giant, 0.8, 0.05, "R Breast02", 0.0);
 
             DamageAV(giant, ActorValue::kHealth, -30); // Heal GTS
-            Absorb_GrowInSize(giant, tiny, 0.5);
+            Absorb_GrowInSize(giant, tiny, growth);
             PrintBreastAbsorbed(giant, tiny);
-            AdjustSizeReserve(giant, 0.04);
+
+            AdjustSizeReserve(giant, 0.00425);
+			AdjustSizeLimit(0.0095, giant);
+			AdjustMassLimit(0.0095, giant);
 
             if (tiny->formID != 0x14) {
                 Disintegrate(tiny);
@@ -386,7 +396,7 @@ namespace {
                 tiny->KillImpl(giant, 1, true, true);
             }
             
-            std::string taskname = std::format("MergeWithTiny_{}", tiny->formID);
+            std::string taskname = std::format("MergeWithTiny_{}_{}", giant->formID, tiny->formID);
             ActorHandle giantHandle = giant->CreateRefHandle();
             ActorHandle tinyHandle = tiny->CreateRefHandle();
             TaskManager::RunOnce(taskname, [=](auto& update){

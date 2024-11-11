@@ -294,7 +294,9 @@ namespace Gts {
 			Notify("Error: Spine2 [Spn2] node not found");
 			return;
 		}
-		Runtime::PlaySoundAtNode("ShrinkToNothingSound", giant, 1.0, 1.0, "NPC Spine2 [Spn2]");
+
+		std::string sound = "ShrinkToNothingSound";
+		Runtime::PlaySoundAtNode(sound, giant, 1.0, 1.0, "NPC Spine2 [Spn2]");
 
 		if (!IsLiving(tiny)) {
 			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);

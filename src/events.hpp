@@ -208,14 +208,12 @@ namespace Gts {
 
 	struct VoreInformation {
 		Actor* giantess;
-		bool WasGiant;
-		bool WasDragon;
-		bool WasMammoth;
 		bool WasLiving;
 		float Scale;
 		float Vore_Power;
 		float Restore_Power;
 		float Natural_Scale;
+		float Duration;
 		std::string_view Tiny_Name;
 	};
 

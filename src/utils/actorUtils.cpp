@@ -1368,7 +1368,7 @@ namespace Gts {
 										float bounding_z = get_bounding_box_z(otherActor);
 										if (bounding_z > 0.0) {
 											if (IsCrawling(giant) && IsBeingHugged(otherActor)) {
-												bounding_z *= 0.15; // Move the icon down
+												bounding_z *= 0.25; // Move the icon down
 											}
 											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35); // 2.25 to be slightly above the head
 											//log::info("For Actor: {}", otherActor->GetDisplayFullName());
@@ -2177,6 +2177,10 @@ namespace Gts {
 			return 1.0;
 		}
 
+		if (giant->AsActorState()->GetSitSleepState() != SIT_SLEEP_STATE::kNormal){
+            return 1.0; // For some reason makes furniture angles funny if there's anim slowdown. So we prevent that
+        }
+
 		float scale = get_visual_scale(giant);
 		SoftPotential getspeed {
 			.k = 0.142, // 0.125
@@ -2549,7 +2553,7 @@ namespace Gts {
 
 		ModSizeExperience(giant, (shrinkpower * gigantism) * 0.60);
 
-		float MinScale = 0.11;
+		float MinScale = SHRINK_TO_NOTHING_SCALE / Adjustment;
 
 		if (get_target_scale(tiny) <= MinScale) {
 			set_target_scale(tiny, MinScale);
