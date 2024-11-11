@@ -129,5 +129,25 @@
         "msvc"
       ]
     }
-  ]
+  ],
+  "buildPresets": [
+        {
+            "name": "Release-MSVC",
+            "displayName": "Release (MSVC)",
+            "configurePreset": "AE_SE_Release",
+            "description": "Optimized release build."
+        },
+        {
+            "name": "ReleaseWithDebInfo-MSVC",
+            "displayName": "RelWithDebInfo (MSVC)",
+            "configurePreset": "AE_SE_RelWithDebInfo",
+            "description": "Optimized release build with more debug information."
+        },
+        {
+            "name": "Debug-MSVC",
+            "displayName": "Debug (MSVC)",
+            "configurePreset": "AE_SE_Debug",
+            "description": "Debug build for testing."
+        }
+	]
 }
