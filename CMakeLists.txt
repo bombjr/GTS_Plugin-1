@@ -106,6 +106,15 @@ set_property(TARGET ${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME}
         APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_SCRIPTS}")
 
-
+#For convinience Copy the PDB and dll to the directory defined by this var
+#so i don't have to remember to ctrl c ctrl v all the time
+if (DEFINED ENV{GTSPLUGIN_COPY_DIR})
+	if(${CMAKE_BUILD_TYPE} STREQUAL Debug OR ${CMAKE_BUILD_TYPE} STREQUAL RelWithDebInfo OR ${CMAKE_BUILD_TYPE} STREQUAL Release)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> "$ENV{GTSPLUGIN_COPY_DIR}/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "$ENV{GTSPLUGIN_COPY_DIR}/")
+	endif()
+endif()
 
 
