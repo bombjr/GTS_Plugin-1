@@ -3135,15 +3135,6 @@ namespace Gts {
 						actorData->target_scale += deltaScale;
 						growData->addedSoFar = totalScaleToAdd;
 					}
-
-					/*log::info("target: {}, visual: {}", actorData->target_scale, actorData->visual_scale);
-					log::info("Scale: {}, max_scale: {}", scale, max_scale);
-					if (!drain_stamina) { // Apply only to growth with animation
-						float initialScale = GetInitialScale(actor);// Do the same thing GtsManager does
-						float GameScale = game_getactorscale(actor); 
-						
-						update_model_visuals(actor, get_visual_scale(actor) * initialScale * GameScale); 
-					}*/
 				}
 			}
 			return fabs(growData->amount.value - growData->amount.target) > 1e-4;
@@ -3173,11 +3164,6 @@ namespace Gts {
 					actorData->target_scale += deltaScale;
 					actorData->visual_scale += deltaScale;
 					growData->addedSoFar = totalScaleToAdd;
-
-					/*float initialScale = GetInitialScale(actor);// Do the same thing GtsManager does
-					float GameScale = game_getactorscale(actor); 
-					
-					update_model_visuals(actor, get_visual_scale(actor) * initialScale * GameScale); */
 				}
 			}
 

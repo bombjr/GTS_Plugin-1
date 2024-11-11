@@ -450,8 +450,4 @@ namespace Gts
 	std::string AnimationThighSandwich::DebugName() {
 		return "AnimationThighSandwich";
 	}
-
-	void AnimationThighSandwich::Update() {
-
-	}
 }

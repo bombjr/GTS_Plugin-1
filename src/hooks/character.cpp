@@ -147,7 +147,17 @@ namespace Hooks
 		if (a_this->IsInKillMove()) {
 			return _Move(a_this, a_arg2, a_position); // Do nothing in Kill moves
 		}
-		float bonus = AttributeManager::AlterMovementSpeed(a_this, a_position);
+
+		bool allow = Time::WorldTimeElapsed() > 0.33; 
+		// ^ Game has a chance to catch a dead freeze/crash without crash log without it on some actors (when first loading a save)
+		// ^ So far happened on hostile actors that were spawned through console and saved into the save, seems to work without it fine otherwise
+		float bonus = 1.0; 
+		
+		if (allow && a_this->Get3D1(false)) {
+			if (a_this->Is3DLoaded()) {
+				bonus = AttributeManager::AlterMovementSpeed(a_this, a_position);
+			}
+		}
 		return _Move(a_this, a_arg2, a_position * bonus);
 	}
 

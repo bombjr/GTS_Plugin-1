@@ -138,55 +138,57 @@ namespace Gts {
 	}
 
 	void SandwichingData::Update() {
-		auto giant = this->giant.get().get();
-		bool move = this->MoveTinies;
-		if (!giant) {
-			return;
-		}
-		float giantScale = get_visual_scale(giant);
-		if (giant->formID != 0x14) {
-			if (GetPlayerOrControlled()->formID == 0x14 && this->SandwichTimer.ShouldRun()) {
-				this->ManageAi(giant);
-			}
-		}
-		for (auto& [key, tinyref]: this->tinies) {
-			if (!move) {
+		if (this->giant) {
+			auto giant = this->giant.get().get();
+			bool move = this->MoveTinies;
+			if (!giant) {
 				return;
 			}
-			auto tiny = tinyref.get().get();
-			if (!tiny) {
-				return;
+			float giantScale = get_visual_scale(giant);
+			if (giant->formID != 0x14) {
+				if (GetPlayerOrControlled()->formID == 0x14 && this->SandwichTimer.ShouldRun()) {
+					this->ManageAi(giant);
+				}
 			}
+			for (auto& [key, tinyref]: this->tinies) {
+				if (!move) {
+					return;
+				}
+				auto tiny = tinyref.get().get();
+				if (!tiny) {
+					return;
+				}
 
-			Actor* tiny_is_actor = skyrim_cast<Actor*>(tiny);
-			if (tiny_is_actor) {
-				ShutUp(tiny_is_actor);
-				ForceRagdoll(tiny_is_actor, false);
-				AttachToObjectA(giant, tiny_is_actor);
-			}
+				Actor* tiny_is_actor = skyrim_cast<Actor*>(tiny);
+				if (tiny_is_actor) {
+					ShutUp(tiny_is_actor);
+					ForceRagdoll(tiny_is_actor, false);
+					AttachToObjectA(giant, tiny_is_actor);
+				}
 
-			float tinyScale = get_visual_scale(tiny);
-			float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, false);
-			float threshold = Action_Sandwich;
+				float tinyScale = get_visual_scale(tiny);
+				float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, false);
+				float threshold = Action_Sandwich;
 
-			if (giant->IsDead() || sizedifference < threshold || !IsThighSandwiching(giant)) {
-				EnableCollisions(tiny);
-				SetBeingHeld(tiny, false);
-				AllowToBeCrushed(tiny, true);
-				PushActorAway(giant, tiny, 1.0);
-				ForceRagdoll(tiny_is_actor, true);
-				Cprint("{} slipped out of {} thighs", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
-				this->tinies.erase(tiny->formID); // Disallow button abuses to keep tiny when on low scale
-			}
+				if (giant->IsDead() || sizedifference < threshold || !IsThighSandwiching(giant)) {
+					EnableCollisions(tiny);
+					SetBeingHeld(tiny, false);
+					AllowToBeCrushed(tiny, true);
+					PushActorAway(giant, tiny, 1.0);
+					ForceRagdoll(tiny_is_actor, true);
+					Cprint("{} slipped out of {} thighs", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
+					this->tinies.erase(tiny->formID); // Disallow button abuses to keep tiny when on low scale
+				}
 
-			if (this->Suffocate && CanDoDamage(giant, tiny, false)) {
-				float sizedifference = giantScale/tinyScale;
-				float damage = Damage_ThighSandwich_DOT * sizedifference * TimeScale();
-				float hp = GetAV(tiny, ActorValue::kHealth);
-				InflictSizeDamage(giant, tiny, damage);
-				if (damage > hp && !tiny->IsDead()) {
-					this->Remove(tiny);
-					PrintSuffocate(giant, tiny);
+				if (this->Suffocate && CanDoDamage(giant, tiny, false)) {
+					float sizedifference = giantScale/tinyScale;
+					float damage = Damage_ThighSandwich_DOT * sizedifference * TimeScale();
+					float hp = GetAV(tiny, ActorValue::kHealth);
+					InflictSizeDamage(giant, tiny, damage);
+					if (damage > hp && !tiny->IsDead()) {
+						this->Remove(tiny);
+						PrintSuffocate(giant, tiny);
+					}
 				}
 			}
 		}

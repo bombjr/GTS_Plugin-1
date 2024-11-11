@@ -16,6 +16,5 @@ namespace Hooks
 	void Hook_TESCamera::Update(TESCamera* a_this) {
 		log::info("Hook_TESCamera::Update");
 		_Update(a_this);
-		// CameraManager::GetSingleton().Update();
 	}
 }

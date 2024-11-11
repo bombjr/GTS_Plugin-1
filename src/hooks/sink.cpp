@@ -16,10 +16,12 @@ namespace Hooks {
 					if (a_this) {
 						Actor* actor = skyrim_cast<Actor*>(a_this);
 						if (actor) {
-							if (actor->Get3D1(false) && actor->Is3DLoaded()) {
-								float scale = get_visual_scale(actor);
-								if (scale > 1e-4) {
-									result *= scale;
+							if (actor->Get3D1(false)) {
+								if (actor->Is3DLoaded()) {
+									float scale = get_visual_scale(actor);
+									if (scale > 1e-4) {
+										result *= scale;
+									}
 								}
 							}
 						}

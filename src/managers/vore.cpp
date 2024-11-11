@@ -207,7 +207,7 @@ namespace {
 				DamageAV(giantref, ActorValue::kStamina, -health * TimeScale()); 
 				// Restore HP and Stamina for GTS
 
-				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03
+				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03 (multiplies by race scale)
 					update_target_scale(giantref, (sizeToApply / reduction) * TimeScale(), SizeEffectType::kGrow);
 					AddStolenAttributes(giantref, sizeToApply * TimeScale());
 				}
@@ -354,20 +354,22 @@ namespace Gts {
 
 	void VoreData::Update() {
 		auto profiler = Profilers::Profile("Vore: Update");
-		auto giant = this->giant.get().get();
-		float giantScale = get_visual_scale(giant);
-		// Stick them to the AnimObjectA
-		for (auto& [key, tinyref]: this->tinies) {
-			auto tiny = tinyref.get().get();
-			if (!tiny) {
-				return;
-			}
-			if (!giant) {
-				return;
-			}
+		if (this->giant) {
+			auto giant = this->giant.get().get();
+			float giantScale = get_visual_scale(giant);
+			// Stick them to the AnimObjectA
+			for (auto& [key, tinyref]: this->tinies) {
+				auto tiny = tinyref.get().get();
+				if (!tiny) {
+					return;
+				}
+				if (!giant) {
+					return;
+				}
 
-			if (this->allGrabbed && !giant->IsDead()) {
-				AttachToObjectA(giant, tiny);
+				if (this->allGrabbed && !giant->IsDead()) {
+					AttachToObjectA(giant, tiny);
+				}
 			}
 		}
 	}

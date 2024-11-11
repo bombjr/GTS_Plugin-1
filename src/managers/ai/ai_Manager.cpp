@@ -121,23 +121,23 @@ namespace Gts {
 		if (ActionTimer.ShouldRun()) {
 			auto& persist = Persistent::GetSingleton();
 			for (auto actor: find_actors()) {
-				std::vector<Actor*> AbleToAct = {};
-				if (IsTeammate(actor) && actor->formID != 0x14 && IsFemale(actor) || (EffectsForEveryone(actor) && IsFemale(actor))) {
-					if (actor->IsInCombat() || !persist.vore_combatonly) {
-						AbleToAct.push_back(actor);
+					std::vector<Actor*> AbleToAct = {};
+					if (IsTeammate(actor) && actor->formID != 0x14 && IsFemale(actor) || (EffectsForEveryone(actor) && IsFemale(actor))) {
+						if (actor->IsInCombat() || !persist.vore_combatonly) {
+							AbleToAct.push_back(actor);
+						}
 					}
-				}
-				if (!AbleToAct.empty()) {
-					int idx = RandomInt(0, AbleToAct.size() - 1);
-					Actor* Performer = AbleToAct[idx];
-					if (Performer) {
-						AI_TryAction(Performer);
-						//log::info("Performing action on {}, AbleToAct size: {}", Performer->GetDisplayFullName(), AbleToAct.size());
+					if (!AbleToAct.empty()) {
+						int idx = RandomInt(0, AbleToAct.size() - 1);
+						Actor* Performer = AbleToAct[idx];
+						if (Performer) {
+							AI_TryAction(Performer);
+							//log::info("Performing action on {}, AbleToAct size: {}", Performer->GetDisplayFullName(), AbleToAct.size());
+						}
 					}
 				}
 			}
 		}
-	}
 
 	std::vector<Actor*> AiManager::RandomStomp(Actor* pred, std::size_t numberOfPrey) {
 		// Get targets in front

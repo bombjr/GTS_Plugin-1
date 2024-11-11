@@ -62,18 +62,20 @@ namespace {
 	float affect_by_scale(TESObjectREFR* ref, float original) {
 		Actor* giant = skyrim_cast<Actor*>(ref);
 		if (giant) {
-			if (HasHeadTrackingTarget(giant)) { // Apply it ONLY when targeting someone (when locking on Enemy with TDM for example)
-				//|| giant->formID != 0x14 && !HasHeadTrackingTarget(giant)) { 
-				// ^ needs to be enabled if experimenting with ForceLookAtCleavage() function, else they double-apply
-				if (IsinRagdollState(giant) || IsDragon(giant)) {  // Dragons seem to behave funny if we edit them...sigh...
-					// For some Bethesda™ reason - it breaks tiny ragdoll (their skeleton stretches :/) when they're small, so they fly into the sky.
-					return original;      // We really want to prevent that, so we return original value in this case.
-				}
-				float fix = original * ((get_giantess_scale(giant)) / game_getactorscale(giant)); // game_getscale() is used here by the game, so we want to / it again
+			if (giant->Is3DLoaded()) {
+				if (HasHeadTrackingTarget(giant)) { // Apply it ONLY when targeting someone (when locking on Enemy with TDM for example)
+					//|| giant->formID != 0x14 && !HasHeadTrackingTarget(giant)) { 
+					// ^ needs to be enabled if experimenting with ForceLookAtCleavage() function, else they double-apply
+					if (IsinRagdollState(giant) || IsDragon(giant)) {  // Dragons seem to behave funny if we edit them...sigh...
+						// For some Bethesda™ reason - it breaks tiny ragdoll (their skeleton stretches :/) when they're small, so they fly into the sky.
+						return original;      // We really want to prevent that, so we return original value in this case.
+					}
+					float fix = original * ((get_giantess_scale(giant)) / game_getactorscale(giant)); // game_getscale() is used here by the game, so we want to / it again
 
-				return fix;
+					return fix;
+				}
+				// ^ Compensate it, since SetScale() already affects HT by default
 			}
-			// ^ Compensate it, since SetScale() already affects HT by default
 		}
 		return original;
 	}
@@ -82,25 +84,27 @@ namespace {
 		if (!actor) {
 			return;
 		}
-		if (!HasHeadTrackingTarget(actor)) {// || actor->formID != 0x14) { // Alter it ONLY when target is nullptr or if Actor is not a player
-		    //                                    ^ Needs to be enabled if experimenting with ForceLookAtCleavage() so dll will allow pos override
-			if (!IsinRagdollState(actor)) { // ^ Needed to fix TDM bugs with deforming Meshes of Actors when we lock onto someone
-			
-				// log::info("Actor: {}", actor->GetDisplayFullName());
-				auto headPos = actor->GetLookingAtLocation();
-				// log::info("headPos: {}", Vector2Str(headPos));
-				auto model = actor->Get3D();
-				if (model) {
-					auto trans = model->world;
-					auto transInv = trans.Invert();
-					auto scale = get_visual_scale(actor) / game_getactorscale(actor);
+		if (actor->Is3DLoaded()) {
+			if (!HasHeadTrackingTarget(actor)) {// || actor->formID != 0x14) { // Alter it ONLY when target is nullptr or if Actor is not a player
+				//                                    ^ Needs to be enabled if experimenting with ForceLookAtCleavage() so dll will allow pos override
+				if (!IsinRagdollState(actor)) { // ^ Needed to fix TDM bugs with deforming Meshes of Actors when we lock onto someone
+				
+					// log::info("Actor: {}", actor->GetDisplayFullName());
+					auto headPos = actor->GetLookingAtLocation();
+					// log::info("headPos: {}", Vector2Str(headPos));
+					auto model = actor->Get3D();
+					if (model) {
+						auto trans = model->world;
+						auto transInv = trans.Invert();
+						auto scale = get_visual_scale(actor) / game_getactorscale(actor);
 
-					auto unscaledHeadPos = trans * (transInv*headPos * (1.0/scale));
+						auto unscaledHeadPos = trans * (transInv*headPos * (1.0/scale));
 
-					//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
+						//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
 
-					auto direction = target - headPos;
-					target = unscaledHeadPos + direction;
+						auto direction = target - headPos;
+						target = unscaledHeadPos + direction;
+					}
 				}
 			}
 		}

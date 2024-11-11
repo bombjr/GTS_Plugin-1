@@ -218,8 +218,8 @@ SKSEPluginLoad(const LoadInterface * a_skse)
 SKSEPluginInfo(
 	.Version = REL::Version{ 2, 0, 0, 0 },
 	.Name = "GtsPlugin",
-	.Author = "Sermit",
-	.StructCompatibility = SKSE::StructCompatibility::Dependent,
+	.Author = "Sermit and Andy",
+	.StructCompatibility = SKSE::StructCompatibility::Independent,
 	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
 );
 

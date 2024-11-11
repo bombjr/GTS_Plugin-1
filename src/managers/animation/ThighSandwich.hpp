@@ -14,7 +14,6 @@ namespace Gts {
 			[[nodiscard]] static AnimationThighSandwich& GetSingleton() noexcept;
 
 			virtual std::string DebugName() override;
-			virtual void Update() override;
 
 			static void GrabActor(Actor* giant, TESObjectREFR* tiny);
 			static void Release(Actor* giant);

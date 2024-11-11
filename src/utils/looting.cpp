@@ -261,7 +261,7 @@ namespace Gts {
 			return;
 		}
 		float Start = Time::WorldTimeElapsed();
-		dropbox->SetDisplayName(name, true); // Rename container to match chosen name
+		dropbox->SetDisplayName(name, false); // Rename container to match chosen name
 
 		ObjectRefHandle dropboxHandle = dropbox->CreateRefHandle();
 

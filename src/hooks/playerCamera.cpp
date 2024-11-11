@@ -16,6 +16,5 @@ namespace Hooks
 	void Hook_PlayerCamera::Update(PlayerCamera* a_this) {
 		log::info("Hook_PlayerCamera::Update");
 		_Update(a_this);
-		// CameraManager::GetSingleton().Update();
 	}
 }

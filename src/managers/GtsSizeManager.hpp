@@ -32,7 +32,7 @@ namespace Gts {
 
 			virtual std::string DebugName() override;
 
-			void Reset();
+			virtual void Reset() override;
 			virtual void ResetActor(Actor* actor) override;
 
 			SizeManagerData& GetData(Actor* actor);

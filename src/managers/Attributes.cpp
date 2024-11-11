@@ -92,14 +92,11 @@ namespace {
 
 	// Todo unify the functions
 	void UpdateActors(Actor* actor) {
-		if (!actor) {
-			return;
-		}
-		
-		ManagePerkBonuses(actor);
-
-		if (actor->formID == 0x14) {
-			TinyCalamity_BonusSpeed(actor); // Manages SMT bonuses
+		if (actor) {
+			ManagePerkBonuses(actor);
+			if (actor->formID == 0x14) {
+				TinyCalamity_BonusSpeed(actor); // Manages SMT bonuses
+			}
 		}
 	}
 }
@@ -120,7 +117,11 @@ namespace Gts {
 
 		if (timer.ShouldRunFrame()) { // Run once per 0.5 sec
 			for (auto actor: find_actors()) {
-				UpdateActors(actor);
+				if (actor) {
+					if (actor->Is3DLoaded()) {
+						UpdateActors(actor);
+					}
+				}
 			}
 		}
 	}

@@ -108,9 +108,4 @@ namespace Gts {
 			//log::info("Size difference is met, pushing actor away");
 		}
 	}
-
-	void HitManager::Update() {
-		// unused
-		return;
-	}
 }

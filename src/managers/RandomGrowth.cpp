@@ -81,49 +81,48 @@ namespace Gts {
 
 	void RandomGrowth::Update() {
 		static Timer GrowthTimer = Timer(1.0);
-		if (!GrowthTimer.ShouldRunFrame()) {
-			return; //Scan once per 1 sec
-		}
-		for (auto actor: find_actors()) {
-			if (actor && actor->Is3DLoaded()) {
-				if (actor->formID == 0x14 || IsTeammate(actor)) {
-					if (ShouldGrow(actor)) {
-						if (get_target_scale(actor) < get_max_scale(actor)) {
-							float scale = get_visual_scale(actor);
-							float ProgressionMultiplier = Persistent::GetSingleton().progression_multiplier;
-							int random = RandomInt(0, 80);
-							float TotalPower = (100.0 + random)/100.0;
-							float base_power = ((0.00750 * TotalPower * 25) * ProgressionMultiplier);  // The power of it
-							float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
+		if (GrowthTimer.ShouldRunFrame()) {
+			for (auto actor: find_actors()) {
+				if (actor && actor->Is3DLoaded()) {
+					if (actor->formID == 0x14 || IsTeammate(actor)) {
+						if (ShouldGrow(actor)) {
+							if (get_target_scale(actor) < get_max_scale(actor)) {
+								float scale = get_visual_scale(actor);
+								float ProgressionMultiplier = Persistent::GetSingleton().progression_multiplier;
+								int random = RandomInt(0, 80);
+								float TotalPower = (100.0 + random)/100.0;
+								float base_power = ((0.00750 * TotalPower * 25) * ProgressionMultiplier);  // The power of it
+								float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
 
-							if (Runtime::HasPerkTeam(actor, "RandomGrowthAug") && TotalPower >= Get_Breach_Threshold(actor) && !IsGtsBusy(actor)) {
-								AnimationManager::StartAnim("StartRandomGrowth", actor);
-								return;
-							} else {
-								ActorHandle gianthandle = actor->CreateRefHandle();
-								std::string name = std::format("RandomGrowth_{}", actor->formID);
-								// Sounds
-								float Volume = std::clamp(scale/4, 0.20f, 1.0f);
+								if (Runtime::HasPerkTeam(actor, "RandomGrowthAug") && TotalPower >= Get_Breach_Threshold(actor) && !IsGtsBusy(actor)) {
+									AnimationManager::StartAnim("StartRandomGrowth", actor);
+									return;
+								} else {
+									ActorHandle gianthandle = actor->CreateRefHandle();
+									std::string name = std::format("RandomGrowth_{}", actor->formID);
+									// Sounds
+									float Volume = std::clamp(scale/4, 0.20f, 1.0f);
 
-								PlayMoanSound(actor, 1.0);
-								Task_FacialEmotionTask_Moan(actor, 2.0, "RandomGrow");
-								Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0, "NPC COM [COM ]");
-								Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]");
+									PlayMoanSound(actor, 1.0);
+									Task_FacialEmotionTask_Moan(actor, 2.0, "RandomGrow");
+									Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0, "NPC COM [COM ]");
+									Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]");
 
-								TaskManager::RunFor(name, 0.40 * TotalPower, [=](auto& progressData) {
-									if (!gianthandle) {
-										return false;
-									}
-									auto giantref = gianthandle.get().get();
-									// Grow
-									float delta_time = Time::WorldTimeDelta();
-									update_target_scale(giantref, base_power * delta_time * Gigantism, SizeEffectType::kGrow);
+									TaskManager::RunFor(name, 0.40 * TotalPower, [=](auto& progressData) {
+										if (!gianthandle) {
+											return false;
+										}
+										auto giantref = gianthandle.get().get();
+										// Grow
+										float delta_time = Time::WorldTimeDelta();
+										update_target_scale(giantref, base_power * delta_time * Gigantism, SizeEffectType::kGrow);
 
-									// Play sound
-									Rumbling::Once("RandomGrowth", giantref, base_power, 0.10);
-									RandomGrowth::RestoreStats(giantref, 0.8); // Regens Attributes if PC has perk
-									return true;
-								});
+										// Play sound
+										Rumbling::Once("RandomGrowth", giantref, base_power, 0.10);
+										RandomGrowth::RestoreStats(giantref, 0.8); // Regens Attributes if PC has perk
+										return true;
+									});
+								}
 							}
 						}
 					}
