@@ -338,7 +338,7 @@ namespace Gts {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		std::string tag = GetFootstepName(giant, right);
 
-		BSTEventSource<BGSFootstepEvent>* eventSource;
+		BSTEventSource<BGSFootstepEvent>* eventSource = nullptr;
 		auto foot_event = BGSFootstepEvent();
 
 		foot_event.actor = giantHandle;

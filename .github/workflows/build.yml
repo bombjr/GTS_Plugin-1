@@ -39,8 +39,8 @@ jobs:
         with:
           # configurePreset: build-release-msvc
           # buildPreset: release-msvc
-          configurePreset: build-release-withdebuginfo-msvc
-          buildPreset: release-withdebuginfo-msvc
+          configurePreset: AE_SE_Release
+          buildPreset: Release-MSVC
       - name: Copy Plugin
         shell: bash
         run: |
