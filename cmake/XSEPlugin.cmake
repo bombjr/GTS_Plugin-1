@@ -70,7 +70,7 @@ if(MSVC)
 
 	target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG>")
 
-	set(SC_RELEASE_OPTS "/arch:SSE4.2;/fp:fast;/GL;/Gy;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
+	set(SC_RELEASE_OPTS "/arch:SSE4.2;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
 
 	target_compile_options(
 		"${PROJECT_NAME}"

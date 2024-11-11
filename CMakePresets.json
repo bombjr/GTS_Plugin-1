@@ -110,24 +110,6 @@
         "generator-ninja",
         "msvc"
       ]
-    },
-	  {
-      "name": "AE_SE_RelWithDebInfo",
-      "cacheVariables": {
-        "BUILD_SKYRIM": true,
-        "ENABLE_SKYRIM_AE": "ON",
-        "ENABLE_SKYRIM_SE": "ON",
-        "ENABLE_SKYRIM_VR": "OFF",
-        "BUILD_TESTS": "OFF",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      },
-      "inherits": [
-        "common",
-        "vcpkg",
-        "platform-win32-unicode",
-        "generator-ninja",
-        "msvc"
-      ]
     }
   ],
   "buildPresets": [
@@ -136,12 +118,6 @@
             "displayName": "Release (MSVC)",
             "configurePreset": "AE_SE_Release",
             "description": "Optimized release build."
-        },
-        {
-            "name": "ReleaseWithDebInfo-MSVC",
-            "displayName": "RelWithDebInfo (MSVC)",
-            "configurePreset": "AE_SE_RelWithDebInfo",
-            "description": "Optimized release build with more debug information."
         },
         {
             "name": "Debug-MSVC",
