@@ -54,7 +54,7 @@ jobs:
       - name: Compile
         run: |
            cmake --preset AE_SE_Release
-           cmake --build build --config Release
+           cmake --build build --config RelWithDebInfo
             
       - name: Copy Plugin
         shell: bash
