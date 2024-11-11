@@ -38,6 +38,7 @@ namespace {
 	 * (or <code>Skyrim VR</code> if you are using VR).
 	 * </p>
 	 */
+
 	void InitializeLogging()
 	{
 		auto path = log_directory();
@@ -58,24 +59,22 @@ namespace {
 				"Global", std::make_shared <spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
 
-		log->set_level(spdlog::level::level_enum::trace);
-		log->flush_on(spdlog::level::level_enum::trace);
-		log->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
-		log->info("Logging started");
-
 		try {
+			spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
+			spdlog::set_level(spdlog::level::level_enum::trace);
+			spdlog::flush_on(spdlog::level::level_enum::trace);
+			log::info("Loading Config...");
 			const auto& debugConfig = Gts::Config::GetSingleton().GetDebug();
-
-			log->info("Plugin Config Loaded");
-			log->set_level(debugConfig.GetLogLevel());
-			log->flush_on(debugConfig.GetFlushLevel());
+			log::info("Plugin Config Loaded");
+			spdlog::set_level(debugConfig.GetLogLevel());
+			spdlog::flush_on(debugConfig.GetFlushLevel());
 		} catch (const std::exception& ex) {
-			log->error("Could not load config: {}", ex.what());
+			log::critical("Could not load config: {}", ex.what());
 			report_and_fail(std::format("Could not load config: {}", ex.what()));
 		}
 
-		spdlog::set_default_logger(std::move(log));
-		spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
+		//spdlog::set_default_logger(std::move(log));
+		//spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
 	}
 
 
@@ -195,7 +194,7 @@ void InitializeEventSystem() {
  */
 SKSEPluginLoad(const LoadInterface * a_skse)
 {
-	InitializeLogging();
+	
 
 	auto *plugin  = PluginDeclaration::GetSingleton();
 	auto version = plugin->GetVersion();
@@ -204,6 +203,7 @@ SKSEPluginLoad(const LoadInterface * a_skse)
 	log::info("{} {} {} is loading...", plugin->GetName(), version, gitData);
 
 	Init(a_skse);
+	InitializeLogging();
 	InitializeMessaging();
 	Hooks::Install();
 	InitializePapyrus();
