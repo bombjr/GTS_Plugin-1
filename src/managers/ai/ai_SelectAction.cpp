@@ -265,7 +265,7 @@ namespace Gts {
 	void AI_StartThighCrushTask(Actor* giant) {
 		std::string name = std::format("ThighCrush_{}", giant->formID);
 		ActorHandle gianthandle = giant->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		static Timer ActionTimer = Timer(6.0f);
 
 		TaskManager::Run(name, [=](auto& progressData) {
@@ -273,9 +273,9 @@ namespace Gts {
 				return false;
 			}
 			Actor* giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
-			if (Finish - Start > 0.10f) {
+			if (Finish - Start > 0.10) {
 				if (!IsThighCrushing(giantref)) {
 					return false;
 				}

@@ -65,9 +65,9 @@ namespace {
     void StartStackDecayTask(Actor* giant, float stack_power, TempActorData* data) {
         std::string name = std::format("StackDecay_{}_{}", giant->formID, Time::WorldTimeElapsed());
         ActorHandle gianthandle = giant->CreateRefHandle();
-        float Start = Time::WorldTimeElapsed();
+        double Start = Time::WorldTimeElapsed();
 
-        float stack_duration = 240.0f;
+        double stack_duration = 240.0;
         if (!data) {
             return;
         }
@@ -88,7 +88,7 @@ namespace {
                 return false;
             }
             Actor* giantref = gianthandle.get().get();
-            float Finish = Time::WorldTimeElapsed();
+            double Finish = Time::WorldTimeElapsed();
 
             if (Finish - Start >= stack_duration) {
                 if (data) {

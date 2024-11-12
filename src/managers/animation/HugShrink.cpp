@@ -74,7 +74,7 @@ namespace {
 			}
 			mod_target_scale(giant, steal);
 		} else {
-			float Start = Time::WorldTimeElapsed();
+			double Start = Time::WorldTimeElapsed();
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			float original_scale = Vore::ReadOriginalScale(tiny);
 			std::string name = std::format("HugCrushGrowth_{}_{}", giant->formID, tiny->formID);
@@ -86,7 +86,7 @@ namespace {
 
 				auto giantref = gianthandle.get().get();
 
-				float Elapsed = Time::WorldTimeElapsed() - Start;
+				float Elapsed = static_cast<float>(Time::WorldTimeElapsed() - Start);
 				float formula = bezier_curve(Elapsed, 0.2f, 1.9f, 0, 0, 3.0f, 4.0f); // Reuse formula from GrowthAnimation::Growth_2/5
 				// https://www.desmos.com/calculator/reqejljy19
 				if (formula >= 1.0f) {
@@ -511,8 +511,7 @@ namespace Gts {
 			stamina *= Perk_GetCostReduction(giantref);
 
 			if (sizedifference >= GetHugShrinkThreshold(giantref)) {
-				auto name = giantref->GetDisplayFullName();
-				std::string_view message = std::format("{} stole all available size", name);
+				std::string_view message = fmt::format("{} stole all available size", giantref->GetDisplayFullName());
 				Notify(message);
 				return false;
 			}
@@ -669,7 +668,7 @@ namespace Gts {
 		if (!huggedActor) {
 			return;
 		}
-		std::string_view message = std::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
+		std::string_view message = fmt::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
 		float sizedifference = get_visual_scale(giant)/get_visual_scale(huggedActor);
 		if (giant->formID == 0x14) {
 			shake_camera(giant, 0.25f * sizedifference, 0.35f);

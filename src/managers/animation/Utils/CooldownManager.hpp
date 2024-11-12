@@ -38,37 +38,37 @@ namespace Gts {
     };
 
     struct CooldownData {
-        double lastPushTime = -1.0e8;
-        double lastHandDamageTime = -1.0e8;
-        double lastLaunchTime = -1.0e8;
-        double lastHealthGateTime = -1.0e8;
-        double lastThighDamageTime = -1.0e8;
-        double lastButtCrushTime = -1.0e8;
-        double lastScareTime = -1.0e8;
-        double lastHugTime = -1.0e8;
+        float lastPushTime = -1.0e8f;
+        float lastHandDamageTime = -1.0e8f;
+        float lastLaunchTime = -1.0e8f;
+        float lastHealthGateTime = -1.0e8f;
+        float lastThighDamageTime = -1.0e8f;
+        float lastButtCrushTime = -1.0e8f;
+        float lastScareTime = -1.0e8f;
+        float lastHugTime = -1.0e8f;
 
-        double lastAbsorbTime = -1.0e8;
+        float lastAbsorbTime = -1.0e8f;
 
-        double lastBreastAbsorbTime = -1.0e8;
-        double lastBreastSuffocateTime = -1.0e8;
-        double lastBreastVoreTime = -1.0e8;
+        float lastBreastAbsorbTime = -1.0e8f;
+        float lastBreastSuffocateTime = -1.0e8f;
+        float lastBreastVoreTime = -1.0e8f;
         
-        double lastLaughTime = -1.0e8;
-        double lastMoanTime = -1.0e8;
+        float lastLaughTime = -1.0e8f;
+        float lastMoanTime = -1.0e8f;
 
-        double lastRevertTime = -1.0e8;
-        double lastSoundGrowthTime = -1.0e8;
-        double lastHitTime = -1.0e8;
-        double lastGrowthTime = -1.0e8;
-        double lastOutburstTime = -1.0e8;
-        double lastForceOutburstTime = -1.0e8;
-        double lastShrinkParticleTime = -1.0e8;
-        double lastAnimShrinkParticleTime = -1.0e8;
-        double lastGazeShrinkParticleTime = -1.0e8;
-        double lastTinyCalamityTime = -1.0e8;
+        float lastRevertTime = -1.0e8f;
+        float lastSoundGrowthTime = -1.0e8f;
+        float lastHitTime = -1.0e8f;
+        float lastGrowthTime = -1.0e8f;
+        float lastOutburstTime = -1.0e8f;
+        float lastForceOutburstTime = -1.0e8f;
+        float lastShrinkParticleTime = -1.0e8f;
+        float lastAnimShrinkParticleTime = -1.0e8f;
+        float lastGazeShrinkParticleTime = -1.0e8f;
+        float lastTinyCalamityTime = -1.0e8f;
 
-        double lastFootstepTime_R = -1.0e8;
-        double lastFootstepTime_L = -1.0e8;
+        float lastFootstepTime_R = -1.0e8f;
+        float lastFootstepTime_L = -1.0e8f;
     };
 
     void ApplyActionCooldown(Actor* giant, CooldownSource source);

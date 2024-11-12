@@ -80,14 +80,14 @@ namespace {
 	void DisableButtTrackTask(Actor* giant) {
 		std::string name = std::format("DisableCameraTask_{}", giant->formID);
 		auto gianthandle = giant->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			if ((Finish - Start) / AnimationManager::GetAnimSpeed(giantref) > 12.0f || !IsButtCrushing(giantref) && !IsGtsBusy(giantref)) {
 				ManageCamera(giantref, false, CameraTracking::Butt);
 				log::info("Camera Reset");
@@ -231,17 +231,17 @@ namespace {
 
 		ManageCamera(giant, true, CameraTracking::Butt);
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
 
-			if (Finish - Start > 0.04f) { 
+			if (Finish - Start > 0.04) { 
 
 				SetButtCrushSize(giant, 0.0f, true);
 

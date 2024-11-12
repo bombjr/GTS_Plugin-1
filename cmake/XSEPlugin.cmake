@@ -104,6 +104,10 @@ if(MSVC)
 		/wd4101
 		/wd4458
 		/wd4459
+		/wd4456
+		/wd4457
+		/wd4189
+
 	)
 
 	target_compile_options(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:/fp:strict>")

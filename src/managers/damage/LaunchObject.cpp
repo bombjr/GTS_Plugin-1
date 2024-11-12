@@ -249,7 +249,7 @@ namespace Gts {
 		}
 
 		if (nodeCollisions > 0) {
-			float Start = Time::WorldTimeElapsed();
+			double Start = Time::WorldTimeElapsed();
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			ObjectRefHandle objectref = object->CreateRefHandle();
 			std::string name = std::format("PushObject_{}_{}", giant->formID, object->formID);
@@ -264,10 +264,10 @@ namespace Gts {
 				}
 				auto giantref = gianthandle.get().get();
 				auto ref = objectref.get().get();
-				float Finish = Time::WorldTimeElapsed();
-				float timepassed = Finish - Start;
+				double Finish = Time::WorldTimeElapsed();
+				float timepassed = static_cast<float>(Finish - Start);
 
-				if (timepassed > 1e-4) {
+				if (timepassed > 1e-4f) {
 					NiPoint3 EndPos = Bone->world.translate;
 					ApplyPhysicsToObject_Towards(giantref, ref, EndPos - StartPos, start_power, giantScale);
 					Break_Object(ref, power * giantScale * start_power, giantScale, smt);

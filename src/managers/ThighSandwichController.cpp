@@ -91,14 +91,14 @@ namespace Gts {
 	void SandwichingData::EnableRuneTask(Actor* giant, bool shrink) {
 		string node_name = "GiantessRune";
 		if (shrink == true) {
-			float Start = Time::WorldTimeElapsed();
+			float Start = static_cast<float>(Time::WorldTimeElapsed());
 			std::string name = std::format("ShrinkRune_{}", giant->formID);
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
-				float Finish = Time::WorldTimeElapsed();
+				float Finish = static_cast<float>(Time::WorldTimeElapsed());
 				auto giantref = gianthandle.get().get();
 				auto node = find_node(giantref, node_name, false);
 				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.70f, 0.01f, 0.98f);
@@ -113,14 +113,14 @@ namespace Gts {
 				return true;
 			});
 		} else if (shrink == false) {
-			float Start = Time::WorldTimeElapsed();
+			float Start = static_cast<float>(Time::WorldTimeElapsed());
 			std::string name = std::format("ScaleRune_{}", giant->formID);
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
-				float Finish = Time::WorldTimeElapsed();
+				float Finish = static_cast<float>(Time::WorldTimeElapsed());
 				auto giantref = gianthandle.get().get();
 				auto node = find_node(giantref, node_name, false);
 				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.80f, 0.01f, 9999.0f);
@@ -319,7 +319,7 @@ namespace Gts {
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_SANDWICH_SCALE) {
 			if (pred->formID == 0x14) {
-				std::string_view message = std::format("{} is too big to be smothered between thighs: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_SANDWICH_SCALE);
+				std::string_view message = fmt::format("{} is too big to be smothered between thighs: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_SANDWICH_SCALE);
 				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {

@@ -54,7 +54,7 @@ namespace {
 			modified = Phenome_GetPhenomeValue(data, phenome);
 		}
 		
-		float start = Time::WorldTimeElapsed();
+		float start = static_cast<float>(Time::WorldTimeElapsed());
 
 		bool Reset = (target < 0.01f);
 
@@ -64,7 +64,7 @@ namespace {
 			}
 
 			auto giantref = giantHandle.get().get();
-			float pass = Time::WorldTimeElapsed() - start;
+			float pass = static_cast<float>(Time::WorldTimeElapsed()) - start;
 
 			if (!giantref->Is3DLoaded()) {
 				return false;
@@ -73,13 +73,13 @@ namespace {
 			float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
 			float speed = 1.25f * AnimSpeed * halflife * Speed_up;
 			//log::info("Running Facial Task: {}", name);
-			float value = (pass * speed);
+			float value = pass * speed;
 			auto FaceData = GetFacialData(giantref);
 			if (FaceData) {
 				if (Reset && modified != 0.0f) {
 					value = modified - (pass * speed);
 					Phenome_ManagePhenomes(FaceData, phenome, value);
-					if (value <= 0) {
+					if (value <= 0.0f) {
 						Phenome_ManagePhenomes(FaceData, phenome, 0.0f);
 						return false;
 					}
@@ -111,7 +111,7 @@ namespace {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 
 		bool Reset = (target < 0.01f);
 
@@ -121,7 +121,7 @@ namespace {
 			}
 
 			auto giantref = giantHandle.get().get();
-			float pass = Time::WorldTimeElapsed() - start;
+			float pass = static_cast<float>(Time::WorldTimeElapsed() - start);
 
 			if (!giantref->Is3DLoaded()) {
 				return false;

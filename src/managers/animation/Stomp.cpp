@@ -105,7 +105,7 @@ namespace {
 		if (footNode) {
 			auto footPos = footNode->world.translate;
 			for (auto tiny: FindSquished(giant)) {
-				std::uniform_real_distribution<> dist(-10, 10);
+				std::uniform_real_distribution<float> dist(-10.f, 10.f);
 				float dx = dist(e2);
 				float dy = dist(e2);
 				auto randomOffset = NiPoint3(dx, dy, 0.0f);
@@ -139,18 +139,18 @@ namespace {
 		std::string taskname = std::format("DelayLaunch_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(taskname, [=](auto& update){ // Needed to prioritize grind over launch
 			if (!giantHandle) {
 				return false;
 			}
 			Actor* giantref = giantHandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
-			float timepassed = Finish - Start;
+			double timepassed = Finish - Start;
 
-			if (timepassed > 0.03f) {
+			if (timepassed > 0.03) {
 				LaunchTask(giantref, radius, power, Event);
 				return false;
 			}
@@ -176,17 +176,17 @@ namespace {
 		std::string taskname = std::format("StompAttack_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has a wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 		
-			if (Finish - Start > 0.02f) { 
+			if (Finish - Start > 0.02) { 
 
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.10f);
 				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 10, 0.25f, Event, 1.0f, Source);
@@ -222,16 +222,16 @@ namespace {
 		std::string taskname = std::format("StompLand_{}_{}", giant->formID, Time::WorldTimeElapsed());
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has a bit too early timings
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
-			if (Finish - Start > 0.025f) { 
+			if (Finish - Start > 0.025) { 
 				auto giant = giantHandle.get().get();
 
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);

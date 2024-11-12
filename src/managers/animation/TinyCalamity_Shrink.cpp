@@ -43,7 +43,7 @@ namespace {
     void AttachRune(Actor* giant, bool ShrinkRune, float speed, float scale) { // A task that scales/shrinks the runes
 		string node_name = "ShrinkRune-Obj";
 
-        float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
         std::string name = std::format("Calamity_{}_{}", giant->formID, ShrinkRune);
         ActorHandle gianthandle = giant->CreateRefHandle();
 
@@ -53,7 +53,7 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-                float Finish = Time::WorldTimeElapsed();
+				float Finish = static_cast<float>(Time::WorldTimeElapsed());
 				auto node = find_node(giantref, node_name, false);
 				float timepassed = std::clamp(((Finish - Start) * AnimationManager::GetAnimSpeed(giantref)) * speed, 0.01f, 0.98f);
 				if (node) {
@@ -71,7 +71,7 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-                float Finish = Time::WorldTimeElapsed();
+				float Finish = static_cast<float>(Time::WorldTimeElapsed());
 				auto node = find_node(giantref, node_name, false);
 				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * speed, 0.01f, 9999.0f);
 				if (node) {

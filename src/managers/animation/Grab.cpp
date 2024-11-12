@@ -605,7 +605,7 @@ namespace Gts {
 				log::info("Moving tiny to giant");
 				tiny->MoveTo(giant);
 
-				float Start = Time::WorldTimeElapsed();
+				double Start = Time::WorldTimeElapsed();
 				std::string name = std::format("Reattach_{}", tiny->formID);
 				ActorHandle gianthandle = giant->CreateRefHandle();
 				ActorHandle tinyhandle = tiny->CreateRefHandle();
@@ -619,9 +619,9 @@ namespace Gts {
 					auto giantref = gianthandle.get().get();
 					auto tinyref = tinyhandle.get().get();
 
-					float Finish = Time::WorldTimeElapsed();
-					float timepassed = Finish - Start;
-					if (timepassed > 0.25f) {
+					double Finish = Time::WorldTimeElapsed();
+					double timepassed = Finish - Start;
+					if (timepassed > 0.25) {
 						tinyref->MoveTo(giantref);
 						DisableCollisions(tinyref, giantref);
 						if (IsBetweenBreasts(tinyref)) {

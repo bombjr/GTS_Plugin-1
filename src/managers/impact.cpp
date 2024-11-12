@@ -198,7 +198,7 @@ namespace Gts {
 				
 				float damage = sizemanager.GetSizeAttribute(actor, SizeAttribute::JumpFall) * fallmod; // get jump damage boost
 
-				float Start = Time::WorldTimeElapsed();
+				double Start = Time::WorldTimeElapsed();
 				ActorHandle gianthandle = actor->CreateRefHandle();
 				std::string name = std::format("JumpLandT_{}", actor->formID);
 				
@@ -207,7 +207,7 @@ namespace Gts {
 						return false; // end task
 					}
 					auto giant = gianthandle.get().get();
-					float timepassed = Time::WorldTimeElapsed() - Start;
+					float timepassed = static_cast<float>(Time::WorldTimeElapsed() - Start);
 
 					if (timepassed >= 0.15f) {
 						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft, true);

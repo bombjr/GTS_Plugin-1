@@ -44,7 +44,7 @@ namespace Gts {
 
 	void Task_InitHavokTask(Actor* tiny) {
 
-		float startTime = Time::WorldTimeElapsed();
+		double startTime = static_cast<float>(Time::WorldTimeElapsed());
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		std::string taskname = std::format("EnterRagdoll_{}", tiny->formID);
 
@@ -204,7 +204,7 @@ namespace Gts {
 	void ForceFlee(Actor* giant, Actor* tiny, float duration, bool apply_size_difference) {
 		float oldConfidence = GetAV(tiny, ActorValue::kConfidence);
 
-		float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
 		std::string name = std::format("ScareAway_{}", tiny->formID);
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -221,7 +221,7 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float Finish = Time::WorldTimeElapsed();
+			float Finish = static_cast<float>(Time::WorldTimeElapsed());
 
 			auto tinyRef = tinyHandle.get().get();
 			auto giantRef = giantHandle.get().get();

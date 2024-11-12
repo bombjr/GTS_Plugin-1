@@ -49,7 +49,7 @@ namespace {
         Task_AdjustHalfLifeTask(tiny, 0.10f, 3.0);
         SetBeingHeld(tiny, true);
         
-        float Start = Time::WorldTimeElapsed();
+        double Start = Time::WorldTimeElapsed();
 
         TaskManager::Run(name, [=](auto& progressData) {
 			if (!tinyhandle) {
@@ -60,7 +60,7 @@ namespace {
             }
 			Actor* tinyref = tinyhandle.get().get();
             Actor* giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+            double Finish = Time::WorldTimeElapsed();
 
             set_target_scale(tinyref, 0.03f);
 

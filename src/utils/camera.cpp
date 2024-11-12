@@ -117,7 +117,7 @@ namespace Gts {
 				
 				ActorHandle giantHandle = giant->CreateRefHandle();
 
-				float start = Time::WorldTimeElapsed();
+				float start = static_cast<float>(Time::WorldTimeElapsed());
 
 				TaskManager::Run([=](auto& update) {
 					if (!giantHandle) {
@@ -126,7 +126,7 @@ namespace Gts {
 					Actor* giantref = giantHandle.get().get();
 					bool Busy = IsGtsBusy(giantref);
 					if (!Busy) {
-						if (Time::WorldTimeElapsed() - start < 0.15f) {
+						if (static_cast<float>(Time::WorldTimeElapsed()) - start < 0.15f) {
 							return true;
 						}
 						if (thirdPersonState && !IsFirstPerson()) {

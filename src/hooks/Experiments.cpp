@@ -88,14 +88,14 @@ namespace {
 	void FixScaleTask(Actor* actor) {
 		std::string name = std::format("ScaleFix_{}", actor->formID);
 		ActorHandle gianthandle = actor->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			Actor* target = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
 			if (Finish - Start > 0.10f) {
 				float natural_scale = get_natural_scale(target);

@@ -35,18 +35,18 @@ namespace {
 		std::string taskname = std::format("DelayLaunch_Trample_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(taskname, [=](auto& update){ // Needed to prioritize grind over launch
 			if (!giantHandle) {
 				return false;
 			}
 			Actor* giantref = giantHandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
-			float timepassed = Finish - Start;
+			double timepassed = Finish - Start;
 
-			if (timepassed > 0.03f) {
+			if (timepassed > 0.03) {
 				LaunchTask(giant, radius, power, Event);
 				return false;
 			}
@@ -65,7 +65,7 @@ namespace {
 			smt = 1.5f;
 		}
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		std::string taskname = std::format("TrampleAttack_{}", giant->formID);
 
@@ -74,10 +74,10 @@ namespace {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 
-			if (Finish - Start > 0.06f) { 
+			if (Finish - Start > 0.06) { 
 				DoDamageEffect(giant, Damage_Trample * perk, Radius_Trample, 100, 0.10f, Event, 1.10f, Source);
 				DrainStamina(giant, "StaminaDrain_Trample", "DestructionBasics", true, 0.6f); // start stamina drain
 

@@ -163,7 +163,7 @@ namespace Gts {
 			continue;
 		}
 
-		int ArmorCount = ArmorList.size();
+		uint32_t ArmorCount = static_cast<uint32_t>(ArmorList.size());
 		if (ArmorCount == 0) {
 			return; //No Vallid Armors Found
 		}

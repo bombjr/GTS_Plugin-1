@@ -32,14 +32,14 @@ namespace {
 		}
 
 		float DefaultTP = data->WorldFov_Default;
-		float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			float Finish = static_cast<float>(Time::WorldTimeElapsed());
 
 			if (AllowEdits) {
 				camera->worldFOV += DefaultTP * 0.003f;
@@ -65,7 +65,7 @@ namespace {
 		camera->firstPersonFOV *= 0.35f;
 		float DefaultFP = data->FpFov_Default;
 
-		float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
 
 		TaskManager::Run(name,[=](auto& progressData) {
 			if (!gianthandle) {
@@ -73,7 +73,7 @@ namespace {
 			}
 
 			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			float Finish = static_cast<float>(Time::WorldTimeElapsed());
 
 			if (AllowEdits) {
 				camera->firstPersonFOV += DefaultFP * 0.003f;

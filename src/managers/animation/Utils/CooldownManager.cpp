@@ -142,93 +142,93 @@ namespace Gts {
     }
 
     void ApplyActionCooldown(Actor* giant, CooldownSource source) {
-        float time = Time::WorldTimeElapsed();
+        float time = static_cast<float>(Time::WorldTimeElapsed());
         auto& data = CooldownManager::GetSingleton().GetCooldownData(giant);
 
         switch (source) {
             case CooldownSource::Damage_Launch: 
-                data.lastLaunchTime = Time::WorldTimeElapsed();
+                data.lastLaunchTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Damage_Hand:
-                data.lastHandDamageTime = Time::WorldTimeElapsed();
+                data.lastHandDamageTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;    
             case CooldownSource::Damage_Thigh:
-                data.lastThighDamageTime = Time::WorldTimeElapsed();
+                data.lastThighDamageTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Push_Basic:
-                data.lastPushTime = Time::WorldTimeElapsed();
+                data.lastPushTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;    
             case CooldownSource::Action_ButtCrush:
-                data.lastButtCrushTime = Time::WorldTimeElapsed();
+                data.lastButtCrushTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Action_HealthGate:
-                data.lastHealthGateTime = Time::WorldTimeElapsed();
+                data.lastHealthGateTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Action_ScareOther:   
-                data.lastScareTime = Time::WorldTimeElapsed();
+                data.lastScareTime = static_cast<float>(Time::WorldTimeElapsed());
                 break; 
             case CooldownSource::Action_Hugs:   
-                data.lastHugTime = Time::WorldTimeElapsed();
+                data.lastHugTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;     
             case CooldownSource::Action_AbsorbOther:
-                data.lastAbsorbTime = Time::WorldTimeElapsed();
+                data.lastAbsorbTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Action_Breasts_Suffocate:
-                data.lastBreastSuffocateTime = Time::WorldTimeElapsed();
+                data.lastBreastSuffocateTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Action_Breasts_Vore:
-                data.lastBreastVoreTime = Time::WorldTimeElapsed();
+                data.lastBreastVoreTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;   
             case CooldownSource::Action_Breasts_Absorb:
-                data.lastBreastAbsorbTime = Time::WorldTimeElapsed();
+                data.lastBreastAbsorbTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;        
             case CooldownSource::Emotion_Laugh:   
-                data.lastLaughTime = Time::WorldTimeElapsed();
+                data.lastLaughTime = static_cast<float>(Time::WorldTimeElapsed());
                 break; 
             case CooldownSource::Emotion_Moan: 
-                data.lastMoanTime = Time::WorldTimeElapsed();
+                data.lastMoanTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;  
             case CooldownSource::Misc_RevertSound: 
-                data.lastRevertTime = Time::WorldTimeElapsed();
+                data.lastRevertTime = static_cast<float>(Time::WorldTimeElapsed());
                 break; 
             case CooldownSource::Misc_GrowthSound:
-                data.lastSoundGrowthTime = Time::WorldTimeElapsed();
+                data.lastSoundGrowthTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_BeingHit:
-                data.lastHitTime = Time::WorldTimeElapsed();
+                data.lastHitTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_AiGrowth:
-                data.lastGrowthTime = Time::WorldTimeElapsed();
+                data.lastGrowthTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;    
             case CooldownSource::Misc_ShrinkOutburst:
-                data.lastOutburstTime = Time::WorldTimeElapsed();
+                data.lastOutburstTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_ShrinkOutburst_Forced:
-                data.lastForceOutburstTime = Time::WorldTimeElapsed();
+                data.lastForceOutburstTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_ShrinkParticle:
-                data.lastShrinkParticleTime = Time::WorldTimeElapsed();
+                data.lastShrinkParticleTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_ShrinkParticle_Animation:
-                data.lastAnimShrinkParticleTime = Time::WorldTimeElapsed();
+                data.lastAnimShrinkParticleTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_ShrinkParticle_Gaze:
-                data.lastGazeShrinkParticleTime = Time::WorldTimeElapsed();
+                data.lastGazeShrinkParticleTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Misc_TinyCalamityRage:
-                data.lastTinyCalamityTime = Time::WorldTimeElapsed();
+                data.lastTinyCalamityTime = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Footstep_Right:
-                data.lastFootstepTime_R = Time::WorldTimeElapsed();
+                data.lastFootstepTime_R = static_cast<float>(Time::WorldTimeElapsed());
                 break;
             case CooldownSource::Footstep_Left:
-                data.lastFootstepTime_L = Time::WorldTimeElapsed();
+                data.lastFootstepTime_L = static_cast<float>(Time::WorldTimeElapsed());
                 break; 
         }
     }
 
     float GetRemainingCooldown(Actor* giant, CooldownSource source) {
-        float time = Time::WorldTimeElapsed();
+        float time = static_cast<float>(Time::WorldTimeElapsed());
         auto& data = CooldownManager::GetSingleton().GetCooldownData(giant);
 
         switch (source) {
@@ -285,11 +285,11 @@ namespace Gts {
             case CooldownSource::Footstep_Left:
                 return (data.lastFootstepTime_L + Calculate_FootstepTimer(giant)) - time; 
             }
-        return 0.0f;
+        return 0.0;
     }
 
     bool IsActionOnCooldown(Actor* giant, CooldownSource source) {
-        float time = Time::WorldTimeElapsed();
+        float time = static_cast<float>(Time::WorldTimeElapsed());
         auto& data = CooldownManager::GetSingleton().GetCooldownData(giant);
 
         switch (source) {

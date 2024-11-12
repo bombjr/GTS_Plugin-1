@@ -102,17 +102,17 @@ namespace {
 		
 		GrowthAnimation GrowthType = GetGrowthType(actor);
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giant = gianthandle.get().get();
-			float timepassed = Time::WorldTimeElapsed() - Start;
+			double timepassed = Time::WorldTimeElapsed() - Start;
 			float animspeed = AnimationManager::GetAnimSpeed(giant);
 
-			float elapsed = std::clamp(timepassed * animspeed, 0.0f, 4.4f);
+			float elapsed = static_cast<float>(std::clamp(timepassed * animspeed, 0.0, 4.4));
 			float gain = std::clamp(get_growth_formula(giant, elapsed, GrowthType), -0.01f, 1.0f);
 
 			float growth = CalcPower(actor, 0.0080f * growth_mult * gain * animspeed, 0.0f, false);

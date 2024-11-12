@@ -94,17 +94,17 @@ namespace {
 		std::string taskname = std::format("StrongStompAttack_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 
-			if (Finish - Start > 0.07f) { 
+			if (Finish - Start > 0.07) { 
 
 				DoDamageEffect(giant, Damage_Stomp_Strong * damage * perk, Radius_Stomp_Strong, 5, 0.35f, Event, 1.0f, Source);
 				DoImpactRumble(giant, Node, rumble);

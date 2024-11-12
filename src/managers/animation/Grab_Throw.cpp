@@ -77,8 +77,8 @@ namespace {
 				NiPoint3 vector = endCoords - startCoords;
 
 				float distanceTravelled = vector.Length();
-				float timeTaken = endTime - startTime;
-				float speed = (distanceTravelled/timeTaken) * 10; // Standing throw default power
+				double timeTaken = endTime - startTime;
+				float speed = static_cast<float>((distanceTravelled / timeTaken) * 10); // Standing throw default power
 
 				if (!giant->IsSneaking()) { // Goal is to fix standing throw direction
 

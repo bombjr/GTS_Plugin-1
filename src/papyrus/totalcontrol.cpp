@@ -47,7 +47,7 @@ namespace {
 				if (!targetHandle) {
 					return false;
 				}
-				float timeDelta = progressData.delta * 60; // Was optimised as 60fps
+				float timeDelta = static_cast<float>(progressData.delta * 60); // Was optimised as 60fps
 
 				auto target = targetHandle.get().get();
 				auto caster = casterHandle.get().get();

@@ -911,7 +911,7 @@ namespace Gts {
 								ActorHandle giantHandle = actor->CreateRefHandle();
 								ActorHandle tinyHandle = otherActor->CreateRefHandle();
 
-								float Start = Time::WorldTimeElapsed();
+								double Start = Time::WorldTimeElapsed();
 
 								std::string taskname = std::format("GrindCheck_{}_{}", actor->formID, otherActor->formID);
 								TaskManager::RunFor(taskname, 1.0f, [=](auto& update){
@@ -922,12 +922,12 @@ namespace Gts {
 										return false;
 									}
 									
-									float Finish = Time::WorldTimeElapsed();
+									double Finish = Time::WorldTimeElapsed();
 
 									auto giant = giantHandle.get().get();
 									auto tiny = tinyHandle.get().get();
 
-									if (Finish - Start > 0.02f) {
+									if (Finish - Start > 0.02) {
 										if (CanDoDamage(giant, tiny, false)) {
 											if (aveForce >= 0.00f && !tiny->IsDead()) {
 												SetBeingGrinded(tiny, true);
@@ -1379,7 +1379,7 @@ namespace Gts {
 			"L Breast03",
 			"R Breast03"
 		};
-		std::uint32_t bone_count = bone_names.size();
+		std::uint32_t bone_count = static_cast<uint32_t>(bone_names.size());
 		for (auto &bone_name_A : bone_names) {
 			auto bone = find_node(giant, bone_name_A);
 			if (!bone) {
@@ -1471,7 +1471,7 @@ namespace Gts {
 	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
 		float open_speed = duration/2;
@@ -1486,9 +1486,9 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
+			float timepassed = static_cast<float>(finish - start);
 
 			if (timepassed >= duration) {
 				float close_speed = duration / 1.75f;
@@ -1507,7 +1507,7 @@ namespace Gts {
 	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
 		AdjustFacialExpression(giant, 0, 1.0f, 0.0f, duration/2, "modifier"); // blink L
@@ -1518,9 +1518,9 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
+			float timepassed = static_cast<float>(finish - start);
 
 			if (timepassed >= duration) {
 				AdjustFacialExpression(giant, 0, 0.0f, 0.0f, 0.0f, "modifier"); // blink L
@@ -1535,7 +1535,7 @@ namespace Gts {
 	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
 		AdjustFacialExpression(giant, 0, 0.1f, "phenome"); // Start opening mouth
@@ -1558,9 +1558,9 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
+			float timepassed = static_cast<float>(finish - start);
 			if (timepassed >= duration) {
 				AdjustFacialExpression(giant, 0, 0.0f, "phenome"); // Start closing mouth
 

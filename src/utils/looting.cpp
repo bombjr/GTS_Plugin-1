@@ -44,7 +44,7 @@ namespace {
 			if (!dropboxHandle) {
 				return false;
 			}
-			float Finish = Time::WorldTimeElapsed();
+			float Finish = static_cast<float>(Time::WorldTimeElapsed());
 			auto dropboxPtr = dropboxHandle.get().get();
 			if (!dropboxPtr->Is3DLoaded()) {
 				return true;
@@ -142,7 +142,7 @@ namespace Gts {
 		}
 		// ^ we generally do not want to transfer loot in that case: 2 loot piles will spawn if actor was resurrected
 
-		float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
 		ActorHandle gianthandle = to->CreateRefHandle();
 		ActorHandle tinyhandle = from->CreateRefHandle();
 		bool PCLoot = Runtime::GetBool("GtsEnableLooting");
@@ -174,7 +174,7 @@ namespace Gts {
 			float hp = GetAV(tiny, ActorValue::kHealth);
 
 			if (tiny && (tiny->IsDead() || hp <= 0.0f)) {
-				float Finish = Time::WorldTimeElapsed();
+				float Finish = static_cast<float>(Time::WorldTimeElapsed());
 				float timepassed = Finish - Start;
 				if (timepassed < expectedtime) {
 					return true; // retry, not enough time has passed yet
@@ -260,7 +260,7 @@ namespace Gts {
 		if (!dropbox) {
 			return;
 		}
-		float Start = Time::WorldTimeElapsed();
+		float Start = static_cast<float>(Time::WorldTimeElapsed());
 		dropbox->SetDisplayName(name, false); // Rename container to match chosen name
 
 		ObjectRefHandle dropboxHandle = dropbox->CreateRefHandle();

@@ -181,7 +181,7 @@ namespace {
 			std::string name = std::format("Vore_Buff_{}_{}", giant->formID, tiny->formID);
 			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0f);
 			ActorHandle gianthandle = giant->CreateRefHandle();
-			float start_time = Time::WorldTimeElapsed();
+			float start_time = static_cast<float>(Time::WorldTimeElapsed());
 
 			float Regeneration = VoreInfo.Restore_Power;
 			float Recorded_Scale = VoreInfo.Scale;
@@ -195,7 +195,7 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-				float timepassed = Time::WorldTimeElapsed() - start_time;
+				float timepassed = static_cast<float>(Time::WorldTimeElapsed()) - start_time;
 
 				float reduction = std::clamp(get_visual_scale(giantref) / tinySize_Grow, 1.0f, 10.0f);
 				float regen_attributes = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006f;
@@ -271,7 +271,7 @@ namespace Gts {
 				SurvivalMode_AdjustHunger(this->giant.get().get(), Vore::GetSingleton().ReadOriginalScale(tiny) * GetSizeFromBoundingBox(tiny), Living, false);
 			}
 
-			Task_Vore_StartVoreBuff(giant, tiny, this->tinies.size());
+			Task_Vore_StartVoreBuff(giant, tiny, static_cast<int>(this->tinies.size()));
 			VoreMessage_SwallowedAbsorbing(giant, tiny);
 		}
 	}
@@ -650,14 +650,14 @@ namespace Gts {
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
 
 		if (IsInsect(prey, true) || IsBlacklisted(prey) || IsUndead(prey, true)) {
-			std::string_view message = std::format("{} has no desire to eat {}", pred->GetDisplayFullName(), prey->GetDisplayFullName());
+			std::string_view message = fmt::format("{} has no desire to eat {}", pred->GetDisplayFullName(), prey->GetDisplayFullName());
 			NotifyWithSound(pred, message);
 			return false;
 		}
 
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_VORE_SCALE) {
 			if (pred->formID == 0x14) {
-				std::string_view message = std::format("{} is too big to be eaten: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_VORE_SCALE);
+				std::string_view message = fmt::format("{} is too big to be eaten: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_VORE_SCALE);
 				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {

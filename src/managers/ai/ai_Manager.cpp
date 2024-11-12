@@ -87,7 +87,7 @@ namespace {
 			}
 		}
 		if (!AbleToVore.empty()) {
-			int idx = RandomInt(0, AbleToVore.size() -1);
+			int idx = RandomInt(0, static_cast<int>(AbleToVore.size()) -1);
 			Actor* voreActor = AbleToVore[idx];
 			if (voreActor) {
 				AI_PerformRandomVore(voreActor);
@@ -128,7 +128,7 @@ namespace Gts {
 						}
 					}
 					if (!AbleToAct.empty()) {
-						int idx = RandomInt(0, AbleToAct.size() - 1);
+						int idx = RandomInt(0, static_cast<int>(AbleToAct.size()) - 1);
 						Actor* Performer = AbleToAct[idx];
 						if (Performer) {
 							AI_TryAction(Performer);
