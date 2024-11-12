@@ -77,12 +77,12 @@ namespace Gts {
 
 	float HighHeelOffset() {
 		Actor* player = PlayerCharacter::GetSingleton();
-		float hh = 0.0;
+		float hh = 0.0f;
 		if (player) {
 			hh = HighHeelManager::GetBaseHHOffset(player).z;
 			hh *= HighHeelManager::GetHHMultiplier(player);
 			if (IsFootGrinding(player) || IsTrampling(player) || IsStomping(player) || IsVoring(player)) {
-				hh = 0.0;
+				hh = 0.0f;
 			}
 		}
 		return hh;
@@ -103,7 +103,7 @@ namespace Gts {
 		if (setting) {
 			return setting->data.f;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	void EnsureINIFloat(std::string_view name, float value) {
@@ -122,16 +122,16 @@ namespace Gts {
 	}
 
 	void ResetIniSettings() {
-		EnsureINIFloat("fOverShoulderPosX:Camera", 30.0);
-		EnsureINIFloat("fOverShoulderPosY:Camera", 30.0);
-		EnsureINIFloat("fOverShoulderPosZ:Camera", -10.0);
-		EnsureINIFloat("fOverShoulderCombatPosX:Camera", 0.0);
-		EnsureINIFloat("fOverShoulderCombatPosY:Camera", 0.0);
-		EnsureINIFloat("fOverShoulderCombatPosZ:Camera", 20.0);
-		EnsureINIFloat("fVanityModeMaxDist:Camera", 600.0);
-		EnsureINIFloat("fVanityModeMinDist:Camera", 155.0);
-		EnsureINIFloat("fMouseWheelZoomSpeed:Camera", 0.8000000119);
-		EnsureINIFloat("fMouseWheelZoomIncrement:Camera", 0.075000003);
+		EnsureINIFloat("fOverShoulderPosX:Camera", 30.0f);
+		EnsureINIFloat("fOverShoulderPosY:Camera", 30.0f);
+		EnsureINIFloat("fOverShoulderPosZ:Camera", -10.0f);
+		EnsureINIFloat("fOverShoulderCombatPosX:Camera", 0.0f);
+		EnsureINIFloat("fOverShoulderCombatPosY:Camera", 0.0f);
+		EnsureINIFloat("fOverShoulderCombatPosZ:Camera", 20.0f);
+		EnsureINIFloat("fVanityModeMaxDist:Camera", 600.0f);
+		EnsureINIFloat("fVanityModeMinDist:Camera", 155.0f);
+		EnsureINIFloat("fMouseWheelZoomSpeed:Camera", 0.8000000119f);
+		EnsureINIFloat("fMouseWheelZoomIncrement:Camera", 0.075000003f);
 		UpdateThirdPerson();
 	}
 
@@ -325,7 +325,7 @@ namespace Gts {
 					if (model) {
 						NiPoint3 cameraLocation = GetCameraPosition();
 						auto playerTrans = model->world;
-						playerTrans.scale = model->parent ? model->parent->world.scale : 1.0; // Only do translation/rotation
+						playerTrans.scale = model->parent ? model->parent->world.scale : 1.0f; // Only do translation/rotation
 						auto playerTransInve = playerTrans.Invert();
 						// Get Scaled Camera Location
 						return playerTransInve*cameraLocation;
@@ -350,17 +350,17 @@ namespace Gts {
 
 		float tmp1 = q.x*q.y;
 		float tmp2 = q.z*q.w;
-		float m10 = 2.0 * (tmp1 + tmp2)*invs;
-		float m01 = 2.0 * (tmp1 - tmp2)*invs;
+		float m10 = 2.0f * (tmp1 + tmp2)*invs;
+		float m01 = 2.0f * (tmp1 - tmp2)*invs;
 
 		tmp1 = q.x*q.z;
 		tmp2 = q.y*q.w;
-		float m20 = 2.0 * (tmp1 - tmp2)*invs;
-		float m02 = 2.0 * (tmp1 + tmp2)*invs;
+		float m20 = 2.0f * (tmp1 - tmp2)*invs;
+		float m02 = 2.0f * (tmp1 + tmp2)*invs;
 		tmp1 = q.y*q.z;
 		tmp2 = q.x*q.w;
-		float m21 = 2.0 * (tmp1 + tmp2)*invs;
-		float m12 = 2.0 * (tmp1 - tmp2)*invs;
+		float m21 = 2.0f * (tmp1 + tmp2)*invs;
+		float m12 = 2.0f * (tmp1 - tmp2)*invs;
 
 		return NiMatrix3(
 			NiPoint3(m00, m01, m02),
@@ -393,7 +393,7 @@ namespace Gts {
 				return tpState->currentZoomOffset;
 			}
 		}
-		return 0.0;
+		return 0.0f;
 	}
 	float MaxZoom() {
 		return GetINIFloat("fVanityModeMaxDist:Camera");
@@ -405,7 +405,7 @@ namespace Gts {
 		NiMatrix3 cameraRotMat = GetCameraRotation();
 
 		float zoomOffset = ZoomFactor() * MaxZoom() * zoomScale;
-		NiPoint3 zoomOffsetVec = NiPoint3(0.0, zoomOffset, 0.0);
+		NiPoint3 zoomOffsetVec = NiPoint3(0.0f, zoomOffset, 0.0f);
 		return cameraRotMat * zoomOffsetVec + cameraTrans;
 	}
 
@@ -415,7 +415,7 @@ namespace Gts {
 		auto player = GetCameraActor();
 		auto currentState = camera->currentState;
 
-		float value = Runtime::GetFloatOr("cameraAlternateX", 1.0);
+		float value = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
 
 		if (cameraRoot) {
 			if (currentState) {
@@ -427,13 +427,13 @@ namespace Gts {
 						auto model = player->Get3D(false);
 						if (model) {
 							auto playerTrans = model->world;
-							playerTrans.scale = model->parent ? model->parent->world.scale : 1.0;  // Only do translation/rotation
+							playerTrans.scale = model->parent ? model->parent->world.scale : 1.0f;  // Only do translation/rotation
 							auto playerTransInve = playerTrans.Invert();
 
 							// Make the transform matrix for our changes
 							NiTransform adjustments = NiTransform();
 							adjustments.scale = scale;
-							// Adjust by scale reports 1.0 / naturalscale (Which includes RaceMenu and GetScale)
+							// Adjust by scale reports 1.0f / naturalscale (Which includes RaceMenu and GetScale)
 
 
 							adjustments.translate = playerLocalOffset;

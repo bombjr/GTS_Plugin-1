@@ -31,10 +31,10 @@ namespace Util {
 	}
 	inline glm::mat4 HkToGlm(const RE::hkTransform &transform) {
 		return glm::mat4(
-			glm::vec4(HkVecToGlmVec(transform.rotation.col0), 0.0),
-			glm::vec4(HkVecToGlmVec(transform.rotation.col1), 0.0),
-			glm::vec4(HkVecToGlmVec(transform.rotation.col2), 0.0),
-			glm::vec4(HkToGlm(transform.translation), 1.0)
+			glm::vec4(HkVecToGlmVec(transform.rotation.col0), 0.0f),
+			glm::vec4(HkVecToGlmVec(transform.rotation.col1), 0.0f),
+			glm::vec4(HkVecToGlmVec(transform.rotation.col2), 0.0f),
+			glm::vec4(HkToGlm(transform.translation), 1.0f)
 			);
 	}
 	inline glm::mat4 HkToGlm(const RE::hkQsTransform &transform) {
@@ -43,7 +43,7 @@ namespace Util {
 		return glm::translate(
 			(rotMat *
 			 glm::scale(
-				 glm::mat4(1.0),
+				 glm::mat4(1.0f),
 				 HkVecToGlmVec(transform.scale)
 				 )
 			),
@@ -56,7 +56,7 @@ namespace Util {
 	}
 
 	inline glm::vec3 ApplyTransform(glm::vec3 vec, glm::mat4 mat) {
-		return glm::vec3(mat * glm::vec4(vec, 1.0));
+		return glm::vec3(mat * glm::vec4(vec, 1.0f));
 	}
 
 	inline bool IsRoughlyEqual(float first, float second, float maxDif)
@@ -168,10 +168,10 @@ namespace Gts {
 
 	inline glm::mat4 Ni2Glm(const RE::NiTransform &transform) {
 		return glm::mat4(
-			glm::vec4(transform.rotate.entry[0][0], transform.rotate.entry[0][1], transform.rotate.entry[0][2], 0.0),
-			glm::vec4(transform.rotate.entry[1][0], transform.rotate.entry[1][1], transform.rotate.entry[1][2], 0.0),
-			glm::vec4(transform.rotate.entry[2][0], transform.rotate.entry[2][1], transform.rotate.entry[2][2], 0.0),
-			glm::vec4(transform.translate[0], transform.translate[1], transform.translate[2], 1.0)
+			glm::vec4(transform.rotate.entry[0][0], transform.rotate.entry[0][1], transform.rotate.entry[0][2], 0.0f),
+			glm::vec4(transform.rotate.entry[1][0], transform.rotate.entry[1][1], transform.rotate.entry[1][2], 0.0f),
+			glm::vec4(transform.rotate.entry[2][0], transform.rotate.entry[2][1], transform.rotate.entry[2][2], 0.0f),
+			glm::vec4(transform.translate[0], transform.translate[1], transform.translate[2], 1.0f)
 			);
 	}
 }

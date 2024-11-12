@@ -44,7 +44,7 @@ namespace Gts {
 			TempActorData result;
 			auto bound_values = get_bound_values(actor);
 			auto scale = get_scale(actor);
-			if (scale < 0.0) {
+			if (scale < 0.0f) {
 				log::info("Scale of {} is < 0", actor->GetDisplayFullName());
 				return nullptr;
 			}
@@ -52,21 +52,21 @@ namespace Gts {
 			float base_height_meters = unit_to_meter(base_height_unit);
 			float fall_start = actor->GetPosition()[2];
 			float last_set_fall_start = fall_start;
-			float carryweight_boost = 0.0;
-			float health_boost = 0.0;
-			float SMT_Bonus_Duration = 0.0;
-			float SMT_Penalty_Duration = 0.0;
-			float FallTimer = 1.0;
-			float Hug_AnimSpeed = 1.0;
-			float Throw_Speed = 0.0;
+			float carryweight_boost = 0.0f;
+			float health_boost = 0.0f;
+			float SMT_Bonus_Duration = 0.0f;
+			float SMT_Penalty_Duration = 0.0f;
+			float FallTimer = 1.0f;
+			float Hug_AnimSpeed = 1.0f;
+			float Throw_Speed = 0.0f;
 
-			float potion_max_size = 0.0;
-			float buttcrush_max_size = 0.0;
-			float buttcrush_start_scale = 0.0;
+			float potion_max_size = 0.0f;
+			float buttcrush_max_size = 0.0f;
+			float buttcrush_start_scale = 0.0f;
 
-			float SizeVulnerability = 0.0;
+			float SizeVulnerability = 0.0f;
 
-			float push_force = 1.0;
+			float push_force = 1.0f;
 			
 			bool Throw_WasThrown = false;
 
@@ -93,16 +93,14 @@ namespace Gts {
 			bool disable_collision = false;
 			bool was_sneaking = false;
 
-			float IsNotImmune = 1.0;
+			float IsNotImmune = 1.0f;
 
-			float rip_lastScale = 1.0;
+			NiPoint3 POS_Last_Leg_L = NiPoint3(0.0f, 0.0f, 0.0f);
+			NiPoint3 POS_Last_Leg_R = NiPoint3(0.0f, 0.0f, 0.0f);
+			NiPoint3 POS_Last_Hand_L = NiPoint3(0.0f, 0.0f, 0.0f);
+			NiPoint3 POS_Last_Hand_R = NiPoint3(0.0f, 0.0f, 0.0f);
 
-			NiPoint3 POS_Last_Leg_L = NiPoint3(0.0, 0.0, 0.0);
-			NiPoint3 POS_Last_Leg_R = NiPoint3(0.0, 0.0, 0.0);
-			NiPoint3 POS_Last_Hand_L = NiPoint3(0.0, 0.0, 0.0);
-			NiPoint3 POS_Last_Hand_R = NiPoint3(0.0, 0.0, 0.0);
-
-			float shrink_until = 0.0;
+			float shrink_until = 0.0f;
 
 			Actor* IsInControl = nullptr;
 
@@ -113,20 +111,20 @@ namespace Gts {
 
 			AttachToNode AttachmentNode = AttachToNode::None;
 
-			float otherScales = 1.0;
-			float vore_recorded_scale = 1.0;
+			float otherScales = 1.0f;
+			float vore_recorded_scale = 1.0f;
 			float WorldFov_Default = 0;
 			float FpFov_Default = 0;
 			float ButtCrushGrowthAmount = 0;
-			float MovementSlowdown = 1.0;
-			float ShrinkResistance = 0.0;
-			float MightValue = 0.0;
-			float Shrink_Ticks = 0.0;
-			float Shrink_Ticks_Calamity = 0.0;
+			float MovementSlowdown = 1.0f;
+			float ShrinkResistance = 0.0f;
+			float MightValue = 0.0f;
+			float Shrink_Ticks = 0.0f;
+			float Shrink_Ticks_Calamity = 0.0f;
 			
 
-			float Perk_BonusActionSpeed = 1.0;
-			float Perk_lifeForceStolen = 0.0;
+			float Perk_BonusActionSpeed = 1.0f;
+			float Perk_lifeForceStolen = 0.0f;
 			int Perk_lifeForceStacks = 0;
 
 			int CrushedTinies = 0;
@@ -137,13 +135,13 @@ namespace Gts {
 			float base_volume = bound_values[0] * bound_values[1] * bound_values[2] * scale * scale * scale;
 			float base_volume_meters = unit_to_meter(base_volume);
 
-			const float rip_initScale = -1.0;
+			const float rip_initScale = -1.0f;
 
 			result.base_height = base_height_meters;
 			result.base_volume = base_volume_meters;
 
 			auto shoe = actor->GetWornArmor(BGSBipedObjectForm::BipedObjectSlot::kFeet);
-			float shoe_weight = 1.0;
+			float shoe_weight = 1.0f;
 			if (shoe) {
 				shoe_weight = shoe->weight;
 			}
@@ -258,7 +256,7 @@ namespace Gts {
 			try {
 				auto data = this->_actor_data.at(key);
 				auto shoe = actor->GetWornArmor(BGSBipedObjectForm::BipedObjectSlot::kFeet);
-				float shoe_weight = 1.0;
+				float shoe_weight = 1.0f;
 				if (shoe) {
 					shoe_weight = shoe->weight;
 				}

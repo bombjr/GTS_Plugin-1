@@ -21,21 +21,21 @@ using namespace Gts;
 namespace {
     void PlayGoreEffects(Actor* tiny, Actor* giant) {
         if (!IsLiving(tiny)) {
-            SpawnDustParticle(tiny, giant, "NPC Root [Root]", 3.0);
+            SpawnDustParticle(tiny, giant, "NPC Root [Root]", 3.0f);
         } else {
             if (!LessGore()) {
                 auto root = find_node(tiny, "NPC Root [Root]");
                 if (root) {
                     float currentSize = get_visual_scale(tiny);
-                    SpawnParticle(tiny, 0.60, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 1.25, 7, root);
-                    SpawnParticle(tiny, 0.60, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 1.25, 7, root);
-                    SpawnParticle(tiny, 0.60, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 1.25, 7, root);
-                    SpawnParticle(tiny, 0.60, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 1.25, 7, root);
-                    SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, currentSize * 12.5, 7, root);
+                    SpawnParticle(tiny, 0.60f, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 1.25f, 7, root);
+                    SpawnParticle(tiny, 0.60f, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 1.25f, 7, root);
+                    SpawnParticle(tiny, 0.60f, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 1.25f, 7, root);
+                    SpawnParticle(tiny, 0.60f, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 1.25f, 7, root);
+                    SpawnParticle(tiny, 1.20f, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, currentSize * 12.5f, 7, root);
                 }
             }
             Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, true);
-            Runtime::CreateExplosion(tiny, get_visual_scale(tiny) * 0.5, "BloodExplosion");
+            Runtime::CreateExplosion(tiny, get_visual_scale(tiny) * 0.5f, "BloodExplosion");
         }
     }
 }
@@ -87,7 +87,7 @@ namespace Gts {
                         Disintegrate(tiny); // Set critical stage 4 on actors
                     } else if (tiny->formID == 0x14) {
                         TriggerScreenBlood(50);
-                        tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+                        tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
                     }
 
                     data.state = OverkillState::Overkilled;
@@ -140,7 +140,7 @@ namespace Gts {
 	}
 
 	OverkillData::OverkillData(Actor* giant) :
-		delay(Timer(0.01)),
+		delay(Timer(0.01f)),
 		state(OverkillState::Healthy),
 		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
 	}

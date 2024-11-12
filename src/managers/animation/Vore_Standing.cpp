@@ -94,7 +94,7 @@ namespace {
 			if (!once) {
 				Rumbling::Start(rumbleName, &actor, power,  halflife, node_name);
 			} else {
-				Rumbling::Once(rumbleName, &actor, power, halflife, node_name, 0.0);
+				Rumbling::Once(rumbleName, &actor, power, halflife, node_name, 0.0f);
 			}
 		}
 	}
@@ -140,7 +140,7 @@ namespace {
 		if (!Runtime::GetBool("FreeLookOnVore") && giant->formID == 0x14) {
 			ManageCamera(giant, true, CameraTracking::Hand_Right);
 		}
-		StartBodyRumble("BodyRumble", data.giant, 0.15, 0.10, false);
+		StartBodyRumble("BodyRumble", data.giant, 0.15f, 0.10f, false);
 
 		Task_HighHeel_SyncVoreAnim(giant);
 
@@ -156,24 +156,24 @@ namespace {
 		
 		float shake_power = Rumble_Vore_Stomp_Light * GetHighHeelsBonusDamage(&data.giant, true);
 		if (HasSMT(&data.giant)) {
-			shake_power *= 2.0;
+			shake_power *= 2.0f;
 		}
-		Rumbling::Once("StompLS", &data.giant, shake_power, 0.05, LNode,  0.0);
+		Rumbling::Once("StompLS", &data.giant, shake_power, 0.05f, LNode,  0.0f);
 		
-		DoFootstepSound(&data.giant, 0.90, FootEvent::Left, LNode);
-		DoDustExplosion(&data.giant, 0.90, FootEvent::Left, LNode);
-		DoDamageEffect(&data.giant, Damage_Vore_Standing_Footstep, Radius_Vore_Standing_Footstep, 30, 0.25, FootEvent::Left, 1.0, DamageSource::CrushedLeft);
-		DoLaunch(&data.giant, 0.50, 1.20, FootEvent::Left);
+		DoFootstepSound(&data.giant, 0.90f, FootEvent::Left, LNode);
+		DoDustExplosion(&data.giant, 0.90f, FootEvent::Left, LNode);
+		DoDamageEffect(&data.giant, Damage_Vore_Standing_Footstep, Radius_Vore_Standing_Footstep, 30, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft);
+		DoLaunch(&data.giant, 0.50f, 1.20f, FootEvent::Left);
 		
 	}
 
 	void GTSvore_sit_end(AnimationEventData& data) {
 		Rumbling::Stop("BodyRumble", &data.giant);
-		AdjustFacialExpression(&data.giant, 2, 1.0, "expression"); // smile (expression)
+		AdjustFacialExpression(&data.giant, 2, 1.0f, "expression"); // smile (expression)
 	}
 
 	void GTSvore_hand_extend(AnimationEventData& data) {
-		StartRHandRumble("HandR", data.giant, 0.25, 0.15);
+		StartRHandRumble("HandR", data.giant, 0.25f, 0.15f);
 		auto& VoreData = Vore::GetSingleton().GetVoreData(&data.giant);
 		for (auto& tiny: VoreData.GetVories()) {
 			tiny->NotifyAnimationGraph("GTS_ExitFear");
@@ -200,17 +200,17 @@ namespace {
 	}
 
 	void GTSvore_bringactor_start(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 3, 0.8, "phenome"); // Smile a bit (Mouth)
-		StartRHandRumble("HandR", data.giant, 0.2, 0.175);
+		AdjustFacialExpression(&data.giant, 3, 0.8f, "phenome"); // Smile a bit (Mouth)
+		StartRHandRumble("HandR", data.giant, 0.2f, 0.175f);
 	}
 
 	void GTSvore_open_mouth(AnimationEventData& data) {
 		auto giant = &data.giant;
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
-		Task_FacialEmotionTask_OpenMouth(giant, 0.75 / AnimationManager::GetAnimSpeed(giant), "StandingVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.75f / AnimationManager::GetAnimSpeed(giant), "StandingVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
-			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1);
+			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
 		}
 	}
 
@@ -234,13 +234,13 @@ namespace {
 				CallDevourment(giant, tiny);
 			} 
 		} else {
-			Runtime::PlaySoundAtNode("VoreSwallow", giant, 1.0, 1.0, "NPC Head [Head]"); // Play sound
+			Runtime::PlaySoundAtNode("VoreSwallow", giant, 1.0f, 1.0f, "NPC Head [Head]"); // Play sound
 			VoreData.Swallow();
 		}
 	}
 
 	void GTSvore_swallow_sound(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 3, 0.0, "phenome"); // Remove smile (Mouth)
+		AdjustFacialExpression(&data.giant, 3, 0.0f, "phenome"); // Remove smile (Mouth)
 	}
 
 	void GTSvore_close_mouth(AnimationEventData& data) {
@@ -249,8 +249,8 @@ namespace {
 
 		VoreData.EnableMouthShrinkZone(false);
 
-		std::string name_1 = std::format("Phenome_{}_{}_{}", giant->formID, 0, 1.0);
-		std::string name_2 = std::format("Phenome_{}_{}_{}", giant->formID, 1, 0.5);
+		std::string name_1 = std::format("Phenome_{}_{}_{}", giant->formID, 0, 1.0f);
+		std::string name_2 = std::format("Phenome_{}_{}_{}", giant->formID, 1, 0.5f);
 
 		TaskManager::Cancel(name_1);
 		TaskManager::Cancel(name_2);
@@ -268,13 +268,13 @@ namespace {
 		/*if (!AllowDevourment()) {
 			
 		}*/
-		AdjustFacialExpression(giant, 0, 0.0, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.0, "modifier"); // blink R
-		StartRHandRumble("HandR", data.giant, 0.20, 0.15);
+		AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
+		StartRHandRumble("HandR", data.giant, 0.20f, 0.15f);
 	}
 
 	void GTSvore_handL_reposition_S(AnimationEventData& data) {
-		StartLHandRumble("HandL", data.giant, 0.20, 0.15);
+		StartLHandRumble("HandL", data.giant, 0.20f, 0.15f);
 	}
 
 	void GTSvore_handR_reposition_E(AnimationEventData& data) {
@@ -287,7 +287,7 @@ namespace {
 
 	void GTSvore_eat_actor(AnimationEventData& data) {
 		auto& VoreData = Vore::GetSingleton().GetVoreData(&data.giant);
-		AdjustFacialExpression(&data.giant, 2, 0.0, "expression"); // Remove smile
+		AdjustFacialExpression(&data.giant, 2, 0.0f, "expression"); // Remove smile
 		VoreData.KillAll();
 	}
 
@@ -296,7 +296,7 @@ namespace {
 
 	void GTSvore_standup_start(AnimationEventData& data) {
 		auto giant = &data.giant;
-		StartBodyRumble("BodyRumble", data.giant, 0.15, 0.10, false);
+		StartBodyRumble("BodyRumble", data.giant, 0.15f, 0.10f, false);
 		if (!Runtime::GetBool("FreeLookOnVore") && giant->formID == 0x14) {
 			ManageCamera(giant, false, CameraTracking::Hand_Right);
 			ManageCamera(giant, false, CameraTracking::VoreHand_Right);
@@ -304,12 +304,12 @@ namespace {
 	}
 
 	void GTSvore_impactRS(AnimationEventData& data) {
-		Rumbling::Once("StompRS", &data.giant, 0.95, 0.05, RNode, 0.0);
+		Rumbling::Once("StompRS", &data.giant, 0.95f, 0.05f, RNode, 0.0f);
 		float perk = GetPerkBonus_Basics(&data.giant);
-		DoFootstepSound(&data.giant, 0.90, FootEvent::Right, RNode);
-		DoDustExplosion(&data.giant, 0.90, FootEvent::Right, RNode);
-		DoDamageEffect(&data.giant, Damage_Vore_Standing_Footstep, Radius_Vore_Standing_Footstep, 30, 0.25, FootEvent::Right, 1.0, DamageSource::CrushedRight);
-		DoLaunch(&data.giant, 0.70 * perk, 1.20 * data.animSpeed, FootEvent::Right);
+		DoFootstepSound(&data.giant, 0.90f, FootEvent::Right, RNode);
+		DoDustExplosion(&data.giant, 0.90f, FootEvent::Right, RNode);
+		DoDamageEffect(&data.giant, Damage_Vore_Standing_Footstep, Radius_Vore_Standing_Footstep, 30, 0.25f, FootEvent::Right, 1.0f, DamageSource::CrushedRight);
+		DoLaunch(&data.giant, 0.70f * perk, 1.20f * data.animSpeed, FootEvent::Right);
 	}
 
 	void GTSvore_standup_end(AnimationEventData& data) {

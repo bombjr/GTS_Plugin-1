@@ -36,7 +36,7 @@ namespace {
 	void SpawnRuneOnTiny(Actor* tiny) {
 		auto node = find_node(tiny, "NPC Root [Root]");
 		if (node) {
-			SpawnParticle(tiny, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), node->world.translate, 1.0, 7, node); 
+			SpawnParticle(tiny, 3.00f, "GTS/gts_tinyrune.nif", NiMatrix3(), node->world.translate, 1.0f, 7, node); 
 		}
 	}
 
@@ -60,7 +60,7 @@ namespace {
 					node->local.scale = std::clamp(0.60f - timepassed, 0.01f, 1.0f);
 					update_node(node);
 				}
-				if (timepassed >= 0.98) {
+				if (timepassed >= 0.98f) {
 					return false; // end it
 				}
 				return true;
@@ -79,7 +79,7 @@ namespace {
                     node->local.scale *= scale;
 					update_node(node);
 				}
-				if (timepassed >= 1.0) {
+				if (timepassed >= 1.0f) {
 					return false; // end it
 				}
 				return true;
@@ -90,10 +90,10 @@ namespace {
     void GTS_TC_RuneStart(AnimationEventData& data) {
         auto node = find_node(&data.giant, "ShrinkRune-Obj", false);
         if (node) {
-            node->local.scale = 0.01;
+            node->local.scale = 0.01f;
             update_node(node);
         }
-        AttachRune(&data.giant, false, 0.6, 0.70);
+        AttachRune(&data.giant, false, 0.6f, 0.70f);
     }
 
 	void GTS_TC_ReadySound(AnimationEventData& data) {
@@ -101,17 +101,17 @@ namespace {
 		std::string name = std::format("Calamity_{}_{}", giant->formID, false);
 		TaskManager::Cancel(name);
 
-		Runtime::PlaySoundAtNode("TinyCalamity_ReadyRune", giant, 1.0, 1.0, "NPC R Hand [RHnd]");
+		Runtime::PlaySoundAtNode("TinyCalamity_ReadyRune", giant, 1.0f, 1.0f, "NPC R Hand [RHnd]");
 
 		auto node = find_node(&data.giant, "ShrinkRune-Obj", false);
         if (node) {
-            node->local.scale = 0.60;
+            node->local.scale = 0.60f;
             update_node(node);
         }
 		if (giant->formID == 0x14) {
-			shake_camera(giant, 0.80, 0.35);
+			shake_camera(giant, 0.80f, 0.35f);
 		} else {
-			Rumbling::Once("Calamity_R", giant, 4.25, 0.15, "NPC R Hand [RHnd]", 0.0);
+			Rumbling::Once("Calamity_R", giant, 4.25f, 0.15f, "NPC R Hand [RHnd]", 0.0f);
 		}
 	}
 
@@ -121,15 +121,15 @@ namespace {
 			if (victims.size() > 0 && victim) {
 				SpawnRuneOnTiny(victim);
 				float until = Animation_TinyCalamity::GetShrinkUntil(victim);
-				ShrinkUntil(&data.giant, victim, until, 0.26, false);
+				ShrinkUntil(&data.giant, victim, until, 0.26f, false);
 				StartCombat(victim, &data.giant);
 
-				ChanceToScare(&data.giant, victim, 6, 6.0, false); // chance to force actor to flee 
+				ChanceToScare(&data.giant, victim, 6.0f, 6, false); // chance to force actor to flee 
 
-				slow_down(victim, 0.60); // decrease MS by 60%
+				slow_down(victim, 0.60f); // decrease MS by 60%
 
-				Runtime::PlaySoundAtNode("TinyCalamity_SpawnRune", victim, 1.0, 1.0, "NPC Root [Root]");
-				Runtime::PlaySoundAtNode("TinyCalamity_AbsorbTiny", victim, 1.0, 1.0, "NPC Root [Root]");
+				Runtime::PlaySoundAtNode("TinyCalamity_SpawnRune", victim, 1.0f, 1.0f, "NPC Root [Root]");
+				Runtime::PlaySoundAtNode("TinyCalamity_AbsorbTiny", victim, 1.0f, 1.0f, "NPC Root [Root]");
 			}
 		}
 	}
@@ -138,10 +138,10 @@ namespace {
 		auto victims = Animation_TinyCalamity::GetShrinkActors(&data.giant);
 		for (auto victim: victims) {
 			if (victims.size() > 0 && victim) {
-				slow_down(victim, -0.60); // restore normal MS
+				slow_down(victim, -0.60f); // restore normal MS
 			}
 		}
-        AttachRune(&data.giant, true, 1.4, 0.60);
+        AttachRune(&data.giant, true, 1.4f, 0.60f);
     }
 
 	void GTS_TC_ShrinkStop(AnimationEventData& data) {
@@ -206,6 +206,6 @@ namespace Gts
 		if (tranData_tiny) {
 			return tranData_tiny->shrink_until;
 		}
-		return 1.0;
+		return 1.0f;
     }
 }

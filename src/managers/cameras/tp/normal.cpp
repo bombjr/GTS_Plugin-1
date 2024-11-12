@@ -40,8 +40,8 @@ namespace Gts {
 
 	// fVanityModeMaxDist:Camera Changes The Offset Value We Need So we need to take this value into account;
 	void Normal::SetZOff(float Offset) {
-		//The 0.15 was found through testing different fVanityModeMaxDist values
-		Normal::ZOffset = Offset - (0.15 * Gts::MaxZoom());
+		//The 0.15f was found through testing different fVanityModeMaxDist values
+		Normal::ZOffset = Offset - (0.15f * Gts::MaxZoom());
 	}
 
 	BoneTarget Normal::GetBoneTarget() {
@@ -67,7 +67,7 @@ namespace Gts {
 							"NPC L Butt",
 							"NPC R Butt",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::Knees: {
@@ -76,7 +76,7 @@ namespace Gts {
 							"NPC L Calf [LClf]",
 							"NPC R Calf [RClf]",
 						},
-							.zoomScale = 1.25,
+							.zoomScale = 1.25f,
 					};
 				}
 				case CameraTracking::Breasts_02: {
@@ -85,7 +85,7 @@ namespace Gts {
 							"L Breast02",
 							"R Breast02",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::Thigh_Crush: {
@@ -96,7 +96,7 @@ namespace Gts {
 							"NPC L PreRearCalf",
 							"NPC L Foot [Lft ]",
 						},
-							.zoomScale = 1.00,
+							.zoomScale = 1.00f,
 					};
 				}
 				case CameraTracking::Thigh_Sandwich: {
@@ -104,7 +104,7 @@ namespace Gts {
 							.boneNames = {
 							"AnimObjectA",
 						},
-							.zoomScale = 1.00,
+							.zoomScale = 1.00f,
 					};
 				}
 				case CameraTracking::Hand_Right: {
@@ -112,7 +112,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC R Hand [RHnd]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::Hand_Left: {
@@ -120,7 +120,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC L Hand [LHnd]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::Grab_Left: {
@@ -128,7 +128,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC L Finger02 [LF02]",
 						},
-							.zoomScale = 0.60,
+							.zoomScale = 0.60f,
 					};
 				}
 				case CameraTracking::L_Foot: {
@@ -136,7 +136,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC L Foot [Lft ]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::R_Foot: {
@@ -144,7 +144,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC R Foot [Rft ]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking::Mid_Butt_Legs: {
@@ -155,7 +155,7 @@ namespace Gts {
 							"NPC L Foot [Lft ]",
 							"NPC R Foot [Rft ]",
 						},
-							.zoomScale = 1.25,
+							.zoomScale = 1.25f,
 					};
 				}
 				case CameraTracking::VoreHand_Right: {
@@ -163,7 +163,7 @@ namespace Gts {
 							.boneNames = {
 							"AnimObjectA",
 						},
-							.zoomScale = 1.25,
+							.zoomScale = 1.25f,
 					};
 				}
 				case CameraTracking::Finger_Right: {
@@ -171,7 +171,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC R Finger12 [RF12]",
 						},
-							.zoomScale = 0.60,
+							.zoomScale = 0.60f,
 					};
 				}
 				case CameraTracking::Finger_Left: {
@@ -179,7 +179,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC L Finger12 [LF12]",
 						},
-							.zoomScale = 0.60,
+							.zoomScale = 0.60f,
 					};
 				}
 				case CameraTracking::ObjectA: {
@@ -187,7 +187,7 @@ namespace Gts {
 							.boneNames = {
 							"AnimObjectA",
 						},
-							.zoomScale = 1.0,
+							.zoomScale = 1.0f,
 					};
 				}
 				case CameraTracking::ObjectB: {
@@ -195,7 +195,7 @@ namespace Gts {
 							.boneNames = {
 							"AnimObjectB",
 						},
-							.zoomScale = 1.0,
+							.zoomScale = 1.0f,
 					};
 				}
 			}
@@ -210,7 +210,7 @@ namespace Gts {
 							"NPC Spine2 [Spn2]",
 							"NPC Neck [Neck]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Clavicle: {
@@ -219,7 +219,7 @@ namespace Gts {
 							"NPC R Clavicle [RClv]",
 							"NPC L Clavicle [LClv]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Breasts_01: {
@@ -228,7 +228,7 @@ namespace Gts {
 							"NPC L Breast",
 							"NPC R Breast",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Breasts_02: {
@@ -237,7 +237,7 @@ namespace Gts {
 							"L Breast02",
 							"R Breast02",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Breasts_03: {
@@ -246,7 +246,7 @@ namespace Gts {
 							"L Breast03",
 							"R Breast03",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Neck: {
@@ -254,7 +254,7 @@ namespace Gts {
 							.boneNames = {
 							"NPC Neck [Neck]",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 				case CameraTracking_MCM::Butt: {
@@ -263,7 +263,7 @@ namespace Gts {
 							"NPC L Butt",
 							"NPC R Butt",
 						},
-							.zoomScale = 0.75,
+							.zoomScale = 0.75f,
 					};
 				}
 			}

@@ -2,7 +2,7 @@
 //
 //  Module Enumeration Functions (modules.cpp of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0.1
+//  Microsoft Research Detours Package, Version 4.0f.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //

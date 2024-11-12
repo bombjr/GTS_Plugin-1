@@ -25,10 +25,10 @@
 #include "node.hpp"
 
 namespace {
-	const float MINIMUM_STOMP_DISTANCE = 50.0;
-	const float MINIMUM_STOMP_SCALE_RATIO = 1.5;
+	const float MINIMUM_STOMP_DISTANCE = 50.0f;
+	const float MINIMUM_STOMP_SCALE_RATIO = 1.5f;
 	const float STOMP_ANGLE = 50;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 
 	bool CanStompDead(Actor* tiny, float sizedifference) {
 		if (tiny->IsDead() && sizedifference < Action_Crush) {
@@ -59,7 +59,7 @@ namespace {
 		for (auto actor: find_actors()) {
 			if (actor->Is3DLoaded()) {
 				if (!actor->IsDead()) {
-					int Requirement = 14 * SizeManager::GetSingleton().BalancedMode();
+					int Requirement = 14 * static_cast<int>(SizeManager::GetSingleton().BalancedMode());
 
 					int random = RandomInt(0, Requirement);
 					int trigger_threshold = 2;
@@ -113,8 +113,8 @@ namespace Gts {
 
 	void AiManager::Update() {
 		auto profiler = Profilers::Profile("Ai: Update");
-		static Timer ActionTimer = Timer(0.80);
-		static Timer VoreTimer = Timer(2.50); // Random Vore once per 2.5 sec
+		static Timer ActionTimer = Timer(0.80f);
+		static Timer VoreTimer = Timer(2.50f); // Random Vore once per 2.5f sec
 		if (VoreTimer.ShouldRunFrame()) {
 			AI_ChanceToStartVore();
 		}
@@ -193,17 +193,17 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(STOMP_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(STOMP_ANGLE/2.0f));
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(STOMP_ANGLE*PI/180.0);
+			return cosTheta <= cos(STOMP_ANGLE*PI/180.0f);
 		}), preys.end());
 		// Reduce vector size
 
@@ -234,9 +234,9 @@ namespace Gts {
 		float pred_scale = get_visual_scale(pred);
 		float sizedifference = GetSizeDifference(pred, prey, SizeType::VisualScale, true, false);
 
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		if (IsCrawling(pred)) {
-			bonus = 2.0; // +100% stomp distance
+			bonus = 2.0f; // +100% stomp distance
 		}
 		if (!CanStompDead(prey, sizedifference)) { // We don't want the follower to be stuck stomping corpses that can't be crushed.
 			return false;
@@ -248,7 +248,7 @@ namespace Gts {
 		}
 		if (prey_distance <= (MINIMUM_STOMP_DISTANCE * pred_scale * bonus)
 		    && sizedifference > MINIMUM_STOMP_SCALE_RATIO
-		    && prey_distance > 25.0) { // We don't want the Stomp to be too close
+		    && prey_distance > 25.0f) { // We don't want the Stomp to be too close
 			return true;
 		} else {
 			return false;

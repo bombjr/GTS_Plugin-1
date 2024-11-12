@@ -408,7 +408,7 @@ namespace Gts {
 	bool Runtime::GetBoolOr(const std::string_view& tag, const bool& default_value) {
 		auto data = GetGlobal(tag);
 		if (data) {
-			return fabs(data->value - 0.0) > 1e-4;
+			return fabs(data->value - 0.0f) > 1e-4;
 		} else {
 			return default_value;
 		}
@@ -418,9 +418,9 @@ namespace Gts {
 		auto data = GetGlobal(tag);
 		if (data) {
 			if (value) {
-				data->value = 1.0;
+				data->value = 1.0f;
 			} else {
-				data->value = 0.0;
+				data->value = 0.0f;
 			}
 		}
 	}
@@ -432,7 +432,7 @@ namespace Gts {
 	int Runtime::GetIntOr(const std::string_view& tag, const int& default_value) {
 		auto data = GetGlobal(tag);
 		if (data) {
-			return data->value;
+			return static_cast<int>(data->value);
 		} else {
 			return default_value;
 		}
@@ -441,7 +441,7 @@ namespace Gts {
 	void Runtime::SetInt(const std::string_view& tag, const int& value) {
 		auto data = GetGlobal(tag);
 		if (data) {
-			data->value = value;
+			data->value = static_cast<float>(value);
 		}
 	}
 

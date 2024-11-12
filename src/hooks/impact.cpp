@@ -23,9 +23,9 @@ namespace Hooks
 							if (actor->formID == 0x14) {
 								float scale = get_visual_scale(actor);
 								if (HasSMT(actor)) {
-									scale *= 2.0;
+									scale *= 2.0f;
 								}
-								if (scale > 1.75) {
+								if (scale > 1.75f) {
 									//log::info("Disabling sounds for {}", actor->GetDisplayFullName());
 									data.playSound1 = false;
 									data.playSound2 = false;
@@ -55,7 +55,7 @@ namespace Hooks
 							log::info("Sound ID: {}", handle->soundID); // each next sound is ID + 1 or 2 so it's impossible to whitelist by ID...
 							log::info("Pad 05: {}", handle->pad05); // always 0
 							log::info("Pad 06: {}", handle->pad06); // always 0
-							if (get_visual_scale(actor) >= 1.5) {
+							if (get_visual_scale(actor) >= 1.5f) {
 								log::info("Disabling sounds for {}", actor->GetDisplayFullName());
 								//data.playSound1 = false;
 								//data.playSound2 = false;

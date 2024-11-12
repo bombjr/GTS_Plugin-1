@@ -46,7 +46,7 @@ namespace {
 
 			float timepassed = Finish - Start;
 
-			if (timepassed > 0.03) {
+			if (timepassed > 0.03f) {
 				LaunchTask(giant, radius, power, Event);
 				return false;
 			}
@@ -57,19 +57,19 @@ namespace {
 
 	void FootTrample_Stage1(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float smt = 1.0;
-		float dust = 1.0;
+		float smt = 1.0f;
+		float dust = 1.0f;
 		
 		if (HasSMT(giant)) {
-			dust = 1.25;
-			smt = 1.5;
+			dust = 1.25f;
+			smt = 1.5f;
 		}
 
 		float Start = Time::WorldTimeElapsed();
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		std::string taskname = std::format("TrampleAttack_{}", giant->formID);
 
-		TaskManager::RunFor(taskname, 1.0, [=](auto& update){ // Needed because anim has a bit wrong timing(s)
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has a bit wrong timing(s)
 			if (!giantHandle) {
 				return false;
 			}
@@ -77,19 +77,19 @@ namespace {
 			float Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 
-			if (Finish - Start > 0.06) { 
-				DoDamageEffect(giant, Damage_Trample * perk, Radius_Trample, 100, 0.10, Event, 1.10, Source);
-				DrainStamina(giant, "StaminaDrain_Trample", "DestructionBasics", true, 0.6); // start stamina drain
+			if (Finish - Start > 0.06f) { 
+				DoDamageEffect(giant, Damage_Trample * perk, Radius_Trample, 100, 0.10f, Event, 1.10f, Source);
+				DrainStamina(giant, "StaminaDrain_Trample", "DestructionBasics", true, 0.6f); // start stamina drain
 
 				float shake_power = Rumble_Trample_Stage1 * smt * GetHighHeelsBonusDamage(giant, true);
 				
-				Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 0.0);
+				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);
 				
 				DoDustExplosion(giant, dust * smt, Event, Node);
-				DoFootstepSound(giant, 1.0, Event, Node);
+				DoFootstepSound(giant, 1.0f, Event, Node);
 				
 				FootGrindCheck(giant, Radius_Trample, true, right);
-				DelayedLaunch(giant, 0.65 * perk, 1.15 * perk, Event);
+				DelayedLaunch(giant, 0.65f * perk, 1.15f * perk, Event);
 
 				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 
@@ -101,47 +101,47 @@ namespace {
 
 	void FootTrample_Stage2(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float dust = 1.15;
-		float smt = 1.0;
+		float dust = 1.15f;
+		float smt = 1.0f;
 		
 		if (HasSMT(giant)) {
-			smt = 1.5;
-			dust *= 1.25;
+			smt = 1.5f;
+			dust *= 1.25f;
 		}
 
 		float shake_power = Rumble_Trample_Stage2 * smt * GetHighHeelsBonusDamage(giant, true);
 
-		Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 1.1);
-		DoDamageEffect(giant, Damage_Trample_Repeat * perk, Radius_Trample_Repeat, 1, 0.12, Event, 1.10, Source);
-		DoFootstepSound(giant, 1.0, Event, Node);
+		Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.1f);
+		DoDamageEffect(giant, Damage_Trample_Repeat * perk, Radius_Trample_Repeat, 1, 0.12f, Event, 1.10f, Source);
+		DoFootstepSound(giant, 1.0f, Event, Node);
 		DoDustExplosion(giant, dust * smt, Event, Node);
-		DoLaunch(giant, 0.85 * perk, 1.85 * perk, Event);
-		DeplenishStamina(giant, 30.0);
+		DoLaunch(giant, 0.85f * perk, 1.85f * perk, Event);
+		DeplenishStamina(giant, 30.0f);
 
 		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
 	void FootTrample_Stage3(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float dust = 1.65;
-		float smt = 1.0;
+		float dust = 1.65f;
+		float smt = 1.0f;
 		
 		if (HasSMT(giant)) {
-			smt = 1.5;
-			dust *= 1.25;
+			smt = 1.5f;
+			dust *= 1.25f;
 		}
 
 		float shake_power = Rumble_Trample_Stage3 * smt * GetHighHeelsBonusDamage(giant, true);
 
-		Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 1.2);
-		DoDamageEffect(giant, Damage_Trample_Finisher * perk, Radius_Trample_Finisher, 1, 0.25, Event, 0.85, Source);
-		DoLaunch(giant, 1.25 * perk, 4.20 * perk, Event);
-		DoFootstepSound(giant, 1.15, Event, Node);
+		Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.2f);
+		DoDamageEffect(giant, Damage_Trample_Finisher * perk, Radius_Trample_Finisher, 1, 0.25f, Event, 0.85f, Source);
+		DoLaunch(giant, 1.25f * perk, 4.20f * perk, Event);
+		DoFootstepSound(giant, 1.15f, Event, Node);
 		DoDustExplosion(giant, dust * smt, Event, Node);
 
-		DeplenishStamina(giant, 100.0);
+		DeplenishStamina(giant, 100.0f);
 
-		FootStepManager::DoStrongSounds(giant, 1.25, Node);
+		FootStepManager::DoStrongSounds(giant, 1.25f, Node);
 		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
@@ -152,15 +152,15 @@ namespace {
 	void GTS_Trample_Leg_Raise_L(AnimationEventData& data) {
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		if (data.animSpeed == 1.0) {
-			data.animSpeed = 1.3;
+		if (data.animSpeed == 1.0f) {
+			data.animSpeed = 1.3f;
 		}
 	}
 	void GTS_Trample_Leg_Raise_R(AnimationEventData& data) {
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		if (data.animSpeed == 1.0) {
-			data.animSpeed = 1.3;
+		if (data.animSpeed == 1.0f) {
+			data.animSpeed = 1.3f;
 		}
 	}
 
@@ -173,17 +173,17 @@ namespace {
 
 	void GTS_Trample_Cam_End_L(AnimationEventData& data) {
 		ManageCamera(&data.giant, false, CameraTracking::L_Foot);
-		DrainStamina(&data.giant, "StaminaDrain_Trample", "DestructionBasics", false, 0.6);
+		DrainStamina(&data.giant, "StaminaDrain_Trample", "DestructionBasics", false, 0.6f);
 
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;
 		data.stage = 0;
 	}
 	void GTS_Trample_Cam_End_R(AnimationEventData& data) {
 		ManageCamera(&data.giant, false, CameraTracking::R_Foot);
-		DrainStamina(&data.giant, "StaminaDrain_Trample", "DestructionBasics", false, 0.6);
+		DrainStamina(&data.giant, "StaminaDrain_Trample", "DestructionBasics", false, 0.6f);
 
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;
 		data.stage = 0;
 	}
@@ -191,7 +191,7 @@ namespace {
 ////////////////////////////////////////////////////////////D A M A G E
 
 	void GTS_Trample_Footstep_L(AnimationEventData& data) { // Stage 1 footsteps
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;
 		data.stage = 0;
 
@@ -200,7 +200,7 @@ namespace {
 	void GTS_Trample_Footstep_R(AnimationEventData& data) { // stage 1 footsteps
 		FootTrample_Stage1(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "TrampleR");
 
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;
 		data.stage = 0;
 	}
@@ -210,8 +210,8 @@ namespace {
 
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		if (data.animSpeed == 1.0) {
-			data.animSpeed = 1.15;
+		if (data.animSpeed == 1.0f) {
+			data.animSpeed = 1.15f;
 		}
 	}
 
@@ -220,8 +220,8 @@ namespace {
 
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		if (data.animSpeed == 1.00) {
-			data.animSpeed = 1.15;
+		if (data.animSpeed == 1.00f) {
+			data.animSpeed = 1.15f;
 		}
 	}
 
@@ -244,7 +244,7 @@ namespace {
 		if (IsCrawling(player) || player->IsSneaking() || IsProning(player)) {
 			return;
 		}
-		float WasteStamina = 35.0 * GetWasteMult(player);
+		float WasteStamina = 35.0f * GetWasteMult(player);
 
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("TrampleL", player);
@@ -261,7 +261,7 @@ namespace {
 		if (IsCrawling(player) || player->IsSneaking() || IsProning(player)) {
 			return;
 		}
-		float WasteStamina = 35.0 * GetWasteMult(player);
+		float WasteStamina = 35.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("TrampleR", player);
 		} else {

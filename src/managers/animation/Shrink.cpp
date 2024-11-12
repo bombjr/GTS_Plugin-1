@@ -47,9 +47,9 @@ namespace {
 		float scale = get_visual_scale(actor);
 		float Volume = std::clamp(scale * 0.10f, 0.10f, 1.0f);
 			
-		Runtime::PlaySoundAtNode("shrinkSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]");
+		Runtime::PlaySoundAtNode("shrinkSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 
-		//SetHalfLife(actor, 0.0);
+		//SetHalfLife(actor, 0.0f);
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
@@ -57,7 +57,7 @@ namespace {
 			auto caster = gianthandle.get().get();
 			float timepassed = Time::WorldTimeElapsed() - Start;
 			float elapsed = std::clamp(timepassed * AnimationManager::GetAnimSpeed(caster), 0.01f, 1.2f);
-			float multiply = bezier_curve(elapsed, 0, 1.9, 0.6, 0, 2.0, 1.0);
+			float multiply = bezier_curve(elapsed, 0, 1.9f, 0.6f, 0, 2.0f, 1.0f);
 			//                            ^value   x1  x2  x3  x4  i     k
 
 			float caster_scale = get_visual_scale(caster);
@@ -65,9 +65,9 @@ namespace {
 
 			float perk = Perk_GetCostReduction(caster);
 
-			DamageAV(caster, ActorValue::kStamina, 0.15 * perk * caster_scale * stamina * TimeScale() * multiply);
+			DamageAV(caster, ActorValue::kStamina, 0.15f * perk * caster_scale * stamina * TimeScale() * multiply);
 
-			float shrink = CalcPower(caster, 0.0080 * stamina * multiply, 0.0, false); // Is automatically *'d by scale through CalcPower()
+			float shrink = CalcPower(caster, 0.0080f * stamina * multiply, 0.0f, false); // Is automatically *'d by scale through CalcPower()
 
 			if (caster_scale > Minimum_Actor_Scale) {
 				override_actor_scale(caster, -shrink, SizeEffectType::kNeutral);
@@ -77,8 +77,8 @@ namespace {
 				return false;
 			}
 
-			Rumbling::Once("ShrinkButton", caster, 2.0 * stamina, 0.05, "NPC Pelvis [Pelv]",  0.0);
-			if (elapsed >= 0.99) {
+			Rumbling::Once("ShrinkButton", caster, 2.0f * stamina, 0.05f, "NPC Pelvis [Pelv]",  0.0f);
+			if (elapsed >= 0.99f) {
 				return false;
 			}
 			return true;

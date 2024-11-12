@@ -26,14 +26,14 @@ namespace Gts {
 			return;
 		}
 
-		Rumbling::Once("Shrink_Poison", target, 2.0, 0.05);
+		Rumbling::Once("Shrink_Poison", target, 2.0f, 0.05f);
 
 		float Volume = std::clamp(get_visual_scale(target) * 0.10f, 0.10f, 1.0f);
-		Runtime::PlaySound("shrinkSound", target, Volume, 1.0);
+		Runtime::PlaySound("shrinkSound", target, Volume, 1.0f);
 	}
 
 	void Shrink_Poison::OnUpdate() {
-		const float BASE_POWER = 0.004000;
+		const float BASE_POWER = 0.004000f;
 
 		auto caster = GetCaster();
 		if (!caster) {
@@ -45,12 +45,12 @@ namespace Gts {
 		}
 
 		float AlchemyLevel = std::clamp(caster->AsActorValueOwner()->GetActorValue(ActorValue::kAlchemy)/100.0f + 1.0f, 1.0f, 2.0f);
-		Rumbling::Once("Shrink_Poison", target, 0.4, 0.05);
+		Rumbling::Once("Shrink_Poison", target, 0.4f, 0.05f);
 		float powercap = std::clamp(get_visual_scale(target), 0.85f, 1.10f);
 		float Power = BASE_POWER * powercap * AlchemyLevel;
 
-		ShrinkActor(target, Power, 0.0);
-		if (get_visual_scale(target) < 0.08/GetSizeFromBoundingBox(target) && ShrinkToNothingManager::CanShrink(caster, target)) {
+		ShrinkActor(target, Power, 0.0f);
+		if (get_visual_scale(target) < 0.08f/GetSizeFromBoundingBox(target) && ShrinkToNothingManager::CanShrink(caster, target)) {
 			PrintDeathSource(caster, target, DamageSource::Explode);
 			ShrinkToNothingManager::Shrink(caster, target);
 		}

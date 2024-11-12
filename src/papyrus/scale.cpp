@@ -30,14 +30,14 @@ namespace {
 		if (actor_data) {
 			result = set_model_scale(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
 	}
 	float GetModelScale(StaticFunctionTag*, Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		auto result = get_model_scale(actor);
 		return result;
@@ -49,7 +49,7 @@ namespace {
 			auto scale = get_model_scale(actor) + amt;
 			result = set_model_scale(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
@@ -62,14 +62,14 @@ namespace {
 		if (actor_data) {
 			result = set_npcnode_scale(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
 	}
 	float GetNodeScale(StaticFunctionTag*, Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		auto result = get_npcnode_scale(actor);
 		return result;
@@ -81,7 +81,7 @@ namespace {
 			auto scale = get_npcnode_scale(actor) + amt;
 			result = set_npcnode_scale(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
@@ -100,14 +100,14 @@ namespace {
 			}
 			//result = true; // Ref scale cannot fail
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
 	}
 	float GetHybridScale(StaticFunctionTag*, Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		auto result = get_model_scale(actor); // If not player, get Model
 		if (actor->formID == 0x14) {
@@ -131,7 +131,7 @@ namespace {
 			//set_ref_scale(actor, scale);
 			//result = true;
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
@@ -179,14 +179,14 @@ namespace {
 		if (actor_data) {
 			result = update_model_visuals(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
 	}
 	float GetScale(StaticFunctionTag*, Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		auto result = get_scale(actor);
 		return result;
@@ -198,7 +198,7 @@ namespace {
 			auto scale = get_scale(actor) + amt;
 			result = update_model_visuals(actor, scale);
 			actor_data->visual_scale = scale;
-			actor_data->visual_scale_v = 0.0;
+			actor_data->visual_scale_v = 0.0f;
 			actor_data->target_scale = scale;
 		}
 		return result;
@@ -224,7 +224,7 @@ namespace {
 	float GetMaxScale(StaticFunctionTag*, Actor* actor) {
 		return get_max_scale(actor); 
 		// Naturally we / the scale by natural scale inside GtsSizeManager.cpp, so we compensate it here
-		// Else it will report x3.0 instead of x8.0 for example (when the SetScale is x2.5)
+		// Else it will report x3.0f instead of x8.0f for example (when the SetScale is x2.5f)
 	}
 
 	void ModMaxScale(StaticFunctionTag*, Actor* actor, float amt) {

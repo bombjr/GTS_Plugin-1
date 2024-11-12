@@ -38,14 +38,14 @@ using namespace std;
 
 namespace {
 	void ActivateEmotions(Actor* actor, bool toggle) {
-		float p_1 = 1.0;
-		float p_2 = 0.75;
+		float p_1 = 1.0f;
+		float p_2 = 0.75f;
 		int rng = RandomInt(0, 8);
 		if (!toggle) {
-			p_1 = 0.0;
-			p_2 = 0.0;
+			p_1 = 0.0f;
+			p_2 = 0.0f;
 		} if (rng <= 1) {
-			PlayMoanSound(actor, 1.0);
+			PlayMoanSound(actor, 1.0f);
 		}
 		AdjustFacialExpression(actor, 0, p_1, "modifier"); // blink L
 		AdjustFacialExpression(actor, 1, p_1, "modifier"); // blink R
@@ -71,13 +71,13 @@ namespace {
 	}
 
     bool Hugs_RestoreHealth(Actor* giantref, Actor* tinyref) {
-		static Timer HeartTimer = Timer(0.5);
+		static Timer HeartTimer = Timer(0.5f);
 		float hp = GetAV(tinyref, ActorValue::kHealth);
 		float maxhp = GetMaxAV(tinyref, ActorValue::kHealth);
 		bool Healing = IsHugHealing(giantref);
 		
 		if (Healing && HeartTimer.ShouldRunFrame()) {
-			SpawnHearts(giantref, tinyref, 0.0, 2.4, true);
+			SpawnHearts(giantref, tinyref, 0.0f, 2.4f, true);
 		}
 
 		if (!Healing && hp >= maxhp) {
@@ -90,11 +90,11 @@ namespace {
 
 		if (giantref->formID == 0x14) {
 			float sizedifference = get_visual_scale(giantref)/get_visual_scale(tinyref);
-			shake_camera(giantref, 0.30 * sizedifference, 0.05);
+			shake_camera(giantref, 0.30f * sizedifference, 0.05f);
 		} else {
-			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Heal, 0.02);
+			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Heal, 0.02f);
 		}
-		tinyref->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, maxhp * 0.004 * 0.15 * TimeScale());
+		tinyref->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, maxhp * 0.004f * 0.15f * TimeScale());
 
 		if (!Healing) {
 			return false;
@@ -124,11 +124,11 @@ namespace {
 			auto tinyref = tinyhandle.get().get();
 
 			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, false, true);
-			float threshold = 3.0;
-			float stamina = 0.35;
+			float threshold = 3.0f;
+			float stamina = 0.35f;
 
 			if (Runtime::HasPerkTeam(giantref, "HugCrush_Greed")) {
-				stamina *= 0.75;
+				stamina *= 0.75f;
 			}
 			stamina *= Perk_GetCostReduction(giantref);
 
@@ -136,13 +136,13 @@ namespace {
 				SetBeingHeld(tinyref, false);
 				AbortHugAnimation(giantref, tinyref);
 				if (giantref->formID == 0x14) {
-					shake_camera(giantref, 0.50, 0.15);
+					shake_camera(giantref, 0.50f, 0.15f);
 					Notify("It's difficult to gently hug {}", tinyref->GetDisplayFullName());
 				}
 				return false;
 			}
-			DamageAV(tinyref, ActorValue::kStamina, -(0.45 * TimeScale())); // Restore Tiny stamina
-			DamageAV(giantref, ActorValue::kStamina, 0.25 * stamina * TimeScale()); // Damage GTS Stamina
+			DamageAV(tinyref, ActorValue::kStamina, -(0.45f * TimeScale())); // Restore Tiny stamina
+			DamageAV(giantref, ActorValue::kStamina, 0.25f * stamina * TimeScale()); // Damage GTS Stamina
 
 			return Hugs_RestoreHealth(giantref, tinyref);
 

@@ -42,7 +42,7 @@ namespace {
 		if (otherActor) {
 			VoreData.AddTiny(otherActor);
 		}
-		StartLHandRumble("GrabVoreL", data.giant, 0.5, 0.10);
+		StartLHandRumble("GrabVoreL", data.giant, 0.5f, 0.10f);
 	}
 
 	void GTSGrab_Eat_OpenMouth(AnimationEventData& data) {
@@ -51,9 +51,9 @@ namespace {
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 		if (otherActor) {
 			SetBeingEaten(otherActor, true);
-			Vore::GetSingleton().ShrinkOverTime(giant, otherActor, 0.1);
+			Vore::GetSingleton().ShrinkOverTime(giant, otherActor, 0.1f);
 		}
-		Task_FacialEmotionTask_OpenMouth(giant, 1.1 / AnimationManager::GetAnimSpeed(giant), "GrabVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 1.1f / AnimationManager::GetAnimSpeed(giant), "GrabVoreOpenMouth");
 		StopLHandRumble("GrabVoreL", data.giant);
 	}
 
@@ -65,7 +65,7 @@ namespace {
 				if (!AllowDevourment()) {
 					VoreData.Swallow();
 					if (IsCrawling(&data.giant)) {
-						otherActor->SetAlpha(0.0); // Hide Actor
+						otherActor->SetAlpha(0.0f); // Hide Actor
 					}
 				} else {
 					CallDevourment(&data.giant, otherActor);
@@ -88,7 +88,7 @@ namespace {
 			}
 			giant->SetGraphVariableInt("GTS_GrabbedTiny", 0);
 			giant->SetGraphVariableInt("GTS_Grab_State", 0);
-			Runtime::PlaySoundAtNode("VoreSwallow", &data.giant, 1.0, 1.0, "NPC Head [Head]"); // Play sound
+			Runtime::PlaySoundAtNode("VoreSwallow", &data.giant, 1.0f, 1.0f, "NPC Head [Head]"); // Play sound
 			AnimationManager::StartAnim("TinyDied", giant);
 			//BlockFirstPerson(giant, false);
 			ManageCamera(&data.giant, false, CameraTracking::Grab_Left);

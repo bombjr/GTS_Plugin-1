@@ -31,21 +31,21 @@ namespace {
 	float GetShrinkPenalty(float size) {
 		// https://www.desmos.com/calculator/pqgliwxzi2
 		SoftPotential launch {
-			.k = 0.98,
-			.n = 0.82,
-			.s = 0.70,
-			.a = 0.0,
+			.k = 0.98f,
+			.n = 0.82f,
+			.s = 0.70f,
+			.a = 0.0f,
 		};
-		float balance = GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::ShrinkRate_Base) * 1.6;
+		float balance = GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::ShrinkRate_Base) * 1.6f;
 		float power = soft_power(size, launch) * balance;
 		return power;
 	}
 
 	float Aspect_GetEfficiency(float aspect) {
-		float k = 0.75;
-		float a = 0.0;
-		float n = 0.85;
-		float s = 1.0;
+		float k = 0.75f;
+		float a = 0.0f;
+		float n = 0.85f;
+		float s = 1.0f;
 		// https://www.desmos.com/calculator/ygoxbe7hjg
 		float result = k*pow(s*(aspect-a), n);
 		return result;
@@ -66,21 +66,21 @@ namespace Gts {
 	float GameModeManager::GetBalanceModeInfo(BalanceModeInfo info) {
 		auto& Persist = Persistent::GetSingleton();
 		switch (info) {
-			case BalanceModeInfo::SizeGain_Penalty: // 1.0
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0f
 				return Persist.BalanceMode_SizeGain_Penalty;
-			case BalanceModeInfo::ShrinkRate_Base: // 1.0
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0f
 				return Persist.BalanceMode_ShrinkRate_Base;
-			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08f
 				return Persist.BalanceMode_ShrinkRate_Combat;
 			break;
 		}
 			
-		return 1.0;
+		return 1.0f;
 	}
 
 	void GameModeManager::ApplyGameMode(Actor* actor, const ChosenGameMode& game_mode, const float& GrowthRate, const float& ShrinkRate)  {
 		auto profiler = Profilers::Profile("Manager: ApplyGameMode");
-		const float EPS = 1e-7;
+		const float EPS = 1e-7f;
 		if (game_mode != ChosenGameMode::None) {
 			auto player = PlayerCharacter::GetSingleton();
 			float natural_scale = get_natural_scale(actor, true);
@@ -92,15 +92,15 @@ namespace Gts {
 			
 			if (IsFemale(actor)) {
 				if (Runtime::GetFloat("MultiplyGameModePC") == 0 && actor == player) {
-					Scale = 1.0;
+					Scale = 1.0f;
 				}
 				if (Runtime::GetFloat("MultiplyGameModeNPC") == 0 && actor != player) {
-					Scale = 1.0;
+					Scale = 1.0f;
 				}
 
 				switch (game_mode) {
 					case ChosenGameMode::Grow: {
-						float modAmount = Scale * (0.00010 + (GrowthRate * 0.25)) * 60 * Time::WorldTimeDelta();
+						float modAmount = Scale * (0.00010f + (GrowthRate * 0.25f)) * 60 * Time::WorldTimeDelta();
 						if (fabs(GrowthRate) < EPS) {
 							return;
 						}
@@ -112,7 +112,7 @@ namespace Gts {
 						break;
 					}
 					case ChosenGameMode::Shrink: {
-						float modAmount = -(0.00025 + (ShrinkRate * 0.25) * Scale) * 60 * Time::WorldTimeDelta();
+						float modAmount = -(0.00025f + (ShrinkRate * 0.25f) * Scale) * 60 * Time::WorldTimeDelta();
 						if (fabs(ShrinkRate) < EPS) {
 							return;
 						}
@@ -125,7 +125,7 @@ namespace Gts {
 					}
 					case ChosenGameMode::Standard: {
 						if (actor->IsInCombat()) {
-							float modAmount = Scale * (0.00008 + (GrowthRate * 0.17)) * 60 * Time::WorldTimeDelta();
+							float modAmount = Scale * (0.00008f + (GrowthRate * 0.17f)) * 60 * Time::WorldTimeDelta();
 							if (fabs(GrowthRate) < EPS) {
 								return;
 							}
@@ -135,7 +135,7 @@ namespace Gts {
 								set_target_scale(actor, maxScale);
 							} // else let spring handle it
 						} else {
-							float modAmount = Scale * -(0.00029 + (ShrinkRate * 0.34)) * 60 * Time::WorldTimeDelta();
+							float modAmount = Scale * -(0.00029f + (ShrinkRate * 0.34f)) * 60 * Time::WorldTimeDelta();
 							if (fabs(ShrinkRate) < EPS) {
 								return;
 							}
@@ -149,12 +149,12 @@ namespace Gts {
 					}
 					case ChosenGameMode::StandardNoShrink: {
 						if (actor->IsInCombat()) {
-							float modAmount = Scale * (0.00008 + (GrowthRate * 0.17)) * 60 * Time::WorldTimeDelta();
+							float modAmount = Scale * (0.00008f + (GrowthRate * 0.17f)) * 60 * Time::WorldTimeDelta();
 							if (fabs(GrowthRate) < EPS) {
 								return;
 							}
 							if ((targetScale + modAmount) < maxScale) {
-								update_target_scale(actor, modAmount * 0.33, SizeEffectType::kGrow);
+								update_target_scale(actor, modAmount * 0.33f, SizeEffectType::kGrow);
 							} else if (targetScale < maxScale) {
 								set_target_scale(actor, maxScale);
 							} // else let spring handle it
@@ -169,30 +169,30 @@ namespace Gts {
 						int GrowthTimer = RandomInt(0, 6);                                                               // Randomize 're-trigger' delay, kinda
 						int StrongGrowthChance = RandomInt(0, 6);                                                        // Self-explanatory
 						int MegaGrowth = RandomInt(0, 20);                                                               // A chance to multiply growth again
-						float GrowthPower = GtsSkillLevel*0.00240 / Random;                                              // Randomized strength of growth
-						static Timer timer = Timer(1.40 * GrowthTimer);                                                  // How often it procs
+						float GrowthPower = GtsSkillLevel*0.00240f / Random;                                              // Randomized strength of growth
+						static Timer timer = Timer(1.40f * GrowthTimer);                                                  // How often it procs
 						if (targetScale >= sizelimit || Random <= 0 || GrowthTimer <= 0) {
 							return; // Protections against infinity
 						}
 						if (timer.ShouldRunFrame()) {
-							if (StrongGrowthChance >= 19 && MegaGrowth >= 19.0) {
-								GrowthPower *= 4.0;                                                                       // Proc super growth if conditions are met
+							if (StrongGrowthChance >= 19 && MegaGrowth >= 19.0f) {
+								GrowthPower *= 4.0f;                                                                       // Proc super growth if conditions are met
 							}
-							if (StrongGrowthChance >= 19.0) {
-								GrowthPower *= 4.0;                                                                       // Stronger growth if procs
-								Rumbling::Once("CurseOfGrowth", actor, GrowthPower * 40, 0.10);
+							if (StrongGrowthChance >= 19.0f) {
+								GrowthPower *= 4.0f;                                                                       // Stronger growth if procs
+								Rumbling::Once("CurseOfGrowth", actor, GrowthPower * 40, 0.10f);
 							}
 							if (targetScale >= sizelimit) {
 								set_target_scale(actor, sizelimit);
 							}
-							if (((StrongGrowthChance >= 19 && Random >= 19.0) || (StrongGrowthChance >= 19 && MegaGrowth >= 19.0)) && Runtime::GetFloat("AllowMoanSounds") == 1.0) {
+							if (((StrongGrowthChance >= 19 && Random >= 19.0f) || (StrongGrowthChance >= 19 && MegaGrowth >= 19.0f)) && Runtime::GetFloat("AllowMoanSounds") == 1.0f) {
 								PlayMoanSound(actor, targetScale/4);
-								Task_FacialEmotionTask_Moan(actor, 2.0, "GameMode");
+								Task_FacialEmotionTask_Moan(actor, 2.0f, "GameMode");
 							}
 							if (targetScale < maxScale) {
 								update_target_scale(actor, GrowthPower, SizeEffectType::kGrow);
-								Rumbling::Once("CurseOfGrowth", actor, GrowthPower * 20, 0.10);
-								Runtime::PlaySoundAtNode("growthSound", actor, GrowthPower * 6, 1.0, "NPC Pelvis [Pelv]");
+								Rumbling::Once("CurseOfGrowth", actor, GrowthPower * 20, 0.10f);
+								Runtime::PlaySoundAtNode("growthSound", actor, GrowthPower * 6, 1.0f, "NPC Pelvis [Pelv]");
 							}
 						}
 						break;
@@ -204,8 +204,8 @@ namespace Gts {
 						}
 
 						float Aspect = Ench_Aspect_GetPower(actor);
-						float gigantism = Aspect_GetEfficiency(Aspect) * 0.5;
-						float default_scale = natural_scale * (1.0 + gigantism);
+						float gigantism = Aspect_GetEfficiency(Aspect) * 0.5f;
+						float default_scale = natural_scale * (1.0f + gigantism);
 						
 						if ((targetScale + modAmount) > default_scale) {
 							update_target_scale(actor, modAmount, SizeEffectType::kShrink);
@@ -225,44 +225,44 @@ namespace Gts {
 			return;
 		}
 		ChosenGameMode gameMode = ChosenGameMode::None;
-		float growthRate = 0.0;
-		float shrinkRate = 0.0;
+		float growthRate = 0.0f;
+		float shrinkRate = 0.0f;
 		int game_mode_int = 0;
 		float QuestStage = Runtime::GetStage("MainQuest");
 		float BalanceMode = SizeManager::GetSingleton().BalancedMode();
 		float scale = get_visual_scale(actor);
-		float BonusShrink = 7.4;
-		float bonus = 1.0;
+		float BonusShrink = 7.4f;
+		float bonus = 1.0f;
 		
-		if (BalanceMode >= 2.0) {
+		if (BalanceMode >= 2.0f) {
 			BonusShrink *= GetShrinkPenalty(scale);
 		}
 
-		if (QuestStage < 100.0 || BalanceMode >= 2.0) {
+		if (QuestStage < 100.0f || BalanceMode >= 2.0f) {
 			if (actor->formID == 0x14 || IsTeammate(actor)) {
 				game_mode_int = 6; // QuestMode
 				if (QuestStage < 40) {
-					shrinkRate = 0.00086 * BonusShrink * 2.0;
+					shrinkRate = 0.00086f * BonusShrink * 2.0f;
 				} else if (QuestStage >= 40 && QuestStage < 80) {
-					shrinkRate = 0.00086 * BonusShrink * 1.6;
-				} else if (BalanceMode >= 2.0 && QuestStage >= 80) {
-					shrinkRate = 0.00086 * BonusShrink * 1.40;
+					shrinkRate = 0.00086f * BonusShrink * 1.6f;
+				} else if (BalanceMode >= 2.0f && QuestStage >= 80) {
+					shrinkRate = 0.00086f * BonusShrink * 1.40f;
 				}
 
 				shrinkRate *= Potion_GetShrinkResistance(actor);
-				shrinkRate /= (1.0 + Ench_Aspect_GetPower(actor));
+				shrinkRate /= (1.0f + Ench_Aspect_GetPower(actor));
 
 				if (Potion_IsUnderGrowthPotion(actor)) {
-					shrinkRate *= 0.0; // prevent shrinking in that case
+					shrinkRate *= 0.0f; // prevent shrinking in that case
 				} 
 				if (HasGrowthSpurt(actor)) {
-					shrinkRate *= 0.25;
+					shrinkRate *= 0.25f;
 				}
-				if (actor->IsInCombat() && BalanceMode == 1.0) {
-					shrinkRate = 0.0;
-				} else if (SizeManager::GetSingleton().GetGrowthSpurt(actor) > 0.01) {
-					shrinkRate = 0.0;
-				} else if (actor->IsInCombat() && BalanceMode >= 2.0) {
+				if (actor->IsInCombat() && BalanceMode == 1.0f) {
+					shrinkRate = 0.0f;
+				} else if (SizeManager::GetSingleton().GetGrowthSpurt(actor) > 0.01f) {
+					shrinkRate = 0.0f;
+				} else if (actor->IsInCombat() && BalanceMode >= 2.0f) {
 					shrinkRate *= GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::ShrinkRate_Combat); // shrink at 6% rate
 				}
 
@@ -270,10 +270,10 @@ namespace Gts {
 					game_mode_int = 0; // Nothing to do
 				}
 			}
-		} else if (QuestStage > 100.0 && BalanceMode <= 1.0) {
+		} else if (QuestStage > 100.0f && BalanceMode <= 1.0f) {
 			if (actor->formID == 0x14) {
 				if (Runtime::HasMagicEffect(PlayerCharacter::GetSingleton(), "EffectSizeAmplifyPotion")) {
-					bonus = scale * 0.25 + 0.75;
+					bonus = scale * 0.25f + 0.75f;
 				}
 				game_mode_int = Runtime::GetInt("ChosenGameMode");
 				growthRate = Runtime::GetFloat("GrowthModeRate");
@@ -281,7 +281,7 @@ namespace Gts {
 
 			} else if (actor->formID != 0x14 && IsTeammate(actor)) {
 				if (Runtime::HasMagicEffect(actor, "EffectSizeAmplifyPotion")) {
-					bonus = scale * 0.25 + 0.75;
+					bonus = scale * 0.25f + 0.75f;
 				}
 				game_mode_int = Runtime::GetInt("ChosenGameModeNPC");
 				growthRate = Runtime::GetFloat("GrowthModeRateNPC") * bonus;

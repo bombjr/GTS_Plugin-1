@@ -19,6 +19,6 @@ namespace Gts {
 			virtual std::string GetName() override;
 
 		private:
-			float magnitude = 0.0;
+			float magnitude = 0.0f;
 	};
 }

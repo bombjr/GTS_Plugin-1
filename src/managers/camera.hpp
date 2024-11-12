@@ -61,11 +61,11 @@ namespace Gts {
 
 			NiPoint3 manualEdit;
 
-			Timer initimer = Timer(3.00);
+			Timer initimer = Timer(3.00f);
 
-			Spring smoothScale = Spring(0.30, 0.50);
-			Spring3 smoothOffset = Spring3(NiPoint3(0.30, 0.30, 0.30), 0.50);
-			float CameraDelay = 0.0;
+			Spring smoothScale = Spring(0.30f, 0.50f);
+			Spring3 smoothOffset = Spring3(NiPoint3(0.30f, 0.30f, 0.30f), 0.50f);
+			float CameraDelay = 0.0f;
 
 			CameraState* currentState = nullptr;
 			std::unique_ptr<TransState> transitionState = std::unique_ptr<TransState>(nullptr);

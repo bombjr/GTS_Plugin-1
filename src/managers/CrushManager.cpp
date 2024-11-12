@@ -37,7 +37,7 @@ namespace {
 		int voreFearRoll = RandomInt(0, 5);
 		if (HasSMT(actor)) {
 			voreFearRoll = RandomInt(0, 2);
-			shake_camera(actor, 0.4, 0.25);
+			shake_camera(actor, 0.4f, 0.25f);
 		}
 
 		if (voreFearRoll <= 0) {
@@ -47,7 +47,7 @@ namespace {
 
 	void FearChance(Actor* giant)  {
 		float size = get_visual_scale(giant);
-		int MaxValue = (20 - (1.6 * size));
+		int MaxValue = (20 - static_cast<int>(1.6f * size));
 
 		if (MaxValue <= 3 || HasSMT(giant)) {
 			MaxValue = 3;
@@ -74,26 +74,26 @@ namespace {
 		if (!Runtime::GetBool("GtsDecideGrowth") || HasSMT(caster)) {
 			return;
 		} else if (Runtime::HasPerkTeam(caster, "GrowthDesirePerk") && Runtime::GetInt("GtsDecideGrowth") >= 1) {
-			float Rate = (0.00016 * get_visual_scale(target)) * 120;
+			float Rate = (0.00016f * get_visual_scale(target)) * 120;
 			if (Runtime::HasPerkTeam(caster, "AdditionalGrowth")) {
-				Rate *= 2.0;
+				Rate *= 2.0f;
 			}
 			CrushGrow(caster, 0, Rate * SizeSteal_GetPower(caster, target));
 			GrowthText(caster);
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
-		static Timer voicetimer = Timer(2.4);
+		static Timer voicetimer = Timer(2.4f);
 		auto randomInt = RandomInt(0, 16);
 		auto select = RandomInt(0, 2);
 		if (randomInt <= 3) {
 			if (voicetimer.ShouldRun()) {
 				if (select >= 2) {
-					PlayMoanSound(giant, 1.0);
+					PlayMoanSound(giant, 1.0f);
 					GrowAfterTheKill(giant, target);
-					Task_FacialEmotionTask_Moan(giant, 2.0, "Crush");
+					Task_FacialEmotionTask_Moan(giant, 2.0f, "Crush");
 				} else {
-					PlayLaughSound(giant, 1.0, 2);
+					PlayLaughSound(giant, 1.0f, 2);
 				}
 			}
 		}
@@ -158,9 +158,9 @@ namespace Gts {
 				}
 				std::random_device rd;
 				std::mt19937 gen(rd());
-				std::uniform_real_distribution<float> dis(-0.2, 0.2);
+				std::uniform_real_distribution<float> dis(-0.2f, 0.2f);
 
-				AddSMTDuration(giant, 5.0);
+				AddSMTDuration(giant, 5.0f);
 				ScareChance(giant);
 
 				// Do crush
@@ -168,16 +168,16 @@ namespace Gts {
 				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
 				if (!IsLiving(tiny) || LessGore()) {
-					SpawnDustParticle(giant, tiny, "NPC Root [Root]", 3.0);
+					SpawnDustParticle(giant, tiny, "NPC Root [Root]", 3.0f);
 				} else {
 					if (!LessGore()) {
 						auto root = find_node(tiny, "NPC Root [Root]");
 						if (root) {
-							SpawnParticle(tiny, 0.60, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 2.5, 7, root);
-							SpawnParticle(tiny, 0.60, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 2.5, 7, root);
-							SpawnParticle(tiny, 0.60, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 2.5, 7, root);
-							SpawnParticle(tiny, 0.60, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 2.5, 7, root);
-							SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, currentSize * 25, 7, root);
+							SpawnParticle(tiny, 0.60f, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 2.5f, 7, root);
+							SpawnParticle(tiny, 0.60f, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, currentSize * 2.5f, 7, root);
+							SpawnParticle(tiny, 0.60f, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 2.5f, 7, root);
+							SpawnParticle(tiny, 0.60f, "GTS/Damage/Crush.nif", root->world.rotate, root->world.translate, currentSize * 2.5f, 7, root);
+							SpawnParticle(tiny, 1.20f, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, currentSize * 25, 7, root);
 						}
 						Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4,"BloodExplosion");
 						Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
@@ -203,7 +203,7 @@ namespace Gts {
 					Disintegrate(tiny); // Set critical stage 4 on actors
 				} else if (tiny->formID == 0x14) {
 					TriggerScreenBlood(50);
-					tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+					tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
 				}
 
 				FearChance(giant);
@@ -258,7 +258,7 @@ namespace Gts {
 	}
 
 	CrushData::CrushData(Actor* giant) :
-		delay(Timer(0.01)),
+		delay(Timer(0.01f)),
 		state(CrushState::Healthy),
 		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
 	}

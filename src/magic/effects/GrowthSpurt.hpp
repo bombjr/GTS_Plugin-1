@@ -23,10 +23,10 @@ namespace Gts {
 			virtual void DoGrowth(Actor* actor, float value);
 			virtual void DoShrink(Actor* actor);
 		private:
-			float power = 0.0;
+			float power = 0.0f;
 			bool AllowStacking = true;
-			float grow_limit = 1.0;
-			Timer timer = Timer(2.33);
-			Timer timerSound = Timer(0.7);
+			float grow_limit = 1.0f;
+			Timer timer = Timer(2.33f);
+			Timer timerSound = Timer(0.7f);
 	};
 }

@@ -50,7 +50,7 @@ namespace {
 	}
 
 	float Record_Node_Coordinates(NiAVObject* Node, NiPoint3& coords_out) {
-		float NodeMovementForce = 0.0;
+		float NodeMovementForce = 0.0f;
 		if (Node) {
 			NiPoint3 coords_in = Node->world.translate;
 
@@ -77,7 +77,7 @@ namespace Gts {
 		auto profiler = Profilers::Profile("NodeMovement");
 		NiAVObject* Node = nullptr;
 
-		float NodeMovementForce = 0.0;
+		float NodeMovementForce = 0.0f;
 		float scale = get_visual_scale(giant);
 		
 		auto Data = Transient::GetSingleton().GetData(giant);
@@ -111,7 +111,7 @@ namespace Gts {
 					NodeMovementForce = Record_Node_Coordinates(Node, DataCoordinates_RH);
 				break;
 				case NodeMovementType::Movement_None:
-					return 1.0; // Always allow for actions that are supposed to stagger always
+					return 1.0f; // Always allow for actions that are supposed to stagger always
 				break;
 			}
 		}
@@ -122,7 +122,7 @@ namespace Gts {
 			//log::info("Clamped movement force: {}", NodeMovementForce_Clamped);
 			return NodeMovementForce_Clamped;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	float Get_Bone_Movement_Speed(Actor* giant, DamageSource Source) {

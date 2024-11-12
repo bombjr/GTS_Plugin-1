@@ -61,7 +61,7 @@ namespace Gts
 		private:
 			std::string name = "";
 			unordered_set<std::uint32_t> keys = {};
-			float minDuration = 0.0;
+			float minDuration = 0.0f;
 			double startTime = 0.0;
 			// If true this event won't fire unles ONLY the keys are pressed for the entire duration
 			bool exclusive = false;

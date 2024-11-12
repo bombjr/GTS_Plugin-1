@@ -26,9 +26,9 @@ using namespace RE;
 using namespace Gts;
 
 namespace {
-	const float MINIMUM_VORE_DISTANCE = 94.0;
+	const float MINIMUM_VORE_DISTANCE = 94.0f;
 	const float VORE_ANGLE = 76;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 
 	void CantVorePlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Vore) {
@@ -39,10 +39,10 @@ namespace {
 
 	VoreInformation GetVoreInfo(Actor* giant, Actor* tiny, float growth_mult) {
 		float recorded_scale = Vore::GetSingleton().ReadOriginalScale(tiny);
-		float restore_power = 0.0;
-		float mealEfficiency = 0.2; // Normal pred has 20% efficent stomach
-		float duration = 80.0; // 80 seconds duration by default
-		float growth = 2.0; // Default power of gaining size
+		float restore_power = 0.0f;
+		float mealEfficiency = 0.2f; // Normal pred has 20% efficent stomach
+		float duration = 80.0f; // 80 seconds duration by default
+		float growth = 2.0f; // Default power of gaining size
 
 		std::string_view tiny_name = tiny->GetDisplayFullName();
 
@@ -52,11 +52,11 @@ namespace {
 
 		if (Runtime::HasPerkTeam(giant, "Gluttony")) {
 			restore_power = GetMaxAV(tiny, ActorValue::kHealth) * 4 * mealEfficiency; // 4 times stronger hp/sp regen
-			mealEfficiency += 0.2; // 100% more growth
-			duration *= 0.5; // 50% faster vore
+			mealEfficiency += 0.2f; // 100% more growth
+			duration *= 0.5f; // 50% faster vore
 		}
 		if (Runtime::HasPerkTeam(giant, "AdditionalGrowth")) {
-			growth *= 1.25; // 25% stronger growth
+			growth *= 1.25f; // 25% stronger growth
 		}
 			
 		float bounding_box = GetSizeFromBoundingBox(tiny);
@@ -80,7 +80,7 @@ namespace {
 	void BuffAttributes(Actor* giant, float tinyscale) {
 		if (giant) {
 			if (Runtime::HasPerk(giant, "SoulVorePerk")) { // Permamently increases random AV after eating someone
-				float TotalMod = 0.33;
+				float TotalMod = 0.33f;
 				int Boost = RandomInt(0, 3);
 				if (Boost == 0) {
 					AddStolenAttributesTowards(giant, ActorValue::kHealth, TotalMod);
@@ -133,7 +133,7 @@ namespace {
 		}
 	}
 
-	void Task_Vore_FinishVoreBuff(const VoreInformation& VoreInfo, float amount_of_tinies, bool Allow_Devourment) {
+	void Task_Vore_FinishVoreBuff(const VoreInformation& VoreInfo, int amount_of_tinies, bool Allow_Devourment) {
 
 		Actor* giant = VoreInfo.giantess;
 
@@ -146,40 +146,40 @@ namespace {
 		std::string_view tiny_name = VoreInfo.Tiny_Name;
 
 		bool Devourment = AllowDevourment();
-		float multiplier = 1.0;
+		float multiplier = 1.0f;
 		if (Devourment) {
-			multiplier = 0.5;
+			multiplier = 0.5f;
 		}
 
 		if (!Devourment || Allow_Devourment) {
 			if (giant) {
 				float tinySize_Grow = std::clamp(tinySize, 1.0f, 10000.0f);
 				float reduction = std::clamp(get_visual_scale(giant) / tinySize_Grow, 1.0f, 10.0f);
-				update_target_scale(giant, (sizePower/reduction) * 0.52, SizeEffectType::kGrow);
-				GainWeight(giant, 3.0 * tinySize * amount_of_tinies * multiplier);
-				ModSizeExperience(giant, 0.20 * multiplier + (tinySize * 0.02));
+				update_target_scale(giant, (sizePower/reduction) * 0.52f, SizeEffectType::kGrow);
+				GainWeight(giant, 3.0f * tinySize * amount_of_tinies * multiplier);
+				ModSizeExperience(giant, 0.20f * multiplier + (tinySize * 0.02f));
 				VoreMessage_Absorbed(giant, tiny_name);
 				AdjustSizeReserve(giant, sizePower);
 				BuffAttributes(giant, tinySize);
 				
 				if (giant->formID == 0x14) {
-					AdjustSizeLimit(0.0260 * multiplier, giant);
-					AdjustMassLimit(0.0106 * multiplier, giant);
+					AdjustSizeLimit(0.0260f * multiplier, giant);
+					AdjustMassLimit(0.0106f * multiplier, giant);
 					SurvivalMode_AdjustHunger(giant, tinySize * natural_scale * multiplier, WasLiving, true);
 				}
-				Rumbling::Once("GrowthRumble", giant, 1.75, 0.30);
+				Rumbling::Once("GrowthRumble", giant, 1.75f, 0.30f);
 				if (Vore::GetSingleton().GetVoreData(giant).GetTimer() == true) {
-					PlayMoanSound(giant, 1.0); // play timed sound. Timer is a must else we moan 10 times at once for example.
-					Task_FacialEmotionTask_Moan(giant, 2.0, "Vore");
+					PlayMoanSound(giant, 1.0f); // play timed sound. Timer is a must else we moan 10 times at once for example.
+					Task_FacialEmotionTask_Moan(giant, 2.0f, "Vore");
 				}
 			}
 		}
 	}
 
-	void Task_Vore_StartVoreBuff(Actor* giant, Actor* tiny, float amount_of_tinies) {
+	void Task_Vore_StartVoreBuff(Actor* giant, Actor* tiny, int amount_of_tinies) {
 		if (!AllowDevourment()) {
 			std::string name = std::format("Vore_Buff_{}_{}", giant->formID, tiny->formID);
-			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0);
+			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0f);
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			float start_time = Time::WorldTimeElapsed();
 
@@ -198,7 +198,7 @@ namespace {
 				float timepassed = Time::WorldTimeElapsed() - start_time;
 
 				float reduction = std::clamp(get_visual_scale(giantref) / tinySize_Grow, 1.0f, 10.0f);
-				float regen_attributes = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006;
+				float regen_attributes = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006f;
 				float health = std::clamp(Regeneration/4000.0f, 0.0f, regen_attributes);
 
 				float sizeToApply = Growth/5000;
@@ -207,7 +207,7 @@ namespace {
 				DamageAV(giantref, ActorValue::kStamina, -health * TimeScale()); 
 				// Restore HP and Stamina for GTS
 
-				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03 (multiplies by race scale)
+				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03f (multiplies by race scale)
 					update_target_scale(giantref, (sizeToApply / reduction) * TimeScale(), SizeEffectType::kGrow);
 					AddStolenAttributes(giantref, sizeToApply * TimeScale());
 				}
@@ -215,7 +215,7 @@ namespace {
 				if (timepassed >= Duration) {
 					Task_Vore_FinishVoreBuff(VoreInfo, amount_of_tinies, false);
 					if (giantref->formID == 0x14) {
-						shake_camera(giantref, 0.50, 0.75);
+						shake_camera(giantref, 0.50f, 0.75f);
 					}
 					return false;
 				}
@@ -231,11 +231,11 @@ namespace {
 		if (Digested) {
 			Vore_AdvanceQuest(Pred, Prey, IsDragon(Prey), IsGiant(Prey)); // Progress quest
 			if (Pred->formID == 0x14) {
-				shake_camera(Pred, 0.50, 0.75);
+				shake_camera(Pred, 0.50f, 0.75f);
 			}
 		}
 
-		Task_Vore_FinishVoreBuff(VoreInfo, 1.0, true);
+		Task_Vore_FinishVoreBuff(VoreInfo, 1, true);
 	}
 }
 
@@ -266,7 +266,7 @@ namespace Gts {
 				bool Mammoth = IsMammoth(tiny);
 				
 				float DefaultScale = get_natural_scale(tiny);
-				ModSizeExperience(giant, 0.08 + (DefaultScale*0.025));
+				ModSizeExperience(giant, 0.08f + (DefaultScale*0.025f));
 
 				SurvivalMode_AdjustHunger(this->giant.get().get(), Vore::GetSingleton().ReadOriginalScale(tiny) * GetSizeFromBoundingBox(tiny), Living, false);
 			}
@@ -281,7 +281,7 @@ namespace Gts {
 				auto tiny = tinyref.get().get();
 				auto giantref = this->giant;
 				SetBeingHeld(tiny, false);
-				AddSMTDuration(giantref.get().get(), 6.0);
+				AddSMTDuration(giantref.get().get(), 6.0f);
 				if (tiny->formID != 0x14) {
 					KillActor(giantref.get().get(), tiny);
 					PerkHandler::UpdatePerkValues(giantref.get().get(), PerkUpdate::Perk_LifeForceAbsorption);
@@ -289,7 +289,7 @@ namespace Gts {
 					InflictSizeDamage(giantref.get().get(), tiny, 900000);
 					KillActor(giantref.get().get(), tiny);
 					TriggerScreenBlood(50);
-					tiny->SetAlpha(0.0); // Player can't be disintegrated: simply nothing happens. So we Just make player Invisible instead.
+					tiny->SetAlpha(0.0f); // Player can't be disintegrated: simply nothing happens. So we Just make player Invisible instead.
 				}
 
 				Vore_AdvanceQuest(giantref.get().get(), tiny, IsDragon(tiny), IsGiant(tiny)); // Progress quest
@@ -309,7 +309,7 @@ namespace Gts {
 					if (smoll->formID != 0x14) {
 						Disintegrate(smoll);
 					}
-					TransferInventory(smoll, giant, 1.0, false, true, DamageSource::Vored, true);
+					TransferInventory(smoll, giant, 1.0f, false, true, DamageSource::Vored, true);
 				});
 			}
 		} else {
@@ -459,7 +459,7 @@ namespace Gts {
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(VORE_ANGLE*PI/180.0);
+			return cosTheta <= cos(VORE_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		if (numberOfPrey == 1) {
@@ -537,18 +537,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(VORE_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(VORE_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(VORE_ANGLE*PI/180.0);
+			return cosTheta <= cos(VORE_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		if (numberOfPrey == 1) {
@@ -642,7 +642,7 @@ namespace Gts {
 		float MINIMUM_DISTANCE = MINIMUM_VORE_DISTANCE;
 
 		if (HasSMT(pred)) {
-			MINIMUM_DISTANCE *= 1.75;
+			MINIMUM_DISTANCE *= 1.75f;
 		}
 		float pred_scale = get_visual_scale(pred);
 		float sizedifference = GetSizeDifference(pred, prey, SizeType::VisualScale, true, false);
@@ -658,7 +658,7 @@ namespace Gts {
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_VORE_SCALE) {
 			if (pred->formID == 0x14) {
 				std::string_view message = std::format("{} is too big to be eaten: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_VORE_SCALE);
-				shake_camera(pred, 0.45, 0.30);
+				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
 				CantVorePlayerMessage(pred, prey, sizedifference);
@@ -710,7 +710,7 @@ namespace Gts {
 				Notify("{} is too tired for vore.", pred->GetDisplayFullName());
 				DamageAV(prey, ActorValue::kHealth, 3 * sizedifference);
 				if (pred->formID == 0x14) {
-					Runtime::PlaySound("VoreSound_Fail", pred, 0.4, 1.0);
+					Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
 				}
 				StaggerActor(pred, prey, 0.25f);
 				return;
@@ -721,16 +721,16 @@ namespace Gts {
 		
 		if (GetSizeDifference(pred, prey, SizeType::VisualScale, false, false) < Action_Vore) {
 			if (pred->IsSneaking() && !IsCrawling(pred)) {
-				ShrinkUntil(pred, prey, 10.2, 0.14, true); // Shrink if we have SMT to allow 'same-size' vore
+				ShrinkUntil(pred, prey, 10.2f, 0.14f, true); // Shrink if we have SMT to allow 'same-size' vore
 			} else {
-				ShrinkUntil(pred, prey, 10.2, 0.16, true); // Shrink if we have SMT to allow 'same-size' vore
+				ShrinkUntil(pred, prey, 10.2f, 0.16f, true); // Shrink if we have SMT to allow 'same-size' vore
 				StaggerActor(pred, prey, 0.25f);
 			}
 			return;
 		}
 
 		if (pred->formID == 0x14) {
-			Runtime::PlaySound("VoreSound_Fail", pred, 0.4, 1.0);
+			Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
 		}
 		auto& voreData = this->GetVoreData(pred);
 		voreData.AddTiny(prey);
@@ -750,7 +750,7 @@ namespace Gts {
 		if (Data) {
 			return Data->vore_recorded_scale;
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	void Vore::ShrinkOverTime(Actor* giant, Actor* tiny, float over_time) {
@@ -776,7 +776,7 @@ namespace Gts {
 					float scale = get_visual_scale(actor);
 
 					if (scale > targetScale) {
-						override_actor_scale(actor, shrink_magnitude * 0.225 * TimeScale(), SizeEffectType::kNeutral);
+						override_actor_scale(actor, shrink_magnitude * 0.225f * TimeScale(), SizeEffectType::kNeutral);
 						if (get_target_scale(actor) < targetScale) {
 							set_target_scale(actor, targetScale);
 							return false;
@@ -802,10 +802,10 @@ namespace Gts {
 					if (Digested && !Devoured) { // Actors was completely absorbed (stage 2)
 						Notify("{} was devoured by {}", Prey->GetDisplayFullName(), Pred->GetDisplayFullName());
 						Cprint("{} was devoured by {}", Prey->GetDisplayFullName(), Pred->GetDisplayFullName());
-						DevourmentBonuses(Pred, Prey, true, 1.0);
+						DevourmentBonuses(Pred, Prey, true, 1.0f);
 						Devoured = true;
 					} else if (!Eaten) { // health bar was absorbed (stage 1)
-						DevourmentBonuses(Pred, Prey, false, 1.0);
+						DevourmentBonuses(Pred, Prey, false, 1.0f);
 						log::info("Adding to Eaten faction");
 						Eaten = true;
 					}

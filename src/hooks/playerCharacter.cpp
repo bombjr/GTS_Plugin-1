@@ -83,7 +83,7 @@ namespace Hooks
 		float value = _GetBaseActorValue(a_owner, a_akValue);
 		if (Plugin::Ready()) {
 			Actor* a_this = skyrim_cast<Actor*>(a_owner);
-			float bonus = 1.0;
+			float bonus = 1.0f;
 			if (a_this) {
 				value = AttributeManager::AlterGetBaseAv(a_this, a_akValue, value);
 			}

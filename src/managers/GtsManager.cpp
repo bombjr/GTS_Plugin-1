@@ -75,7 +75,7 @@ namespace {
 					auto transient = Transient::GetSingleton().GetData(player);
 					if (transient) {
 						float scale = std::clamp(get_visual_scale(player), 0.06f, 2.0f);
-						float CalcFall = 1.0 + (charCont->fallTime * (4.0 / scale) - 4.0);
+						float CalcFall = 1.0f + (charCont->fallTime * (4.0f / scale) - 4.0f);
 						float FallTime = std::clamp(CalcFall, 1.0f, 3.0f);
 						transient->FallTimer = FallTime;
 					}
@@ -87,7 +87,7 @@ namespace {
 	void FixActorFade(Actor* actor) {
 		auto profiler = Profilers::Profile("Manager: Fade Fix");
 
-		static Timer ApplyTimer = Timer(2.00);
+		static Timer ApplyTimer = Timer(2.00f);
 
 		if (!ApplyTimer.ShouldRunFrame()) {
 			return;
@@ -96,7 +96,7 @@ namespace {
 		bool reset = false;
 		NiAVObject* node = find_node(actor, "skeleton_female.nif");
 		
-		if (get_visual_scale(actor) < 1.5) {
+		if (get_visual_scale(actor) < 1.5f) {
 			reset = true;
 		}
 		if (node) {
@@ -113,15 +113,15 @@ namespace {
 	}
 
 	void PerformRoofRaycastAdjustments(Actor* actor, float& target_scale, float currentOtherScale) {
-		if (SizeRaycastEnabled() && !actor->IsDead() && target_scale > 1.025) {
+		if (SizeRaycastEnabled() && !actor->IsDead() && target_scale > 1.025f) {
 			float room_scale = GetMaxRoomScale(actor);
-			if (room_scale > (currentOtherScale - 0.05)) {
+			if (room_scale > (currentOtherScale - 0.05f)) {
 				// Only apply room scale if room_scale > natural_scale
-				//   This stops it from working when room_scale < 1.0
+				//   This stops it from working when room_scale < 1.0f
 				target_scale = min(target_scale, room_scale);
 			} else {
 				// Else we just scale to natural
-				target_scale = 1.0;
+				target_scale = 1.0f;
 			}
 		}
 	}
@@ -147,22 +147,22 @@ namespace {
 		// Smooth target_scale towards max_scale if target_scale > max_scale
 		float max_scale = persi_actor_data->max_scale;
 		if (target_scale > max_scale) {
-			float minimum_scale_delta = 0.000005; // 0.00005%
+			float minimum_scale_delta = 0.000005f; // 0.00005f%
 			if (fabs(target_scale - max_scale) < minimum_scale_delta) {
 				float target = max_scale;
 				persi_actor_data->target_scale = target;
-				persi_actor_data->target_scale_v = 0.0;
+				persi_actor_data->target_scale_v = 0.0f;
 			} else {
 				critically_damped(
 					persi_actor_data->target_scale,
 					persi_actor_data->target_scale_v,
 					max_scale,
-					persi_actor_data->half_life*1.5,
+					persi_actor_data->half_life*1.5f,
 					Time::WorldTimeDelta()
 					);
 			}
 		} else {
-			persi_actor_data->target_scale_v = 0.0;
+			persi_actor_data->target_scale_v = 0.0f;
 		}
 
 		// Room Size adjustments
@@ -171,10 +171,10 @@ namespace {
 		PerformRoofRaycastAdjustments(actor, target_scale, currentOtherScale);
 		
 		if (fabs(target_scale - persi_actor_data->visual_scale) > 1e-5) {
-			float minimum_scale_delta = 0.000005; // 0.00005%
+			float minimum_scale_delta = 0.000005f; // 0.00005f%
 			if (fabs(target_scale - persi_actor_data->visual_scale) < minimum_scale_delta) {
 				persi_actor_data->visual_scale = target_scale;
-				persi_actor_data->visual_scale_v = 0.0;
+				persi_actor_data->visual_scale_v = 0.0f;
 			} else {
 				critically_damped(
 					persi_actor_data->visual_scale,
@@ -203,17 +203,17 @@ namespace {
 			return;
 		}
 		float scale = get_scale(actor);
-		if (scale < 0.0) {
+		if (scale < 0.0f) {
 			return;
 		}
 		float visual_scale = persi_actor_data->visual_scale;
 		if (actor->formID == 0x14) {
 			float scaleOverride = get_fp_scale(actor);
 			if (IsFirstPerson() && scaleOverride >= 1e-4) {
-				if (scaleOverride > 1.0) {
+				if (scaleOverride > 1.0f) {
 					visual_scale *= GetProneAdjustment(); // In normal case we * it for compatibility with crawling/proning.
 				} else {
-					visual_scale = scaleOverride; // In Loot/Combat mode case, we override it with flat value (such as 0.6).
+					visual_scale = scaleOverride; // In Loot/Combat mode case, we override it with flat value (such as 0.6f).
 				}
 			}
 		}
@@ -317,23 +317,23 @@ void GtsManager::Update() {
 				ScareActors(actor);
 				FixActorFade(actor);
 
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
 				
 				ClothManager::GetSingleton().CheckClothingRip(actor);
 				TinyCalamity_SeekActors(actor);
 				SpawnActionIcon(actor);
 
 				if (IsCrawling(actor)) {
-					ApplyAllCrawlingDamage(actor, 1000, 0.25);
+					ApplyAllCrawlingDamage(actor, 1000, 0.25f);
 				}
 
 				GameModeManager::GetSingleton().GameMode(actor); // Handle Game Modes
 			}
 			if (Runtime::GetBool("PreciseDamageOthers")) {
 				if (actor->formID != 0x14 && !IsTeammate(actor)) {
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
 				}
 			}
 			update_actor(actor);

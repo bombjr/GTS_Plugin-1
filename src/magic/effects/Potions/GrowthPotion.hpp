@@ -24,7 +24,7 @@ namespace Gts {
 			GrowthPotion(ActiveEffect* effect);
 
 		private:
-			Timer timer = Timer(2.33); // Run every 2.33s or as soon as we can
-			float power = 0.0;
+			Timer timer = Timer(2.33f); // Run every 2.33s or as soon as we can
+			float power = 0.0f;
 	};
 }

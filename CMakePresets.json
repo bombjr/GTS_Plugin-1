@@ -65,7 +65,7 @@
       "name": "msvc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /WX $penv{CXXFLAGS}"
+        "CMAKE_CXX_FLAGS": "/EHsc /MP $penv{CXXFLAGS}"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {

@@ -74,20 +74,20 @@ namespace Gts {
 				float SurvivalEnabled = Runtime::GetBool("Survival_ModeEnabled");
 				if (SurvivalEnabled) {
 					auto HungerNeed = Runtime::GetGlobal("Survival_HungerNeedValue"); // Obtain
-					float restore = 128.0;
+					float restore = 128.0f;
 
 					if (!IsLiving) {
-						tinyscale *= 0.20; // Less effective on non living targets
+						tinyscale *= 0.20f; // Less effective on non living targets
 					}
 					if (Finished) {
-						restore *= 6.0; // Stronger gain on Vore Finish
+						restore *= 6.0f; // Stronger gain on Vore Finish
 					}
 
 					float power = (get_visual_scale(giant)/tinyscale); // Get size difference and * it by natural size
 
 					HungerNeed->value -= (restore / power);
-					if (HungerNeed->value <= 0.0) {
-						HungerNeed->value = 0.0; // Cap it at 0.0
+					if (HungerNeed->value <= 0.0f) {
+						HungerNeed->value = 0.0f; // Cap it at 0.0f
 					}
 					float value = HungerNeed->value;
 					SurvivalMode_RefreshSpells(giant, value);

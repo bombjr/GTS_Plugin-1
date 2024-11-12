@@ -35,28 +35,28 @@ using namespace std;
 
 namespace {
 	void Break_Object(TESObjectREFR* ref, float damage, float giant_size, bool smt) {
-		if (giant_size > 1.5 || smt) {
+		if (giant_size > 1.5f || smt) {
 			if (smt) {
-				damage *= 4.0;
+				damage *= 4.0f;
 			}
 			ref->DamageObject(damage * 40, true);
 		}
 	}
 
 	float Multiply_By_Perk(Actor* giant) {
-		float multiply = 1.0;
+		float multiply = 1.0f;
 		if (Runtime::HasPerkTeam(giant, "RumblingFeet")) {
-			multiply *= 1.25;
+			multiply *= 1.25f;
 		}
 
 		if (Runtime::HasPerkTeam(giant, "DisastrousTremor")) {
-			multiply *= 1.5;
+			multiply *= 1.5f;
 		}
 		return multiply;
 	}
 
 	float Multiply_By_Mass(bhkRigidBody* body) {
-		float mass_total = 1.0;
+		float mass_total = 1.0f;
 		if (body->referencedObject) {
 			if (const auto havokRigidBody = static_cast<hkpRigidBody*>(body->referencedObject.get())) {
 				hkVector4 mass_get = havokRigidBody->motion.inertiaAndMassInv;
@@ -68,7 +68,7 @@ namespace {
 					mass_total /= mass;
 
 					//log::info("Mass of object is {}", mass_total);
-					mass_total *= 0.5; // Just to have old push force on objects
+					mass_total *= 0.5f; // Just to have old push force on objects
 				}
 			}
 		}
@@ -86,7 +86,7 @@ namespace {
 				if (body) {
 					push *= Multiply_By_Mass(body);
 					//log::info("Applying force to object, Push: {}, Force: {}, Result: {}", Vector2Str(push), force, Vector2Str(push * force));
-					SetLinearImpulse(body, hkVector4(push.x * force, push.y * force, push.z * force, 1.0));
+					SetLinearImpulse(body, hkVector4(push.x * force, push.y * force, push.z * force, 1.0f));
 				}
 			}
 		}
@@ -100,18 +100,18 @@ namespace Gts {
 		// https://www.desmos.com/calculator/wh0vwgljfl
 		if (Launch) {
 			SoftPotential launch {
-				.k = 1.6,//1.42,
-				.n = 0.70,//0.78
-				.s = 0.6,
-				.a = 0.0,
+				.k = 1.6f,//1.42f,
+				.n = 0.70f,//0.78f
+				.s = 0.6f,
+				.a = 0.0f,
 			};
 			return soft_power(sizeRatio, launch);
 		} else {
 			SoftPotential kick {
-			.k = 1.6,//1.42,
-			.n = 0.62,//0.78
-			.s = 0.6,
-			.a = 0.0,
+			.k = 1.6f,//1.42f,
+			.n = 0.62f,//0.78f
+			.s = 0.6f,
+			.a = 0.0f,
 			};
 			return soft_power(sizeRatio, kick);
 		}
@@ -133,21 +133,21 @@ namespace Gts {
 
 		if (HasSMT(giant)) {
 			smt = true;
-			power *= 1.25;
+			power *= 1.25f;
 		}
 
-		if (giantScale < 2.5) {  // slowly gain power of pushing
-			float reduction = (giantScale - 1.5);
+		if (giantScale < 2.5f) {  // slowly gain power of pushing
+			float reduction = (giantScale - 1.5f);
 			if (smt) {
-				reduction = 0.6;
+				reduction = 0.6f;
 			}
-			if (reduction < 0.0) {
-				reduction = 0.0;
+			if (reduction < 0.0f) {
+				reduction = 0.0f;
 			}
 			power *= reduction;
 		}
 
-		float start_power = Push_Object_Upwards * (1.0 + Potion_GetMightBonus(giant));
+		float start_power = Push_Object_Upwards * (1.0f + Potion_GetMightBonus(giant));
 
 		std::vector<ObjectRefHandle> Refs = GetNearbyObjects(giant);
 
@@ -156,7 +156,7 @@ namespace Gts {
 				if (IsFoot) {
 					point.z -= HH;
 				}
-				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxFootDistance, 600, {0.0, 1.0, 0.0, 1.0});
+				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxFootDistance, 600, {0.0f, 1.0f, 0.0f, 1.0f});
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace Gts {
 							}
 							float distance = (point - objectlocation).Length();
 							if (distance <= maxFootDistance) {
-								float force = 1.0 - distance / maxFootDistance;
+								float force = 1.0f - distance / maxFootDistance;
 								float push = start_power * GetLaunchPower_Object(giantScale, true) * force * power;
 								auto Object1 = objectref->Get3D1(false);
 							
@@ -220,18 +220,18 @@ namespace Gts {
 		bool smt = HasSMT(giant);
 		float giantScale = get_visual_scale(giant);
 
-		float start_power = Push_Object_Forward * (1.0 + Potion_GetMightBonus(giant));
+		float start_power = Push_Object_Forward * (1.0f + Potion_GetMightBonus(giant));
 
 		NiPoint3 point = Bone->world.translate;
 		float maxDistance = radius * giantScale;
 
         if (Kick) { // Offset pos down
             float HH = HighHeelManager::GetHHOffset(giant).Length();
-			point.z -= HH * 0.75;
+			point.z -= HH * 0.75f;
 		}
 
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
-			DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 20, {0.5, 0.0, 0.5, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 20, {0.5f, 0.0f, 0.5f, 1.0f});
 		}
 
 		int nodeCollisions = 0;

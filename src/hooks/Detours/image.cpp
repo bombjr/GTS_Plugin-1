@@ -2,7 +2,7 @@
 //
 //  Image manipulation functions (image.cpp of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0.1
+//  Microsoft Research Detours Package, Version 4.0f.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
@@ -1677,7 +1677,7 @@ fail:
 			m_nNextFileAddr = Max(m_SectionHeaders[n].PointerToRawData +
 			                      m_SectionHeaders[n].SizeOfRawData,
 			                      m_nNextFileAddr);
-			// Old images have VirtualSize == 0 as a matter of course, e.g. NT 3.1.
+			// Old images have VirtualSize == 0 as a matter of course, e.g. NT 3.1f.
 			// In which case, use SizeOfRawData instead.
 			m_nNextVirtAddr = Max(m_SectionHeaders[n].VirtualAddress +
 			                      (m_SectionHeaders[n].Misc.VirtualSize

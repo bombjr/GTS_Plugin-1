@@ -11,7 +11,7 @@
 using namespace Gts;
 
 namespace {
-	const float EPS = 1e-4;
+	const float EPS = 1e-4f;
 }
 
 namespace Gts {
@@ -45,7 +45,7 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->target_scale * get_natural_scale(&actor, true);
 		} else {
-			return -1.0;
+			return -1.0f;
 		}
 	}
 	float get_target_scale(Actor* actor) {
@@ -53,7 +53,7 @@ namespace Gts {
 			Actor& a = *actor;
 			return get_target_scale(a);
 		} else {
-			return -1.0;
+			return -1.0f;
 		}
 	}
 
@@ -66,7 +66,7 @@ namespace Gts {
 
 			amt /= natural_scale;
 
-			if (amt - EPS < 0.0) { // If neative change always: allow
+			if (amt - EPS < 0.0f) { // If neative change always: allow
 				actor_data->target_scale += amt;
 			} else if (target_scale + amt < (actor_data->max_scale + EPS)) { // If change results is below max: allow it
 				actor_data->target_scale += amt;
@@ -99,13 +99,13 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->max_scale;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 	float get_max_scale(Actor* actor) {
 		if (actor) {
 			return get_max_scale(*actor);
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	void mod_max_scale(Actor& actor, float amt) {
@@ -125,19 +125,19 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->visual_scale * get_natural_scale(&actor, true);
 		}
-		return -1.0;
+		return -1.0f;
 	}
 	float get_visual_scale(Actor* actor) {
 		if (actor) {
 			return get_visual_scale(*actor);
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	float get_natural_scale(Actor& actor, bool game_scale) {
 		auto actor_data = Transient::GetSingleton().GetData(&actor);
 		if (actor_data) {
-			//static Timer timer = Timer(5.0);
+			//static Timer timer = Timer(5.0f);
 		    float initialScale = GetInitialScale(&actor);
 			/*if (actor.formID == 0x14 && timer.ShouldRunFrame()) {
 				log::info("Initial Scale: {}", initialScale);
@@ -153,25 +153,25 @@ namespace Gts {
 			return result;
 			// otherScales reads RaceMenu scale
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	float get_natural_scale(Actor* actor, bool game_scale) {
 		if (actor) {
 			return get_natural_scale(*actor, game_scale);
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	float get_natural_scale(Actor* actor) {
 		if (actor) {
 			return get_natural_scale(*actor, false);
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	float get_neutral_scale(Actor* actor) {
-		return 1.0;
+		return 1.0f;
 	}
 
 	float get_giantess_scale(Actor& actor) {
@@ -181,13 +181,13 @@ namespace Gts {
 			// Sadly had to add natural scale to it so it will respect GetScale * RaceMenu alterations
 			return result;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 	float get_giantess_scale(Actor* actor) {
 		if (actor) {
 			return get_giantess_scale(*actor);
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 }

@@ -70,7 +70,7 @@ namespace {
 		return Strong;
 	}
 	bool Allow_Damage(Actor* giant, Actor* tiny, DamageSource cause, float difference) {
-		float threshold = 3.0;
+		float threshold = 3.0f;
 
 		if (DisallowSizeDamage(giant, tiny)) {
 			return false;
@@ -99,8 +99,8 @@ namespace {
 		if (PreventDamage) {
 			// goal of this function is to deal heavily decreased damage on normal walk footsteps to actors
 			// so it won't look silly by dealing 30 damage by briefly colliding with others
-			if (difference > 1.4) {
-				InflictSizeDamage(giant, tiny, difference * 0.35);
+			if (difference > 1.4f) {
+				InflictSizeDamage(giant, tiny, difference * 0.35f);
 			} 
 			return false;
 		}
@@ -131,15 +131,15 @@ namespace {
 			auto& sizemanager = SizeManager::GetSingleton();
 
 			if (Runtime::HasPerkTeam(giant, "RavagingInjuries") && giant->AsActorState()->IsSprinting() && !IsGtsBusy(giant)) {
-				damage *= 3.0; // x3 stronger during sprint
+				damage *= 3.0f; // x3 stronger during sprint
 			}
 
-			sizemanager.ModSizeVulnerability(tiny, damage * 0.0010);
+			sizemanager.ModSizeVulnerability(tiny, damage * 0.0010f);
 		}
 	}
 
 	float HighHeels_PerkDamage(Actor* giant, DamageSource Cause) {
-		float value = 1.0;
+		float value = 1.0f;
 		bool perk = Runtime::HasPerkTeam(giant, "hhBonus");
 		bool rumbling_feet = Runtime::HasPerkTeam(giant, "RumblingFeet");
 		bool matches = false;
@@ -160,9 +160,9 @@ namespace {
 		}
 		if (matches) {
 			if (rumbling_feet) {
-				value += 0.25; // 25% bonus damage if we have lvl 65 perk
+				value += 0.25f; // 25% bonus damage if we have lvl 65 perk
 			} if (perk) {
-				value += 0.15; // 15% bonus damage if we have High Heels perk
+				value += 0.15f; // 15% bonus damage if we have High Heels perk
 			}
 		}
 		
@@ -190,17 +190,17 @@ namespace Gts {
 		}
 
 		float giantScale = get_visual_scale(actor) * GetSizeFromBoundingBox(actor);
-		float BASE_CHECK_DISTANCE = 180.0;
-		float SCALE_RATIO = 1.15;
-		float Calamity = 1.0;
+		float BASE_CHECK_DISTANCE = 180.0f;
+		float SCALE_RATIO = 1.15f;
+		float Calamity = 1.0f;
 
 		bool SMT = HasSMT(actor);
 		if (SMT) {
 			if (SupportCalamity) {
-				Calamity = 4.0; // Only active during stomps and such
+				Calamity = 4.0f; // Only active during stomps and such
 			}
-			giantScale += 0.20;
-			SCALE_RATIO = 0.7;
+			giantScale += 0.20f;
+			SCALE_RATIO = 0.7f;
 		}
 
 		float maxFootDistance = radius * giantScale;
@@ -291,41 +291,41 @@ namespace Gts {
 		auto& sizemanager = SizeManager::GetSingleton();
 		float size_difference = GetSizeDifference(giant, tiny, SizeType::VisualScale, false, true);
 
-		float size_threshold = 1.25;
+		float size_threshold = 1.25f;
 
 		if (SMT) {
-			size_threshold = 0.9;
+			size_threshold = 0.9f;
 		}
 
 		if (size_difference > size_threshold) {
 			if (Allow_Damage(giant, tiny, Cause, size_difference)) {
 				float damagebonus = HighHeels_PerkDamage(giant, Cause); // 15% bonus HH damage if we have perk
 
-				float vulnerability = 1.0 + sizemanager.GetSizeVulnerability(tiny); // Get size damage debuff from enemy
-				float normaldamage = std::clamp(sizemanager.GetSizeAttribute(giant, SizeAttribute::Normal) * 0.30, 0.30, 999999.0);
+				float vulnerability = 1.0f + sizemanager.GetSizeVulnerability(tiny); // Get size damage debuff from enemy
+				float normaldamage = std::clamp(sizemanager.GetSizeAttribute(giant, SizeAttribute::Normal) * 0.30f, 0.30f, 999999.0f);
 
-				float highheelsdamage = 1.0;
+				float highheelsdamage = 1.0f;
 				if (ApplyHighHeelBonus(giant, Cause)) {
 					highheelsdamage = GetHighHeelsBonusDamage(giant, true);
 				}
 
-				float sprintdamage = 1.0; // default Sprint damage of 1.0
-				float weightdamage = 1.0 + (giant->GetWeight()*0.01);
+				float sprintdamage = 1.0f; // default Sprint damage of 1.0f
+				float weightdamage = 1.0f + (giant->GetWeight()*0.01f);
 
 				if (giant->AsActorState()->IsSprinting()) {
-					sprintdamage = 1.5 * sizemanager.GetSizeAttribute(giant, SizeAttribute::Sprint);
-					damage *= 1.5;
+					sprintdamage = 1.5f * sizemanager.GetSizeAttribute(giant, SizeAttribute::Sprint);
+					damage *= 1.5f;
 				}
 
-				float Might = 1.0 + Potion_GetMightBonus(giant);
+				float Might = 1.0f + Potion_GetMightBonus(giant);
 				float damage_result = (damage * size_difference * damagebonus) * (normaldamage * sprintdamage) * (highheelsdamage * weightdamage) * vulnerability;
 
 				damage_result *= Might;
 
-				TinyCalamity_ShrinkActor(giant, tiny, damage_result * 0.35 * GetDamageSetting());
+				TinyCalamity_ShrinkActor(giant, tiny, damage_result * 0.35f * GetDamageSetting());
 
 				if (giant->IsSneaking()) {
-					damage_result *= 0.70;
+					damage_result *= 0.70f;
 				}
 
 				// ^ Chance to break bonues and inflict additional damage, as well as making target more vulerable to size damage
@@ -335,8 +335,8 @@ namespace Gts {
 					ModSizeExperience(giant, experience);
 				}
 
-				if (tiny->formID == 0x14 && GetAV(tiny, ActorValue::kStamina) > 2.0) {
-					DamageAV(tiny, ActorValue::kStamina, damage_result * 2.0);
+				if (tiny->formID == 0x14 && GetAV(tiny, ActorValue::kStamina) > 2.0f) {
+					DamageAV(tiny, ActorValue::kStamina, damage_result * 2.0f);
 					damage_result -= GetAV(tiny, ActorValue::kStamina); // Reduce damage by stamina amount
 					if (damage_result < 0) {
 						damage_result = 0; // just to be safe and to not restore attributes
@@ -358,7 +358,7 @@ namespace Gts {
 
 	void CollisionDamage::CrushCheck(Actor* giant, Actor* tiny, float size_difference, float crush_threshold, DamageSource Cause) {
 		bool CanBeCrushed = (
-			GetAV(tiny, ActorValue::kHealth) <= 1.0 ||
+			GetAV(tiny, ActorValue::kHealth) <= 1.0f ||
 			tiny->IsDead()
 		);
 		
@@ -373,7 +373,7 @@ namespace Gts {
 						AdvanceQuestProgression(giant, tiny, QuestStage::Crushing, 1, false);
 					}
 				} else {
-					AdvanceQuestProgression(giant, tiny, QuestStage::Crushing, 0.25, false);
+					AdvanceQuestProgression(giant, tiny, QuestStage::Crushing, 0.25f, false);
 				}
 				SetReanimatedState(tiny);
 

@@ -10,9 +10,9 @@
 namespace {
 	void PlayGrowthAudio(Actor* giant, bool checkTimer) {
 		if (checkTimer) {
-			Rumbling::Once("ShrinkResistPotion", giant, 2.0, 0.05);
+			Rumbling::Once("ShrinkResistPotion", giant, 2.0f, 0.05f);
 			float Volume = std::clamp(get_visual_scale(giant)/10.0f, 0.20f, 2.0f);
-			Runtime::PlaySoundAtNode("growthSound", giant, Volume, 1.0, "NPC Pelvis [Pelv]");
+			Runtime::PlaySoundAtNode("growthSound", giant, Volume, 1.0f, "NPC Pelvis [Pelv]");
 		}
 	}
 }
@@ -27,13 +27,13 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("ResistShrinkPotionWeak")) {
-			this->Resistance = 0.2;
+			this->Resistance = 0.2f;
 		} else if (base_spell == Runtime::GetMagicEffect("ResistShrinkPotionNormal")) {
-			this->Resistance = 0.4;
+			this->Resistance = 0.4f;
 		} else if (base_spell == Runtime::GetMagicEffect("ResistShrinkPotionStrong")) {
-			this->Resistance = 0.6;
+			this->Resistance = 0.6f;
 		} else if (base_spell == Runtime::GetMagicEffect("ResistShrinkPotionExtreme")) {
-			this->Resistance = 0.8;
+			this->Resistance = 0.8f;
 		} 
 	}
 
@@ -49,7 +49,7 @@ namespace Gts {
 	void ShrinkResistPotion::OnFinish() {
 		auto caster = GetCaster();
 		if (caster) {
-			Potion_SetShrinkResistance(caster, 0.0);
+			Potion_SetShrinkResistance(caster, 0.0f);
 		}
 	}
 }

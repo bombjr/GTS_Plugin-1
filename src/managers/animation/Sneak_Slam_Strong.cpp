@@ -28,12 +28,12 @@ namespace {
     void GTS_Sneak_SlamStrong_Raise_Arm_R(AnimationEventData& data) {
         Utils_UpdateHighHeelBlend(&data.giant, false);
         TrackMatchingHand(&data.giant, CrawlEvent::RightHand, true); // OFF is handled inside Sneak_Slam.cpp
-		DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", true, 2.2);
+		DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", true, 2.2f);
 	} 
 	void GTS_Sneak_SlamStrong_Raise_Arm_L(AnimationEventData& data) {
         Utils_UpdateHighHeelBlend(&data.giant, false);
         TrackMatchingHand(&data.giant, CrawlEvent::LeftHand, true); // OFF is handled inside Sneak_Slam.cpp
-		DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", true, 2.2);
+		DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", true, 2.2f);
 	}
 
     void GTS_Sneak_SlamStrong_Lower_Arm_R(AnimationEventData& data) {}
@@ -41,24 +41,24 @@ namespace {
 
     void GTS_Sneak_SlamStrong_Impact_R(AnimationEventData& data) {
         float scale = get_visual_scale(&data.giant);
-        DoCrawlingFunctions(&data.giant, scale, 2.75, Damage_Sneak_HandSlam_Strong, CrawlEvent::RightHand, "RightHandRumble", 1.6, Radius_Sneak_HandSlam_Strong, 1.0, DamageSource::HandSlamRight);
-        DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", false, 2.2);
+        DoCrawlingFunctions(&data.giant, scale, 2.75f, Damage_Sneak_HandSlam_Strong, CrawlEvent::RightHand, "RightHandRumble", 1.6f, Radius_Sneak_HandSlam_Strong, 1.0f, DamageSource::HandSlamRight);
+        DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", false, 2.2f);
     }  
 	void GTS_Sneak_SlamStrong_Impact_L(AnimationEventData& data) {
         float scale = get_visual_scale(&data.giant);
-        DoCrawlingFunctions(&data.giant, scale, 2.75, Damage_Sneak_HandSlam_Strong, CrawlEvent::LeftHand, "RightHandRumble", 1.6, Radius_Sneak_HandSlam_Strong, 1.0, DamageSource::HandSlamLeft);
-        DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", false, 2.2);
-        Grab::DamageActorInHand(&data.giant, Damage_Sneak_HandSlam_Strong * 0.6);
+        DoCrawlingFunctions(&data.giant, scale, 2.75f, Damage_Sneak_HandSlam_Strong, CrawlEvent::LeftHand, "RightHandRumble", 1.6f, Radius_Sneak_HandSlam_Strong, 1.0f, DamageSource::HandSlamLeft);
+        DrainStamina(&data.giant, "StaminaDrain_StrongSneakSlam", "DestructionBasics", false, 2.2f);
+        Grab::DamageActorInHand(&data.giant, Damage_Sneak_HandSlam_Strong * 0.6f);
     } 
 
     void GTS_Sneak_SlamStrong_Impact_Secondary_R(AnimationEventData& data) {
-        float scale = get_visual_scale(&data.giant) * 0.8;
-        DoCrawlingFunctions(&data.giant, scale, 0.85, Damage_Sneak_HandSlam_Strong_Secondary, CrawlEvent::RightHand, "RightHandRumble", 0.8, Radius_Sneak_HandSlam_Strong_Recover, 2.0, DamageSource::HandSlamRight);
+        float scale = get_visual_scale(&data.giant) * 0.8f;
+        DoCrawlingFunctions(&data.giant, scale, 0.85f, Damage_Sneak_HandSlam_Strong_Secondary, CrawlEvent::RightHand, "RightHandRumble", 0.8f, Radius_Sneak_HandSlam_Strong_Recover, 2.0f, DamageSource::HandSlamRight);
     }
     void GTS_Sneak_SlamStrong_Impact_Secondary_L(AnimationEventData& data) {
-        float scale = get_visual_scale(&data.giant) * 0.8;
-        DoCrawlingFunctions(&data.giant, scale, 0.85, Damage_Sneak_HandSlam_Strong_Secondary, CrawlEvent::LeftHand, "RightHandRumble", 0.8, Radius_Sneak_HandSlam_Strong_Recover, 2.0, DamageSource::HandSlamRight);
-        Grab::DamageActorInHand(&data.giant, Damage_Sneak_HandSlam_Strong_Secondary * 0.6);
+        float scale = get_visual_scale(&data.giant) * 0.8f;
+        DoCrawlingFunctions(&data.giant, scale, 0.85f, Damage_Sneak_HandSlam_Strong_Secondary, CrawlEvent::LeftHand, "RightHandRumble", 0.8f, Radius_Sneak_HandSlam_Strong_Recover, 2.0f, DamageSource::HandSlamRight);
+        Grab::DamageActorInHand(&data.giant, Damage_Sneak_HandSlam_Strong_Secondary * 0.6f);
     }
 }
 

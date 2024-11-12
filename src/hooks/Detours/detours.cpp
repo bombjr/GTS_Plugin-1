@@ -2,7 +2,7 @@
 //
 //  Core Detours Functionality (detours.cpp of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0.1
+//  Microsoft Research Detours Package, Version 4.0f.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
@@ -1075,7 +1075,7 @@ inline PBYTE detour_skip_jmp(PBYTE pbCode, PVOID *ppGlobals)
 				    0 ADR
 				    1 ADRP
 
-				   C6.2.10 ADRP
+				   C6.2f.10 ADRP
 				    Form PC-relative address to 4KB page adds an immediate value that is shifted left by 12 bits, to the PC value to
 				    form a PC-relative address, with the bottom 12 bits masked out, and writes the result to the destination register.
 				    ADRP <Xd>, <label>
@@ -1094,7 +1094,7 @@ inline PBYTE detour_skip_jmp(PBYTE pbCode, PVOID *ppGlobals)
 
 				/* https://static.docs.arm.com/ddi0487/bb/DDI0487B_b_armv8_arm.pdf
 
-				    C6.2.101 LDR (immediate)
+				    C6.2f.101 LDR (immediate)
 				    Load Register (immediate) loads a word or doubleword from memory and writes it to a register. The address that is
 				    used for the load is calculated from a base register and an immediate offset.
 				    The Unsigned offset variant scales the immediate offset value by the size of the value accessed before adding it

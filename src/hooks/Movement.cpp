@@ -33,8 +33,8 @@ namespace Hooks
             // 0x1404fe820 : 32703
             // 0x1404fed71 - 0x1404fe820 = 0x551
 			[](auto* param_1) {
-				float result = 1.0;
-				return result; // Always return 1.0, We don't want to scale that: breaks dodge mods
+				float result = 1.0f;
+				return result; // Always return 1.0f, We don't want to scale that: breaks dodge mods
                 // And we alter it by havok hook anyway.
             }
         );
@@ -48,17 +48,17 @@ namespace Hooks
                 // ---------------AE:
                 // FUN_140630510 :  37943
                 // 0x140630561 - 0x140630510 = 0x51
-                float result = 1.0; // force it to 1.0. We DON'T want the SetScale() to affect it.
-                //log::info("(21) - Hooked Alter Movement Speed, value * 0.15");
+                float result = 1.0f; // force it to 1.0f. We DON'T want the SetScale() to affect it.
+                //log::info("(21) - Hooked Alter Movement Speed, value * 0.15f");
                 return result;
             }
         );
 
         static CallHook<float(TESObjectREFR* param_1)>Scale_AlterAnimSpeed(  // something bone related
 			REL::RelocationID(41683, 42768), REL::Relocate(0x31, 0x31), // Affects Animation speed of: Walk Speed, Sneak Speed
-			// There's vanilla bug: If you save the game at SetScale of 2.0 (for example)
-            // Then load a save and perform SetScale of 1.0 = your animations will look slower. Bethesda.
-			// Anyway, we want to always force it to 1.0 since we manage animation speed anyway.
+			// There's vanilla bug: If you save the game at SetScale of 2.0f (for example)
+            // Then load a save and perform SetScale of 1.0f = your animations will look slower. Bethesda.
+			// Anyway, we want to always force it to 1.0f since we manage animation speed anyway.
 			// This hook seems to be called only once, on save file load
 			[](auto* param_1) {
                 // ---------------SE:
@@ -68,7 +68,7 @@ namespace Hooks
 				// FUN_140746b40 : 42768
 				// 0x140746b71 - 0x140746b40 = 0x31   // wow it's the same
 
-				float result = 1.0; // Override it
+				float result = 1.0f; // Override it
 				
 				return result;
             }

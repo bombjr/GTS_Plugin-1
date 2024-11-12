@@ -22,6 +22,6 @@ namespace Gts {
 			ShrinkResistPotion(ActiveEffect* effect);
 
 		private:
-			float Resistance = 0.0;
+			float Resistance = 0.0f;
 	};
 }

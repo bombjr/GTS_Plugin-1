@@ -20,17 +20,17 @@ namespace Gts {
 		auto player = GetCameraActor();
 		float result = get_visual_scale(player);
 		if (!player) {
-			return 1.0;
+			return 1.0f;
 		}
 		return result;
 	}
 
 	float CameraState::GetScaleOverride(bool IsCrawling) {
-		return -1.0;
+		return -1.0f;
 	}
 
 	NiPoint3 CameraState::GetOffset(const NiPoint3& cameraPosLocal) {
-		return NiPoint3(0.0, 0.0, 0.0);
+		return NiPoint3(0.0f, 0.0f, 0.0f);
 	}
 	NiPoint3 CameraState::GetOffsetProne(const NiPoint3& cameraPosLocal) {
 		return this->GetOffset(cameraPosLocal);
@@ -44,7 +44,7 @@ namespace Gts {
 	}
 
 	NiPoint3 CameraState::GetCombatOffset(const NiPoint3& cameraPosLocal) {
-		return NiPoint3(0.0, 0.0, 0.0);
+		return NiPoint3(0.0f, 0.0f, 0.0f);
 	}
 	NiPoint3 CameraState::GetCombatOffsetProne(const NiPoint3& cameraPosLocal) {
 		return this->GetCombatOffset(cameraPosLocal);
@@ -58,7 +58,7 @@ namespace Gts {
 	}
 
 	NiPoint3 CameraState::GetPlayerLocalOffset(const NiPoint3& cameraPosLocal) {
-		return NiPoint3(0.0, 0.0, 0.0);
+		return NiPoint3(0.0f, 0.0f, 0.0f);
 	}
 	NiPoint3 CameraState::GetPlayerLocalOffsetProne(const NiPoint3& cameraPosLocal) {
 		return this->GetPlayerLocalOffset(cameraPosLocal);

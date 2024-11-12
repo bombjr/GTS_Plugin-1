@@ -26,7 +26,7 @@ namespace Gts {
 
 	void Profiler::Reset()
 	{
-		this->elapsed = 0.0;
+		this->elapsed = 0.0f;
 	}
 
 	double Profiler::Elapsed() {
@@ -114,7 +114,7 @@ namespace Gts {
 
 		static std::uint64_t last_report_frame = 0;
 		static double last_report_time = 0.0;
-		std::uint64_t current_report_frame = Time::WorldTimeElapsed();
+		std::uint64_t current_report_frame = static_cast<uint64_t>(Time::FramesElapsed());
 		double current_report_time = Time::WorldTimeElapsed();
 		double total_time = current_report_time - last_report_time;
 
@@ -127,7 +127,7 @@ namespace Gts {
 			if (shortenedName.length() > 19) {
 				shortenedName = shortenedName.substr(0, 18) + "…";
 			}
-			report += std::format("\n {:20}:					{:15.3f}|{:14.1f}%|{:15.3f}|{:14.3f}%", shortenedName, elapsed, elapsed*100.0/total, spf, time_percent);
+			report += std::format("\n {:20}:					{:15.3f}|{:14.1f}%|{:15.3f}|{:14.3f}%", shortenedName, elapsed, elapsed*100.0f/total, spf, time_percent);
 			profiler.Reset();
 		}
 		log::info("{}", report);

@@ -54,7 +54,7 @@ namespace RE {
 }
 
 namespace {
-	const float EPS = 1e-4;
+	const float EPS = 1e-4f;
 
 	const std::vector<std::string> disarm_nodes = {
 		"WeaponDagger",
@@ -71,19 +71,19 @@ namespace {
 	float GetGrowthReduction(float size) {
 		// https://www.desmos.com/calculator/pqgliwxzi2
 		
-		if (SizeManager::GetSingleton().BalancedMode() >= 2.0) {
+		if (SizeManager::GetSingleton().BalancedMode() >= 2.0f) {
 			SoftPotential cut {
-				.k = 1.08,
-				.n = 0.90,
-				.s = 3.00,
-				.a = 0.0,
+				.k = 1.08f,
+				.n = 0.90f,
+				.s = 3.00f,
+				.a = 0.0f,
 			};
 			float balance = GameModeManager::GetSingleton().GetBalanceModeInfo(BalanceModeInfo::SizeGain_Penalty);
 			float power = soft_power(size, cut) * balance;
 			return std::clamp(power, 1.0f, 99999.0f);
 		} else {
-			return 1.0;
-			// So it never reports values below 1.0. Just to make sure.
+			return 1.0f;
+			// So it never reports values below 1.0f. Just to make sure.
 		}
 	}
 
@@ -92,27 +92,27 @@ namespace {
 
 		if (!force_cancel && Balance) {
 			float perk = Perk_GetCostReduction(giantref);
-			float damage = 0.08 * TimeScale() * perk;
+			float damage = 0.08f * TimeScale() * perk;
 			if (giantref->formID != 0x14) {
-				damage *= 0.5; // less stamina drain for NPC's
+				damage *= 0.5f; // less stamina drain for NPC's
 			}
 			DamageAV(giantref, ActorValue::kStamina, damage);
 		}
 
-		if (sp <= 1.0 || force_cancel) {
+		if (sp <= 1.0f || force_cancel) {
 			float OldScale;
 			giantref->GetGraphVariableFloat("GiantessScale", OldScale); // save old scale
-			giantref->SetGraphVariableFloat("GiantessScale", 1.0); // Needed to allow Stagger to play, else it won't work
+			giantref->SetGraphVariableFloat("GiantessScale", 1.0f); // Needed to allow Stagger to play, else it won't work
 
 			if (!force_cancel) {
-				StaggerActor(giantref, 0.25);
+				StaggerActor(giantref, 0.25f);
 			}
 			float scale = get_visual_scale(giantref);
 
-			StaggerActor_Around(giantref, 48.0, false);
+			StaggerActor_Around(giantref, 48.0f, false);
 
 			auto node = find_node(giantref, "NPC Root [Root]");
-			Runtime::PlaySoundAtNode("Magic_BreakTinyProtection", giantref, 1.0, 1.0, "NPC COM [COM ]");
+			Runtime::PlaySoundAtNode("Magic_BreakTinyProtection", giantref, 1.0f, 1.0f, "NPC COM [COM ]");
 			
 			if (node) {
 				NiPoint3 position = node->world.translate;
@@ -120,10 +120,10 @@ namespace {
 				std::string name_com = std::format("BreakProtect_{}", giantref->formID);
 				std::string name_root = std::format("BreakProtect_Root_{}", giantref->formID);
 
-				Rumbling::Once(name_com, giantref, Rumble_Misc_FailTinyProtection, 0.20, "NPC COM [COM ]", 0.0);
-				Rumbling::Once(name_root, giantref, Rumble_Misc_FailTinyProtection, 0.20, "NPC Root [Root]", 0.0);
+				Rumbling::Once(name_com, giantref, Rumble_Misc_FailTinyProtection, 0.20f, "NPC COM [COM ]", 0.0f);
+				Rumbling::Once(name_root, giantref, Rumble_Misc_FailTinyProtection, 0.20f, "NPC Root [Root]", 0.0f);
 
-				SpawnParticle(giantref, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.4, 7, nullptr); // Spawn it
+				SpawnParticle(giantref, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.4f, 7, nullptr); // Spawn it
 			}
 			giantref->SetGraphVariableFloat("GiantessScale", OldScale);
 
@@ -133,7 +133,7 @@ namespace {
 	}
 
 	float GetPerkBonus_OnTheEdge(Actor* giant, float amt) {
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		bool perk = Runtime::HasPerkTeam(giant, "OnTheEdge");
 		if (perk) {
 			float GetHP = std::clamp(GetHealthPercentage(giant) + 0.4f, 0.5f, 1.0f); // Bonus Size Gain if Actor has perk
@@ -148,10 +148,10 @@ namespace {
 
 	float ShakeStrength(Actor* Source) {
 		float Size = get_visual_scale(Source);
-		float k = 0.065;
-		float n = 1.0;
-		float s = 1.12;
-		float Result = 1.0/(pow(1.0+pow(k*(Size),n*s),1.0/s));
+		float k = 0.065f;
+		float n = 1.0f;
+		float s = 1.12f;
+		float Result = 1.0f/(pow(1.0f+pow(k*(Size),n*s),1.0f/s));
 		return Result;
 	}
 
@@ -174,25 +174,25 @@ namespace {
 	}
 
 	struct SpringGrowData {
-		Spring amount = Spring(0.0, 1.0);
-		float addedSoFar = 0.0;
+		Spring amount = Spring(0.0f, 1.0f);
+		float addedSoFar = 0.0f;
 		bool drain = false;
 		ActorHandle actor;
 
 		SpringGrowData(Actor* actor, float amountToAdd, float halfLife) : actor(actor->CreateRefHandle()) {
-			amount.value = 0.0;
+			amount.value = 0.0f;
 			amount.target = amountToAdd;
 			amount.halflife = halfLife;
 		}
 	};
 
 	struct SpringShrinkData {
-		Spring amount = Spring(0.0, 1.0);
-		float addedSoFar = 0.0;
+		Spring amount = Spring(0.0f, 1.0f);
+		float addedSoFar = 0.0f;
 		ActorHandle actor;
 
 		SpringShrinkData(Actor* actor, float amountToAdd, float halfLife) : actor(actor->CreateRefHandle()) {
-			amount.value = 0.0;
+			amount.value = 0.0f;
 			amount.target = amountToAdd;
 			amount.halflife = halfLife;
 		}
@@ -271,16 +271,16 @@ namespace Gts {
 		return nullptr;
 	}
 
-	void Task_AdjustHalfLifeTask(Actor* tiny, float halflife, float revert_after) {
+	void Task_AdjustHalfLifeTask(Actor* tiny, float halflife, double revert_after) {
 		auto& Persist = Persistent::GetSingleton();
 		auto actor_data = Persist.GetData(tiny);
-		float old_halflife = 0.0;
+		float old_halflife = 0.0f;
 		if (actor_data) {
 			old_halflife = actor_data->half_life; // record old half life
 			actor_data->half_life = halflife;
 		}
 
-		auto Start = Time::FramesElapsed();
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle tinyhandle = tiny->CreateRefHandle();
 		std::string name = std::format("AdjustHalfLife_{}", tiny->formID);
 		TaskManager::Run(name, [=](auto& progressData) {
@@ -288,7 +288,7 @@ namespace Gts {
 				return false;
 			}
 			auto tinyref = tinyhandle.get().get();
-			float timepassed = Time::FramesElapsed() - Start;
+			double timepassed = Time::WorldTimeElapsed() - Start;
 			if (timepassed > revert_after) {
 				if (actor_data) {
 					actor_data->half_life = old_halflife;
@@ -303,18 +303,18 @@ namespace Gts {
 	float GetLaunchPower(Actor* giant, float sizeRatio) {
 		// https://www.desmos.com/calculator/wh0vwgljfl
 		SoftPotential launch {
-			.k = 1.42,
-			.n = 0.78,
-			.s = 0.6,
-			.a = 0.8,
+			.k = 1.42f,
+			.n = 0.78f,
+			.s = 0.6f,
+			.a = 0.8f,
 		};
 		float power = soft_power(sizeRatio, launch);
 
 		if (!giant) {
-			return 1.0;
+			return 1.0f;
 		}
 
-		float limit = (14.0 * get_visual_scale(giant));
+		float limit = (14.0f * get_visual_scale(giant));
 
 		if (power > limit) {
 			return limit;
@@ -337,7 +337,7 @@ namespace Gts {
 			auto tiny = tinyhandle.get().get();
 			float Finish = Time::WorldTimeElapsed();
 			float timepassed = Finish - Start;
-			if (timepassed < 1.0) {
+			if (timepassed < 1.0f) {
 				return true; // not enough time has passed yet
 			}
 			EventDispatcher::DoResetActor(tiny);
@@ -347,18 +347,18 @@ namespace Gts {
 
 	void PlayMoanSound(Actor* actor, float volume) {
 		if (IsFemale(actor) && IsHuman(actor)) {
-			float falloff = 0.125 * get_visual_scale(actor);
-			Runtime::PlaySoundAtNode_FallOff("MoanSound", actor, volume, 1.0, "NPC Head [Head]", falloff);
+			float falloff = 0.125f * get_visual_scale(actor);
+			Runtime::PlaySoundAtNode_FallOff("MoanSound", actor, volume, 1.0f, "NPC Head [Head]", falloff);
 		}
 	}
 
 	void PlayLaughSound(Actor* actor, float volume, int type) {
-		float falloff = 0.125 * get_visual_scale(actor);
+		float falloff = 0.125f * get_visual_scale(actor);
 		if (IsFemale(actor) && IsHuman(actor)) {
 			if (type == 2) {
-				Runtime::PlaySoundAtNode_FallOff("LaughSound_Type2", actor, volume, 1.0, "NPC Head [Head]", falloff);
+				Runtime::PlaySoundAtNode_FallOff("LaughSound_Type2", actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			} else {
-				Runtime::PlaySoundAtNode_FallOff("LaughSound_Type1", actor, volume, 1.0, "NPC Head [Head]", falloff);
+				Runtime::PlaySoundAtNode_FallOff("LaughSound_Type1", actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			}
 		}
 	}
@@ -432,12 +432,13 @@ namespace Gts {
 			if (actor->formID == 0x14 && actor->IsSneaking() && IsFirstPerson() && transient) {
 				return transient->FPCrawling; // Needed to fix crawling being applied to FP even when Prone is off
 			}
+			return actor->IsSneaking() && crawl;
 		}
-		return actor->IsSneaking() && crawl;
+		return false;
 	}
 
 	bool IsInBalanceMode() {
-		return SizeManager::GetSingleton().BalancedMode() > 1.0;
+		return SizeManager::GetSingleton().BalancedMode() > 1.0f;
 	}
 
 	bool IsHugCrushing(Actor* actor) {
@@ -632,7 +633,7 @@ namespace Gts {
 	bool ButtCrush_IsAbleToGrow(Actor* actor, float limit) {
 		auto transient = Transient::GetSingleton().GetData(actor);
 		float stamina = GetAV(actor, ActorValue::kStamina);
-		if (stamina <= 4.0) {
+		if (stamina <= 4.0f) {
 			return false;
 		}
 		if (transient) {
@@ -779,16 +780,16 @@ namespace Gts {
 		if (transient) {
 			return transient->MightValue; // return raw bonus
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	float Potion_GetSizeMultiplier(Actor* giant) {
 		auto transient = Transient::GetSingleton().GetData(giant);
 		if (transient) {
 			float bonus = std::clamp(transient->potion_max_size, 0.0f, 10.0f);
-			return 1.0 + bonus;
+			return 1.0f + bonus;
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	void Potion_SetShrinkResistance(Actor* giant, float value) {
@@ -800,12 +801,12 @@ namespace Gts {
 
 	float Potion_GetShrinkResistance(Actor* giant) {
 		auto transient = Transient::GetSingleton().GetData(giant);
-		float Resistance = 1.0;
+		float Resistance = 1.0f;
 		if (transient) {
 			Resistance -= transient->ShrinkResistance;
 		}
-		if (Resistance <= 0.25) {
-			Resistance = 0.25; // cap it just in case
+		if (Resistance <= 0.25f) {
+			Resistance = 0.25f; // cap it just in case
 		}
 		return Resistance;
 	}
@@ -1123,7 +1124,7 @@ namespace Gts {
 
 	float GetFallModifier(Actor* giant) {
 		auto transient = Transient::GetSingleton().GetData(giant);
-		float fallmod = 1.0;
+		float fallmod = 1.0f;
 		if (transient) {
 			fallmod = transient->FallTimer;
 			//log::info("Fall mult :{}", transient->FallTimer);
@@ -1132,22 +1133,22 @@ namespace Gts {
 	}
 
 	std::vector<Actor*> Vore_GetMaxVoreCount(Actor* giant, std::vector<Actor*> actors) {
-		float capacity = 1.0;
+		float capacity = 1.0f;
 		std::vector<Actor*> vories = {};
 		if (Runtime::HasPerkTeam(giant, "EnhancedCapacity")) {
-			capacity = 3.0 * get_visual_scale(giant);
+			capacity = 3.0f * get_visual_scale(giant);
 			if (HasSMT(giant)) {
-				capacity *= 3.0;
+				capacity *= 3.0f;
 			}
 		} 
 		for (auto target: actors) {
-			if (capacity <= 1.0) {
-				capacity = 1.0;
+			if (capacity <= 1.0f) {
+				capacity = 1.0f;
 				vories.push_back(target);
 				//log::info("(Return) Max Vore for {} is {}", giant->GetDisplayFullName(), vories.size());
 				return vories;
 			}
-			float decrease = get_target_scale(target) * 12.0;
+			float decrease = get_target_scale(target) * 12.0f;
 			capacity -= decrease;
 			vories.push_back(target);
 		}  
@@ -1156,18 +1157,18 @@ namespace Gts {
 	}
 
 	float Ench_Aspect_GetPower(Actor* giant) { 
-		float aspect = SizeManager::GetSingleton().GetEnchantmentBonus(giant) * 0.01;
+		float aspect = SizeManager::GetSingleton().GetEnchantmentBonus(giant) * 0.01f;
 		return aspect;
 	}
 	float Ench_Hunger_GetPower(Actor* giant) {
-		float hunger = SizeManager::GetSingleton().GetSizeHungerBonus(giant) * 0.01;
+		float hunger = SizeManager::GetSingleton().GetSizeHungerBonus(giant) * 0.01f;
 		return hunger;
 	}
 
 	float Perk_GetSprintShrinkReduction(Actor* actor) {
-		float resistance = 1.0;
+		float resistance = 1.0f;
 		if (actor->AsActorState()->IsSprinting() && Runtime::HasPerkTeam(actor, "QuickApproach")) {
-			resistance -= 0.20;
+			resistance -= 0.20f;
 		}
 		return resistance;
 	}
@@ -1185,15 +1186,15 @@ namespace Gts {
 	}
 
 	float GetSizeDifference(Actor* giant, Actor* tiny, SizeType Type, bool Check_SMT, bool HH) {
-		float hh_gts = 0.0; 
-		float hh_tiny = 0.0;
+		float hh_gts = 0.0f; 
+		float hh_tiny = 0.0f;
 
-		float GiantScale = 1.0;
-		float TinyScale = 1.0;
+		float GiantScale = 1.0f;
+		float TinyScale = 1.0f;
 
 		if (HH) { // Apply HH only in cases when we need it, such as damage and hugs
-			hh_gts = HighHeelManager::GetHHOffset(giant)[2] * 0.01;
-			hh_tiny = HighHeelManager::GetHHOffset(tiny)[2] * 0.01;
+			hh_gts = HighHeelManager::GetHHOffset(giant)[2] * 0.01f;
+			hh_tiny = HighHeelManager::GetHHOffset(tiny)[2] * 0.01f;
 		}
 		
 		switch (Type) {
@@ -1213,12 +1214,12 @@ namespace Gts {
 
 		if (Check_SMT) {
 			if (HasSMT(giant)) {
-				GiantScale += 10.2;
+				GiantScale += 10.2f;
 			} 
 		}
 
 		if (tiny->formID == 0x14 && HasSMT(tiny)) {
-			TinyScale += 1.50;
+			TinyScale += 1.50f;
 		}
 
 		float Difference = GiantScale/TinyScale;
@@ -1234,16 +1235,16 @@ namespace Gts {
 	float GetActorWeight(Actor* giant, bool metric) {
 		float hh = HighHeelManager::GetBaseHHOffset(giant)[2]/100;
 		float scale = get_visual_scale(giant);
-		float smt = 1.0;
-		float totalscale = scale + (hh*0.10 * scale);
-		float actorweight = 1.0 + giant->GetWeight()/300;
+		float smt = 1.0f;
+		float totalscale = scale + (hh*0.10f * scale);
+		float actorweight = 1.0f + giant->GetWeight()/300;
 		float weight;
-		if (metric) { // 70.1 kg as a base
-			weight = 70.1 * actorweight * (totalscale * totalscale * totalscale);
+		if (metric) { // 70.1f kg as a base
+			weight = 70.1f * actorweight * (totalscale * totalscale * totalscale);
 		} else {
-			weight = (70.1 * actorweight * (totalscale * totalscale * totalscale)) * 2.205;
+			weight = (70.1f * actorweight * (totalscale * totalscale * totalscale)) * 2.205f;
 		} if (HasSMT(giant)) {
-			smt = 6.0;
+			smt = 6.0f;
 		}
 		return weight * smt;
 	}
@@ -1252,12 +1253,12 @@ namespace Gts {
 		float hh = HighHeelManager::GetBaseHHOffset(giant)[2]/100;
 		float bb = GetSizeFromBoundingBox(giant);
 		float scale = get_visual_scale(giant);
-		float smt = 1.0;
+		float smt = 1.0f;
 		float height;
-		if (metric) { // 1.82 m as a base
-			height = 1.82 * bb * scale + (hh * scale); // meters
+		if (metric) { // 1.82f m as a base
+			height = 1.82f * bb * scale + (hh * scale); // meters
 		} else {
-			height = (1.82 * bb * scale + (hh * scale)) * 3.28; // ft
+			height = (1.82f * bb * scale + (hh * scale)) * 3.28f; // ft
 		}
 		return height;
 	}
@@ -1270,27 +1271,27 @@ namespace Gts {
 
 	float GetRoomStateScale(Actor* giant) {
 		// Goal is to make us effectively smaller during these checks, so RayCast won't adjust our height unless we're truly too big
-		float Normal = 1.0;
-		float Reduction = 1.0;
+		float Normal = 1.0f;
+		float Reduction = 1.0f;
 
 		if (IsProning(giant)) {
-			return 0.30;
+			return 0.30f;
 		} else if (IsCrawling(giant)) {
-			return 0.46;
+			return 0.46f;
 		} else if (giant->IsSneaking()) {
-			Reduction = 0.70;
+			Reduction = 0.70f;
 		} else {
-			Reduction = 1.0;
+			Reduction = 1.0f;
 		}
-		float HH = (HighHeelManager::GetBaseHHOffset(giant).Length()/100)/1.82; // Get HH value and convert it to meters
+		float HH = (HighHeelManager::GetBaseHHOffset(giant).Length()/100)/1.82f; // Get HH value and convert it to meters
 		return (Normal + HH) * Reduction;
 	}
 
 	float GetProneAdjustment() {
 		auto player = PlayerCharacter::GetSingleton();
-		float value = 1.0;
+		float value = 1.0f;
 		if (IsProning(player)) {
-			return 0.18;
+			return 0.18f;
 		} else if (IsCrawling(player)) {
 			value = std::clamp(Runtime::GetFloat("ProneOffsetFP"), 0.10f, 1.0f);
 		}
@@ -1306,22 +1307,22 @@ namespace Gts {
 		if (!enabled) {
 			return;
 		}
-		static Timer EffectTimer = Timer(3.0);
+		static Timer EffectTimer = Timer(3.0f);
 		if (giant->formID == 0x14 && EffectTimer.ShouldRunFrame()) {
 			NiPoint3 NodePosition = giant->GetPosition();
 
 			float giantScale = get_visual_scale(giant);
 			auto huggedActor = HugShrink::GetHuggiesActor(giant);
 
-			const float BASE_DISTANCE = 124.0;
+			const float BASE_DISTANCE = 124.0f;
 			float CheckDistance = BASE_DISTANCE * giantScale;
 
 			if (IsCrawling(giant)) {
-				CheckDistance *= 1.5;
+				CheckDistance *= 1.5f;
 			}
 
 			if (IsDebugEnabled()) {
-				DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 60, {0.5, 1.0, 0.0, 0.5});
+				DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 60, {0.5f, 1.0f, 0.0f, 0.5f});
 			}
 
 			for (auto otherActor: find_actors()) {
@@ -1329,11 +1330,11 @@ namespace Gts {
 					if (otherActor->Is3DLoaded() && !otherActor->IsDead()) {
 						float tinyScale = get_visual_scale(otherActor) * GetSizeFromBoundingBox(otherActor);
 						float difference = GetSizeDifference(giant, otherActor, SizeType::VisualScale, true, false);
-						if (difference > 5.8 || huggedActor) {
+						if (difference > 5.8f || huggedActor) {
 							NiPoint3 actorLocation = otherActor->GetPosition();
 							if ((actorLocation - NodePosition).Length() < CheckDistance) {
 								int nodeCollisions = 0;
-								float force = 0.0;
+								float force = 0.0f;
 
 								auto model = otherActor->GetCurrent3D();
 
@@ -1342,7 +1343,7 @@ namespace Gts {
 										float distance = (NodePosition - a_obj.world.translate).Length();
 										if (distance < CheckDistance) {
 											nodeCollisions += 1;
-											force = 1.0 - distance / CheckDistance;
+											force = 1.0f - distance / CheckDistance;
 											return false;
 										}
 										return true;
@@ -1353,24 +1354,24 @@ namespace Gts {
 									if (node) {
 										auto grabbedActor = Grab::GetHeldActor(giant);
 										float correction = 0; 
-										if (tinyScale < 1.0) {
+										if (tinyScale < 1.0f) {
 											correction = std::clamp((18.0f / tinyScale) - 18.0f, 0.0f, 144.0f);
 										} else {
-											correction = (18.0 * tinyScale) - 18.0;
+											correction = (18.0f * tinyScale) - 18.0f;
 										}
 
-										float iconScale = std::clamp(tinyScale, 1.0f, 9999.0f) * 2.4;
+										float iconScale = std::clamp(tinyScale, 1.0f, 9999.0f) * 2.4f;
 										bool Ally = !IsHostile(giant, otherActor) && IsTeammate(otherActor);
 										bool HasLovingEmbrace = Runtime::HasPerkTeam(giant, "HugCrush_LovingEmbrace");
 										bool Healing = IsHugHealing(giant);
 
 										NiPoint3 Position = node->world.translate;
 										float bounding_z = get_bounding_box_z(otherActor);
-										if (bounding_z > 0.0) {
+										if (bounding_z > 0.0f) {
 											if (IsCrawling(giant) && IsBeingHugged(otherActor)) {
-												bounding_z *= 0.25; // Move the icon down
+												bounding_z *= 0.25f; // Move the icon down
 											}
-											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35); // 2.25 to be slightly above the head
+											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35f); // 2.25f to be slightly above the head
 											//log::info("For Actor: {}", otherActor->GetDisplayFullName());
 											//log::info("---	Position: {}", Vector2Str(Position));
 											//log::info("---	Actor Position: {}", Vector2Str(otherActor->GetPosition()));
@@ -1382,35 +1383,35 @@ namespace Gts {
 										if (grabbedActor && grabbedActor == otherActor) {
 											//do nothing
 										} else if (huggedActor && huggedActor == otherActor && Ally && HasLovingEmbrace && !Healing) {
-											SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_LovingEmbrace.nif", NiMatrix3(), Position, iconScale, 7, node);
+											SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_LovingEmbrace.nif", NiMatrix3(), Position, iconScale, 7, node);
 										} else if (huggedActor && huggedActor == otherActor && !IsHugCrushing(giant) && !Healing) {
 											bool LowHealth = (GetHealthPercentage(huggedActor) < GetHugCrushThreshold(giant, otherActor, true));
 											bool ForceCrush = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles");
 											float Stamina = GetStaminaPercentage(giant);
-											if (HasSMT(giant) || LowHealth || (ForceCrush && Stamina > 0.75)) {
-												SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Hug_Crush.nif", NiMatrix3(), Position, iconScale, 7, node); // Spawn 'can be hug crushed'
+											if (HasSMT(giant) || LowHealth || (ForceCrush && Stamina > 0.75f)) {
+												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Hug_Crush.nif", NiMatrix3(), Position, iconScale, 7, node); // Spawn 'can be hug crushed'
 											}
 										} else if (!IsGtsBusy(giant) && IsEssential(giant, otherActor)) {
-											SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Essential.nif", NiMatrix3(), Position, iconScale, 7, node); 
+											SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Essential.nif", NiMatrix3(), Position, iconScale, 7, node); 
 											// Spawn Essential icon
 										} else if (!IsGtsBusy(giant) && difference >= Action_Crush) {
 											if (CanPerformAnimation(giant, 3)) {
-												SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Crush_All.nif", NiMatrix3(), Position, iconScale, 7, node); 
+												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Crush_All.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'can be crushed and any action can be done'
 											} else {
-												SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Crush.nif", NiMatrix3(), Position, iconScale, 7, node); 
+												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Crush.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// just spawn can be crushed, can happen at any quest stage
 											}
 										} else if (!IsGtsBusy(giant) && difference >= Action_Grab) {
 											if (CanPerformAnimation(giant, 3)) {
-												SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Vore_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
+												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Vore_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'Can be grabbed/vored'
 											} else if (CanPerformAnimation(giant, 2)) {
-												SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
+												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'Can be grabbed'
 											}
 										} else if (!IsGtsBusy(giant) && difference >= Action_Sandwich && CanPerformAnimation(giant, 2)) {
-											SpawnParticle(otherActor, 3.00, "GTS/UI/Icon_Sandwich.nif", NiMatrix3(), Position, iconScale, 7, node); // Spawn 'Can be sandwiched'
+											SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Sandwich.nif", NiMatrix3(), Position, iconScale, 7, node); // Spawn 'Can be sandwiched'
 										} 
 										// 1 = stomps and kicks
 										// 2 = Grab and Sandwich
@@ -1429,14 +1430,14 @@ namespace Gts {
 	    // It ignores half-life, allowing more than 1 growth/shrink sources to stack nicely
 		auto Persistent = Persistent::GetSingleton().GetData(giant);
 		if (Persistent) {
-			float OnTheEdge = 1.0;
+			float OnTheEdge = 1.0f;
 			float scale = get_visual_scale(giant);
 
 			if (amt > 0 && (giant->formID == 0x14 || IsTeammate(giant))) {
-				if (scale >= 1.0) {
+				if (scale >= 1.0f) {
 					amt /= GetGrowthReduction(scale); // Enabled if BalanceMode is True. Decreases Grow Efficiency.
 				}
-			} else if (giant->formID == 0x14 && amt - EPS < 0.0) {
+			} else if (giant->formID == 0x14 && amt - EPS < 0.0f) {
 				// If negative change: add stolen attributes
 				DistributeStolenAttributes(giant, -amt * GetGrowthReduction(scale)); // Adjust max attributes
 			}
@@ -1456,14 +1457,14 @@ namespace Gts {
 	}
 
 	void update_target_scale(Actor* giant, float amt, SizeEffectType type) { // used to mod scale with perk bonuses taken into account
-		float OnTheEdge = 1.0;
+		float OnTheEdge = 1.0f;
 		
 		if (amt > 0 && (giant->formID == 0x14 || IsTeammate(giant))) {
 			float scale = get_visual_scale(giant);
-			if (scale >= 1.0) {
+			if (scale >= 1.0f) {
 				amt /= GetGrowthReduction(scale); // Enabled if BalanceMode is True. Decreases Grow Efficiency.
 			}
-		} else if (giant->formID == 0x14 && amt - EPS < 0.0) {
+		} else if (giant->formID == 0x14 && amt - EPS < 0.0f) {
 			// If negative change: add stolen attributes
 			float scale = get_visual_scale(giant);
 			DistributeStolenAttributes(giant, -amt * GetGrowthReduction(scale)); // Adjust max attributes
@@ -1477,14 +1478,14 @@ namespace Gts {
 	}
 
 	float get_update_target_scale(Actor* giant, float amt, SizeEffectType type) { // Used for growth spurt
-		float OnTheEdge = 1.0;
+		float OnTheEdge = 1.0f;
 		
 		if (amt > 0 && (giant->formID == 0x14 || IsTeammate(giant))) {
 			float scale = get_visual_scale(giant);
-			if (scale >= 1.0) {
+			if (scale >= 1.0f) {
 				amt /= GetGrowthReduction(scale); // Enabled if BalanceMode is True. Decreases Grow Efficiency.
 			}
-		} else if (giant->formID == 0x14 && amt - EPS < 0.0) {
+		} else if (giant->formID == 0x14 && amt - EPS < 0.0f) {
 			// If negative change: add stolen attributes
 			float scale = get_visual_scale(giant);
 			DistributeStolenAttributes(giant, -amt * GetGrowthReduction(scale)); // Adjust max attributes
@@ -1696,13 +1697,13 @@ namespace Gts {
 	}
 
 	void PushActorAway(Actor* source, Actor* receiver, float afKnockBackForce) {
-		// Force < 1.0 can introduce weird sliding issues to Actors, not recommended to pass force < 1.0
+		// Force < 1.0f can introduce weird sliding issues to Actors, not recommended to pass force < 1.0f
 		if (receiver->IsDead()) {
 			return;
 		}
 
-		if (afKnockBackForce <= 1.0) {
-			afKnockBackForce = 1.0;
+		if (afKnockBackForce <= 1.0f) {
+			afKnockBackForce = 1.0f;
 		} 
 
 		if (source) {
@@ -1727,8 +1728,8 @@ namespace Gts {
 	
 	void ApplyManualHavokImpulse(Actor* target, float afX, float afY, float afZ, float Multiplier) {
 		// For this function to work, actor must be pushed away first. 
-		// It may be a good idea to wait about 0.05 sec before callind it after actor has been pushed, else it may not work
-		hkVector4 impulse = hkVector4(afX * Multiplier, afY * Multiplier, afZ * Multiplier, 1.0);
+		// It may be a good idea to wait about 0.05f sec before callind it after actor has been pushed, else it may not work
+		hkVector4 impulse = hkVector4(afX * Multiplier, afY * Multiplier, afZ * Multiplier, 1.0f);
 
 		auto collision = target->Get3D(false)->GetCollisionObject();
 		if (collision) {
@@ -1753,25 +1754,25 @@ namespace Gts {
 				if (transient) {
 					Cprint("Quest is Completed");
 					transient->dragon_was_eaten = true;
-					SpawnCustomParticle(tiny, Type, NiPoint3(), "NPC Root [Root]", 1.0);
+					SpawnCustomParticle(tiny, Type, NiPoint3(), "NPC Root [Root]", 1.0f);
 				}
 			}
 		}
 	}
 	float GetHighHeelsBonusDamage(Actor* actor, bool multiply) {
-		return GetHighHeelsBonusDamage(actor, multiply, 1.0);
+		return GetHighHeelsBonusDamage(actor, multiply, 1.0f);
 	}
 	float GetHighHeelsBonusDamage(Actor* actor, bool multiply, float adjust) {
 		auto profiler = Profilers::Profile("ActorUtils: GetHHBonusDamage");
-		float value = 0.0;
-		float hh = 0.0;
+		float value = 0.0f;
+		float hh = 0.0f;
 
 		if (actor) {
 			if (Runtime::HasPerkTeam(actor, "hhBonus")) {
 				hh = HighHeelManager::GetBaseHHOffset(actor).Length()/100;
 			}
 		} if (multiply) {
-			value = 1.0 + (hh * 5.0 * adjust);
+			value = 1.0f + (hh * 5.0f * adjust);
 		} else {
 			value = hh;
 		}
@@ -1787,20 +1788,21 @@ namespace Gts {
 			auto delta = point_a - point_b;
 			return delta.Length();
 		}
-		return 3.4028237E38; // Max float
+		return std::numeric_limits<float>::max();
+		//return 3.4028237E38; // Max float
 	}
 
 	void ApplyShake(Actor* caster, float modifier, float radius) {
 		if (caster) {
 			auto position = caster->GetPosition();
-			ApplyShakeAtPoint(caster, modifier, position, 0.0);
+			ApplyShakeAtPoint(caster, modifier, position, 0.0f);
 		}
 	}
 
 	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv) {
 		auto node = find_node(caster, nodesv);
 		if (node) {
-			ApplyShakeAtPoint(caster, modifier, node->world.translate, 0.0);
+			ApplyShakeAtPoint(caster, modifier, node->world.translate, 0.0f);
 		}
 	}
 
@@ -1814,7 +1816,7 @@ namespace Gts {
 			auto& persist = Persistent::GetSingleton();
 			
 			float tremor_scale = persist.npc_tremor_scale;
-			float might = 1.0 + Potion_GetMightBonus(caster); // Stronger, more impactful shake with Might potion
+			float might = 1.0f + Potion_GetMightBonus(caster); // Stronger, more impactful shake with Might potion
 			
 			float distance = (coords - receiver->GetPosition()).Length(); // In that case we apply shake based on actor distance
 
@@ -1824,7 +1826,7 @@ namespace Gts {
 			float receiversize = get_visual_scale(receiver);
 
 			float sizedifference = sourcesize/receiversize;
-			float scale_bonus = 0.0;
+			float scale_bonus = 0.0f;
 
 			if (caster->formID == 0x14) {
 				distance = get_distance_to_camera(coords); // use player camera distance (for player only)
@@ -1832,30 +1834,30 @@ namespace Gts {
 				sizedifference = sourcesize;
 
 				if (HasSMT(caster)) {
-					sourcesize += 0.2; // Fix SMT having no shake at x1.0 scale
+					sourcesize += 0.2f; // Fix SMT having no shake at x1.0f scale
 				}
 				if (IsFirstPerson()) {
-					tremor_scale *= 0.25; // Less annoying FP screen shake
+					tremor_scale *= 0.25f; // Less annoying FP screen shake
 				}
 
-				scale_bonus = 0.1;
+				scale_bonus = 0.1f;
 			} 
 
-			if (sourcesize < 2.0) {  // slowly gain power of shakes
-				float reduction = (sourcesize - 1.0);
-				if (reduction < 0.0) {
-					reduction = 0.0;
+			if (sourcesize < 2.0f) {  // slowly gain power of shakes
+				float reduction = (sourcesize - 1.0f);
+				if (reduction < 0.0f) {
+					reduction = 0.0f;
 				}
 				modifier *= reduction;
 			}
 
-			SoftPotential params {.k = 0.0065, .n = 3.0, .s = 1.0, .o = 0.0, .a = 0.0, };
+			SoftPotential params {.k = 0.0065f, .n = 3.0f, .s = 1.0f, .o = 0.0f, .a = 0.0f, };
 			//https://www.desmos.com/calculator/jeeugm72gn
 
 			sizedifference *= modifier * tremor_scale * might;
 
-			float intensity = soft_core(distance * 2.5 / sizedifference, params);
-			float duration = 0.45 * (1 + intensity);
+			float intensity = soft_core(distance * 2.5f / sizedifference, params);
+			float duration = 0.45f * (1 + intensity);
 
 			intensity *= 1 + ((sourcesize * scale_bonus) - scale_bonus);
 
@@ -1866,7 +1868,7 @@ namespace Gts {
 			intensity = std::clamp(intensity, 0.0f, 4.0f);
 			duration = std::clamp(duration, 0.0f, 2.6f);
 
-			if (intensity > 0.005) {
+			if (intensity > 0.005f) {
 				shake_controller(intensity, intensity, duration);
 
 				auto camera = PlayerCamera::GetSingleton(); // Shake at the camera pos, else it won't always shake properly
@@ -1922,7 +1924,7 @@ namespace Gts {
 			return false;
 		}
 		//float scale = get_visual_scale(giant);
-		//if (scale > 1.10) {
+		//if (scale > 1.10f) {
 		bool dead = giant->IsDead();
 		bool everyone = Runtime::GetBool("PreciseDamageOthers");
 		if (!dead && everyone) {
@@ -1960,11 +1962,11 @@ namespace Gts {
 					}
 					auto giantref = gianthandle.get().get();
 					float& original_weight = giantref->GetActorBase()->weight;
-					if (original_weight >= 100.0) {
+					if (original_weight >= 100.0f) {
 						return false;
 					} 
-					if (original_weight + value >= 100.0) {
-						original_weight = 100.0;
+					if (original_weight + value >= 100.0f) {
+						original_weight = 100.0f;
 					} else {
 						original_weight += value;
 					}
@@ -2004,14 +2006,14 @@ namespace Gts {
 		}
 		if (int(level) % 5 == 0) {
 			Notify("You've learned a bonus perk point");
-			GtsSkillPerkPoints->value += 1.0;
+			GtsSkillPerkPoints->value += 1.0f;
 		}
 		if (level == 20 || level == 40) {
-			GtsSkillPerkPoints->value += 2.0;
+			GtsSkillPerkPoints->value += 2.0f;
 		} else if (level == 60 || level == 80) {
-			GtsSkillPerkPoints->value += 3.0;
+			GtsSkillPerkPoints->value += 3.0f;
 		} else if (level == 100) {
-			GtsSkillPerkPoints->value += 4.0;
+			GtsSkillPerkPoints->value += 4.0f;
 		}
 	}
 
@@ -2020,8 +2022,8 @@ namespace Gts {
 			auto attributes = Persistent::GetSingleton().GetData(giant);
 			if (attributes) {
 				attributes->stolen_attributes += value;
-				if (attributes->stolen_attributes <= 0.0) {
-					attributes->stolen_attributes = 0.0; // Cap it just in case
+				if (attributes->stolen_attributes <= 0.0f) {
+					attributes->stolen_attributes = 0.0f; // Cap it just in case
 				}
 			}
 		}
@@ -2031,11 +2033,11 @@ namespace Gts {
 		if (giant->formID == 0x14) {
 			auto Persistent = Persistent::GetSingleton().GetData(giant);
 			if (Persistent) {
-				float modifier = Runtime::GetFloatOr("LevelLimitModifier", 1.0);
+				float modifier = Runtime::GetFloatOr("LevelLimitModifier", 1.0f);
 				float& health = Persistent->stolen_health;
 				float& magick = Persistent->stolen_magick;
 				float& stamin = Persistent->stolen_stamin;
-				float limit = 2.0 * giant->GetLevel() * modifier;
+				float limit = 2.0f * giant->GetLevel() * modifier;
 				if (type == ActorValue::kHealth) {
 					health += value;
 					if (health >= limit) {
@@ -2070,12 +2072,12 @@ namespace Gts {
 				} else if (type == ActorValue::kStamina) {
 					return Persistent->stolen_stamin;
 				} else {
-					return 0.0;
+					return 0.0f;
 				}
 			}
-			return 0.0;
+			return 0.0f;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	float GetStolenAttributes(Actor* giant) {
@@ -2083,15 +2085,15 @@ namespace Gts {
 		if (persist) {
 			return persist->stolen_attributes;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	void DistributeStolenAttributes(Actor* giant, float value) {
 		if (value > 0 && giant->formID == 0x14 && Runtime::HasPerk(giant, "SizeAbsorption")) { // Permamently increases random AV after shrinking and stuff
 			float scale = std::clamp(get_visual_scale(giant), 0.01f, 999999.0f);
-			float modifier = Runtime::GetFloatOr("LevelLimitModifier", 1.0);
+			float modifier = Runtime::GetFloatOr("LevelLimitModifier", 1.0f);
 			float Storage = GetStolenAttributes(giant);
-			float limit = 2.0 * giant->GetLevel() * modifier;
+			float limit = 2.0f * giant->GetLevel() * modifier;
 
 
 			auto Persistent = Persistent::GetSingleton().GetData(giant);
@@ -2103,7 +2105,7 @@ namespace Gts {
 			float& magick = Persistent->stolen_magick;
 			float& stamin = Persistent->stolen_stamin;
 
-			if (Storage > 0.0) {
+			if (Storage > 0.0f) {
 				int Boost = RandomInt(0, 3);
 				if (Boost == 0) {
 					health += (value * 4);
@@ -2130,69 +2132,69 @@ namespace Gts {
 	}
 
 	float GetRandomBoost() {
-		float rng = (RandomInt(0, 150));
-		float random = rng/100;
+		float rng = (RandomFloat(0, 150));
+		float random = rng/100.f;
 		return random;
 	}
 
 	float GetButtCrushCost(Actor* actor, bool DoomOnly) {
-		float cost = 1.0;
+		float cost = 1.0f;
 		if (!DoomOnly && Runtime::HasPerkTeam(actor, "ButtCrush_KillerBooty")) {
-			cost -= 0.15;
+			cost -= 0.15f;
 		}
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_LoomingDoom")) {
-			cost -= 0.25;
+			cost -= 0.25f;
 		}
 		cost *= Perk_GetCostReduction(actor);
 		return cost;
 	}
 
 	float Perk_GetCostReduction(Actor* giant) {
-		float cost = 1.0;
-		float reduction_1 = 0.0;
-		float reduction_2 = 1.0;
+		float cost = 1.0f;
+		float reduction_1 = 0.0f;
+		float reduction_2 = 1.0f;
 		if (Runtime::HasPerkTeam(giant, "SkilledGTS")) {
 			reduction_1 += std::clamp(GetGtsSkillLevel(giant) * 0.0035f, 0.0f, 0.35f);
 		}
 		if (giant->formID == 0x14 && HasGrowthSpurt(giant)) {
 			if (Runtime::HasPerkTeam(giant, "GrowthOfStrength")) {
-				reduction_2 -= 0.10;
+				reduction_2 -= 0.10f;
 			} 
 			if (Runtime::HasPerk(giant, "ExtraGrowth")) {
-				reduction_2 -= 0.30;
+				reduction_2 -= 0.30f;
 			}
 		}
 		cost -= reduction_1;
 		cost *= reduction_2;
-		cost *= (1.0 - Potion_GetMightBonus(giant));
-		cost *= (1.0 - std::clamp(GetGtsSkillLevel(giant) * 0.0020f, 0.0f, 0.20f)); // Based on skill tree progression
+		cost *= (1.0f - Potion_GetMightBonus(giant));
+		cost *= (1.0f - std::clamp(GetGtsSkillLevel(giant) * 0.0020f, 0.0f, 0.20f)); // Based on skill tree progression
 		return cost;
 	}
 
 	float GetAnimationSlowdown(Actor* giant) {
 		if (!giant) {
-			return 1.0;
+			return 1.0f;
 		}
 		if (!Persistent::GetSingleton().is_speed_adjusted) {
-			return 1.0;
+			return 1.0f;
 		}
 
 		if (giant->AsActorState()->GetSitSleepState() != SIT_SLEEP_STATE::kNormal){
-            return 1.0; // For some reason makes furniture angles funny if there's anim slowdown. So we prevent that
+            return 1.0f; // For some reason makes furniture angles funny if there's anim slowdown. So we prevent that
         }
 
 		float scale = get_visual_scale(giant);
 		SoftPotential getspeed {
-			.k = 0.142, // 0.125
-			.n = 0.82, // 0.86
-			.s = 1.90, // 1.12
-			.o = 1.0,
-			.a = 0.0,  //Default is 0
+			.k = 0.142f, // 0.125f
+			.n = 0.82f, // 0.86f
+			.s = 1.90f, // 1.12f
+			.o = 1.0f,
+			.a = 0.0f,  //Default is 0
 		};
 		float speedmultcalc = soft_core(scale, getspeed);
 
-		if (speedmultcalc > 1.0) { // We don't want it to be > 1
-			speedmultcalc = 1.0;
+		if (speedmultcalc > 1.0f) { // We don't want it to be > 1
+			speedmultcalc = 1.0f;
 		}
 
 		return speedmultcalc;
@@ -2256,8 +2258,8 @@ namespace Gts {
 				explosion->GetExplosionRuntimeData().radius *= 3 * get_visual_scale(tiny) * size;
 				explosion->GetExplosionRuntimeData().imodRadius *= 3 * get_visual_scale(tiny) * size;
 				explosion->GetExplosionRuntimeData().unkB8 = nullptr;
-				explosion->GetExplosionRuntimeData().negativeVelocity *= 0.0;
-				explosion->GetExplosionRuntimeData().unk11C *= 0.0;
+				explosion->GetExplosionRuntimeData().negativeVelocity *= 0.0f;
+				explosion->GetExplosionRuntimeData().unk11C *= 0.0f;
 			}
 		}
 	}
@@ -2280,19 +2282,19 @@ namespace Gts {
 		float tinySize = get_visual_scale(tiny); 
 
 		if (HasSMT(giant)) {
-			giantSize += 1.0;
+			giantSize += 1.0f;
 		} if (tiny->formID == 0x14 && HasSMT(tiny)) {
-			tinySize += 1.25;
+			tinySize += 1.25f;
 		}
 
 		float sizedifference = giantSize/tinySize;
 		float sizedifference_tinypov = tinySize/giantSize;
 
 		int ragdollchance = RandomInt(0, 30);
-		if ((giantSize > 1.25 || IsBeingGrinded(tiny)) && !IsRagdolled(tiny) && sizedifference > 2.8 && ragdollchance < 4.0 * sizedifference) { // Chance for ragdoll. Becomes 100% at high scales
-			PushActorAway(giant, tiny, 1.0); // Ragdoll
+		if ((giantSize > 1.25f || IsBeingGrinded(tiny)) && !IsRagdolled(tiny) && sizedifference > 2.8f && ragdollchance < 4.0f * sizedifference) { // Chance for ragdoll. Becomes 100% at high scales
+			PushActorAway(giant, tiny, 1.0f); // Ragdoll
 			return;
-		} else if (sizedifference > 1.25) { // Always Stagger
+		} else if (sizedifference > 1.25f) { // Always Stagger
 			tiny->SetGraphVariableFloat("GiantessScale", sizedifference_tinypov); // enable stagger just in case
 
 		    float push = std::clamp(0.25f * (sizedifference - 0.25f), 0.25f, 1.0f);
@@ -2306,7 +2308,7 @@ namespace Gts {
 	
 		if (model) {
 			bool isdamaging = IsActionOnCooldown(tiny, CooldownSource::Push_Basic);
-			if (!isdamaging && (force >= 0.12 || IsFootGrinding(giant))) {
+			if (!isdamaging && (force >= 0.12f || IsFootGrinding(giant))) {
 				//log::info("Check passed, pushing {}, force: {}", tiny->GetDisplayFullName(), force);
 				StaggerOr(giant, tiny, 0, 0, 0, 0);
 				ApplyActionCooldown(tiny, CooldownSource::Push_Basic);
@@ -2363,7 +2365,7 @@ namespace Gts {
 			if (!tiny->GetCurrent3D()) {
 				return true;
 			}
-			if ((endTime - startTime) > 0.05) {
+			if ((endTime - startTime) > 0.05f) {
 				// Enough time has elapsed
 
 				NiPoint3 vector = endCoords - startCoords;
@@ -2377,24 +2379,24 @@ namespace Gts {
 					float tinyscale = get_visual_scale(tiny) * GetSizeFromBoundingBox(tiny);
 
 					if (tiny->IsDead()) {
-						tinyscale *= 0.4;
+						tinyscale *= 0.4f;
 					}
 
 					if (HasSMT(giant)) {
-						giantscale *= 6.0;
+						giantscale *= 6.0f;
 					}
 					float sizedifference = giantscale/tinyscale;
 
-					if (sizedifference < 1.2) {
+					if (sizedifference < 1.2f) {
 						return false; // terminate task
-					} else if (sizedifference > 1.2 && sizedifference < 3.0) {
+					} else if (sizedifference > 1.2f && sizedifference < 3.0f) {
 						StaggerActor(giant, tiny, 0.25f * sizedifference);
 						return false; //Only Stagger
 					}
 				}
 
-				float Time = (1.0 / Time::GetTimeMultiplier());
-				ApplyManualHavokImpulse(tiny, direction.x, direction.y, direction.z, speed * 2.0 * power * Time);
+				float Time = (1.0f / Time::GetTimeMultiplier());
+				ApplyManualHavokImpulse(tiny, direction.x, direction.y, direction.z, speed * 2.0f * power * Time);
 
 				return false;
 			}
@@ -2408,7 +2410,7 @@ namespace Gts {
 		ActorHandle tinyHandle = tinyref->CreateRefHandle();
 		ActorHandle giantHandle = giantref->CreateRefHandle();
 
-		PushActorAway(giantref, tinyref, 1.0);
+		PushActorAway(giantref, tinyref, 1.0f);
 
 		double startTime = Time::WorldTimeElapsed();
 
@@ -2452,7 +2454,7 @@ namespace Gts {
 		ActorHandle tinyHandle = tinyref->CreateRefHandle();
 		ActorHandle gianthandle = giantref->CreateRefHandle();
 		std::string taskname = std::format("PushOther_{}", tinyref->formID);
-		PushActorAway(giantref, tinyref, 1.0);
+		PushActorAway(giantref, tinyref, 1.0f);
 		TaskManager::Run(taskname, [=](auto& update) {
 			if (!gianthandle) {
 				return false;
@@ -2470,7 +2472,7 @@ namespace Gts {
 			RE::NiPoint3 direction = globalForwardVector;
 			double endTime = Time::WorldTimeElapsed();
 
-			if ((endTime - startTime) > 0.05) {
+			if ((endTime - startTime) > 0.05f) {
 				ApplyManualHavokImpulse(tiny, direction.x, direction.y, direction.z, power);
 				return false;
 			} else {
@@ -2493,7 +2495,7 @@ namespace Gts {
 		float totaldistance = maxDistance * giantScale;
 		// Make a list of points to check
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant))) {
-			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), totaldistance, 600, {0.0, 1.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), totaldistance, 600, {0.0f, 1.0f, 0.0f, 1.0f});
 		}
 
 		NiPoint3 giantLocation = giant->GetPosition();
@@ -2501,16 +2503,16 @@ namespace Gts {
 		for (auto otherActor: find_actors()) {
 			if (otherActor != giant) {
 				NiPoint3 actorLocation = otherActor->GetPosition();
-				if ((actorLocation-giantLocation).Length() < (maxDistance*giantScale * 3.0)) {
+				if ((actorLocation-giantLocation).Length() < (maxDistance*giantScale * 3.0f)) {
 					int nodeCollisions = 0;
-					float force = 0.0;
+					float force = 0.0f;
 					auto model = otherActor->GetCurrent3D();
 					if (model) {
 						VisitNodes(model, [&nodeCollisions, &force, NodePosition, totaldistance](NiAVObject& a_obj) {
 							float distance = (NodePosition - a_obj.world.translate).Length();
 							if (distance < totaldistance) {
 								nodeCollisions += 1;
-								force = 1.0 - distance / totaldistance;
+								force = 1.0f - distance / totaldistance;
 								return false;
 							}
 							return true;
@@ -2518,10 +2520,10 @@ namespace Gts {
 					}
 					if (nodeCollisions > 0) {
 						float sizedifference = giantScale/get_visual_scale(otherActor);
-						if (sizedifference <= 1.6) {
+						if (sizedifference <= 1.6f) {
 							StaggerActor(giant, otherActor, 0.75f);
 						} else {
-							PushActorAway(giant, otherActor, 1.0 * GetLaunchPower(giant, sizedifference));
+							PushActorAway(giant, otherActor, 1.0f * GetLaunchPower(giant, sizedifference));
 						}
 					}
 				}
@@ -2536,22 +2538,22 @@ namespace Gts {
 		bool DarkArts1 = Runtime::HasPerk(giant, "DarkArts_Aug");
 		bool DarkArts2 = Runtime::HasPerk(giant, "DarkArts_Aug2");
 
-		float shrinkpower = (shrink * 0.35) * (1.0 + (GetGtsSkillLevel(giant) * 0.005)) * CalcEffeciency(giant, tiny);
+		float shrinkpower = (shrink * 0.35f) * (1.0f + (GetGtsSkillLevel(giant) * 0.005f)) * CalcEffeciency(giant, tiny);
 
 		float Adjustment = GetSizeFromBoundingBox(tiny);
 
 		float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, false, false);
 		if (DarkArts1) {
-			giant->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, 8.0);
+			giant->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, 8.0f);
 		}
 		if (DarkArts2 && (IsGrowthSpurtActive(giant) || HasSMT(giant))) {
-			shrinkpower *= 1.40;
+			shrinkpower *= 1.40f;
 		}
 
 		update_target_scale(tiny, -(shrinkpower * gigantism), SizeEffectType::kShrink);
 		Attacked(tiny, giant);
 
-		ModSizeExperience(giant, (shrinkpower * gigantism) * 0.60);
+		ModSizeExperience(giant, (shrinkpower * gigantism) * 0.60f);
 
 		float MinScale = SHRINK_TO_NOTHING_SCALE / Adjustment;
 
@@ -2559,10 +2561,10 @@ namespace Gts {
 			set_target_scale(tiny, MinScale);
 		}
 		if (!IsBetweenBreasts(tiny)) {
-			if (sizedifference <= 4.0) { // Stagger or Push
+			if (sizedifference <= 4.0f) { // Stagger or Push
 				StaggerActor(giant, tiny, 0.25f);
 			} else {
-				PushActorAway(giant, tiny, 1.0/Adjustment * GetLaunchPower(giant, sizedifference));
+				PushActorAway(giant, tiny, 1.0f/Adjustment * GetLaunchPower(giant, sizedifference));
 			}
 		}
 	}
@@ -2578,33 +2580,33 @@ namespace Gts {
 		NiPoint3 NodePosition = node->world.translate;
 
 		float giantScale = get_visual_scale(giant);
-		float gigantism = 1.0 + Ench_Aspect_GetPower(giant);
-		float shrink = 0.38;
-		float radius = 1.0;
+		float gigantism = 1.0f + Ench_Aspect_GetPower(giant);
+		float shrink = 0.38f;
+		float radius = 1.0f;
 
-		float explosion = 0.75;
+		float explosion = 0.75f;
 		bool DarkArts1 = Runtime::HasPerk(giant, "DarkArts_Aug");
 		if (WasHit) {
-			radius *= 1.4;
-			shrink += 0.20;
-			explosion += 0.95;
+			radius *= 1.4f;
+			shrink += 0.20f;
+			explosion += 0.95f;
 		}
 		if (DarkArts1) {
-			radius *= 1.33;
-			shrink *= 1.33;
-			explosion += 0.30;
+			radius *= 1.33f;
+			shrink *= 1.33f;
+			explosion += 0.30f;
 		}
 
-		const float BASE_DISTANCE = 84.0;
+		const float BASE_DISTANCE = 84.0f;
 		float CheckDistance = BASE_DISTANCE*giantScale*gigantism*radius;
 
-		Runtime::PlaySoundAtNode("ShrinkOutburstSound", giant, explosion, 1.0, "NPC Pelvis [Pelv]");
-		Rumbling::For("ShrinkOutburst", giant, Rumble_Misc_ShrinkOutburst, 0.15, "NPC COM [COM ]", 0.60, 0.0);
+		Runtime::PlaySoundAtNode("ShrinkOutburstSound", giant, explosion, 1.0f, "NPC Pelvis [Pelv]");
+		Rumbling::For("ShrinkOutburst", giant, Rumble_Misc_ShrinkOutburst, 0.15f, "NPC COM [COM ]", 0.60f, 0.0f);
 
-		SpawnParticle(giant, 6.00, "GTS/Shouts/ShrinkOutburst.nif", NiMatrix3(), NodePosition, giantScale*explosion*3.0, 7, nullptr); // Spawn effect
+		SpawnParticle(giant, 6.00f, "GTS/Shouts/ShrinkOutburst.nif", NiMatrix3(), NodePosition, giantScale*explosion*3.0f, 7, nullptr); // Spawn effect
 
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant))) {
-			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 600, {0.0, 1.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 600, {0.0f, 1.0f, 0.0f, 1.0f});
 		}
 
 		NiPoint3 giantLocation = giant->GetPosition();
@@ -2613,7 +2615,7 @@ namespace Gts {
 				NiPoint3 actorLocation = otherActor->GetPosition();
 				if ((actorLocation - giantLocation).Length() < BASE_DISTANCE*giantScale*radius*3) {
 					int nodeCollisions = 0;
-					float force = 0.0;
+					float force = 0.0f;
 
 					auto model = otherActor->GetCurrent3D();
 
@@ -2622,7 +2624,7 @@ namespace Gts {
 							float distance = (NodePosition - a_obj.world.translate).Length();
 							if (distance < CheckDistance) {
 								nodeCollisions += 1;
-								force = 1.0 - distance / CheckDistance;
+								force = 1.0f - distance / CheckDistance;
 								return false;
 							}
 							return true;
@@ -2643,14 +2645,14 @@ namespace Gts {
 			if (actor == player || IsTeammate(actor)) {
 				float scale = get_visual_scale(actor);
 
-				SpawnCustomParticle(actor, ParticleType::Red, NiPoint3(), "NPC Root [Root]", scale * 1.15);
-				Runtime::PlaySoundAtNode("Magic_ProtectTinies", actor, 1.0, 1.0, "NPC COM [COM ]");
+				SpawnCustomParticle(actor, ParticleType::Red, NiPoint3(), "NPC Root [Root]", scale * 1.15f);
+				Runtime::PlaySoundAtNode("Magic_ProtectTinies", actor, 1.0f, 1.0f, "NPC COM [COM ]");
 
 				std::string name_com = std::format("Protect_{}", actor->formID);
 				std::string name_root = std::format("Protect_Root_{}", actor->formID);
 
-				Rumbling::Once(name_com, actor, 4.0, 0.20, "NPC COM [COM ]", 0.0);
-				Rumbling::Once(name_root, actor, 4.0, 0.20, "NPC Root [Root]", 0.0);
+				Rumbling::Once(name_com, actor, 4.0f, 0.20f, "NPC COM [COM ]", 0.0f);
+				Rumbling::Once(name_root, actor, 4.0f, 0.20f, "NPC Root [Root]", 0.0f);
 				
 				LaunchImmunityTask(actor, Balance);
 			}
@@ -2668,8 +2670,8 @@ namespace Gts {
 
 		TaskManager::Cancel(name); // Stop old task if it's been running
 
-		Rumbling::Once(name, giant, Rumble_Misc_EnableTinyProtection, 0.20, "NPC COM [COM ]", 0.0);
-		Rumbling::Once(name_1, giant, Rumble_Misc_EnableTinyProtection, 0.20, "NPC Root [Root]", 0.0);
+		Rumbling::Once(name, giant, Rumble_Misc_EnableTinyProtection, 0.20f, "NPC COM [COM ]", 0.0f);
+		Rumbling::Once(name_1, giant, Rumble_Misc_EnableTinyProtection, 0.20f, "NPC Root [Root]", 0.0f);
 
 		float Start = Time::WorldTimeElapsed();
 		ActorHandle gianthandle = giant->CreateRefHandle();
@@ -2680,7 +2682,7 @@ namespace Gts {
 
 			float Finish = Time::WorldTimeElapsed();
 			float timepassed = Finish - Start;
-			if (timepassed < 180.0) {
+			if (timepassed < 180.0f) {
 				auto giantref = gianthandle.get().get();
 				if (Utils_ManageTinyProtection(giant, false, Balance)) {
 					return true; // Disallow to check further
@@ -2703,10 +2705,10 @@ namespace Gts {
 
 	void NotifyWithSound(Actor* actor, std::string_view message) {
 		if (actor->formID == 0x14 || IsTeammate(actor)) {
-			static Timer Cooldown = Timer(1.2);
+			static Timer Cooldown = Timer(1.2f);
 			if (Cooldown.ShouldRun()) {
-				float falloff = 0.13 * get_visual_scale(actor);
-				Runtime::PlaySoundAtNode_FallOff("VoreSound_Fail", actor, 0.4, 1.0, "NPC COM [COM ]", falloff);
+				float falloff = 0.13f * get_visual_scale(actor);
+				Runtime::PlaySoundAtNode_FallOff("VoreSound_Fail", actor, 0.4f, 1.0f, "NPC COM [COM ]", falloff);
 				Notify(message);
 			}
 		}
@@ -2734,11 +2736,11 @@ namespace Gts {
 	void DisarmActor(Actor* tiny, bool drop) {
 		if (tiny->formID != 0x14) {
 			if (!drop) {
-				for (auto object_find: disarm_nodes) {
+				for (auto &object_find : disarm_nodes) {
 					auto object = find_node(tiny, object_find);
 					if (object) {
 						//log::info("Found Object: {}", object->name.c_str());
-						//object->local.scale = 0.01;
+						//object->local.scale = 0.01f;
 						object->SetAppCulled(true);
 
 						update_node(object);
@@ -2755,8 +2757,8 @@ namespace Gts {
 							}
 							Actor* Tiny = tinyHandle.get().get();
 							float Finish = Time::WorldTimeElapsed();
-							if (Finish - Start > 0.25 && !IsGtsBusy(Tiny)) {
-								//object->local.scale = 1.0;
+							if (Finish - Start > 0.25f && !IsGtsBusy(Tiny)) {
+								//object->local.scale = 1.0f;
 								object->SetAppCulled(false);
 								update_node(object);
 								return false;
@@ -2787,10 +2789,10 @@ namespace Gts {
 	}
 
 	void ManageRagdoll(Actor* tiny, float deltaLength, NiPoint3 deltaLocation, NiPoint3 targetLocation) {
-		if (deltaLength >= 70.0) {
+		if (deltaLength >= 70.0f) {
 			// WARP if > 1m
 			auto ragDoll = GetRagdoll(tiny);
-			hkVector4 delta = hkVector4(deltaLocation.x/70.0, deltaLocation.y/70.0, deltaLocation.z/70, 1.0);
+			hkVector4 delta = hkVector4(deltaLocation.x/70.0f, deltaLocation.y/70.0f, deltaLocation.z/70, 1.0f);
 			for (auto rb: ragDoll->rigidBodies) {
 				if (rb) {
 					auto ms = rb->GetMotionState();
@@ -2798,7 +2800,7 @@ namespace Gts {
 						hkVector4 currentPos = ms->transform.translation;
 						hkVector4 newPos = currentPos + delta;
 						rb->motion.SetPosition(newPos);
-						rb->motion.SetLinearVelocity(hkVector4(0.0, 0.0, -10.0, 0.0));
+						rb->motion.SetLinearVelocity(hkVector4(0.0f, 0.0f, -10.0f, 0.0f));
 					}
 				}
 			}
@@ -2815,9 +2817,9 @@ namespace Gts {
 						if (handRb) {
 							auto ms = handRb->GetMotionState();
 							if (ms) {
-								hkVector4 targetLocationHavok = hkVector4(targetLocation.x/70.0, targetLocation.y/70.0, targetLocation.z/70, 1.0);
+								hkVector4 targetLocationHavok = hkVector4(targetLocation.x/70.0f, targetLocation.y/70.0f, targetLocation.z/70, 1.0f);
 								handRb->motion.SetPosition(targetLocationHavok);
-								handRb->motion.SetLinearVelocity(hkVector4(0.0, 0.0, -10.0, 0.0));
+								handRb->motion.SetLinearVelocity(hkVector4(0.0f, 0.0f, -10.0f, 0.0f));
 							}
 						}
 					}
@@ -2831,12 +2833,12 @@ namespace Gts {
 			return;
 		}
 		float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, true);
-		if (sizedifference > 1.15 && !tiny->IsDead()) {
+		if (sizedifference > 1.15f && !tiny->IsDead()) {
 			int rng = RandomInt(0, random);
 			if (apply_sd) {
-				rng /= sizedifference;
+				rng = static_cast<int>(static_cast<float>(rng) / sizedifference);
 			}
-			if (rng <= 1.0 * sizedifference) {
+			if (rng <= 1.0f * sizedifference) {
 				bool IsScared = IsActionOnCooldown(tiny, CooldownSource::Action_ScareOther);
 				if (!IsScared && GetAV(tiny, ActorValue::kConfidence) > 0) {
 					ApplyActionCooldown(tiny, CooldownSource::Action_ScareOther);
@@ -2847,7 +2849,7 @@ namespace Gts {
 	}
 
 	void StaggerActor(Actor* receiver, float power) {
-		if (receiver->IsDead() || IsRagdolled(receiver) || GetAV(receiver, ActorValue::kHealth) <= 0.0) {
+		if (receiver->IsDead() || IsRagdolled(receiver) || GetAV(receiver, ActorValue::kHealth) <= 0.0f) {
 			return;
 		}
 		receiver->SetGraphVariableFloat("staggerMagnitude", power);
@@ -2855,7 +2857,7 @@ namespace Gts {
 	}
 
 	void StaggerActor(Actor* giant, Actor* tiny, float power) {
-		if (tiny->IsDead() || IsRagdolled(tiny) || IsBeingHugged(tiny) || GetAV(tiny, ActorValue::kHealth) <= 0.0) {
+		if (tiny->IsDead() || IsRagdolled(tiny) || IsBeingHugged(tiny) || GetAV(tiny, ActorValue::kHealth) <= 0.0f) {
 			return;
 		}
 		StaggerActor_Directional(giant, power, tiny);
@@ -2875,7 +2877,7 @@ namespace Gts {
 		float CheckDistance = radius * giantScale;
 
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant))) {
-			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 600, {0.0, 1.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), CheckDistance, 600, {0.0f, 1.0f, 0.0f, 1.0f});
 		}
 
 		NiPoint3 giantLocation = giant->GetPosition();
@@ -2884,7 +2886,7 @@ namespace Gts {
 				NiPoint3 actorLocation = otherActor->GetPosition();
 				if ((actorLocation - giantLocation).Length() < CheckDistance*3) {
 					int nodeCollisions = 0;
-					float force = 0.0;
+					float force = 0.0f;
 
 					auto model = otherActor->GetCurrent3D();
 
@@ -2893,7 +2895,7 @@ namespace Gts {
 							float distance = (NodePosition - a_obj.world.translate).Length();
 							if (distance < CheckDistance) {
 								nodeCollisions += 1;
-								force = 1.0 - distance / CheckDistance;
+								force = 1.0f - distance / CheckDistance;
 								return false;
 							}
 							return true;
@@ -2901,16 +2903,16 @@ namespace Gts {
 					}
 					if (nodeCollisions > 0) {
 						if (!launch) {
-							StaggerActor(giant, otherActor, 0.50);
+							StaggerActor(giant, otherActor, 0.50f);
 						} else {
 							if (GetSizeDifference(giant, otherActor, SizeType::VisualScale, true, false) < Push_Jump_Launch_Threshold) {
-								StaggerActor(giant, otherActor, 0.50);
+								StaggerActor(giant, otherActor, 0.50f);
 							} else {
-								float launch_power = 0.33;
+								float launch_power = 0.33f;
 								if (HasSMT(giant)) {
-									launch_power *= 6.0;
+									launch_power *= 6.0f;
 								}
-								LaunchActor::ApplyLaunchTo(giant, otherActor, 1.0, launch_power);
+								LaunchActor::ApplyLaunchTo(giant, otherActor, 1.0f, launch_power);
 							}
 						}
 					}
@@ -2920,15 +2922,15 @@ namespace Gts {
 	}
 
 	float GetMovementModifier(Actor* giant) {
-		float modifier = 1.0;
+		float modifier = 1.0f;
 		if (giant->AsActorState()->IsSprinting()) {
-			modifier *= 1.33;
+			modifier *= 1.33f;
 		}
 		if (giant->AsActorState()->IsWalking()) {
-			modifier *= 0.75;
+			modifier *= 0.75f;
 		}
 		if (giant->AsActorState()->IsSneaking()) {
-			modifier *= 0.75;
+			modifier *= 0.75f;
 		}
 		return modifier;
 	}
@@ -2960,27 +2962,27 @@ namespace Gts {
 
 		TESGlobal* BonusSize = Runtime::GetGlobal("ExtraPotionSize"); 
 
-		ModSizeExperience(player, 0.45);
+		ModSizeExperience(player, 0.45f);
 
 		if (BonusSize) {
 			Notify("You feel like something is filling you");
-			BonusSize->value += 0.0659; // +12 cm
+			BonusSize->value += 0.0659f; // +12 cm
 
 			if (rng <= 1) {
-				PlayMoanSound(player, 1.0);
-				Task_FacialEmotionTask_Moan(player, 1.6, "DragonVored");
-				shake_camera(player, 0.5, 0.33);
+				PlayMoanSound(player, 1.0f);
+				Task_FacialEmotionTask_Moan(player, 1.6f, "DragonVored");
+				shake_camera(player, 0.5f, 0.33f);
 			}
 
-			SpawnCustomParticle(player, ParticleType::Red, NiPoint3(), "NPC COM [COM ]", get_visual_scale(player) * 1.6); 
+			SpawnCustomParticle(player, ParticleType::Red, NiPoint3(), "NPC COM [COM ]", get_visual_scale(player) * 1.6f); 
 			
 			ActorHandle gianthandle = player->CreateRefHandle();
 			std::string name = std::format("DragonGrowth_{}", player->formID);
 
-			float HpRegen = GetMaxAV(player, ActorValue::kHealth) * 0.00125;
-			float Gigantism = 1.0 + Ench_Aspect_GetPower(player);
+			float HpRegen = GetMaxAV(player, ActorValue::kHealth) * 0.00125f;
+			float Gigantism = 1.0f + Ench_Aspect_GetPower(player);
 
-			float duration = 6.0 + dur_rng;
+			float duration = 6.0f + dur_rng;
 
 			TaskManager::RunFor(name, duration, [=](auto& progressData) {
 				if (!gianthandle) {
@@ -2988,7 +2990,7 @@ namespace Gts {
 				}
 				auto giantref = gianthandle.get().get();
 				ApplyShakeAtNode(giantref, Rumble_Misc_MightOfDragons, "NPC COM [COM ]");
-				update_target_scale(giantref, 0.0026 * Gigantism * TimeScale(), SizeEffectType::kGrow);
+				update_target_scale(giantref, 0.0026f * Gigantism * TimeScale(), SizeEffectType::kGrow);
 				giantref->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, HpRegen * TimeScale());
 				return true;
 			});
@@ -3056,12 +3058,12 @@ namespace Gts {
 				if (animation) {
 					Animation_TinyCalamity::AddToData(giant, tiny, expected);
 					AnimationManager::StartAnim("Calamity_ShrinkOther", giant);
-					tiny->StopMoving(1.2);
+					tiny->StopMoving(1.2f);
 					return;
 				}
 
 				Task_AdjustHalfLifeTask(tiny, halflife, 1.2); // to make them shrink faster
-				AddSMTPenalty(giant, 5.0 * Adjustment_Tiny);
+				AddSMTPenalty(giant, 5.0f * Adjustment_Tiny);
 				set_target_scale(tiny, targetScale);
 				StartCombat(tiny, giant);
 				
@@ -3108,7 +3110,7 @@ namespace Gts {
 
 		auto growData = std::make_shared<SpringGrowData>(actor, amt, halfLife);
 		std::string name = std::format("SpringGrow_{}_{}", naming, actor->formID);
-		const float DURATION = halfLife * 3.2;
+		const float DURATION = halfLife * 3.2f;
 		growData->drain = drain;
 
 		TaskManager::RunFor(DURATION,
@@ -3122,7 +3124,7 @@ namespace Gts {
 			if (actor) {
 				if (drain_stamina) {
 					float stamina = std::clamp(GetStaminaPercentage(actor), 0.05f, 1.0f);
-					DamageAV(actor, ActorValue::kStamina, 0.55 * (get_visual_scale(actor) * 0.5 + 0.5) * stamina * TimeScale());
+					DamageAV(actor, ActorValue::kStamina, 0.55f * (get_visual_scale(actor) * 0.5f + 0.5f) * stamina * TimeScale());
 				}
 				auto actorData = Persistent::GetSingleton().GetData(actor);
 				if (actorData) {
@@ -3148,7 +3150,7 @@ namespace Gts {
 
 		auto growData = std::make_shared<SpringShrinkData>(actor, amt, halfLife);
 		std::string name = std::format("SpringShrink_{}_{}", naming, actor->formID);
-		const float DURATION = halfLife * 3.2;
+		const float DURATION = halfLife * 3.2f;
 		TaskManager::RunFor(DURATION,
 		                    [ growData ](const auto& progressData) {
 			float totalScaleToAdd = growData->amount.value;
@@ -3158,7 +3160,7 @@ namespace Gts {
 
 			if (actor) {
 				float stamina = std::clamp(GetStaminaPercentage(actor), 0.05f, 1.0f);
-				DamageAV(actor, ActorValue::kStamina, 0.35 * (get_visual_scale(actor) * 0.5 + 0.5) * stamina * TimeScale());
+				DamageAV(actor, ActorValue::kStamina, 0.35f * (get_visual_scale(actor) * 0.5f + 0.5f) * stamina * TimeScale());
 				auto actorData = Persistent::GetSingleton().GetData(actor);
 				if (actorData) {
 					actorData->target_scale += deltaScale;
@@ -3256,16 +3258,16 @@ namespace Gts {
 						if (queststage >= 30 && queststage <= 40) {
 							Persistent::GetSingleton().CrushCount += value;
 							if (value < 1) {
-								SpawnCustomParticle(tiny, ParticleType::DarkRed, NiPoint3(), "NPC Root [Root]", 1.0);
+								SpawnCustomParticle(tiny, ParticleType::DarkRed, NiPoint3(), "NPC Root [Root]", 1.0f);
 							} else {
-								SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0);
+								SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0f);
 							}
 							
 							float progression = GetQuestProgression(static_cast<int>(QuestStage::Crushing));
-							float goal = 3.0;
+							float goal = 3.0f;
 							if (queststage == 40) { // Print this if in STN stage
 								progression = GetQuestProgression(static_cast<int>(QuestStage::ShrinkToNothing));
-								goal = 6.0;
+								goal = 6.0f;
 							}
 							Notify("Progress: {:.1f}/{:.1f}", progression, goal);
 						}
@@ -3274,29 +3276,29 @@ namespace Gts {
 						if (queststage == 40) {
 							Persistent::GetSingleton().STNCount += value;
 							if (value < 1) {
-								SpawnCustomParticle(tiny, ParticleType::DarkRed, NiPoint3(), "NPC Root [Root]", 1.0);
+								SpawnCustomParticle(tiny, ParticleType::DarkRed, NiPoint3(), "NPC Root [Root]", 1.0f);
 							} else {
-								SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0);
+								SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0f);
 							}
-							Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::ShrinkToNothing)), 6.0);
+							Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::ShrinkToNothing)), 6.0f);
 						}
 					break;
 					case QuestStage::HandCrush:				// Stage 4: hand crush 3 enemies
 						Persistent::GetSingleton().HandCrushed += value;
-						SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0);
-						Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::HandCrush)), 3.0);
+						SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0f);
+						Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::HandCrush)), 3.0f);
 					break;
 					case QuestStage::Vore:					// Stage 5: Vore 6 enemies
 						Persistent::GetSingleton().VoreCount += value;
-						SpawnCustomParticle(tiny, ParticleType::Blue, NiPoint3(), "NPC Root [Root]", 1.0);
-						Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::Vore)), 6.0);
+						SpawnCustomParticle(tiny, ParticleType::Blue, NiPoint3(), "NPC Root [Root]", 1.0f);
+						Notify("Progress: {:.1f}/{:.1f}", GetQuestProgression(static_cast<int>(QuestStage::Vore)), 6.0f);
 					break;
 					case QuestStage::Giant:					// Stage 6: Vore/crush/shrink a Giant
 						Persistent::GetSingleton().GiantCount += value;
 						if (vore) {
-							SpawnCustomParticle(tiny, ParticleType::Blue, NiPoint3(), "NPC Root [Root]", 1.0);
+							SpawnCustomParticle(tiny, ParticleType::Blue, NiPoint3(), "NPC Root [Root]", 1.0f);
 						} else {
-							SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0);
+							SpawnCustomParticle(tiny, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 1.0f);
 						}
 					break;
 				}
@@ -3314,7 +3316,7 @@ namespace Gts {
 			case QuestStage::Crushing: 				// Stage 2: Crush 3 (*4 if dead) enemies
 				return Persistent::GetSingleton().CrushCount;
 			case QuestStage::ShrinkToNothing:  		// Stage 3: Crush or Shrink to nothing 6 enemies in total
-				return (Persistent::GetSingleton().CrushCount - 3.0) + Persistent::GetSingleton().STNCount;
+				return (Persistent::GetSingleton().CrushCount - 3.0f) + Persistent::GetSingleton().STNCount;
 			case QuestStage::HandCrush: 			// Stage 4: hand crush 3 enemies
 				return Persistent::GetSingleton().HandCrushed;
 			case QuestStage::Vore: 					// Stage 5: Vore 6 enemies
@@ -3323,17 +3325,17 @@ namespace Gts {
 				return Persistent::GetSingleton().GiantCount;
 			break;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	void ResetQuest() {
-		Persistent::GetSingleton().HugStealCount = 0.0;
-		Persistent::GetSingleton().StolenSize = 0.0;
-		Persistent::GetSingleton().CrushCount = 0.0;
-		Persistent::GetSingleton().STNCount = 0.0;
-		Persistent::GetSingleton().HandCrushed = 0.0;
-		Persistent::GetSingleton().VoreCount = 0.0;
-		Persistent::GetSingleton().GiantCount = 0.0;
+		Persistent::GetSingleton().HugStealCount = 0.0f;
+		Persistent::GetSingleton().StolenSize = 0.0f;
+		Persistent::GetSingleton().CrushCount = 0.0f;
+		Persistent::GetSingleton().STNCount = 0.0f;
+		Persistent::GetSingleton().HandCrushed = 0.0f;
+		Persistent::GetSingleton().VoreCount = 0.0f;
+		Persistent::GetSingleton().GiantCount = 0.0f;
 	}
 
 	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs) {
@@ -3354,7 +3356,7 @@ namespace Gts {
 			float scale = scale_mult * GetSizeFromBoundingBox(actor);
 
 			if (actor->IsDead()) {
-				scale *= 0.33;
+				scale *= 0.33f;
 			}
 
 			auto node = find_node(actor, spawn_at_node);
@@ -3385,30 +3387,30 @@ namespace Gts {
 			}
 			NiPoint3 pos = NiPoint3(); // Empty point 3
 
-			if (spawn_at_point.Length() > 0.01) { // fill it up
+			if (spawn_at_point.Length() > 0.01f) { // fill it up
 				pos = spawn_at_point;
 			} else {
 				pos = node->world.translate;
 			}
 
-			SpawnParticle(actor, 4.60, particle_path, NiMatrix3(), pos, scale, 7, nullptr);
+			SpawnParticle(actor, 4.60f, particle_path, NiMatrix3(), pos, scale, 7, nullptr);
 		}
 	}
 	
 	void InflictSizeDamage(Actor* attacker, Actor* receiver, float value) {
 		if (!receiver->IsDead()) {
 			float HpPercentage = GetHealthPercentage(receiver);
-			float difficulty = 2.0; // taking Legendary Difficulty as a base
-			float levelbonus = 1.0 + ((GetGtsSkillLevel(attacker) * 0.01) * 0.50);
+			float difficulty = 2.0f; // taking Legendary Difficulty as a base
+			float levelbonus = 1.0f + ((GetGtsSkillLevel(attacker) * 0.01f) * 0.50f);
 			value *= levelbonus;
 
 			if (receiver->formID != 0x14) { // Mostly a warning to indicate that actor dislikes it (They don't always aggro right away, with mods at least)
-				if (value >= GetAV(receiver, ActorValue::kHealth) * 0.50 || HpPercentage < 0.70) { // in that case make hostile
+				if (value >= GetAV(receiver, ActorValue::kHealth) * 0.50f || HpPercentage < 0.70f) { // in that case make hostile
 					if (!IsTeammate(receiver) && !IsHostile(attacker, receiver)) {
 						StartCombat(receiver, attacker); // Make actor hostile and add bounty of 40 (can't be configured, needs different hook probably). 
 					}
 				}
-				if (value > 1.0) { // To prevent aggro when briefly colliding
+				if (value > 1.0f) { // To prevent aggro when briefly colliding
 					Attacked(receiver, attacker);
 				}
 			} 
@@ -3426,9 +3428,9 @@ namespace Gts {
 		if (source) {
 			float distance_to_camera = unit_to_meter(get_distance_to_camera(source));
 			// Camera distance based volume falloff
-			return soft_core(distance_to_camera, 0.024 / mult, 2.0, 0.8, 0.0, 0.0);
+			return soft_core(distance_to_camera, 0.024f / mult, 2.0f, 0.8f, 0.0f, 0.0f);
 		}
-		return 1.0;
+		return 1.0f;
 	} 
 
 	// RE Fun

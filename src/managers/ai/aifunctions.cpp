@@ -23,21 +23,21 @@ using namespace Gts;
 namespace Gts {
 
 	float GetScareThreshold(Actor* giant) {
-		float threshold = 2.5;
+		float threshold = 2.5f;
 		if (giant->IsSneaking()) { // If we sneak/prone/crawl = make threshold bigger so it's harder to scare actors
-			threshold += 0.8;
+			threshold += 0.8f;
 		}
 		if (IsCrawling(giant)) {
-			threshold += 1.45;
+			threshold += 1.45f;
 		}
 		if (IsProning(giant)) {
-			threshold += 1.45;
+			threshold += 1.45f;
 		}
 		if (giant->AsActorState()->IsWalking()) { // harder to scare if we're approaching slowly
-			threshold *= 1.35;
+			threshold *= 1.35f;
 		}
 		if (giant->AsActorState()->IsSprinting()) { // easier to scare
-			threshold *= 0.75;
+			threshold *= 0.75f;
 		}
 		return threshold;
 	}
@@ -48,7 +48,7 @@ namespace Gts {
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		std::string taskname = std::format("EnterRagdoll_{}", tiny->formID);
 
-		TaskManager::RunFor(taskname, 2.0, [=](auto& update){
+		TaskManager::RunFor(taskname, 2.0f, [=](auto& update){
 			if (!tinyHandle) {
 				return false;
 			}
@@ -64,7 +64,7 @@ namespace Gts {
 			}
 			double endTime = Time::WorldTimeElapsed();
 
-			if ((endTime - startTime) > 0.05) {
+			if ((endTime - startTime) > 0.05f) {
 				tinyref->InitHavok(); // Hopefully will fix occasional Ragdoll issues
 				return false;
 			} 
@@ -101,13 +101,13 @@ namespace Gts {
 		if (tiny && tiny->Is3DLoaded() && !tiny->IsDead()) {
 			StartCombat(tiny, giant);
 		}
-		float hp = GetMaxAV(tiny, ActorValue::kHealth) * 9.0;	
+		float hp = GetMaxAV(tiny, ActorValue::kHealth) * 9.0f;	
 
 		InflictSizeDamage(giant, tiny, hp); // just to make sure
 		
 		if (tiny->formID == 0x14) {
 			tiny->KillImpl(giant, 1, true, true);
-			tiny->SetAlpha(0.0);
+			tiny->SetAlpha(0.0f);
 		}
 
 		SendDeathEvent(giant, tiny);
@@ -121,30 +121,30 @@ namespace Gts {
 		if (transient) {
 			return transient->ButtCrushGrowthAmount;
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	float GetGrowthLimit(Actor* actor) {
 		float limit = 0;
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_GrowingDisaster")) {
-			limit += 3.0;
+			limit += 3.0f;
 		}
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_UnstableGrowth")) {
-			limit += 4.0;
+			limit += 4.0f;
 		}
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_LoomingDoom")) {
-			limit += 5.0;
+			limit += 5.0f;
 		}
 		return limit;
 	}
 
 	float GetButtCrushDamage(Actor* actor) {
-		float damage = 1.0;
+		float damage = 1.0f;
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_KillerBooty")) {
-			damage += 0.30;
+			damage += 0.30f;
 		}
 		if (Runtime::HasPerkTeam(actor, "ButtCrush_UnstableGrowth")) {
-			damage += 0.70;
+			damage += 0.70f;
 		}
 		return damage;
 	}
@@ -154,7 +154,7 @@ namespace Gts {
 		if (transient) {
 			transient->ButtCrushGrowthAmount += value;
 			if (reset) {
-				transient->ButtCrushGrowthAmount = 0.0;
+				transient->ButtCrushGrowthAmount = 0.0f;
 			}
 		}
 	}
@@ -187,7 +187,7 @@ namespace Gts {
 				set_target_scale(giant, start_scale); 
 				
 				saved_data->buttcrush_max_size = 0;
-				saved_data->buttcrush_start_scale = 0.0;
+				saved_data->buttcrush_start_scale = 0.0f;
 			}
 		}
 	}
@@ -198,7 +198,7 @@ namespace Gts {
 			float butt_crush_size = std::clamp(saved_data->buttcrush_max_size, 0.0f, 1000000.0f);
 			return butt_crush_size;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	void ForceFlee(Actor* giant, Actor* tiny, float duration, bool apply_size_difference) {
@@ -212,7 +212,7 @@ namespace Gts {
 			duration *= GetSizeDifference(giant, tiny, SizeType::VisualScale, false, true);
 		}
 
-		SetAV(tiny, ActorValue::kConfidence, 0.0);
+		SetAV(tiny, ActorValue::kConfidence, 0.0f);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!tinyHandle) {
@@ -242,7 +242,7 @@ namespace Gts {
 			if (IsMoving(tinyRef)) {
 				int FallChance = RandomInt(0, 6000);// Chance to Trip
 				if (FallChance <= 2 && !IsRagdolled(tinyRef)) {
-					PushActorAway(giantRef, tinyRef, 1.0);
+					PushActorAway(giantRef, tinyRef, 1.0f);
 				}
 			}
 			
@@ -270,7 +270,7 @@ namespace Gts {
 				float get_difference = GetSizeDifference(giant, tiny, SizeType::VisualScale, false, true); // Apply HH difference as well
 				float sizedifference = std::clamp(get_difference, 0.10f, 12.0f);
 
-				float distancecheck = 128.0 * GetMovementModifier(giant);
+				float distancecheck = 128.0f * GetMovementModifier(giant);
 				float threshold = GetScareThreshold(giant);
 
 				if (sizedifference >= threshold) {
@@ -289,11 +289,11 @@ namespace Gts {
 							if (GiantRef) {
 								bool SeeingOther;
 								bool IsTrue = tiny->HasLineOfSight(GiantRef, SeeingOther);
-								if (IsTrue || distance < (distancecheck/1.5) * sizedifference) {
+								if (IsTrue || distance < (distancecheck/1.5f) * sizedifference) {
 									auto cell = tiny->GetParentCell();
 									if (cell) {
 										if (!combat) {
-											tiny->InitiateFlee(TinyRef, true, true, true, cell, TinyRef, 100.0, 465.0 * sizedifference);
+											tiny->InitiateFlee(TinyRef, true, true, true, cell, TinyRef, 100.0f, 465.0f * sizedifference);
 										}
 									}
 								}

@@ -85,7 +85,7 @@ namespace Hooks
 		Plugin::SetOnMainThread(false);
 
 		if (Config::GetSingleton().GetDebug().ShouldProfile()) {
-			static Timer timer = Timer(5.0);
+			static Timer timer = Timer(5.0f);
 			if (timer.ShouldRun()) {
 				Profilers::Report();
 			}

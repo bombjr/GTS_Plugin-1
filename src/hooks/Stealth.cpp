@@ -10,31 +10,31 @@ using namespace SKSE;
 
 namespace {
     float modify_detection(float in) {
-        float modify = 1.0;
+        float modify = 1.0f;
         if (in > 1e-6) {
             auto player = PlayerCharacter::GetSingleton();
             float scale = get_visual_scale(player);
-            modify = 1.0 / scale;
+            modify = 1.0f / scale;
         }
         return modify;
     }
     float modify_footstep_detection(Actor* giant, float in) {
         float scale = get_visual_scale(giant);
         float massscale = (scale * scale * scale);
-        float modify = 0.0;
+        float modify = 0.0f;
         if (HasSMT(giant)) {
-            modify = (in * 4.0 + 80) * scale;
+            modify = (in * 4.0f + 80) * scale;
         } else {
             if (in > 1e-6) {
                 modify = in * massscale;
             } else {
-                modify = (1.0 * massscale) - 1.0;
+                modify = (1.0f * massscale) - 1.0f;
             }
         }
 
         if (scale < get_natural_scale(giant)) {
             modify += in * massscale;
-            modify -= 1.0 / massscale; // harder to hear small player
+            modify -= 1.0f / massscale; // harder to hear small player
         }
 
         return modify;
@@ -218,7 +218,7 @@ namespace Hooks {
                 }
 
                 float result = CalculateDetection_1405FD870(giant, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10);
-                result = 0.0;
+                result = 0.0f;
 				log::info("Hook Result: {}", result);
 				return result;
             }
@@ -227,7 +227,7 @@ namespace Hooks {
         /*static FunctionHook<float(Actor* ref)>GetDetectionCalculatedValue( 
             REL::RelocationID(36748, 36748),
             [](auto* ref) {
-				float result = 0.0;//GetDetectionCalculatedValue(ref);
+				float result = 0.0f;//GetDetectionCalculatedValue(ref);
 
 				log::info("Detection of {} is {}", ref->GetDisplayFullName(), result);
 				

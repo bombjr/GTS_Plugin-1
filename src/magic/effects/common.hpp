@@ -19,12 +19,12 @@
 // Module that handles various magic effects
 
 namespace {
-	const float MASTER_POWER = 2.0;
+	const float MASTER_POWER = 2.0f;
 }
 
 namespace Gts {
 	inline float TimeScale() {
-		const float BASE_FPS = 60.0; // Parameters were optimised on this fps
+		const float BASE_FPS = 60.0f; // Parameters were optimised on this fps
 		return Time::WorldTimeDelta() * BASE_FPS;
 	}
 
@@ -37,7 +37,7 @@ namespace Gts {
 		// DLL Equivalent of AdvanceSkill from Papyrus, does the same thing
 		if (giant->formID == 0x14) {
 			//log::info("Advancing skill, points: {}, Mult: {}, TimeScale: {}, Result: {}, * 60: {}", points, multiplier, TimeScale(), points * multiplier * TimeScale(), points * 60 * multiplier * TimeScale());
-			//float Level = GetAV(giant, Attribute) + 1.0;
+			//float Level = GetAV(giant, Attribute) + 1.0f;
 			//log::info("Level: {}", Level);
 			giant->UseSkill(Attribute, points * 20 * multiplier * TimeScale(), nullptr);
 		}
@@ -46,7 +46,7 @@ namespace Gts {
 	inline void Potion_Penalty(Actor* giant) { // Normal people just die if they drink them
 		if (giant->formID != 0x14 && !IsTeammate(giant)) {
 			float currentscale = get_visual_scale(giant);
-			update_target_scale(giant, -currentscale * 0.5, SizeEffectType::kNeutral);
+			update_target_scale(giant, -currentscale * 0.5f, SizeEffectType::kNeutral);
 			giant->KillImmediate();
 		}
 	}
@@ -57,26 +57,26 @@ namespace Gts {
 		}
 		auto Cache = Persistent::GetSingleton().GetData(giant);
 		if (Cache) {
-			Cache->SizeReserve += value * 1.5;
+			Cache->SizeReserve += value * 1.5f;
 		}
 	}
 
 	inline float Shrink_GetPower(Actor* giant, Actor* tiny) { // for shrinking another
-		float reduction = 1.0 / GetSizeFromBoundingBox(tiny);
+		float reduction = 1.0f / GetSizeFromBoundingBox(tiny);
 		//log::info("Default Shrink power for {} is {}", tiny->GetDisplayFullName(), reduction);
 		if (IsUndead(tiny, false) && !IsLiving(tiny)) {
 			if (CanBendLifeless(giant)) {
-				reduction *= 0.31;
+				reduction *= 0.31f;
 			} else {
-				reduction *= 0.22;
+				reduction *= 0.22f;
 			}
 		} else if (IsGiant(tiny)) {
-			reduction *= 0.75;
+			reduction *= 0.75f;
 		} else if (IsMechanical(tiny)) {
 			if (CanBendLifeless(giant)) {
-				reduction *= 0.12;
+				reduction *= 0.12f;
 			} else {
-				reduction *= 0.0;
+				reduction *= 0.0f;
 			}
 		}
 		//log::info("Total Shrink power for {} is {}", tiny->GetDisplayFullName(), reduction);
@@ -87,12 +87,12 @@ namespace Gts {
 		float increase = GetSizeFromBoundingBox(tiny);
 		if (IsUndead(tiny, false) && !IsLiving(tiny)) {
 			if (CanBendLifeless(giant)) {
-				increase *= 0.31;
+				increase *= 0.31f;
 			} else {
-				increase *= 0.22;
+				increase *= 0.22f;
 			}
 		} else if (IsMechanical(tiny)) {
-			increase *= 0.0;
+			increase *= 0.0f;
 		}
 		return increase;
 	}
@@ -106,7 +106,7 @@ namespace Gts {
 					bool Teammate = IsTeammate(Caster);
 					if (Caster->formID == 0x14 || Teammate) {
 						if (Teammate) {
-							value *= 0.2;
+							value *= 0.2f;
 						}
 						auto GtsSkillLevel = Runtime::GetGlobal("GtsSkillLevel");
 						auto GtsSkillRatio = Runtime::GetGlobal("GtsSkillRatio");
@@ -114,24 +114,24 @@ namespace Gts {
 						
 						if (GtsSkillLevel) {
 
-							if (GtsSkillLevel->value >= 100.0) {
-								GtsSkillLevel->value = 100.0;
-								GtsSkillRatio->value = 0.0;
+							if (GtsSkillLevel->value >= 100.0f) {
+								GtsSkillLevel->value = 100.0f;
+								GtsSkillRatio->value = 0.0f;
 								return;
 							}
 
 							float skill_level = GtsSkillLevel->value;
 
-							float ValueEffectiveness = std::clamp(1.0 - GtsSkillLevel->value/100, 0.10, 1.0);
+							float ValueEffectiveness = std::clamp(1.0f - GtsSkillLevel->value/100, 0.10f, 1.0f);
 
-							float oldvaluecalc = 1.0 - GtsSkillRatio->value; //Attempt to keep progress on the next level
+							float oldvaluecalc = 1.0f - GtsSkillRatio->value; //Attempt to keep progress on the next level
 							float Total = value * ValueEffectiveness;
 							GtsSkillRatio->value += Total * GetXpBonus();
 
-							if (GtsSkillRatio->value >= 1.0) {
+							if (GtsSkillRatio->value >= 1.0f) {
 								float transfer = std::clamp(Total - oldvaluecalc, 0.0f, 1.0f);
 								GtsSkillRatio->value = transfer;
-								GtsSkillLevel->value = skill_level + 1.0;
+								GtsSkillLevel->value = skill_level + 1.0f;
 								GtsSkillProgress->value = GtsSkillLevel->value;
 								AddPerkPoints(GtsSkillLevel->value);
 							}
@@ -144,10 +144,10 @@ namespace Gts {
 
 	inline void ModSizeExperience_Crush(Actor* giant, Actor* tiny, bool check) {
 		float size = get_visual_scale(tiny);
-		float xp = 0.20 + (size * 0.02);
+		float xp = 0.20f + (size * 0.02f);
 		if (tiny->IsDead() && check) {
 			//Cprint("Crush Tiny is ded");
-			xp *= 0.20;
+			xp *= 0.20f;
 		}
 		ModSizeExperience(giant, xp); // Adjust Size Matter skill
 	}
@@ -159,8 +159,8 @@ namespace Gts {
 		float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
 
 		auto globalMaxSizeCalc = Runtime::GetFloat("GlobalMaxSizeCalc");
-		if (globalMaxSizeCalc < 10.0) {
-			Runtime::SetFloat("GlobalMaxSizeCalc", globalMaxSizeCalc + (value * 1.45 * 50 * progressionMultiplier * TimeScale())); // Always apply it
+		if (globalMaxSizeCalc < 10.0f) {
+			Runtime::SetFloat("GlobalMaxSizeCalc", globalMaxSizeCalc + (value * 1.45f * 50 * progressionMultiplier * TimeScale())); // Always apply it
 		}
 	}
 
@@ -171,24 +171,24 @@ namespace Gts {
 		auto selectedFormula = Runtime::GetInt("SelectedSizeFormula");
 		float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
 		if (selectedFormula) {
-			if (selectedFormula >= 1.0) {
+			if (selectedFormula >= 1.0f) {
 				SoftPotential mod {
-					.k = 0.070,
+					.k = 0.070f,
 					.n = 3,
-					.s = 0.54,
+					.s = 0.54f,
 				};
 				auto globalMassSize = Runtime::GetFloat("GtsMassBasedSize");
 				float modifier = soft_core(globalMassSize, mod);
-				if (modifier <= 0.10) {
-					modifier = 0.10;
+				if (modifier <= 0.10f) {
+					modifier = 0.10f;
 				}
-				value *= 10.0 * modifier;
+				value *= 10.0f * modifier;
 				//log::info("Modifier: {}", modifier);
 				auto sizeLimit = Runtime::GetFloat("sizeLimit");
 				if (Runtime::HasPerk(caster, "ColossalGrowth")) {
-					sizeLimit = 999999.0;
+					sizeLimit = 999999.0f;
 				}
-				if (globalMassSize + 1.0 < sizeLimit) {
+				if (globalMassSize + 1.0f < sizeLimit) {
 					Runtime::SetFloat("GtsMassBasedSize", globalMassSize + value * progressionMultiplier * TimeScale());
 				}
 			}
@@ -201,10 +201,10 @@ namespace Gts {
 		float casterlevel = std::clamp(level_caster, 1.0f, 500.0f);
 		float targetlevel = std::clamp(level_target, 1.0f, 500.0f);
 
-		float SizeHunger = 1.0 + Ench_Hunger_GetPower(caster);
+		float SizeHunger = 1.0f + Ench_Hunger_GetPower(caster);
 
-		float Gigantism_Caster = 1.0 + (Ench_Aspect_GetPower(caster) * 0.25); // get GTS Aspect Of Giantess
-		float Gigantism_Target = 1.0 + Ench_Aspect_GetPower(target);  // get Tiny Aspect Of Giantess
+		float Gigantism_Caster = 1.0f + (Ench_Aspect_GetPower(caster) * 0.25f); // get GTS Aspect Of Giantess
+		float Gigantism_Target = 1.0f + Ench_Aspect_GetPower(target);  // get Tiny Aspect Of Giantess
 		float efficiency = std::clamp(casterlevel/targetlevel, 0.50f, 1.0f);
 
 		float Scale_Resistance = std::clamp(get_visual_scale(target), 1.0f, 9999.0f); // Calf_power makes shrink effects stronger based on scale, this fixes that.
@@ -226,11 +226,11 @@ namespace Gts {
 
 	inline float CalcPower(Actor* actor, float scale_factor, float bonus, bool shrink) {
 		float progress_mult = Persistent::GetSingleton().progression_multiplier;
-		float size_cap = 0.5;
+		float size_cap = 0.5f;
 		// y = mx +c
 		// power = scale_factor * scale + bonus
 		if (shrink) { // allow for more size weakness when we need it
-			size_cap = 0.02; // up to 98% shrink weakness
+			size_cap = 0.02f; // up to 98% shrink weakness
 		}
 		float scale = std::clamp(get_visual_scale(actor), size_cap, 999999.0f);
 		return (scale * scale_factor + bonus) * progress_mult * MASTER_POWER * TimeScale();
@@ -278,18 +278,18 @@ namespace Gts {
 		float amount = CalcPower(from, scale_factor, bonus, false);
 		float amount_shrink = CalcPower(from, scale_factor, bonus, false);
 
-		float shrink_amount = (amount*0.22);
-		float growth_amount = (amount_shrink*0.33*effeciency) * SizeSteal_GetPower(to, from);
+		float shrink_amount = (amount*0.22f);
+		float growth_amount = (amount_shrink*0.33f*effeciency) * SizeSteal_GetPower(to, from);
 
-		ModSizeExperience(to, 0.14 * scale_factor * visual_scale * SizeSteal_GetPower(to, from));
+		ModSizeExperience(to, 0.14f * scale_factor * visual_scale * SizeSteal_GetPower(to, from));
 
 		update_target_scale(from, -shrink_amount, SizeEffectType::kShrink);
 		update_target_scale(to, growth_amount, SizeEffectType::kShrink); //kShrink to buff size steal with On The Edge perk
 
-		float XpMult = 1.0;
+		float XpMult = 1.0f;
 
 		if (from->IsDead()) {
-			XpMult = 0.25;
+			XpMult = 0.25f;
 		}
 
 		if (source == ShrinkSource::Hugs) { // For hugs: quest: shrink by 2 and 5 meters worth of size in total (stage 1 / 2) 
@@ -306,10 +306,10 @@ namespace Gts {
 	}
 
 	inline void TransferSize(Actor* caster, Actor* target, bool dual_casting, float power, float transfer_effeciency, bool smt, ShrinkSource source) {
-		const float BASE_POWER = 0.0005;
-		const float DUAL_CAST_BONUS = 2.0;
-		const float SMT_BONUS = 1.25;
-		float PERK_BONUS = 1.0;
+		const float BASE_POWER = 0.0005f;
+		const float DUAL_CAST_BONUS = 2.0f;
+		const float SMT_BONUS = 1.25f;
+		float PERK_BONUS = 1.0f;
 
 		if (IsEssential(caster, target)) {
 			return;
@@ -331,20 +331,20 @@ namespace Gts {
 		}
 
 		if (Runtime::HasPerkTeam(caster, "FastShrink")) {
-			PERK_BONUS += 0.15;
+			PERK_BONUS += 0.15f;
 		}
 		if (Runtime::HasPerkTeam(caster, "LethalShrink")) {
-			PERK_BONUS += 0.35;
+			PERK_BONUS += 0.35f;
 		}
 
 		power *= PERK_BONUS; // multiply power by perk bonuses
 
-		AdjustSizeLimit(0.0300 * target_scale * power, caster);
-		AdjustMassLimit(0.0040 * target_scale * power, caster);
+		AdjustSizeLimit(0.0300f * target_scale * power, caster);
+		AdjustMassLimit(0.0040f * target_scale * power, caster);
 
 		auto GtsSkillLevel = GetGtsSkillLevel(caster);
 
-		float alteration_level_bonus = 0.0380 + (GtsSkillLevel * 0.000360); // + 100% bonus at level 100
+		float alteration_level_bonus = 0.0380f + (GtsSkillLevel * 0.000360f); // + 100% bonus at level 100
 		Steal(target, caster, power, power * alteration_level_bonus, transfer_effeciency, source);
 	}
 
@@ -352,10 +352,10 @@ namespace Gts {
 		auto transient = Transient::GetSingleton().GetData(tiny);
 		if (transient) {
 			float& tick = transient->Shrink_Ticks;
-			tick += 0.0166 * TimeScale();
+			tick += 0.0166f * TimeScale();
 
 			if (tick > Shrink_To_Nothing_After * time_mult) {
-				tick = 0.0;
+				tick = 0.0f;
 				return false;
 			} else {
 				bool BlockParticle = IsActionOnCooldown(tiny, CooldownSource::Misc_ShrinkParticle);
@@ -402,11 +402,11 @@ namespace Gts {
 					AdvanceQuestProgression(caster, target, QuestStage::ShrinkToNothing, 1, false);
 				}
 			} else {
-				AdvanceQuestProgression(caster, target, QuestStage::ShrinkToNothing, 0.25, false);
+				AdvanceQuestProgression(caster, target, QuestStage::ShrinkToNothing, 0.25f, false);
 			}
 
-			AdjustSizeLimit(0.0060, caster);
-			AdjustMassLimit(0.0060, caster);
+			AdjustSizeLimit(0.0060f, caster);
+			AdjustMassLimit(0.0060f, caster);
 
 			AdjustSizeReserve(caster, target_scale * bbscale/25);
 			PrintDeathSource(caster, target, DamageSource::Shrinked);
@@ -421,13 +421,13 @@ namespace Gts {
 
 		int Random = RandomInt(1, 8);
 		if (Random >= 8 && Runtime::HasPerk(caster, "GrowthDesirePerk")) {
-			PlayMoanSound(caster, 1.0);
+			PlayMoanSound(caster, 1.0f);
 		}
 
 		if (caster->formID == 0x14) {
 			AdjustSizeReserve(caster, target_scale/25);
-			AdjustSizeLimit(0.0066 * target_scale, caster);
-			AdjustMassLimit(0.0066 * target_scale, caster);
+			AdjustSizeLimit(0.0066f * target_scale, caster);
+			AdjustMassLimit(0.0066f * target_scale, caster);
 		}
 	}
 }

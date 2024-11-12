@@ -18,11 +18,11 @@ namespace {
 		auto profiler = Profilers::Profile("Explosions: CreateParticle");
 		
 		if (HighHeelManager::IsWearingHH(actor)) {
-			SpawnParticle(actor, 4.60, "GTS/Effects/Footstep_High_Heel.nif", NiMatrix3(), position, scale * 2.9, 7, nullptr);
-			SpawnParticle(actor, 4.60, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9, 7, nullptr); // Spawn both
+			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep_High_Heel.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr);
+			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn both
 			return;
 		} else {
-			SpawnParticle(actor, 4.60, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9, 7, nullptr); // Spawn foot only
+			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn foot only
 			return;
 		}
 	}
@@ -66,36 +66,36 @@ namespace Gts {
 		auto actor = impact.actor;
 
 		float scale = impact.scale;
-		float minimal_size = 2.0;
+		float minimal_size = 2.0f;
 		
 		if (actor->formID == 0x14) {
 			if (HasSMT(actor)) {
-				minimal_size = 1.0;
-				scale += 0.33;
+				minimal_size = 1.0f;
+				scale += 0.33f;
 			}
 		}
 		if (scale > minimal_size && !actor->AsActorState()->IsSwimming()) {
 			if (actor->AsActorState()->IsSprinting()) {
-				scale *= 1.25; // Sprinting makes you seem bigger
+				scale *= 1.25f; // Sprinting makes you seem bigger
 				if (Runtime::HasPerk(actor, "DevastatingSprint")) {
-					scale *= 1.75; // A lot bigger
+					scale *= 1.75f; // A lot bigger
 				}
 			}
 			if (actor->AsActorState()->IsWalking()) {
-				scale *= 0.75; // Walking makes you seem smaller
+				scale *= 0.75f; // Walking makes you seem smaller
 			}
 			if (actor->IsSneaking()) {
-				scale *= 0.60; // Sneaking makes you seem smaller
+				scale *= 0.60f; // Sneaking makes you seem smaller
 			}
 
 			FootEvent foot_kind = impact.kind;
 			
 			if (foot_kind == FootEvent::JumpLand) {
-				float fallmod = 1.0 + (GetFallModifier(actor) - 1.0);
-				scale *= 1.5 * fallmod; // Jumping makes you sound bigger
+				float fallmod = 1.0f + (GetFallModifier(actor) - 1.0f);
+				scale *= 1.5f * fallmod; // Jumping makes you sound bigger
 			}
 			if (HighHeelManager::IsWearingHH(actor)) {
-				scale *= GetHighHeelsBonusDamage(actor, true, 0.5); // Wearing High Heels makes explosions bigger based on HH height
+				scale *= GetHighHeelsBonusDamage(actor, true, 0.5f); // Wearing High Heels makes explosions bigger based on HH height
 			}
 
 			for (NiAVObject* node: impact.nodes) {
@@ -104,12 +104,12 @@ namespace Gts {
 				NiPoint3 foot_location = node->world.translate;
 
 				float hh_offset = HighHeelManager::GetBaseHHOffset(actor).Length();
-				NiPoint3 ray_start = foot_location + NiPoint3(0.0, 0.0, (20.0 * scale)); // Start a bit higher
-				NiPoint3 ray_direction(0.0, 0.0, -1.0);
-				float ray_length = (hh_offset + 60.0) * scale;
+				NiPoint3 ray_start = foot_location + NiPoint3(0.0f, 0.0f, (20.0f * scale)); // Start a bit higher
+				NiPoint3 ray_direction(0.0f, 0.0f, -1.0f);
+				float ray_length = (hh_offset + 60.0f) * scale;
 				NiPoint3 explosion_pos = CastRayStatics(actor, ray_start, ray_direction, ray_length, success);
 
-				scale *= 1.0 + (Potion_GetMightBonus(actor) * 0.5);
+				scale *= 1.0f + (Potion_GetMightBonus(actor) * 0.5f);
 				scale *= impact.modifier;
 
 				//log::info("Explosion success: {}", success);
@@ -118,7 +118,7 @@ namespace Gts {
 					explosion_pos = foot_location;
 					explosion_pos.z = actor->GetPosition().z;
 					if (foot_kind == FootEvent::Butt) {
-						explosion_pos.z -= 3.0 * scale;
+						explosion_pos.z -= 3.0f * scale;
 					}
 				}
 				if (actor->formID == 0x14 && Runtime::GetBool("PCAdditionalEffects")) {

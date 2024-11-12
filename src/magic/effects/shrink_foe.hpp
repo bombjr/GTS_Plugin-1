@@ -21,8 +21,8 @@ namespace Gts {
 			ShrinkFoe(ActiveEffect* effect);
 
 		private:
-			float power = 0.0;
-			float efficiency = 0.0;
-			float time_mult = 1.0;
+			float power = 0.0f;
+			float efficiency = 0.0f;
+			float time_mult = 1.0f;
 	};
 }

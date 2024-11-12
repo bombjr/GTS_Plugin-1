@@ -7,12 +7,12 @@
 using namespace RE;
 
 namespace {
-	const float BASE_OVERRIDE = 0.7;
+	const float BASE_OVERRIDE = 0.7f;
 }
 
 namespace Gts {
 	float FirstPersonLoot::GetScaleOverride(bool IsCrawling) {
-		float proneFactor = 1.0;
+		float proneFactor = 1.0f;
 		if (IsCrawling) {
 			proneFactor = GetProneAdjustment();
 		}

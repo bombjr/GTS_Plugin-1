@@ -96,20 +96,20 @@ namespace Gts {
 		}
 		this->data.try_emplace(actor);
 		auto& hhData = this->data[actor];
-		float speedup = 1.0;
+		float speedup = 1.0f;
 		if (IsCrawling(actor) || IsProning(actor) || BehaviorGraph_DisableHH(actor)) {
-			speedup = 4.0; // To shift down a lot faster
+			speedup = 4.0f; // To shift down a lot faster
 		} else if (!IsGtsBusy(actor)) {
-			speedup = 3.0;
+			speedup = 3.0f;
 		}
 		// Should disable HH?
 		bool disableHH = DisableHighHeels(actor);
 
 		if (disableHH) {
-			hhData.multiplier.target = 0.0;
+			hhData.multiplier.target = 0.0f;
 			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 		} else {
-			hhData.multiplier.target = 1.0;
+			hhData.multiplier.target = 1.0f;
 			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 		}
 

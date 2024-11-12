@@ -45,41 +45,45 @@ namespace Gts {
 	float get_distance_to_camera(const NiPoint3& point) {
 		auto camera = PlayerCamera::GetSingleton();
 		if (camera) {
-			auto point_a = point;
+			auto &point_a = point;
 			auto point_b = camera->pos;
 			auto delta = point_a - point_b;
 			return delta.Length();
 		}
-		return 3.4028237E38; // Max float
+		//return 3.4028237E38; // Max float //Throws overflow warning
+		return std::numeric_limits<float>::max(); // Max float
 	}
 
 	float get_distance_to_camera_no_Z(const NiPoint3& point) {
 		auto camera = PlayerCamera::GetSingleton();
 		if (camera) {
-			auto point_a = point;
+			auto &point_a = point;
 			auto point_b = camera->pos;
 			
-			point_a.z = 0;
-			point_b.z = 0;
+			//point_a.z = 0;
+			//point_b.z = 0;
 
 			auto delta = point_a - point_b;
 			return delta.Length();
 		}
-		return 3.4028237E38; // Max float
+		//return 3.4028237E38; // Max float //Throws overflow warning
+		return std::numeric_limits<float>::max(); // Max float
 	}
 
 	float get_distance_to_camera(NiAVObject* node) {
 		if (node) {
 			return get_distance_to_camera(node->world.translate);
 		}
-		return 3.4028237E38; // Max float
+		//return 3.4028237E38; // Max float //Throws overflow warning
+		return std::numeric_limits<float>::max(); // Max float
 	}
 
 	float get_distance_to_camera(Actor* actor) {
 		if (actor) {
 			return get_distance_to_camera(actor->GetPosition());
 		}
-		return 3.4028237E38; // Max float
+		//return 3.4028237E38; // Max float //Throws overflow warning
+		return std::numeric_limits<float>::max(); // Max float
 	}
 
 	bool IsFirstPerson() {
@@ -106,8 +110,8 @@ namespace Gts {
 					log::info("Running Camera Task Once");
 					if (thirdPersonState && isInThirdPerson) {
 						log::info("Applying zoom offset");
-						thirdPersonState->currentZoomOffset = 0.50;
-						thirdPersonState->targetZoomOffset = 0.50;
+						thirdPersonState->currentZoomOffset = 0.50f;
+						thirdPersonState->targetZoomOffset = 0.50f;
 					}
 				});
 				
@@ -122,13 +126,13 @@ namespace Gts {
 					Actor* giantref = giantHandle.get().get();
 					bool Busy = IsGtsBusy(giantref);
 					if (!Busy) {
-						if (Time::WorldTimeElapsed() - start < 0.15) {
+						if (Time::WorldTimeElapsed() - start < 0.15f) {
 							return true;
 						}
 						if (thirdPersonState && !IsFirstPerson()) {
 							camera->ForceFirstPerson();
-							thirdPersonState->currentZoomOffset = 0.0;
-							thirdPersonState->targetZoomOffset = 0.0;
+							thirdPersonState->currentZoomOffset = 0.0f;
+							thirdPersonState->targetZoomOffset = 0.0f;
 							return false;
 						} else {
 							return true;

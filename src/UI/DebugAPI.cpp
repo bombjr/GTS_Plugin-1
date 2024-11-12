@@ -206,43 +206,43 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 				             + localZ * sin(latitude) * radius;
 			      };
 	auto apply_transform = [](glm::vec3 vec, glm::mat4 mat) {
-				       return glm::vec3(mat * glm::vec4(vec, 1.0));
+				       return glm::vec3(mat * glm::vec4(vec, 1.0f));
 			       };
 	// Loop1
 	DrawLineForMS(
-		apply_transform(shaft_point(0.0, 0.0), transform),
-		apply_transform(shaft_point(0.0, 1.0), transform),
+		apply_transform(shaft_point(0.0f, 0.0f), transform),
+		apply_transform(shaft_point(0.0f, 1.0f), transform),
 		liftetimeMS,
 		color,
 		lineThickness);
 	DrawLineForMS(
-		apply_transform(shaft_point(0.5, 0.0), transform),
-		apply_transform(shaft_point(0.5, 1.0), transform),
+		apply_transform(shaft_point(0.5f, 0.0f), transform),
+		apply_transform(shaft_point(0.5f, 1.0f), transform),
 		liftetimeMS,
 		color,
 		lineThickness);
 	// Loop2
 	DrawLineForMS(
-		apply_transform(shaft_point(0.25, 0.0), transform),
-		apply_transform(shaft_point(0.25, 1.0), transform),
+		apply_transform(shaft_point(0.25f, 0.0f), transform),
+		apply_transform(shaft_point(0.25f, 1.0f), transform),
 		liftetimeMS,
 		color,
 		lineThickness);
 	DrawLineForMS(
-		apply_transform(shaft_point(0.75, 0.0), transform),
-		apply_transform(shaft_point(0.75, 1.0), transform),
+		apply_transform(shaft_point(0.75f, 0.0f), transform),
+		apply_transform(shaft_point(0.75f, 1.0f), transform),
 		liftetimeMS,
 		color,
 		lineThickness);
 
 	// Start hemi
 	const int STEPS = 20;
-	glm::vec3 prev_point = apply_transform(start_hemi_point(0.0, 0.0), transform);
+	glm::vec3 prev_point = apply_transform(start_hemi_point(0.0f, 0.0f), transform);
 	for (int i = 1; i<STEPS; i++) {
-		float x = (1.0/STEPS*i);
+		float x = (1.0f/STEPS*i);
 
 		float v = glm::sin(x*pi);
-		float u = (x<0.5) ? 0.0 : 0.5;
+		float u = (x<0.5f) ? 0.0f : 0.5f;
 		glm::vec3 next_point = apply_transform(start_hemi_point(u, v), transform);
 		DrawLineForMS(
 			prev_point,
@@ -252,11 +252,11 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 			lineThickness);
 		prev_point = next_point;
 	}
-	prev_point = apply_transform(start_hemi_point(0.0, 0.25), transform);
+	prev_point = apply_transform(start_hemi_point(0.0f, 0.25f), transform);
 	for (int i = 1; i<STEPS; i++) {
-		float x = (1.0/STEPS*i);
+		float x = (1.0f/STEPS*i);
 		float v = glm::sin(x*pi);
-		float u = (x<0.5) ? 0.25 : 0.75;
+		float u = (x<0.5f) ? 0.25f : 0.75f;
 		glm::vec3 next_point = apply_transform(start_hemi_point(u, v), transform);
 		DrawLineForMS(
 			prev_point,
@@ -268,11 +268,11 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 	}
 
 	// end hemi
-	prev_point = apply_transform(end_hemi_point(0.0, 0.0), transform);
+	prev_point = apply_transform(end_hemi_point(0.0f, 0.0f), transform);
 	for (int i = 1; i<STEPS; i++) {
-		float x = (1.0/STEPS*i);
+		float x = (1.0f/STEPS*i);
 		float v = glm::sin(x*pi);
-		float u = (x<0.5) ? 0.0 : 0.5;
+		float u = (x<0.5f) ? 0.0f : 0.5f;
 		glm::vec3 next_point = apply_transform(end_hemi_point(u, v), transform);
 		DrawLineForMS(
 			prev_point,
@@ -282,11 +282,11 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 			lineThickness);
 		prev_point = next_point;
 	}
-	prev_point = apply_transform(end_hemi_point(0.0, 0.25), transform);
+	prev_point = apply_transform(end_hemi_point(0.0f, 0.25f), transform);
 	for (int i = 1; i<STEPS; i++) {
-		float x = (1.0/STEPS*i);
+		float x = (1.0f/STEPS*i);
 		float v = glm::sin(x*pi);
-		float u = (x<0.5) ? 0.25 : 0.75;
+		float u = (x<0.5f) ? 0.25f : 0.75f;
 		glm::vec3 next_point = apply_transform(end_hemi_point(u, v), transform);
 		DrawLineForMS(
 			prev_point,
@@ -385,7 +385,7 @@ void DebugAPI::DrawBox(glm::vec3 origin, glm::vec3 halfExtents, glm::mat4 transf
 
 void DebugAPI::DrawTriangle(glm::vec3 pointA, glm::vec3 pointB, glm::vec3 pointC, glm::mat4 transform, int liftetimeMS, const glm::vec4& color, float lineThickness) {
 	auto apply_transform = [](glm::vec3 vec, glm::mat4 mat) {
-				       return glm::vec3(mat * glm::vec4(vec, 1.0));
+				       return glm::vec3(mat * glm::vec4(vec, 1.0f));
 			       };
 
 	DrawLineForMS(
@@ -458,7 +458,7 @@ void DebugAPI::DrawLine2D(RE::GPtr<RE::GFxMovieView> movie, glm::vec2 from, glm:
 	FastClampToScreen(from);
 	FastClampToScreen(to);
 
-	// lineStyle(thickness:Number = NaN, color : uint = 0, alpha : Number = 1.0, pixelHinting : Boolean = false,
+	// lineStyle(thickness:Number = NaN, color : uint = 0, alpha : Number = 1.0f, pixelHinting : Boolean = false,
 	// scaleMode : String = "normal", caps : String = null, joints : String = null, miterLimit : Number = 3) :void
 	//
 	// CapsStyle values: 'NONE', 'ROUND', 'SQUARE'
@@ -507,7 +507,7 @@ float DebugAPI::RGBToHex(glm::vec3 rgb)
 const float CLAMP_MAX_OVERSHOOT = 10000.0f;
 void DebugAPI::FastClampToScreen(glm::vec2& point)
 {
-	if (point.x < 0.0) {
+	if (point.x < 0.0f) {
 		float overshootX = abs(point.x);
 		if (overshootX > CLAMP_MAX_OVERSHOOT) {
 			point.x += overshootX - CLAMP_MAX_OVERSHOOT;
@@ -519,7 +519,7 @@ void DebugAPI::FastClampToScreen(glm::vec2& point)
 		}
 	}
 
-	if (point.y < 0.0) {
+	if (point.y < 0.0f) {
 		float overshootY = abs(point.y);
 		if (overshootY > CLAMP_MAX_OVERSHOOT) {
 			point.y += overshootY - CLAMP_MAX_OVERSHOOT;
@@ -755,7 +755,7 @@ void DebugAPI::CacheMenuData()
 //
 // void DebugAPI::ClampPointToScreen(glm::vec2& point, float lineAngle)
 // {
-// 	if (point.y < 0.0)
+// 	if (point.y < 0.0f)
 // 	{
 // 		float overshootY = point.y;
 // 		float overshootX = glm::tan(lineAngle) * overshootY;
@@ -772,7 +772,7 @@ void DebugAPI::CacheMenuData()
 // 		point.x -= overshootX;
 // 	}
 //
-// 	if (point.x < 0.0)
+// 	if (point.x < 0.0f)
 // 	{
 // 		float overshootX = point.x;
 // 		float overshootY = glm::tan(lineAngle) * overshootX;
@@ -797,7 +797,7 @@ bool DebugAPI::IsOnScreen(glm::vec2 from, glm::vec2 to)
 
 bool DebugAPI::IsOnScreen(glm::vec2 point)
 {
-	return (point.x <= ScreenResX && point.x >= 0.0 && point.y <= ScreenResY && point.y >= 0.0);
+	return (point.x <= ScreenResX && point.x >= 0.0f && point.y <= ScreenResY && point.y >= 0.0f);
 }
 
 void DebugOverlayMenu::AdvanceMovie(float a_interval, std::uint32_t a_currentTime)

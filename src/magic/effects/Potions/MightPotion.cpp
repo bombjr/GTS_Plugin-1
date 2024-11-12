@@ -19,13 +19,13 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("EffectMightPotionExtreme")) {
-			this->Power = 0.45;
+			this->Power = 0.45f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectMightPotionStrong")) {
-			this->Power = 0.30;
+			this->Power = 0.30f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectMightPotionNormal")) {
-			this->Power = 0.20;
+			this->Power = 0.20f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectMightPotionWeak")) {
-			this->Power = 0.10;
+			this->Power = 0.10f;
 		}
 	}
 

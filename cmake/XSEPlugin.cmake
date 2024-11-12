@@ -65,6 +65,8 @@ set(Boost_USE_STATIC_RUNTIME ON)
 add_compile_definitions(NOMINMAX)
 add_compile_definitions(_UNICODE)
 
+
+
 if(MSVC)
 
 
@@ -76,7 +78,7 @@ if(MSVC)
 		"${PROJECT_NAME}"
 		PRIVATE
 		/MP
-		/W1
+		/W4
 		/permissive-
 		/Zc:alignedNew
 		/Zc:auto
@@ -98,6 +100,10 @@ if(MSVC)
 		/Zc:trigraphs
 		/Zc:wchar_t
 		/wd4200 # nonstandard extension used : zero-sized array in struct/union
+		/wd4100
+		/wd4101
+		/wd4458
+		/wd4459
 	)
 
 	target_compile_options(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:/fp:strict>")
@@ -115,6 +121,8 @@ if(MSVC)
 	)
 endif()
 
+set(no_dev_warnings_backup "$CACHE{CMAKE_SUPPRESS_DEVELOPER_WARNINGS}")
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE INTERNAL "" FORCE)
 add_subdirectory(${CommonLibPath} ${CommonLibName} EXCLUDE_FROM_ALL)
 
 find_package(spdlog CONFIG REQUIRED)
@@ -133,3 +141,4 @@ target_link_libraries(
 	PUBLIC
 	CommonLibSSE::CommonLibSSE
 )
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ${no_dev_warnings_backup} CACHE INTERNAL "" FORCE)

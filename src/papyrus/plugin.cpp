@@ -58,54 +58,54 @@ namespace {
 			} else if (value == 3) {
 				return Persistent->stolen_attributes * 4;
 			} else {
-				return 0.0;
+				return 0.0f;
 			}
-			return 0.0;
+			return 0.0f;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	float GetAttributeBonus(StaticFunctionTag*, Actor* actor, float value) {
 		auto transient = Transient::GetSingleton().GetData(actor);
 		if (!actor) {
-			return 1.0;
+			return 1.0f;
 		}
 		if (!transient) {
-			return 1.0;
+			return 1.0f;
 		}
-		if (value == 1.0) {
+		if (value == 1.0f) {
 			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kHealth); // Health
 		}
-		if (value == 2.0) {
+		if (value == 2.0f) {
 			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kCarryWeight); // Carry Weight
 		}
-		if (value == 3.0) {
-			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kSpeedMult) - 1.0; // Speed Multi
+		if (value == 3.0f) {
+			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kSpeedMult) - 1.0f; // Speed Multi
 		}
-		if (value == 4.0) {
-			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kAttackDamageMult) - 1.0;
+		if (value == 4.0f) {
+			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kAttackDamageMult) - 1.0f;
 		}
-		if (value == 5.0) {
-			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kJumpingBonus) - 1.0;
+		if (value == 5.0f) {
+			return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kJumpingBonus) - 1.0f;
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	float GetFlatAttributeBonus(StaticFunctionTag*, Actor* actor, float value) {
 		auto transient = Transient::GetSingleton().GetData(actor);
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		if (!transient) {
-			return 0.0;
+			return 0.0f;
 		}
-		if (value == 1.0) { //get hp
+		if (value == 1.0f) { //get hp
 			return transient->health_boost;
 		}
-		if (value == 2.0) { // get carry weight
+		if (value == 2.0f) { // get carry weight
 			return transient->carryweight_boost;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	bool ModSizeVulnerability(StaticFunctionTag*, Actor* actor, float amt) {
@@ -145,7 +145,7 @@ namespace {
 				return actor_data->half_life;
 			}
 		}
-		return 0.05;
+		return 0.05f;
 	}
 
 	bool SetAnimSpeed(StaticFunctionTag*, Actor* actor, float animspeed) {
@@ -309,7 +309,7 @@ namespace {
 				for (bool person: {false, true}) {
 					auto npc_root_node = find_node(actor, "NPC", person);
 					if (npc_root_node && actor->GetOccupiedFurniture()) {
-						npc_root_node->local.translate.z = 0.0;
+						npc_root_node->local.translate.z = 0.0f;
 						update_node(npc_root_node);
 					}
 				}
@@ -383,13 +383,13 @@ namespace {
 		BalanceModeInfo param = static_cast<BalanceModeInfo>(parameter);
 		auto& Persist = Persistent::GetSingleton();
 		switch (param) {
-			case BalanceModeInfo::SizeGain_Penalty: // 1.0
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0f
 				Persist.BalanceMode_SizeGain_Penalty = modifier;
 			break;
-			case BalanceModeInfo::ShrinkRate_Base: // 1.0
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0f
 				Persist.BalanceMode_ShrinkRate_Base = modifier;
 			break;
-			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08f
 				Persist.BalanceMode_ShrinkRate_Combat = modifier;
 			break;
 		}

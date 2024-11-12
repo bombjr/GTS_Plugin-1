@@ -14,12 +14,12 @@ namespace {
 			
 			float scale = get_visual_scale(giant);
 
-			float falloff = 0.16 * scale;
+			float falloff = 0.16f * scale;
 			float Volume = std::clamp(scale/10.0f, 0.20f, 2.0f);
 
-			Rumbling::Once("GrowthPotion", giant, 2.0, 0.05);
+			Rumbling::Once("GrowthPotion", giant, 2.0f, 0.05f);
 
-			Runtime::PlaySoundAtNode_FallOff("growthSound", giant, Volume, 1.0, "NPC Pelvis [Pelv]", falloff);
+			Runtime::PlaySoundAtNode_FallOff("growthSound", giant, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 	}
 }
@@ -34,13 +34,13 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("EffectGrowthPotionWeak")) {
-			this->power = 1.0;
+			this->power = 1.0f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectGrowthPotionNormal")) {
-			this->power = 1.5;
+			this->power = 1.5f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectGrowthPotionStrong")) {
-			this->power = 2.0;
+			this->power = 2.0f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectGrowthPotionExtreme")) {
-			this->power = 2.5;
+			this->power = 2.5f;
 		} 
 	}
 
@@ -50,14 +50,14 @@ namespace Gts {
 			return;
 		}
 
-		if (this->power >= 2.0) {
+		if (this->power >= 2.0f) {
 			bool Blocked = IsActionOnCooldown(caster, CooldownSource::Emotion_Moan);
 			if (!Blocked) {
-				PlayMoanSound(caster, 1.0);
+				PlayMoanSound(caster, 1.0f);
 				ApplyActionCooldown(caster, CooldownSource::Emotion_Moan);
 			}
 			if (caster->formID == 0x14) {
-				shake_camera(caster, 0.75, 0.55);
+				shake_camera(caster, 0.75f, 0.55f);
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace Gts {
 	}
 
 	void GrowthPotion::OnUpdate() {
-		float BASE_POWER = 0.000128 * this->power;
+		float BASE_POWER = 0.000128f * this->power;
 
 		auto caster = GetCaster();
 		if (!caster) {
@@ -76,13 +76,13 @@ namespace Gts {
 
 		PlayGrowthAudio(caster, this->timer.ShouldRun());
 
-		float HP = GetMaxAV(caster, ActorValue::kHealth) * 0.00020 * this->power;
+		float HP = GetMaxAV(caster, ActorValue::kHealth) * 0.00020f * this->power;
 		caster->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, HP * TimeScale());
 
-		float Power = BASE_POWER * 1.5;
+		float Power = BASE_POWER * 1.5f;
 
-		Grow(caster, Power, 0.0);
-		Rumbling::Once("GrowthPotion", caster, 1.0, 0.10, "NPC COM [COM ]", 0.0);
+		Grow(caster, Power, 0.0f);
+		Rumbling::Once("GrowthPotion", caster, 1.0f, 0.10f, "NPC COM [COM ]", 0.0f);
 
 		//log::info("This Power: {}", this->power);
 		//log::info("Enlarging {} with the power of {}", caster->GetDisplayFullName(), Power);

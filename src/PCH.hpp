@@ -122,3 +122,5 @@ namespace util {
 
 #include "util.hpp"
 #include "data/tasks.hpp"
+
+#pragma disable(warning:D9025)

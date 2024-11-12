@@ -48,7 +48,7 @@ namespace {
 		std::string name = std::format("Phenome_{}_{}_{}_{}", giant->formID, phenome, target, Time::WorldTimeElapsed());
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float modified = 0.0;
+		float modified = 0.0f;
 		auto data = GetFacialData(giant);
 		if (data) {
 			modified = Phenome_GetPhenomeValue(data, phenome);
@@ -56,7 +56,7 @@ namespace {
 		
 		float start = Time::WorldTimeElapsed();
 
-		bool Reset = (target < 0.01);
+		bool Reset = (target < 0.01f);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
@@ -71,16 +71,16 @@ namespace {
 			}
 
 			float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
-			float speed = 1.25 * AnimSpeed * halflife * Speed_up;
+			float speed = 1.25f * AnimSpeed * halflife * Speed_up;
 			//log::info("Running Facial Task: {}", name);
 			float value = (pass * speed);
 			auto FaceData = GetFacialData(giantref);
 			if (FaceData) {
-				if (Reset && modified != 0.0) {
+				if (Reset && modified != 0.0f) {
 					value = modified - (pass * speed);
 					Phenome_ManagePhenomes(FaceData, phenome, value);
 					if (value <= 0) {
-						Phenome_ManagePhenomes(FaceData, phenome, 0.0);
+						Phenome_ManagePhenomes(FaceData, phenome, 0.0f);
 						return false;
 					}
 					return true;
@@ -101,7 +101,7 @@ namespace {
 
 		std::string name = std::format("Modifier_{}_{}_{}", giant->formID, modifier, target);
 
-		float modified = 0.0;
+		float modified = 0.0f;
 
 		auto data = GetFacialData(giant);
 		if (data) {
@@ -113,7 +113,7 @@ namespace {
 
 		float start = Time::WorldTimeElapsed();
 
-		bool Reset = (target < 0.01);
+		bool Reset = (target < 0.01f);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
@@ -128,7 +128,7 @@ namespace {
 			}
 
 			float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
-			float speed = 1.0 * AnimSpeed * halflife * Speed_up;
+			float speed = 1.0f * AnimSpeed * halflife * Speed_up;
 
 			float value = (pass * speed);
 			auto FaceData = GetFacialData(giantref);
@@ -138,7 +138,7 @@ namespace {
 					value = modified - (pass * speed);
 					Phenome_ManageModifiers(FaceData, modifier, value);
 					if (value <= 0 || value >= target) {
-						Phenome_ManageModifiers(FaceData, modifier, 0.0);
+						Phenome_ManageModifiers(FaceData, modifier, 0.0f);
 						return false;
 					} if (value == target) {
 						return false;

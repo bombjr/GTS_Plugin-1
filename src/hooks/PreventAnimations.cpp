@@ -11,7 +11,7 @@ using namespace SKSE;
 
 namespace {
     const float KillMove_Threshold_High = 2.00f; // If GTS/Tiny size ratio is > than 2 times = disallow killmove on Tiny
-    const float KillMove_Threshold_Low = 0.75f; // If Tiny/GTS size ratio is < than 0.75 = disallow killmove on GTS
+    const float KillMove_Threshold_Low = 0.75f; // If Tiny/GTS size ratio is < than 0.75f = disallow killmove on GTS
 
 	// Actions that we want to prevent
 	const auto DefaultSheathe = 			0x46BB2;
@@ -83,7 +83,7 @@ namespace {
 		if (charCont) {
 			float scale = get_visual_scale(actor);
 			float falltime = charCont->fallTime;
-			float threshold = 0.04 * scale;
+			float threshold = 0.04f * scale;
 			//log::info("Fall time of {} is {}", actor->GetDisplayFullName(), falltime);
 			if (falltime < threshold) {
 				//log::info("Blocking anim");
@@ -145,7 +145,7 @@ namespace {
 
 	bool PreventSprinting(FormID idle, Actor* performer) {
 		if (idle == SprintRootStart) {
-			if (IsTeammate(performer) && get_visual_scale(performer) > 2.0) {
+			if (IsTeammate(performer) && get_visual_scale(performer) > 2.0f) {
 				return true;
 			}
 			return false;

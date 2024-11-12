@@ -47,7 +47,7 @@ namespace {
 		float stamina = GetStaminaPercentage(giant);
 		bool Can_Force = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles") && IsHostile(giant, tiny);
 
-		if (Can_Force && crush_rng <= 1 && stamina >= 0.75) {
+		if (Can_Force && crush_rng <= 1 && stamina >= 0.75f) {
 			return true;
 		}
 		if (Can_HugCrush) {
@@ -150,7 +150,7 @@ namespace Gts {
 				Sandwiching.StartSandwiching(pred, prey);
 				auto node = find_node(pred, "GiantessRune", false);
 				if (node) {
-					node->local.scale = 0.01;
+					node->local.scale = 0.01f;
 					update_node(node);
 				}
 			}
@@ -167,7 +167,7 @@ namespace Gts {
 				auto& hugs = HugAnimationController::GetSingleton();
 				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, 1);
 				for (auto prey: preys) {
-					// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
+					// ^ If Size > 0.92f (minimum) && Size < 2.5f + perk bonus (maximum) threshold basically
 					AI_StartHugs(pred, prey);
 				}
 			}
@@ -205,7 +205,7 @@ namespace Gts {
 		std::string name = std::format("Huggies_Forced_{}", giant->formID);
 		ActorHandle gianthandle = giant->CreateRefHandle();
 		ActorHandle tinyhandle = tiny->CreateRefHandle();
-		static Timer ActionTimer = Timer(2.5);
+		static Timer ActionTimer = Timer(2.5f);
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
@@ -222,7 +222,7 @@ namespace Gts {
 
 			if (!HugShrink::GetHuggiesActor(giantref)) {
 				if (!AllyHugged && tinyref->formID != 0x14) {
-					PushActorAway(giantref, tinyref, 1.0);
+					PushActorAway(giantref, tinyref, 1.0f);
 				}
 				return false;
 			}
@@ -266,7 +266,7 @@ namespace Gts {
 		std::string name = std::format("ThighCrush_{}", giant->formID);
 		ActorHandle gianthandle = giant->CreateRefHandle();
 		float Start = Time::WorldTimeElapsed();
-		static Timer ActionTimer = Timer(6.0);
+		static Timer ActionTimer = Timer(6.0f);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
@@ -275,15 +275,15 @@ namespace Gts {
 			Actor* giantref = gianthandle.get().get();
 			float Finish = Time::WorldTimeElapsed();
 
-			if (Finish - Start > 0.10) {
+			if (Finish - Start > 0.10f) {
 				if (!IsThighCrushing(giantref)) {
 					return false;
 				}
 
 				if (ActionTimer.ShouldRunFrame()) {
 
-					bool ForceAbort = GetAV(giantref, ActorValue::kStamina) <= 2.0;
-					DamageAV(giantref, ActorValue::kStamina, 0.025);
+					bool ForceAbort = GetAV(giantref, ActorValue::kStamina) <= 2.0f;
+					DamageAV(giantref, ActorValue::kStamina, 0.025f);
 
 					if (ForceAbort) {
 						AnimationManager::StartAnim("ThighLoopExit", giantref);

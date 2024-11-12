@@ -25,7 +25,7 @@ using namespace Gts;
 namespace {
 	bool CanDoImpact(Actor* actor, FootEvent kind) { // This function is needed to prevent sound spam from followers at large sizes
 		if (IsTeammate(actor) && actor->formID != 0x14) {
-			if (get_visual_scale(actor) < 6.0) {
+			if (get_visual_scale(actor) < 6.0f) {
 				return true;
 			}
 			if (kind == FootEvent::Right) {
@@ -158,36 +158,36 @@ namespace Gts {
 				.actor = actor,
 				.kind = kind,
 				.scale = get_visual_scale(actor),
-				.modifier = 1.0,
+				.modifier = 1.0f,
 				.nodes = get_landing_nodes(actor, kind),
 			};
 
 			EventDispatcher::DoOnImpact(impact_data); // Calls Explosions and sounds. A Must.
 
-			float bonus = 1.0;
+			float bonus = 1.0f;
 			if (actor->AsActorState()->IsWalking()) {
-				bonus = 0.8;
+				bonus = 0.8f;
 			}
 			if (actor->IsSneaking()) {
-				bonus *= 0.7;
+				bonus *= 0.7f;
 			}
 			if (actor->AsActorState()->IsSprinting()) {
-				bonus *= 1.15;
+				bonus *= 1.15f;
 				if (Runtime::HasPerkTeam(actor, "DevastatingSprint")) {
-					bonus *= 1.25;
+					bonus *= 1.25f;
 				}
 			}
 
 			if (kind != FootEvent::JumpLand) {
 				if (kind == FootEvent::Left) {
-					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25, kind, 1.25, DamageSource::WalkLeft, true);
+					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25f, kind, 1.25f, DamageSource::WalkLeft, true);
 				}
 				if (kind == FootEvent::Right) {
-					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25, kind, 1.25, DamageSource::WalkRight, true);
+					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25f, kind, 1.25f, DamageSource::WalkRight, true);
 				}
 				//                     ^          ^
 				//                 Damage         Radius
-				DoLaunch(actor, 1.05 * bonus, 1.10 * bonus, kind);
+				DoLaunch(actor, 1.05f * bonus, 1.10f * bonus, kind);
 				//               ^ radius      ^ push power
 				return; // don't check further
 			} else if (kind == FootEvent::JumpLand) {
@@ -209,12 +209,12 @@ namespace Gts {
 					auto giant = gianthandle.get().get();
 					float timepassed = Time::WorldTimeElapsed() - Start;
 
-					if (timepassed >= 0.15) {
-						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25, FootEvent::Left, 1.0, DamageSource::CrushedLeft, true);
-						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25, FootEvent::Right, 1.0, DamageSource::CrushedRight, true);
+					if (timepassed >= 0.15f) {
+						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft, true);
+						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Right, 1.0f, DamageSource::CrushedRight, true);
 
-						DoLaunch(giant, 1.20 * perk * fallmod, 1.75 * fallmod, FootEvent::Left);
-						DoLaunch(giant, 1.20 * perk * fallmod, 1.75 * fallmod, FootEvent::Right);
+						DoLaunch(giant, 1.20f * perk * fallmod, 1.75f * fallmod, FootEvent::Left);
+						DoLaunch(giant, 1.20f * perk * fallmod, 1.75f * fallmod, FootEvent::Right);
 						return false;
 					}
 					return true;

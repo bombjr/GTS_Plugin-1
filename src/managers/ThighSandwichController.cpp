@@ -22,9 +22,9 @@
 
 
 namespace {
-	const float MINIMUM_SANDWICH_DISTANCE = 70.0;
+	const float MINIMUM_SANDWICH_DISTANCE = 70.0f;
 	const float SANDWICH_ANGLE = 60;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 
 	void CantThighSandwichPlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Sandwich) {
@@ -107,7 +107,7 @@ namespace Gts {
 					node->local.scale = std::clamp(1.0f - timepassed, 0.01f, 1.0f);
 					update_node(node);
 				}
-				if (timepassed >= 0.98) {
+				if (timepassed >= 0.98f) {
 					return false; // end it
 				}
 				return true;
@@ -129,7 +129,7 @@ namespace Gts {
 					node->local.scale = std::clamp(timepassed, 0.01f, 1.0f);
 					update_node(node);
 				}
-				if (timepassed >= 1.0) {
+				if (timepassed >= 1.0f) {
 					return false; // end it
 				}
 				return true;
@@ -174,7 +174,7 @@ namespace Gts {
 					EnableCollisions(tiny);
 					SetBeingHeld(tiny, false);
 					AllowToBeCrushed(tiny, true);
-					PushActorAway(giant, tiny, 1.0);
+					PushActorAway(giant, tiny, 1.0f);
 					ForceRagdoll(tiny_is_actor, true);
 					Cprint("{} slipped out of {} thighs", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
 					this->tinies.erase(tiny->formID); // Disallow button abuses to keep tiny when on low scale
@@ -261,18 +261,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(SANDWICH_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(SANDWICH_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(SANDWICH_ANGLE*PI/180.0);
+			return cosTheta <= cos(SANDWICH_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		if (numberOfPrey == 1) {
@@ -311,7 +311,7 @@ namespace Gts {
 		float MINIMUM_DISTANCE = MINIMUM_SANDWICH_DISTANCE;
 
 		if (HasSMT(pred)) {
-			MINIMUM_DISTANCE *= 1.75;
+			MINIMUM_DISTANCE *= 1.75f;
 		}
 
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
@@ -320,7 +320,7 @@ namespace Gts {
 		if (prey_distance <= (MINIMUM_DISTANCE * pred_scale) && sizedifference < MINIMUM_SANDWICH_SCALE) {
 			if (pred->formID == 0x14) {
 				std::string_view message = std::format("{} is too big to be smothered between thighs: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_SANDWICH_SCALE);
-				shake_camera(pred, 0.45, 0.30);
+				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
 				CantThighSandwichPlayerMessage(pred, prey, sizedifference);
@@ -348,7 +348,7 @@ namespace Gts {
 		}
 		
 		if (GetSizeDifference(pred, prey, SizeType::VisualScale, false, false) < Action_Sandwich) {
-			ShrinkUntil(pred, prey, 6.0, 0.20, true);
+			ShrinkUntil(pred, prey, 6.0f, 0.20f, true);
 			return;
 		}
 		

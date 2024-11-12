@@ -11,11 +11,11 @@ namespace Gts {
 	}
 
 	void ShrinkOther::OnUpdate() {
-		const float BASE_POWER = 0.00180;
-		const float CRUSH_BONUS = 0.00180;
-		const float GROWTH_AMOUNT_BONUS = 1.4;
-		const float DUAL_CAST_BONUS = 2.0;
-		const float SCALE_FACTOR = 0.5;
+		const float BASE_POWER = 0.00180f;
+		const float CRUSH_BONUS = 0.00180f;
+		const float GROWTH_AMOUNT_BONUS = 1.4f;
+		const float DUAL_CAST_BONUS = 2.0f;
+		const float SCALE_FACTOR = 0.5f;
 
 		auto caster = GetCaster();
 		if (!caster) {
@@ -31,9 +31,9 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("ShrinkAllyAdept")) {
-			power *= 1.33;
+			power *= 1.33f;
 		} else if (base_spell == Runtime::GetMagicEffect("ShrinkAllyExpert")) {
-			power *= 1.75;
+			power *= 1.75f;
 		}
 
 		float caster_scale = get_visual_scale(caster);
@@ -49,7 +49,7 @@ namespace Gts {
 
 		if (target_scale > Minimum_Actor_Scale) {
 			if (!IsHostile(target, caster)) {
-				ShrinkActor(target, power*0.10, 0);
+				ShrinkActor(target, power*0.10f, 0);
 			}
 		} else {
 			set_target_scale(target, Minimum_Actor_Scale);

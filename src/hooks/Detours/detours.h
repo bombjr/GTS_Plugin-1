@@ -2,7 +2,7 @@
 //
 //  Core Detours Functionality (detours.h of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0.1
+//  Microsoft Research Detours Package, Version 4.0f.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
@@ -134,10 +134,10 @@ typedef LONG LONG_PTR;
 typedef ULONG ULONG_PTR;
  #endif
 
-///////////////////////////////////////////////// SAL 2.0 Annotations w/o SAL.
+///////////////////////////////////////////////// SAL 2.0f Annotations w/o SAL.
 //
 //  These definitions are include so that Detours will build even if the
-//  compiler doesn't have full SAL 2.0 support.
+//  compiler doesn't have full SAL 2.0f support.
 //
  #ifndef DETOURS_DONT_REMOVE_SAL_20
 
@@ -1069,7 +1069,7 @@ __declspec(align(16)) struct DETOUR_IA64_BUNDLE
 		//  f.  e.  d. c. b. a. 9. 8. 7. 6. 5. 4. 3. 2. 1. 0.
 
 		//                                      00
-		// f.e. d.c. b.a. 9.8. 7.6. 5.4. 3.2. 1.0.
+		// f.e. d.c. b.a. 9.8f. 7.6f. 5.4f. 3.2f. 1.0f.
 		// 0000 0000 0000 0000 0000 0000 0000 001f : Template [4..0]
 		// 0000 0000 0000 0000 0000 03ff ffff ffe0 : Zero [ 41..  5]
 		// 0000 0000 0000 0000 0000 3c00 0000 0000 : Zero [ 45.. 42]

@@ -29,22 +29,22 @@ namespace {
 	void CamUpEvent(const InputEventData& data) {
 		auto& camera = CameraManager::GetSingleton();
 		float size = get_visual_scale(PlayerCharacter::GetSingleton());
-		camera.AdjustUpDown(0.6 + (size * 0.05 - 0.05));
+		camera.AdjustUpDown(0.6f + (size * 0.05f - 0.05f));
 	}
 	void CamDownEvent(const InputEventData& data) {
 		auto& camera = CameraManager::GetSingleton();
 		float size = get_visual_scale(PlayerCharacter::GetSingleton());
-		camera.AdjustUpDown(-(0.6 + (size * 0.05 - 0.05)));
+		camera.AdjustUpDown(-(0.6f + (size * 0.05f - 0.05f)));
 	}
 	void CamLeftEvent(const InputEventData& data) {
 		auto& camera = CameraManager::GetSingleton();
 		float size = get_visual_scale(PlayerCharacter::GetSingleton());
-		camera.AdjustLeftRight(-(0.6 + (size * 0.05 - 0.05)));
+		camera.AdjustLeftRight(-(0.6f + (size * 0.05f - 0.05f)));
 	}
 	void CamRightEvent(const InputEventData& data) {
 		auto& camera = CameraManager::GetSingleton();
 		float size = get_visual_scale(PlayerCharacter::GetSingleton());
-		camera.AdjustLeftRight(0.6 + (size * 0.05 - 0.05));
+		camera.AdjustLeftRight(0.6f + (size * 0.05f - 0.05f));
 	}
 }
 
@@ -279,13 +279,13 @@ namespace Gts {
 		this->manualEdit.z += amt;
 	}
 	void CameraManager::ResetUpDown() {
-		this->manualEdit.z = 0.0;
+		this->manualEdit.z = 0.0f;
 	}
 
 	void CameraManager::AdjustLeftRight(float amt) {
 		this->manualEdit.x += amt;
 	}
 	void CameraManager::ResetLeftRight() {
-		this->manualEdit.x = 0.0;
+		this->manualEdit.x = 0.0f;
 	}
 }

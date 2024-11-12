@@ -20,42 +20,42 @@ using namespace SKSE;
 
 
 namespace {
-	const double LAUNCH_COOLDOWN = 1.8f;
-	const double PUSH_COOLDOWN = 2.0f;
-	const double HANDDAMAGE_COOLDOWN = 0.6f;
-	const double THIGHDAMAGE_COOLDOWN = 1.2f;
+	const float LAUNCH_COOLDOWN = 1.8f;
+	const float PUSH_COOLDOWN = 2.0f;
+	const float HANDDAMAGE_COOLDOWN = 0.6f;
+	const float THIGHDAMAGE_COOLDOWN = 1.2f;
 
-    const double ABSORB_OTHER_COOLDOWN = 30.0f;
+    const float ABSORB_OTHER_COOLDOWN = 30.0f;
 
-    const double BREAST_SUFFOCATE_OTHER_COOLDOWN = 30.0f;
-    const double BREAST_ABSORB_OTHER_COOLDOWN = 30.0f;
-    const double BREAST_VORE_OTHER_COOLDOWN = 30.0f;
+    const float BREAST_SUFFOCATE_OTHER_COOLDOWN = 30.0f;
+    const float BREAST_ABSORB_OTHER_COOLDOWN = 30.0f;
+    const float BREAST_VORE_OTHER_COOLDOWN = 30.0f;
 
-    const double TINYCALAMITY_ONESHOT_COOLDOWN = 60.0f;
+    const float TINYCALAMITY_ONESHOT_COOLDOWN = 60.0f;
     
-	const double HEALTHGATE_COOLDOWN = 60.0f;
-	const double SCARE_COOLDOWN = 6.0f;
-	const double BUTTCRUSH_COOLDOWN = 30.0f;
-	const double HUGS_COOLDOWN = 10.0f;
+	const float HEALTHGATE_COOLDOWN = 60.0f;
+	const float SCARE_COOLDOWN = 6.0f;
+	const float BUTTCRUSH_COOLDOWN = 30.0f;
+	const float HUGS_COOLDOWN = 10.0f;
 
-    const double LAUGH_COOLDOWN = 5.0f;
-	const double MOAN_COOLDOWN = 5.0f;
+    const float LAUGH_COOLDOWN = 5.0f;
+	const float MOAN_COOLDOWN = 5.0f;
 
-    const double SOUND_COOLDOWN = 2.0f;
-    const double GROW_SOUND_COOLDOWN = 1.0f;
+    const float SOUND_COOLDOWN = 2.0f;
+    const float GROW_SOUND_COOLDOWN = 1.0f;
 
-    const double HIT_COOLDOWN = 1.0f;
-    const double AI_GROWTH_COOLDOWN = 2.0f;
-    const double SHRINK_OUTBURST_COOLDOWN = 18.0f;
-    const double SHRINK_OUTBURST_COOLDOWN_FORCED = 180.0f;
-    const double SHRINK_PARTICLE_COOLDOWN = 0.25f;
-    const double SHRINK_PARTICLE_COOLDOWN_GAZE = 0.25f;
-    const double SHRINK_PARTICLE_COOLDOWN_ANIM = 1.5f;
-    const double SHRINK_TINYCALAMITY_RAGE = 60.0f;
+    const float HIT_COOLDOWN = 1.0f;
+    const float AI_GROWTH_COOLDOWN = 2.0f;
+    const float SHRINK_OUTBURST_COOLDOWN = 18.0f;
+    const float SHRINK_OUTBURST_COOLDOWN_FORCED = 180.0f;
+    const float SHRINK_PARTICLE_COOLDOWN = 0.25f;
+    const float SHRINK_PARTICLE_COOLDOWN_GAZE = 0.25f;
+    const float SHRINK_PARTICLE_COOLDOWN_ANIM = 1.5f;
+    const float SHRINK_TINYCALAMITY_RAGE = 60.0f;
 
     float Calculate_BreastActionCooldown(Actor* giant, int type) {
-        float Cooldown = 1.0;
-        float mastery = 0.0;
+        float Cooldown = 1.0f;
+        float mastery = 0.0f;
         switch (type) {
             case 0:
                 Cooldown = BREAST_SUFFOCATE_OTHER_COOLDOWN;
@@ -72,17 +72,17 @@ namespace {
         }
 
         if (Runtime::HasPerk(giant, "Breasts_Mastery")) {
-            float level = GetGtsSkillLevel(giant) - 40.0; // Start past level 40
+            float level = GetGtsSkillLevel(giant) - 40.0f; // Start past level 40
             mastery = std::clamp(level * 0.01f, 0.0f, 0.6f);
         }
-        float reduction = 1.0 - mastery;
+        float reduction = 1.0f - mastery;
 
         return Cooldown * reduction;
     }
 
     float Calculate_AbsorbCooldown(Actor* giant) {
-        float mastery = std::clamp(GetGtsSkillLevel(giant) * 0.01f, 0.0f, 1.0f) * 0.73;
-        float reduction = 1.0 - mastery; // Up to 8.1 seconds at level 100
+        float mastery = std::clamp(GetGtsSkillLevel(giant) * 0.01f, 0.0f, 1.0f) * 0.73f;
+        float reduction = 1.0f - mastery; // Up to 8.1f seconds at level 100
 
         return ABSORB_OTHER_COOLDOWN * reduction;
     }
@@ -90,17 +90,17 @@ namespace {
     float Calculate_ButtCrushTimer(Actor* actor) {
 		bool lvl70 = Runtime::HasPerk(actor, "ButtCrush_UnstableGrowth");
 		bool lvl100 = Runtime::HasPerk(actor, "ButtCrush_LoomingDoom");
-		float reduction = 1.0;
+		float reduction = 1.0f;
 		if (lvl100) { // 15% reduction
-			reduction -= 0.15;
+			reduction -= 0.15f;
 		} if (lvl70) { // 10% reduction
-			reduction -= 0.10;
+			reduction -= 0.10f;
 		} 
 		return BUTTCRUSH_COOLDOWN * reduction;
 	}
 
     float Calculate_FootstepTimer(Actor* actor) {
-        float cooldown = 0.2;
+        float cooldown = 0.2f;
         cooldown /= AnimationManager::GetAnimSpeed(actor);
         //log::info("Cooldown for footstep: {}", cooldown);
         return cooldown;
@@ -109,12 +109,12 @@ namespace {
     float Calculate_ShrinkOutbirstTimer(Actor* actor) {
         bool DarkArts3 = Runtime::HasPerk(actor, "DarkArts_Aug3");
         bool HealthRegen = Runtime::HasPerk(actor, "HealthRegenPerk");
-        float reduction = 1.0;
+        float reduction = 1.0f;
         if (DarkArts3) {
-            reduction = 0.7;
+            reduction = 0.7f;
         }
         if (HealthRegen && IsGrowthSpurtActive(actor)) {
-            reduction *= 0.75;
+            reduction *= 0.75f;
         }
         return SHRINK_OUTBURST_COOLDOWN * reduction;
     }
@@ -285,7 +285,7 @@ namespace Gts {
             case CooldownSource::Footstep_Left:
                 return (data.lastFootstepTime_L + Calculate_FootstepTimer(giant)) - time; 
             }
-        return 0.0;
+        return 0.0f;
     }
 
     bool IsActionOnCooldown(Actor* giant, CooldownSource source) {
