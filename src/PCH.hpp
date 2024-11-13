@@ -104,6 +104,7 @@
 #include <Windows.h>
 #include <Psapi.h>
 #undef cdecl // Workaround for Clang 14 CMake configure error.
+#undef PlaySound //Workarond for winapi define breaking intelisense for Runtimne::PlaySound
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
@@ -123,4 +124,3 @@ namespace util {
 #include "util.hpp"
 #include "data/tasks.hpp"
 
-#pragma disable(warning:D9025)

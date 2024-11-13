@@ -95,7 +95,7 @@ namespace {
 			if (!dropbox3D) {
 				return true; // Retry next frame
 			} else {
-				Runtime::Play_Sound("DefaultCrush", dropboxPtr, 1.0f, 1.0f);
+				Runtime::PlaySound("DefaultCrush", dropboxPtr, 1.0f, 1.0f);
 				return false;
 			}
 		});

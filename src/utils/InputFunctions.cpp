@@ -116,7 +116,7 @@ namespace {
 			Rumbling::Once("ColossalGrowth", player, 0.15f, 0.05f);
 			static Timer timergrowth = Timer(2.00f);
 			if (timergrowth.ShouldRun()) {
-				Runtime::Play_Sound("shrinkSound", player, Volume, 1.0f);
+				Runtime::PlaySound("shrinkSound", player, Volume, 1.0f);
 			}
 		}
 	}
@@ -164,7 +164,7 @@ namespace {
 					Rumbling::Once("TotalControlOther", actor, 0.15f, 0.05f);
 					static Timer timergrowth = Timer(2.00f);
 					if (timergrowth.ShouldRun()) {
-						Runtime::Play_Sound("shrinkSound", actor, Volume, 1.0f);
+						Runtime::PlaySound("shrinkSound", actor, Volume, 1.0f);
 					}
 				} 
 			}

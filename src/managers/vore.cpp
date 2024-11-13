@@ -710,7 +710,7 @@ namespace Gts {
 				Notify("{} is too tired for vore.", pred->GetDisplayFullName());
 				DamageAV(prey, ActorValue::kHealth, 3 * sizedifference);
 				if (pred->formID == 0x14) {
-					Runtime::Play_Sound("VoreSound_Fail", pred, 0.4f, 1.0f);
+					Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
 				}
 				StaggerActor(pred, prey, 0.25f);
 				return;
@@ -730,7 +730,7 @@ namespace Gts {
 		}
 
 		if (pred->formID == 0x14) {
-			Runtime::Play_Sound("VoreSound_Fail", pred, 0.4f, 1.0f);
+			Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
 		}
 		auto& voreData = this->GetVoreData(pred);
 		voreData.AddTiny(prey);

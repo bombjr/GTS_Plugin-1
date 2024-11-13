@@ -158,7 +158,7 @@ namespace {
 							set_target_scale(receiver, natural); // to prevent becoming < natural scale
 						}
 						//Rumbling::For("CheatDeath", receiver, 4.0f, 0.10f, "NPC COM [COM ]", 1.50f, 2.0f);
-						Runtime::Play_Sound("TriggerHG", receiver, 2.0f, 0.5f);
+						Runtime::PlaySound("TriggerHG", receiver, 2.0f, 0.5f);
 						shake_camera(receiver, 1.7f, 1.5f);
 						
 						auto node = find_node(receiver, "NPC Root [Root]");

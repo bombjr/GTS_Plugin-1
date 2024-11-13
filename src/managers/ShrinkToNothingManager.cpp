@@ -47,7 +47,7 @@ namespace {
 				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
 				Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
 			} else {
-				Runtime::Play_Sound("BloodGushSound", tiny, 1.0f, 1.0f);
+				Runtime::PlaySound("BloodGushSound", tiny, 1.0f, 1.0f);
 			}
 		}
 	}
@@ -59,7 +59,7 @@ namespace {
 
 		float currentSize = get_visual_scale(tiny);
 
-		Runtime::Play_Sound("ShrinkToNothingSound", giant, 1.0f, 1.0f);
+		Runtime::PlaySound("ShrinkToNothingSound", giant, 1.0f, 1.0f);
 
 		TaskManager::RunOnce(taskname, [=](auto& update){
 			if (!tinyHandle) {
