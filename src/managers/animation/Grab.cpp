@@ -632,7 +632,7 @@ namespace Gts {
 							}
 						}
 					}
-					if (timepassed > 1.25f) { // One last time
+					if (timepassed > 1.25) { // One last time
 						tinyref->MoveTo(giantref);
 						DisableCollisions(tinyref, giantref);
 						if (IsBetweenBreasts(tinyref)) {

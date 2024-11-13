@@ -43,7 +43,7 @@ namespace {
     void AttachRune(Actor* giant, bool ShrinkRune, float speed, float scale) { // A task that scales/shrinks the runes
 		string node_name = "ShrinkRune-Obj";
 
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
         std::string name = std::format("Calamity_{}_{}", giant->formID, ShrinkRune);
         ActorHandle gianthandle = giant->CreateRefHandle();
 
@@ -53,14 +53,14 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-				float Finish = static_cast<float>(Time::WorldTimeElapsed());
+				double Finish = Time::WorldTimeElapsed();
 				auto node = find_node(giantref, node_name, false);
-				float timepassed = std::clamp(((Finish - Start) * AnimationManager::GetAnimSpeed(giantref)) * speed, 0.01f, 0.98f);
+				double timepassed = std::clamp(((Finish - Start) * AnimationManager::GetAnimSpeed(giantref)) * speed, 0.01, 0.98);
 				if (node) {
-					node->local.scale = std::clamp(0.60f - timepassed, 0.01f, 1.0f);
+					node->local.scale = static_cast<float>(std::clamp(0.60 - timepassed, 0.01, 1.0));
 					update_node(node);
 				}
-				if (timepassed >= 0.98f) {
+				if (timepassed >= 0.98) {
 					return false; // end it
 				}
 				return true;
@@ -71,15 +71,15 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-				float Finish = static_cast<float>(Time::WorldTimeElapsed());
+				double Finish = Time::WorldTimeElapsed();
 				auto node = find_node(giantref, node_name, false);
-				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * speed, 0.01f, 9999.0f);
+				double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * speed, 0.01, 9999.0);
 				if (node) {
-					node->local.scale = std::clamp(timepassed, 0.01f, 1.0f);
+					node->local.scale = static_cast<float>(std::clamp(timepassed, 0.01, 1.0));
                     node->local.scale *= scale;
 					update_node(node);
 				}
-				if (timepassed >= 1.0f) {
+				if (timepassed >= 1.0) {
 					return false; // end it
 				}
 				return true;

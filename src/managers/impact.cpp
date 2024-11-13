@@ -207,9 +207,9 @@ namespace Gts {
 						return false; // end task
 					}
 					auto giant = gianthandle.get().get();
-					float timepassed = static_cast<float>(Time::WorldTimeElapsed() - Start);
+					double timepassed = Time::WorldTimeElapsed() - Start;
 
-					if (timepassed >= 0.15f) {
+					if (timepassed >= 0.15) {
 						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft, true);
 						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Right, 1.0f, DamageSource::CrushedRight, true);
 

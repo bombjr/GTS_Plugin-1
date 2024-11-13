@@ -148,7 +148,7 @@ namespace Gts {
 	}
 
 	void ButtCrushController::ButtCrush_OnCooldownMessage(Actor* giant) {
-		float cooldown = GetRemainingCooldown(giant, CooldownSource::Action_ButtCrush);
+		double cooldown = GetRemainingCooldown(giant, CooldownSource::Action_ButtCrush);
 		std::string message;
 		if (giant->formID == 0x14) {
 			if (!IsCrawling(giant) && !giant->IsSneaking()) {

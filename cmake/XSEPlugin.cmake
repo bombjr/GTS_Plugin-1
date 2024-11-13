@@ -71,7 +71,8 @@ if(MSVC)
 
 
 	target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG>")
-
+	#could have enabled avx for some % speed gain but alas, we still have people here with 16yo cpus playing this game
+	#set(SC_RELEASE_OPTS "/arch:AVX;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
 	set(SC_RELEASE_OPTS "/arch:SSE4.2;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
 
 	target_compile_options(
@@ -100,13 +101,13 @@ if(MSVC)
 		/Zc:trigraphs
 		/Zc:wchar_t
 		/wd4200 # nonstandard extension used : zero-sized array in struct/union
-		/wd4100
-		/wd4101
-		/wd4458
-		/wd4459
-		/wd4456
-		/wd4457
-		/wd4189
+		/wd4100 # 'identifier' : unreferenced formal parameter
+		/wd4101 # 'identifier': unreferenced local variable
+		/wd4458 # declaration of 'identifier' hides class member
+		/wd4459 # declaration of 'identifier' hides global declaration
+		/wd4456 # declaration of 'identifier' hides previous local declaration
+		/wd4457 # declaration of 'identifier' hides function parameter
+		/wd4189 # 'identifier' : local variable is initialized but not referenced
 
 	)
 
@@ -125,8 +126,7 @@ if(MSVC)
 	)
 endif()
 
-set(no_dev_warnings_backup "$CACHE{CMAKE_SUPPRESS_DEVELOPER_WARNINGS}")
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE INTERNAL "" FORCE)
+
 add_subdirectory(${CommonLibPath} ${CommonLibName} EXCLUDE_FROM_ALL)
 
 find_package(spdlog CONFIG REQUIRED)
@@ -145,4 +145,3 @@ target_link_libraries(
 	PUBLIC
 	CommonLibSSE::CommonLibSSE
 )
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ${no_dev_warnings_backup} CACHE INTERNAL "" FORCE)

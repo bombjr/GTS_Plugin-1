@@ -265,9 +265,9 @@ namespace Gts {
 				auto giantref = gianthandle.get().get();
 				auto ref = objectref.get().get();
 				double Finish = Time::WorldTimeElapsed();
-				float timepassed = static_cast<float>(Finish - Start);
+				double timepassed = Finish - Start;
 
-				if (timepassed > 1e-4f) {
+				if (timepassed > 1e-4) {
 					NiPoint3 EndPos = Bone->world.translate;
 					ApplyPhysicsToObject_Towards(giantref, ref, EndPos - StartPos, start_power, giantScale);
 					Break_Object(ref, power * giantScale * start_power, giantScale, smt);

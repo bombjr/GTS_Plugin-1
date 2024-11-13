@@ -328,16 +328,16 @@ namespace Gts {
 			return; //Don't reset Player
 		}
 		std::string name = std::format("ResetActor_{}", tiny->formID);
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle tinyhandle = tiny->CreateRefHandle();
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!tinyhandle) {
 				return false;
 			}
 			auto tiny = tinyhandle.get().get();
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
-			float timepassed = Finish - Start;
-			if (timepassed < 1.0f) {
+			double Finish = Time::WorldTimeElapsed();
+			double timepassed = Finish - Start;
+			if (timepassed < 1.0) {
 				return true; // not enough time has passed yet
 			}
 			EventDispatcher::DoResetActor(tiny);
@@ -2343,7 +2343,7 @@ namespace Gts {
 
 	void PushTowards_Task(ActorHandle giantHandle, ActorHandle tinyHandle, const NiPoint3& startCoords, const NiPoint3& endCoords, std::string_view TaskName, float power, bool sizecheck) {
 
-		float startTime = static_cast<float>(Time::WorldTimeElapsed());
+		double startTime = Time::WorldTimeElapsed();
 
 		TaskManager::RunFor(TaskName, 2, [=](auto& update){
 			if (!giantHandle) {
@@ -2355,7 +2355,7 @@ namespace Gts {
 			Actor* giant = giantHandle.get().get();
 			Actor* tiny = tinyHandle.get().get();
 			
-			float endTime = static_cast<float>(Time::WorldTimeElapsed());
+			double endTime = Time::WorldTimeElapsed();
 			if (!tiny) {
 				return false;
 			} 
@@ -2370,7 +2370,7 @@ namespace Gts {
 
 				NiPoint3 vector = endCoords - startCoords;
 				float distanceTravelled = vector.Length();
-				float timeTaken = endTime - startTime;
+				float timeTaken = static_cast<float>(endTime - startTime);
 				float speed = (distanceTravelled / timeTaken) / GetAnimationSlowdown(giant);
 				NiPoint3 direction = vector / vector.Length();
 
@@ -2472,7 +2472,7 @@ namespace Gts {
 			RE::NiPoint3 direction = globalForwardVector;
 			double endTime = Time::WorldTimeElapsed();
 
-			if ((endTime - startTime) > 0.05f) {
+			if ((endTime - startTime) > 0.05) {
 				ApplyManualHavokImpulse(tiny, direction.x, direction.y, direction.z, power);
 				return false;
 			} else {
@@ -2673,15 +2673,15 @@ namespace Gts {
 		Rumbling::Once(name, giant, Rumble_Misc_EnableTinyProtection, 0.20f, "NPC COM [COM ]", 0.0f);
 		Rumbling::Once(name_1, giant, Rumble_Misc_EnableTinyProtection, 0.20f, "NPC Root [Root]", 0.0f);
 
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle gianthandle = giant->CreateRefHandle();
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
-			float timepassed = Finish - Start;
+			double Finish = Time::WorldTimeElapsed();
+			double timepassed = Finish - Start;
 			if (timepassed < 180.0f) {
 				auto giantref = gianthandle.get().get();
 				if (Utils_ManageTinyProtection(giant, false, Balance)) {
@@ -2749,15 +2749,15 @@ namespace Gts {
 						std::string name = std::format("ScaleWeapons_{}_{}", tiny->formID, objectname);
 						ActorHandle tinyHandle = tiny->CreateRefHandle();
 
-						float Start = static_cast<float>(Time::WorldTimeElapsed());
+						double Start = Time::WorldTimeElapsed();
 
 						TaskManager::Run(name,[=](auto& progressData) {
 							if (!tinyHandle) {
 								return false;
 							}
 							Actor* Tiny = tinyHandle.get().get();
-							float Finish = static_cast<float>(Time::WorldTimeElapsed());
-							if (Finish - Start > 0.25f && !IsGtsBusy(Tiny)) {
+							double Finish = Time::WorldTimeElapsed();
+							if (Finish - Start > 0.25 && !IsGtsBusy(Tiny)) {
 								//object->local.scale = 1.0f;
 								object->SetAppCulled(false);
 								update_node(object);

@@ -384,7 +384,7 @@ namespace {
 					Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0f, HpThreshold * 100.0f);
 				}
 			} else {
-				float cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
+				double cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
                 std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
 				NotifyWithSound(player, message);
 			}

@@ -265,7 +265,8 @@ namespace Gts {
 
 	void AnimationManager::StartAnim(std::string_view trigger, Actor& giant, TESObjectREFR* tiny) {
 		if (giant.formID == 0x14) {
-			if (IsFirstPerson() || IsInRaceMenu()) { //Time::WorldTimeElapsed() > 1.0f
+			if (IsFirstPerson() || IsInRaceMenu()) { 
+				//Time::WorldTimeElapsed() > 1.0
 				//ForceThirdPerson(&giant);
 				// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.
 				// Better to wait for full support someday

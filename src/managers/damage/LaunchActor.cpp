@@ -165,7 +165,7 @@ namespace Gts {
 						if (tinyHandle) {
 							double endTime = Time::WorldTimeElapsed();
 							auto tinyref = tinyHandle.get().get();
-							if ((endTime - startTime) > 0.05f) {
+							if ((endTime - startTime) > 0.05) {
 								ApplyManualHavokImpulse(tinyref, Push.x, Push.y, Push.z, 1.0f);
 								return false;
 							}

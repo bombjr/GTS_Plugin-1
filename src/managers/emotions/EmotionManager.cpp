@@ -54,7 +54,7 @@ namespace {
 			modified = Phenome_GetPhenomeValue(data, phenome);
 		}
 		
-		float start = static_cast<float>(Time::WorldTimeElapsed());
+		double start = Time::WorldTimeElapsed();
 
 		bool Reset = (target < 0.01f);
 
@@ -64,7 +64,7 @@ namespace {
 			}
 
 			auto giantref = giantHandle.get().get();
-			float pass = static_cast<float>(Time::WorldTimeElapsed()) - start;
+			double pass = Time::WorldTimeElapsed() - start;
 
 			if (!giantref->Is3DLoaded()) {
 				return false;
@@ -73,11 +73,11 @@ namespace {
 			float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
 			float speed = 1.25f * AnimSpeed * halflife * Speed_up;
 			//log::info("Running Facial Task: {}", name);
-			float value = pass * speed;
+			float value = static_cast<float>(pass * speed);
 			auto FaceData = GetFacialData(giantref);
 			if (FaceData) {
 				if (Reset && modified != 0.0f) {
-					value = modified - (pass * speed);
+					value = modified - static_cast<float>(pass * speed);
 					Phenome_ManagePhenomes(FaceData, phenome, value);
 					if (value <= 0.0f) {
 						Phenome_ManagePhenomes(FaceData, phenome, 0.0f);
@@ -121,7 +121,7 @@ namespace {
 			}
 
 			auto giantref = giantHandle.get().get();
-			float pass = static_cast<float>(Time::WorldTimeElapsed() - start);
+			double pass = Time::WorldTimeElapsed() - start;
 
 			if (!giantref->Is3DLoaded()) {
 				return false;
@@ -130,12 +130,12 @@ namespace {
 			float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
 			float speed = 1.0f * AnimSpeed * halflife * Speed_up;
 
-			float value = (pass * speed);
+			float value = static_cast<float>(pass * speed);
 			auto FaceData = GetFacialData(giantref);
 			//log::info("Running Facial Task: {}", name);
 			if (FaceData) {
 				if (Reset) {
-					value = modified - (pass * speed);
+					value = modified - static_cast<float>(pass * speed);
 					Phenome_ManageModifiers(FaceData, modifier, value);
 					if (value <= 0 || value >= target) {
 						Phenome_ManageModifiers(FaceData, modifier, 0.0f);

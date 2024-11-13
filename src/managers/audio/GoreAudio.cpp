@@ -42,7 +42,7 @@ namespace {
             if (node) {
                 Runtime::PlaySoundAtNode("Foot_SingleCrush_x8", giant, 1.0f, 1.0f, node);
             } else {
-                Runtime::PlaySound("Foot_SingleCrush_x8", giant, 1.0f, 1.0f);
+                Runtime::Play_Sound("Foot_SingleCrush_x8", giant, 1.0f, 1.0f);
             }
         }
     }
@@ -51,7 +51,7 @@ namespace {
         if (node) {
             Runtime::PlaySoundAtNode("Foot_MultiCrush_x3_x8", giant, 1.0f, 1.0f, node);
         } else {
-            Runtime::PlaySound("Foot_MultiCrush_x3_x8", giant, 1.0f, 1.0f);
+            Runtime::Play_Sound("Foot_MultiCrush_x3_x8", giant, 1.0f, 1.0f);
         }
     }
 
@@ -60,7 +60,7 @@ namespace {
             if (node) {
                 Runtime::PlaySoundAtNode("DefaultCrush", giant, 1.0f, 1.0f, node);
             } else {
-                Runtime::PlaySound("DefaultCrush", giant, 1.0f, 1.0f);
+                Runtime::Play_Sound("DefaultCrush", giant, 1.0f, 1.0f);
             }
         }
     }

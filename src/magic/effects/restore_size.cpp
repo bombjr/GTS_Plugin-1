@@ -31,7 +31,7 @@ namespace {
 			if (!BlockSound) {
 				float Volume = std::clamp(get_visual_scale(casterref) * 0.1f, 0.15f, 1.0f);
 				ApplyActionCooldown(casterref, CooldownSource::Misc_RevertSound);
-				Runtime::PlaySound("shrinkSound", casterref, Volume, 1.0f);
+				Runtime::Play_Sound("shrinkSound", casterref, Volume, 1.0f);
 			}
 
 			Rumbling::Once("RestoreSizeOther", casterref, 0.6f, 0.05f);
@@ -55,7 +55,7 @@ namespace Gts {
 			return;
 		}
 		float Volume = std::clamp(get_visual_scale(caster) * 0.1f, 0.10f, 1.0f);
-		Runtime::PlaySound("shrinkSound", caster, Volume, 1.0f);
+		Runtime::Play_Sound("shrinkSound", caster, Volume, 1.0f);
 
 		//log::info("Starting Reset Size of {}", caster->GetDisplayFullName());
 

@@ -80,7 +80,7 @@ namespace Gts {
 		}
 		return data;
 	}
-	void Runtime::PlaySound(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency) {
+	void Runtime::Play_Sound(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency) {
 		auto soundDescriptor = Runtime::GetSound(tag);
 		if (!soundDescriptor) {
 			log::error("Sound invalid: {}", tag);
@@ -112,7 +112,7 @@ namespace Gts {
 		}
 	}
 
-	void Runtime::PlaySound(const std::string_view& tag, TESObjectREFR* ref, const float& volume, const float& frequency) {
+	void Runtime::Play_Sound(const std::string_view& tag, TESObjectREFR* ref, const float& volume, const float& frequency) {
 		auto soundDescriptor = Runtime::GetSound(tag);
 		if (!soundDescriptor) {
 			log::error("Sound invalid: {}", tag);

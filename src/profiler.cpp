@@ -114,7 +114,7 @@ namespace Gts {
 
 		static std::uint64_t last_report_frame = 0;
 		static double last_report_time = 0.0;
-		std::uint64_t current_report_frame = static_cast<uint64_t>(Time::FramesElapsed());
+		std::uint64_t current_report_frame = Time::FramesElapsed();
 		double current_report_time = Time::WorldTimeElapsed();
 		double total_time = current_report_time - last_report_time;
 
@@ -122,7 +122,7 @@ namespace Gts {
 		for (auto& [name, profiler]: Profilers::GetSingleton().profilers) {
 			double elapsed = profiler.Elapsed();
 			double spf = elapsed / (current_report_frame - last_report_frame);
-			double time_percent = elapsed/total_time*100;
+			double time_percent = elapsed/total_time*100.0;
 			std::string shortenedName = name;
 			if (shortenedName.length() > 19) {
 				shortenedName = shortenedName.substr(0, 18) + "…";

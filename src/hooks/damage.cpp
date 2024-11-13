@@ -32,14 +32,14 @@ namespace {
 		}
 
 		float DefaultTP = data->WorldFov_Default;
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
+			double Finish = Time::WorldTimeElapsed();
 
 			if (AllowEdits) {
 				camera->worldFOV += DefaultTP * 0.003f;
@@ -49,8 +49,8 @@ namespace {
 					return false; // stop it
 				}
 			} else {
-				float timepassed = Finish - Start;
-				if (timepassed > 2.6f) {
+				double timepassed = Finish - Start;
+				if (timepassed > 2.6) {
 					data->IsNotImmune = 1.0f;
 					return false;
 				}
@@ -65,7 +65,7 @@ namespace {
 		camera->firstPersonFOV *= 0.35f;
 		float DefaultFP = data->FpFov_Default;
 
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name,[=](auto& progressData) {
 			if (!gianthandle) {
@@ -73,7 +73,7 @@ namespace {
 			}
 
 			auto giantref = gianthandle.get().get();
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
+			double Finish = Time::WorldTimeElapsed();
 
 			if (AllowEdits) {
 				camera->firstPersonFOV += DefaultFP * 0.003f;
@@ -83,8 +83,8 @@ namespace {
 					return false; // stop it
 				}
 			} else {
-				float timepassed = Finish - Start;
-				if (timepassed > 2.6f) {
+				double timepassed = Finish - Start;
+				if (timepassed > 2.6) {
 					data->IsNotImmune = 1.0f;
 					return false;
 				}
@@ -158,7 +158,7 @@ namespace {
 							set_target_scale(receiver, natural); // to prevent becoming < natural scale
 						}
 						//Rumbling::For("CheatDeath", receiver, 4.0f, 0.10f, "NPC COM [COM ]", 1.50f, 2.0f);
-						Runtime::PlaySound("TriggerHG", receiver, 2.0f, 0.5f);
+						Runtime::Play_Sound("TriggerHG", receiver, 2.0f, 0.5f);
 						shake_camera(receiver, 1.7f, 1.5f);
 						
 						auto node = find_node(receiver, "NPC Root [Root]");

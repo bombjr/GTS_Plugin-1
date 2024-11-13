@@ -38,13 +38,13 @@ using namespace Gts;
 
 namespace {
 
-	void RunScaleTask(ObjectRefHandle dropboxHandle, Actor* actor, const float Start, const float Scale, const bool soul, const NiPoint3 TotalPos) {
+	void RunScaleTask(ObjectRefHandle dropboxHandle, Actor* actor, const double Start, const float Scale, const bool soul, const NiPoint3 TotalPos) {
 		std::string taskname = std::format("Dropbox {}", actor->formID); // create task name for main task
 		TaskManager::RunFor(taskname, 16, [=](auto& progressData) { // Spawn loot piles
 			if (!dropboxHandle) {
 				return false;
 			}
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
+			double Finish = Time::WorldTimeElapsed();
 			auto dropboxPtr = dropboxHandle.get().get();
 			if (!dropboxPtr->Is3DLoaded()) {
 				return true;
@@ -53,21 +53,21 @@ namespace {
 			if (!dropbox3D) {
 				return true; // Retry next frame
 			} else {
-				float timepassed = Finish - Start;
+				double timepassed = Finish - Start;
 				if (soul) {
-					timepassed *= 1.33f; // faster soul scale
+					timepassed *= 1.33; // faster soul scale
 				}
 				auto node = find_object_node(dropboxPtr, "GorePile_Obj");
 				auto trigger = find_object_node(dropboxPtr, "Trigger_Obj");
 				if (node) {
-					node->local.scale = (Scale * 0.33f) + (timepassed*0.18f);
+					node->local.scale = (Scale * 0.33f) + static_cast<float>(timepassed*0.18);
 					if (!soul) {
 						node->world.translate.z = TotalPos.z;
 					}
 					update_node(node);
 				}
 				if (trigger) {
-					trigger->local.scale = (Scale * 0.33f) + (timepassed*0.18f);
+					trigger->local.scale = (Scale * 0.33f) + static_cast<float>(timepassed*0.18);
 					if (!soul) {
 						trigger->world.translate.z = TotalPos.z;
 					}
@@ -95,7 +95,7 @@ namespace {
 			if (!dropbox3D) {
 				return true; // Retry next frame
 			} else {
-				Runtime::PlaySound("DefaultCrush", dropboxPtr, 1.0f, 1.0f);
+				Runtime::Play_Sound("DefaultCrush", dropboxPtr, 1.0f, 1.0f);
 				return false;
 			}
 		});
@@ -142,15 +142,15 @@ namespace Gts {
 		}
 		// ^ we generally do not want to transfer loot in that case: 2 loot piles will spawn if actor was resurrected
 
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle gianthandle = to->CreateRefHandle();
 		ActorHandle tinyhandle = from->CreateRefHandle();
 		bool PCLoot = Runtime::GetBool("GtsEnableLooting");
 		bool NPCLoot = Runtime::GetBool("GtsNPCEnableLooting");
 
-		float expectedtime = 0.15f;
+		double expectedtime = 0.15;
 		if (IsDragon(from)) {
-			expectedtime = 0.45f; // Because dragons don't spawn loot right away...sigh...
+			expectedtime = 0.45; // Because dragons don't spawn loot right away...sigh...
 		}
 
 		if (reset) {
@@ -174,8 +174,8 @@ namespace Gts {
 			float hp = GetAV(tiny, ActorValue::kHealth);
 
 			if (tiny && (tiny->IsDead() || hp <= 0.0f)) {
-				float Finish = static_cast<float>(Time::WorldTimeElapsed());
-				float timepassed = Finish - Start;
+				double Finish = Time::WorldTimeElapsed();
+				double timepassed = Finish - Start;
 				if (timepassed < expectedtime) {
 					return true; // retry, not enough time has passed yet
 				}
@@ -260,7 +260,7 @@ namespace Gts {
 		if (!dropbox) {
 			return;
 		}
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 		dropbox->SetDisplayName(name, false); // Rename container to match chosen name
 
 		ObjectRefHandle dropboxHandle = dropbox->CreateRefHandle();

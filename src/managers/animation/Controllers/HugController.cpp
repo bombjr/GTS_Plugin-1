@@ -108,7 +108,7 @@ namespace Gts {
 	}
 
 	void HugAnimationController::Hugs_OnCooldownMessage(Actor* giant) {
-		float cooldown = GetRemainingCooldown(giant, CooldownSource::Action_Hugs);
+		double cooldown = GetRemainingCooldown(giant, CooldownSource::Action_Hugs);
 		if (giant->formID == 0x14) {
 			std::string message = std::format("Hugs are on a cooldown: {:.1f} sec", cooldown);
 			shake_camera(giant, 0.75f, 0.35f);

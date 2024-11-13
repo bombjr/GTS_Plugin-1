@@ -69,7 +69,7 @@ namespace {
 
 			double endTime = Time::WorldTimeElapsed();
 
-			if ((endTime - startTime) > 0.05f) { // Enough Time has elapsed
+			if ((endTime - startTime) > 0.05) { // Enough Time has elapsed
 				
 				// Calculate power of throw
 

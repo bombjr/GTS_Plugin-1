@@ -44,7 +44,7 @@ namespace Gts {
 
 	void Task_InitHavokTask(Actor* tiny) {
 
-		double startTime = static_cast<float>(Time::WorldTimeElapsed());
+		double startTime = Time::WorldTimeElapsed();
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		std::string taskname = std::format("EnterRagdoll_{}", tiny->formID);
 
@@ -64,7 +64,7 @@ namespace Gts {
 			}
 			double endTime = Time::WorldTimeElapsed();
 
-			if ((endTime - startTime) > 0.05f) {
+			if ((endTime - startTime) > 0.05) {
 				tinyref->InitHavok(); // Hopefully will fix occasional Ragdoll issues
 				return false;
 			} 
@@ -204,7 +204,7 @@ namespace Gts {
 	void ForceFlee(Actor* giant, Actor* tiny, float duration, bool apply_size_difference) {
 		float oldConfidence = GetAV(tiny, ActorValue::kConfidence);
 
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 		std::string name = std::format("ScareAway_{}", tiny->formID);
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -221,7 +221,7 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float Finish = static_cast<float>(Time::WorldTimeElapsed());
+			double Finish = Time::WorldTimeElapsed();
 
 			auto tinyRef = tinyHandle.get().get();
 			auto giantRef = giantHandle.get().get();
@@ -238,7 +238,7 @@ namespace Gts {
 
 			ApplyActionCooldown(tinyRef, CooldownSource::Action_ScareOther);
 
-			float timepassed = Finish - Start;
+			double timepassed = Finish - Start;
 			if (IsMoving(tinyRef)) {
 				int FallChance = RandomInt(0, 6000);// Chance to Trip
 				if (FallChance <= 2 && !IsRagdolled(tinyRef)) {
@@ -246,7 +246,7 @@ namespace Gts {
 				}
 			}
 			
-			if (timepassed >= duration) {
+			if (timepassed >= static_cast<float>(duration)) {
 				SetAV(tinyRef, ActorValue::kConfidence, oldConfidence);
 				return false; // end it
 			}

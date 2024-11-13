@@ -97,7 +97,7 @@ namespace {
 			Actor* target = gianthandle.get().get();
 			double Finish = Time::WorldTimeElapsed();
 
-			if (Finish - Start > 0.10f) {
+			if (Finish - Start > 0.10) {
 				float natural_scale = get_natural_scale(target);
 				float target_scale = get_target_scale(target);
 				if (target_scale < natural_scale) {

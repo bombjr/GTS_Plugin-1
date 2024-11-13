@@ -26,7 +26,7 @@ namespace {
 			by *= 1.75f;
 		}
 		float bb = std::clamp(GetSizeFromBoundingBox(tiny), 0.6f, 100.f);
-		float Start = static_cast<float>(Time::WorldTimeElapsed());
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			Actor* actor = tinyHandle.get().get();
@@ -35,7 +35,7 @@ namespace {
 			}
 
 			float Scale = get_visual_scale(actor);
-			float End = static_cast<float>(Time::WorldTimeElapsed());
+			double End = Time::WorldTimeElapsed();
 
 			if (End - Start < over_time) {
 				override_actor_scale(actor, -by * (0.0166f/bb) * TimeScale(), SizeEffectType::kNeutral);

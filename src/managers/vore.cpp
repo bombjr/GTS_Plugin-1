@@ -181,7 +181,7 @@ namespace {
 			std::string name = std::format("Vore_Buff_{}_{}", giant->formID, tiny->formID);
 			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0f);
 			ActorHandle gianthandle = giant->CreateRefHandle();
-			float start_time = static_cast<float>(Time::WorldTimeElapsed());
+			double start_time = Time::WorldTimeElapsed();
 
 			float Regeneration = VoreInfo.Restore_Power;
 			float Recorded_Scale = VoreInfo.Scale;
@@ -195,7 +195,7 @@ namespace {
 					return false;
 				}
 				auto giantref = gianthandle.get().get();
-				float timepassed = static_cast<float>(Time::WorldTimeElapsed()) - start_time;
+				double timepassed = Time::WorldTimeElapsed() - start_time;
 
 				float reduction = std::clamp(get_visual_scale(giantref) / tinySize_Grow, 1.0f, 10.0f);
 				float regen_attributes = GetMaxAV(giantref, ActorValue::kHealth) * 0.0006f;
@@ -710,7 +710,7 @@ namespace Gts {
 				Notify("{} is too tired for vore.", pred->GetDisplayFullName());
 				DamageAV(prey, ActorValue::kHealth, 3 * sizedifference);
 				if (pred->formID == 0x14) {
-					Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
+					Runtime::Play_Sound("VoreSound_Fail", pred, 0.4f, 1.0f);
 				}
 				StaggerActor(pred, prey, 0.25f);
 				return;
@@ -730,7 +730,7 @@ namespace Gts {
 		}
 
 		if (pred->formID == 0x14) {
-			Runtime::PlaySound("VoreSound_Fail", pred, 0.4f, 1.0f);
+			Runtime::Play_Sound("VoreSound_Fail", pred, 0.4f, 1.0f);
 		}
 		auto& voreData = this->GetVoreData(pred);
 		voreData.AddTiny(prey);

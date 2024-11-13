@@ -312,7 +312,7 @@ namespace Gts {
 				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
 				Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSetVoreMedium", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, true);
 			} else {
-				Runtime::PlaySound("BloodGushSound", tiny, 1.0f, 0.5f);
+				Runtime::Play_Sound("BloodGushSound", tiny, 1.0f, 0.5f);
 			}
 		}
 
@@ -574,7 +574,7 @@ namespace Gts {
 					SpawnParticle(giant, 25.0f, "GTS/Damage/Explode.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3* mult, 4, hand);
 					SpawnParticle(giant, 25.0f, "GTS/Damage/Crush.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3 *  mult, 4, hand);
 				} else if (LessGore()) {
-					Runtime::PlaySound("BloodGushSound", grabbedActor, 1.0f, 0.5f);
+					Runtime::Play_Sound("BloodGushSound", grabbedActor, 1.0f, 0.5f);
 				}
 			} else {
 				SpawnDustParticle(giant, grabbedActor, "NPC L Hand [LHnd]", dustmult);
@@ -1560,8 +1560,8 @@ namespace Gts {
 			}
 			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = static_cast<float>(finish - start);
-			if (timepassed >= duration) {
+			double timepassed = finish - start;
+			if (timepassed >= static_cast<double>(duration)) {
 				AdjustFacialExpression(giant, 0, 0.0f, "phenome"); // Start closing mouth
 
 				AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L

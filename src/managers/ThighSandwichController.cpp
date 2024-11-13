@@ -91,20 +91,20 @@ namespace Gts {
 	void SandwichingData::EnableRuneTask(Actor* giant, bool shrink) {
 		string node_name = "GiantessRune";
 		if (shrink == true) {
-			float Start = static_cast<float>(Time::WorldTimeElapsed());
+			double Start = Time::WorldTimeElapsed();
 			std::string name = std::format("ShrinkRune_{}", giant->formID);
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
-				float Finish = static_cast<float>(Time::WorldTimeElapsed());
+				double Finish = Time::WorldTimeElapsed();
 				auto giantref = gianthandle.get().get();
 				auto node = find_node(giantref, node_name, false);
-				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.70f, 0.01f, 0.98f);
+				double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.70, 0.01, 0.98);
 				//log::info("Shrink Rune task is running, timepassed: {}, AnimationSlowdown: {} ", timepassed, GetAnimationSlowdown(giantref));
 				if (node) {
-					node->local.scale = std::clamp(1.0f - timepassed, 0.01f, 1.0f);
+					node->local.scale = static_cast<float>(std::clamp(1.0 - timepassed, 0.01, 1.0));
 					update_node(node);
 				}
 				if (timepassed >= 0.98f) {
@@ -113,20 +113,20 @@ namespace Gts {
 				return true;
 			});
 		} else if (shrink == false) {
-			float Start = static_cast<float>(Time::WorldTimeElapsed());
+			double Start = Time::WorldTimeElapsed();
 			std::string name = std::format("ScaleRune_{}", giant->formID);
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			TaskManager::Run(name, [=](auto& progressData) {
 				if (!gianthandle) {
 					return false;
 				}
-				float Finish = static_cast<float>(Time::WorldTimeElapsed());
+				double Finish = Time::WorldTimeElapsed();
 				auto giantref = gianthandle.get().get();
 				auto node = find_node(giantref, node_name, false);
-				float timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.80f, 0.01f, 9999.0f);
+				double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.80, 0.01, 9999.0);
 				//log::info("Grow Rune task is running, timepassed: {}, AnimationSlowdown: {} ", timepassed, GetAnimationSlowdown(giantref));
 				if (node) {
-					node->local.scale = std::clamp(timepassed, 0.01f, 1.0f);
+					node->local.scale = static_cast<float>(std::clamp(timepassed, 0.01, 1.0));
 					update_node(node);
 				}
 				if (timepassed >= 1.0f) {

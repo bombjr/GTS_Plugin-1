@@ -116,7 +116,7 @@ namespace {
 			Rumbling::Once("ColossalGrowth", player, 0.15f, 0.05f);
 			static Timer timergrowth = Timer(2.00f);
 			if (timergrowth.ShouldRun()) {
-				Runtime::PlaySound("shrinkSound", player, Volume, 1.0f);
+				Runtime::Play_Sound("shrinkSound", player, Volume, 1.0f);
 			}
 		}
 	}
@@ -164,7 +164,7 @@ namespace {
 					Rumbling::Once("TotalControlOther", actor, 0.15f, 0.05f);
 					static Timer timergrowth = Timer(2.00f);
 					if (timergrowth.ShouldRun()) {
-						Runtime::PlaySound("shrinkSound", actor, Volume, 1.0f);
+						Runtime::Play_Sound("shrinkSound", actor, Volume, 1.0f);
 					}
 				} 
 			}
@@ -304,7 +304,7 @@ namespace {
 		bool OnCooldown = IsActionOnCooldown(player, CooldownSource::Misc_ShrinkOutburst);
 		if (OnCooldown) {
 			if (NotifyTimer.ShouldRunFrame()) {
-				float cooldown = GetRemainingCooldown(player, CooldownSource::Misc_ShrinkOutburst);
+				double cooldown = GetRemainingCooldown(player, CooldownSource::Misc_ShrinkOutburst);
 				std::string message = std::format("Shrink Outburst is on a cooldown: {:.1f} sec", cooldown);
 				shake_camera(player, 0.75f, 0.35f);
 				NotifyWithSound(player, message);

@@ -69,8 +69,8 @@ namespace Gts {
 			virtual std::string DebugName() override;
 			virtual void DataReady() override;
 			static BSISoundDescriptor* GetSound(const std::string_view& tag);
-			static void PlaySound(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency);
-			static void PlaySound(const std::string_view& tag, TESObjectREFR* ref, const float& volume, const float& frequency);
+			static void Play_Sound(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency);
+			static void Play_Sound(const std::string_view& tag, TESObjectREFR* ref, const float& volume, const float& frequency);
 
 			static void PlaySoundAtNode_FallOff(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency, const std::string_view& node, float Falloff);
 			static void PlaySoundAtNode_FallOff(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency, NiAVObject* node, float Falloff);
