@@ -25,7 +25,7 @@ using namespace Gts;
 namespace {
 	bool CanDoImpact(Actor* actor, FootEvent kind) { // This function is needed to prevent sound spam from followers at large sizes
 		if (IsTeammate(actor) && actor->formID != 0x14) {
-			if (get_visual_scale(actor) < 6.0) {
+			if (get_visual_scale(actor) < 6.0f) {
 				return true;
 			}
 			if (kind == FootEvent::Right) {
@@ -125,6 +125,80 @@ namespace {
 		}
 		return results;
 	}
+
+	void DoExplosionAndSound(Actor* actor, FootEvent kind) {
+		Impact impact_data = Impact {
+			.actor = actor,
+			.kind = kind,
+			.scale = get_visual_scale(actor),
+			.modifier = 1.0,
+			.nodes = get_landing_nodes(actor, kind),
+		};
+
+		EventDispatcher::DoOnImpact(impact_data); // Calls Explosions and sounds. A Must.
+	}
+
+	void ApplyPerkBonuses(Actor* actor, float& launch, float& radius) {
+		if (actor->AsActorState()->IsWalking()) {
+			launch = 0.8f;
+		}
+		// We already *= sneak damage by 0.70 inside DoSizeDamage() function, no point in doing it here
+		if (actor->AsActorState()->IsSprinting()) {
+			launch *= 1.150f;
+			radius *= 1.175f;
+			if (Runtime::HasPerkTeam(actor, "DevastatingSprint")) {
+				launch *= 1.250f;
+				radius *= 1.275f;
+			}
+		}
+	}
+
+	DamageSource EventToSource(FootEvent kind) {
+		DamageSource source = DamageSource::WalkLeft;
+		if (kind == FootEvent::Right) {
+			source = DamageSource::WalkRight;
+		}
+		return source;
+	}
+
+	void DoJumpLandEffects(Actor* actor) {
+		auto& sizemanager = SizeManager::GetSingleton();
+		float perk = GetPerkBonus_Basics(actor);
+		float fallmod = GetFallModifier(actor);
+		
+		float damage = sizemanager.GetSizeAttribute(actor, SizeAttribute::JumpFall) * fallmod; // get jump damage boost
+
+		std::string name = std::format("JumpLandT_{}", actor->formID);
+		ActorHandle gianthandle = actor->CreateRefHandle();
+		float Start = Time::WorldTimeElapsed();
+		
+		TaskManager::Run(name, [=](auto& progressData) { // Delay it a bit since it often happens in the air
+			if (!gianthandle) {
+				return false; // end task
+			}
+			auto giant = gianthandle.get().get();
+			float timepassed = Time::WorldTimeElapsed() - Start;
+
+			if (timepassed >= 0.15) {
+				DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft, true);
+				DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Right, 1.0f, DamageSource::CrushedRight, true);
+
+				DoLaunch(giant, 1.20f * perk * fallmod, 1.75f * fallmod, FootEvent::Left);
+				DoLaunch(giant, 1.20f * perk * fallmod, 1.75f * fallmod, FootEvent::Right);
+				return false;
+			}
+			return true;
+		});
+	}
+
+	void DoDamageAndLaunch(Actor* actor, FootEvent kind, float launch, float radius) {
+		if (kind != FootEvent::JumpLand) { // If just walking
+			DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * radius, 25, 0.25f, kind, 1.25f, EventToSource(kind), true);
+			DoLaunch(actor, 1.05f * launch, 1.10f * radius, kind);
+		} else { // If jump landing
+			DoJumpLandEffects(actor);
+		}
+	}
 }
 namespace Gts {
 	ImpactManager& ImpactManager::GetSingleton() noexcept {
@@ -133,92 +207,28 @@ namespace Gts {
 	}
 
 	void ImpactManager::HookProcessEvent(BGSImpactManager* impact, const BGSFootstepEvent* a_event, BSTEventSource<BGSFootstepEvent>* a_eventSource) {
+		// Applied when Foot Events such as FootScuffLeft/FootScuffRight and FootLeft/FootRight are seen on Actors
 		if (a_event) {
 			auto profiler = Profilers::Profile("Impact: HookProcess");
 			auto actor = a_event->actor.get().get();
 
 			auto id = a_event->pad04;
-			if (id == 10000001) { // If it passes the check - it means we sent fake footstep event.
-				// So just do nothing in that case, we don't want it to deal damage/do dust clouds and such
-				return;
-			}
-			
-			std::string tag = a_event->tag.c_str();
-			auto event_manager = ModEventManager::GetSingleton();
-			event_manager.m_onfootstep.SendEvent(actor,tag);
+			if (id != 10000001) { // .dll sends fake footstep events to fix missing foot sounds during some animations
+			    // If it matches that number = we don't want to do anything. Done inside FootStepManager::PlayVanillaFootstepSounds function
+				std::string tag = a_event->tag.c_str();
+				auto event_manager = ModEventManager::GetSingleton();
+				event_manager.m_onfootstep.SendEvent(actor,tag);
 
-			auto kind = get_foot_kind(actor, tag);
+				auto kind = get_foot_kind(actor, tag);
 
-			if (!CanDoImpact(actor, kind)) { // Prevent earrape and effect spam from followers when they're large
-				log::info("Impact prevented on {}", actor->GetDisplayFullName());
-				return;
-			}
-
-			Impact impact_data = Impact {
-				.actor = actor,
-				.kind = kind,
-				.scale = get_visual_scale(actor),
-				.modifier = 1.0,
-				.nodes = get_landing_nodes(actor, kind),
-			};
-
-			EventDispatcher::DoOnImpact(impact_data); // Calls Explosions and sounds. A Must.
-
-			float bonus = 1.0;
-			if (actor->AsActorState()->IsWalking()) {
-				bonus = 0.8;
-			}
-			if (actor->IsSneaking()) {
-				bonus *= 0.7;
-			}
-			if (actor->AsActorState()->IsSprinting()) {
-				bonus *= 1.15;
-				if (Runtime::HasPerkTeam(actor, "DevastatingSprint")) {
-					bonus *= 1.25;
-				}
-			}
-
-			if (kind != FootEvent::JumpLand) {
-				if (kind == FootEvent::Left) {
-					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25, kind, 1.25, DamageSource::WalkLeft, true);
-				}
-				if (kind == FootEvent::Right) {
-					DoDamageEffect(actor, Damage_Walk_Defaut, Radius_Walk_Default * bonus, 25, 0.25, kind, 1.25, DamageSource::WalkRight, true);
-				}
-				//                     ^          ^
-				//                 Damage         Radius
-				DoLaunch(actor, 1.05 * bonus, 1.10 * bonus, kind);
-				//               ^ radius      ^ push power
-				return; // don't check further
-			} else if (kind == FootEvent::JumpLand) {
-				float perk = GetPerkBonus_Basics(actor);
-
-				float fallmod = GetFallModifier(actor);
-				auto& sizemanager = SizeManager::GetSingleton();
-				
-				float damage = sizemanager.GetSizeAttribute(actor, SizeAttribute::JumpFall) * fallmod; // get jump damage boost
-
-				float Start = Time::WorldTimeElapsed();
-				ActorHandle gianthandle = actor->CreateRefHandle();
-				std::string name = std::format("JumpLandT_{}", actor->formID);
-				
-				TaskManager::Run(name, [=](auto& progressData) { // Delay it a bit since it often happens in the air
-					if (!gianthandle) {
-						return false; // end task
-					}
-					auto giant = gianthandle.get().get();
-					float timepassed = Time::WorldTimeElapsed() - Start;
-
-					if (timepassed >= 0.15) {
-						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25, FootEvent::Left, 1.0, DamageSource::CrushedLeft, true);
-						DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25, FootEvent::Right, 1.0, DamageSource::CrushedRight, true);
-
-						DoLaunch(giant, 1.20 * perk * fallmod, 1.75 * fallmod, FootEvent::Left);
-						DoLaunch(giant, 1.20 * perk * fallmod, 1.75 * fallmod, FootEvent::Right);
-						return false;
-					}
-					return true;
-				});
+				if (CanDoImpact(actor, kind)) { // Prevents earrape and effect spam from followers when they're large
+					float launch = 1.0f;
+					float radius = 1.0f;
+					
+					DoExplosionAndSound(actor, kind);
+					ApplyPerkBonuses(actor, launch, radius);
+					DoDamageAndLaunch(actor, kind, launch, radius);
+				}	
 			}
 		}
 	}

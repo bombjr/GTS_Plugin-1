@@ -175,8 +175,10 @@ namespace Gts {
 								float force = 1.0 - distance / maxFootDistance;
 								float push = start_power * GetLaunchPower_Object(giantScale, true) * force * power;
 								auto Object1 = objectref->Get3D1(false);
-							
-								Break_Object(objectref, push, giantScale, smt);
+
+								if (distance <= maxFootDistance / 3.0f) { // Apply only if too close
+									Break_Object(objectref, push, giantScale, smt);
+								}
 
 								if (Object1) {
 									auto collision = Object1->GetCollisionObject();
@@ -270,7 +272,7 @@ namespace Gts {
 				if (timepassed > 1e-4) {
 					NiPoint3 EndPos = Bone->world.translate;
 					ApplyPhysicsToObject_Towards(giantref, ref, EndPos - StartPos, start_power, giantScale);
-					Break_Object(ref, power * giantScale * start_power, giantScale, smt);
+					Break_Object(ref, power * 12 * giantScale * start_power, giantScale, smt);
 					return false; // end it
 				}
 				return true;

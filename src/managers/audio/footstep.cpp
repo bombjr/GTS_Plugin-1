@@ -31,13 +31,13 @@ namespace {
 	std::string GetFootstepName(Actor* giant, bool right) {
 		std::string tag;
 		if (!giant->AsActorState()->IsSneaking()) {
-			if (right) {
+			if (right) { // Non Sneaking = use scuffs
 				tag = "FootScuffRight";
 			} else {
 				tag = "FootScuffLeft";
 			}
 		} else {
-			if (right) {
+			if (right) { // Scuffs are silent during sneaking for some reason, so we have to send these instead
 				tag = "FootRight";
 			} else {
 				tag = "FootLeft";
@@ -342,11 +342,10 @@ namespace Gts {
 		auto foot_event = BGSFootstepEvent();
 
 		foot_event.actor = giantHandle;
-		foot_event.pad04 = 10000001; // Filter it out, we don't want it to deal damage/do dust clouds and such
+		foot_event.pad04 = 10000001; // Mark as custom .dll event, so our dll won't listen to it
 		foot_event.tag = tag;
 
-
-		BGSImpactManager::GetSingleton()->ProcessEvent(&foot_event, eventSource);
+		BGSImpactManager::GetSingleton()->ProcessEvent(&foot_event, eventSource); // Make the game play vanilla footstep sound
 	}
 
 	void FootStepManager::DoStrongSounds(Actor* giant, float animspeed, std::string_view feet) {

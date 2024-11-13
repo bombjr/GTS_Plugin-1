@@ -325,7 +325,7 @@ namespace Gts {
 				TinyCalamity_ShrinkActor(giant, tiny, damage_result * 0.35 * GetDamageSetting());
 
 				if (giant->IsSneaking()) {
-					damage_result *= 0.70;
+					damage_result *= 0.85f;
 				}
 
 				// ^ Chance to break bonues and inflict additional damage, as well as making target more vulerable to size damage

@@ -90,7 +90,6 @@ namespace {
 			float Finish = Time::WorldTimeElapsed();
 			if ((Finish - Start) / AnimationManager::GetAnimSpeed(giantref) > 12.0 || !IsButtCrushing(giantref) && !IsGtsBusy(giantref)) {
 				ManageCamera(giantref, false, CameraTracking::Butt);
-				log::info("Camera Reset");
 				return false;
 			}
 			

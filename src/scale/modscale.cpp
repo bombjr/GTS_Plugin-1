@@ -47,7 +47,7 @@ namespace {
 		try {
 			GetActorInitialScales(actor); // It's enough just to call this
 		} catch (exception e){
-			logger::error("UpdateInitScale Failed {}",e.what());
+			log::error("UpdateInitScale Failed {}",e.what());
 		}
 		
 	}
@@ -104,7 +104,7 @@ namespace Gts {
 				}
 			}
 		}catch (exception e) {
-			logger::error("ResetToInitScale Failed {}",e.what());
+			log::error("ResetToInitScale Failed {}", e.what());
 		}
 	}
 
@@ -124,29 +124,36 @@ namespace Gts {
 				}
 			}
 		catch (exception e) {
-			logger::error("GetInitialScale Failed {}", e.what());
+			log::error("GetInitialScale Failed {}", e.what());
 		return 1.0;
 		}
 	}
 
 	void RefreshInitialScales(Actor* actor) {
-		std::string name = std::format("UpdateRace_{}", actor->formID);
-		ActorHandle gianthandle = actor->CreateRefHandle();
+		if (actor) {
+			std::string name = std::format("UpdateRace_{}", actor->formID);
+			ActorHandle gianthandle = actor->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
-		
-		TaskManager::RunOnce(name, [=](auto& progressData) { // Reset it one frame later, called by SwitchRaceHook only, inside Hooks/RaceMenu.cpp 
-			if (!gianthandle) {
-				return false;
-			}
-			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			float Start = Time::WorldTimeElapsed();
+    
+			TaskManager::RunOnce(name, [=](auto& progressData) { // Reset it one frame later, called by SwitchRaceHook only, inside Hooks/RaceMenu.cpp 
+				try {
+					if (!gianthandle) {
+						return false;
+					}
+					auto giantref = gianthandle.get().get();
+					float Finish = Time::WorldTimeElapsed();
 
-			auto& initScale = GetActorInitialScales(giantref);
-			initScale.model = 1.0 * giantref->GetScale();
-			return false;
-		});
-		
+					auto& initScale = GetActorInitialScales(giantref);
+					initScale.model = 1.0 * giantref->GetScale();
+					return false;
+				}
+				catch (exception e) {
+					log::error("RefreshInitialScales Task Failed {}", e.what());
+					return false;
+				}
+			});
+		}
 	}
 
 	void set_ref_scale(Actor* actor, float target_scale) {
@@ -217,7 +224,7 @@ namespace Gts {
 		if (data) {
 			return data->scaleOverride;
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 	float get_npcnode_scale(Actor* actor) {
@@ -231,7 +238,7 @@ namespace Gts {
 		if (first_node) {
 			return first_node->local.scale;
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 	float get_npcparentnode_scale(Actor* actor) {
@@ -247,20 +254,20 @@ namespace Gts {
 		if (!childNode) {
 			childNode = find_node(actor, node_name, true);
 			if (!childNode) {
-				return -1.0;
+				return 1.0;
 			}
 		}
 		auto parent = childNode->parent;
 		if (parent) {
 			return parent->local.scale;
 		}
-		return -1.0; //
+		return 1.0;
 	}
 
 	float get_model_scale(Actor* actor) {
 		// This will set the scale of the root npc node
 		if (!actor->Is3DLoaded()) {
-			return -1.0;
+			return 1.0;
 		}
 
 		auto model = actor->Get3D(false);
@@ -271,7 +278,7 @@ namespace Gts {
 		if (first_model) {
 			return first_model->local.scale;
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 	float get_scale(Actor* actor) {
@@ -293,7 +300,7 @@ namespace Gts {
 					return get_model_scale(actor);
 				}
 			default:
-				return -1.0;
+				return 1.0;
 		}
 	}
 

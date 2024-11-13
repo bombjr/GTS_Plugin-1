@@ -512,7 +512,6 @@ namespace Gts {
 				return bbx;
 			}
 		}
-		//log::info("Bounding Box not found for {}", actor->GetDisplayFullName());
 		return nullptr;
 	}
 

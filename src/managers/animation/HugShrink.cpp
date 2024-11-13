@@ -72,7 +72,7 @@ namespace {
 			if (IsCrawling(giant)) {
 				steal *= 0.8; // Crawl has one more shrink event so we compensate
 			}
-			mod_target_scale(giant, steal);
+			update_target_scale(giant, steal, SizeEffectType::kGrow);
 		} else {
 			float Start = Time::WorldTimeElapsed();
 			ActorHandle gianthandle = giant->CreateRefHandle();

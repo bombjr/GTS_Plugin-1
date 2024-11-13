@@ -46,9 +46,9 @@ namespace {
 		}
 
 		if (maxscale > 250.0 * naturalscale) {
-			Cprint("{} Scale: {:.2f}  (Natural Scale: {:.2f}; Size Limit: Infinite; Aspect Of Giantess: {:.1f}%)", actor->GetDisplayFullName(), scale, naturalscale, gigantism);
+			Cprint("{} Scale: {:.2f}  (Natural Scale: {:.2f}; Bounding Box: {}; Size Limit: Infinite; Aspect Of Giantess: {:.1f}%)", actor->GetDisplayFullName(), scale, naturalscale, BB, gigantism);
 		} else {
-			Cprint("{} Scale: {:.2f}  (Natural Scale: {:.2f}; Size Limit: {:.2f}; Aspect Of Giantess: {:.1f}%)", actor->GetDisplayFullName(), scale, naturalscale, maxscale, gigantism);
+			Cprint("{} Scale: {:.2f}  (Natural Scale: {:.2f}; Bounding Box: {}; Size Limit: {:.2f}; Aspect Of Giantess: {:.1f}%)", actor->GetDisplayFullName(), scale, naturalscale, BB, maxscale, gigantism);
 		}
 		if (hh > 0.0) { // if HH is > 0, print HH info
 			Cprint("{} High Heels: {:.2f} (+{:.2f} cm / +{:.2f} ft)", actor->GetDisplayFullName(), hh, hh, hh*3.28);

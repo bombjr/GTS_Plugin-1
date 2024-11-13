@@ -45,7 +45,7 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->target_scale * get_natural_scale(&actor, true);
 		} else {
-			return -1.0;
+			return 1.0;
 		}
 	}
 	float get_target_scale(Actor* actor) {
@@ -53,7 +53,7 @@ namespace Gts {
 			Actor& a = *actor;
 			return get_target_scale(a);
 		} else {
-			return -1.0;
+			return 1.0;
 		}
 	}
 
@@ -99,13 +99,13 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->max_scale;
 		}
-		return -1.0;
+		return 1.0;
 	}
 	float get_max_scale(Actor* actor) {
 		if (actor) {
 			return get_max_scale(*actor);
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 	void mod_max_scale(Actor& actor, float amt) {
@@ -125,13 +125,13 @@ namespace Gts {
 		if (actor_data) {
 			return actor_data->visual_scale * get_natural_scale(&actor, true);
 		}
-		return -1.0;
+		return 1.0;
 	}
 	float get_visual_scale(Actor* actor) {
 		if (actor) {
 			return get_visual_scale(*actor);
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 	float get_natural_scale(Actor& actor, bool game_scale) {
@@ -181,13 +181,13 @@ namespace Gts {
 			// Sadly had to add natural scale to it so it will respect GetScale * RaceMenu alterations
 			return result;
 		}
-		return -1.0;
+		return 1.0;
 	}
 	float get_giantess_scale(Actor* actor) {
 		if (actor) {
 			return get_giantess_scale(*actor);
 		}
-		return -1.0;
+		return 1.0;
 	}
 
 }

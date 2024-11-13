@@ -8,22 +8,22 @@ using namespace Gts;
 namespace {
 	float height_to_scale(Actor* actor, float height) {
 		if (!actor) {
-			return -1.0;
+			return 1.0;
 		}
 		auto temp_actor_data = Transient::GetSingleton().GetData(actor);
 		if (!temp_actor_data) {
-			return -1.0;
+			return 1.0;
 		}
 		return height / temp_actor_data->base_height;
 	}
 
 	float scale_to_height(Actor* actor, float scale) {
 		if (!actor) {
-			return -1.0;
+			return 1.0;
 		}
 		auto temp_actor_data = Transient::GetSingleton().GetData(actor);
 		if (!temp_actor_data) {
-			return -1.0;
+			return 1.0;
 		}
 		return scale * temp_actor_data->base_height;
 	}
@@ -81,7 +81,7 @@ namespace Gts {
 	float get_base_height(Actor* actor) {
 		auto temp_actor_data = Transient::GetSingleton().GetData(actor);
 		if (!temp_actor_data) {
-			return -1.0;
+			return 1.0;
 		}
 		return temp_actor_data->base_height;
 	}
