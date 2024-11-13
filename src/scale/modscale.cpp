@@ -124,10 +124,8 @@ namespace Gts {
 				}
 			}
 		catch (exception e) {
-			logger::error("GetInitialScale Failed {}", e.what());
-		return 1.0f;
 			log::error("GetInitialScale Failed {}", e.what());
-		return 1.0;
+		return 1.0f;
 		}
 	}
 
@@ -145,14 +143,6 @@ namespace Gts {
 					}
 					auto giantref = gianthandle.get().get();
 					float Finish = Time::WorldTimeElapsed();
-		//double Start = Time::WorldTimeElapsed();
-		
-		TaskManager::RunOnce(name, [=](auto& progressData) { // Reset it one frame later, called by SwitchRaceHook only, inside Hooks/RaceMenu.cpp 
-			if (!gianthandle) {
-				return false;
-			}
-			auto giantref = gianthandle.get().get();
-			//double Finish = Time::WorldTimeElapsed();
 
 					auto& initScale = GetActorInitialScales(giantref);
 					initScale.model = 1.0f * giantref->GetScale();

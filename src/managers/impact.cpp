@@ -26,7 +26,6 @@ namespace {
 	bool CanDoImpact(Actor* actor, FootEvent kind) { // This function is needed to prevent sound spam from followers at large sizes
 		if (IsTeammate(actor) && actor->formID != 0x14) {
 			if (get_visual_scale(actor) < 6.0f) {
-			if (get_visual_scale(actor) < 6.0f) {
 				return true;
 			}
 			if (kind == FootEvent::Right) {
@@ -132,7 +131,7 @@ namespace {
 			.actor = actor,
 			.kind = kind,
 			.scale = get_visual_scale(actor),
-			.modifier = 1.0,
+			.modifier = 1.0f,
 			.nodes = get_landing_nodes(actor, kind),
 		};
 
@@ -171,14 +170,14 @@ namespace {
 
 		std::string name = std::format("JumpLandT_{}", actor->formID);
 		ActorHandle gianthandle = actor->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::Run(name, [=](auto& progressData) { // Delay it a bit since it often happens in the air
 			if (!gianthandle) {
 				return false; // end task
 			}
 			auto giant = gianthandle.get().get();
-			float timepassed = Time::WorldTimeElapsed() - Start;
+			double timepassed = Time::WorldTimeElapsed() - Start;
 
 			if (timepassed >= 0.15) {
 				DoDamageEffect(giant, Damage_Jump_Default * damage, Radius_Jump_Default * fallmod, 20, 0.25f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft, true);

@@ -20,33 +20,29 @@ namespace {
 		if (HighHeelManager::IsWearingHH(actor)) {
 			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep_High_Heel.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr);
 			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn both
-			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep_High_Heel.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr);
-			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn both
 			return;
 		} else {
-			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn foot only
 			SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 2.9f, 7, nullptr); // Spawn foot only
 			return;
 		}
 	}
 
 	void make_explosion_at(FootEvent kind, Actor* actor, NiPoint3 position, float scale) {
-		if (!actor) {
-			return;
-		}
-		switch (kind) {
-			case FootEvent::Left:
-			case FootEvent::Right:
-			case FootEvent::Front:
-			case FootEvent::Back:
-				CreateParticle(actor, position, scale);
-			break;
-			case FootEvent::JumpLand:
-				CreateParticle(actor, position, scale);
-			break;
-			case FootEvent::Butt:
-				CreateParticle(actor, position, scale);	
-			break;
+		if (actor) {
+			switch (kind) {
+				case FootEvent::Left:
+				case FootEvent::Right:
+				case FootEvent::Front:
+				case FootEvent::Back:
+					CreateParticle(actor, position, scale);
+				break;
+				case FootEvent::JumpLand:
+					CreateParticle(actor, position, scale);
+				break;
+				case FootEvent::Butt:
+					CreateParticle(actor, position, scale);	
+				break;
+			}
 		}
 	}
 
@@ -85,12 +81,9 @@ namespace Gts {
 
 		float scale = impact.scale;
 		float minimal_size = 2.0f;
-		float minimal_size = 2.0f;
 		
 		if (actor->formID == 0x14) {
 			if (HasSMT(actor)) {
-				minimal_size = 1.0f;
-				scale += 0.33f;
 				minimal_size = 1.0f;
 				scale += 0.33f;
 			}
@@ -120,14 +113,12 @@ namespace Gts {
 				NiPoint3 explosion_pos = CastRayStatics(actor, ray_start, ray_direction, ray_length, success);
 
 				scale *= 1.0f + (Potion_GetMightBonus(actor) * 0.5f);
-				scale *= 1.0f + (Potion_GetMightBonus(actor) * 0.5f);
 				scale *= impact.modifier;
 
 				if (!success) {
 					explosion_pos = foot_location;
 					explosion_pos.z = actor->GetPosition().z;
 					if (foot_kind == FootEvent::Butt) {
-						explosion_pos.z -= 3.0f * scale;
 						explosion_pos.z -= 3.0f * scale;
 					}
 				}
