@@ -104,7 +104,7 @@ namespace {
 
 			float sizedifference_gts = Scale_A/Scale_B;
 
-			if (gts_scale/tiny_scale < 1.0) { // Switch actor roles
+			if (gts_scale/tiny_scale < 1.0f) { // Switch actor roles
 				//log::info("Roles switched");
 				sizedifference_gts = Scale_B/Scale_A; // Rough fix for Tiny being the Gts sometimes
 			}
@@ -195,7 +195,7 @@ namespace {
 				auto giant = giantHandle.get().get();
 				auto tiny = tinyHandle.get().get();
 				float health = GetAV(tiny, ActorValue::kHealth);
-				if (health <= 1.0 || tiny->IsDead()) {
+				if (health <= 1.0f || tiny->IsDead()) {
 					OverkillManager::GetSingleton().Overkill(giant, tiny);
 				}
 			});
@@ -223,7 +223,7 @@ namespace {
 					Throw_DoDamage(objA, tranDataA->Throw_Offender, tranDataA->Throw_Speed);
 					tranDataA->Throw_WasThrown = false;
 					tranDataA->Throw_Offender = nullptr;
-					tranDataA->Throw_Speed = 0.0;
+					tranDataA->Throw_Speed = 0.0f;
 					return;
 				}
 			}
@@ -234,7 +234,7 @@ namespace {
 					Throw_DoDamage(objB, tranDataB->Throw_Offender, tranDataB->Throw_Speed);
 					tranDataB->Throw_WasThrown = false;
 					tranDataB->Throw_Offender = nullptr;
-					tranDataB->Throw_Speed = 0.0;
+					tranDataB->Throw_Speed = 0.0f;
 					return;
 				}
 			}

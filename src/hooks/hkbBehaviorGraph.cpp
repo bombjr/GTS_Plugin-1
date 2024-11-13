@@ -13,7 +13,7 @@ namespace {
 	float Animation_GetSpeedCorrection(Actor* actor) { // Fixes Hug animation de-sync by copying Gts anim speed to Tiny
 		auto transient = Transient::GetSingleton().GetData(actor);
 		if (transient) {
-			if (transient->Hug_AnimSpeed < 1.0) {
+			if (transient->Hug_AnimSpeed < 1.0f) {
 				return transient->Hug_AnimSpeed;
 			}
 			return AnimationManager::GetAnimSpeed(actor);
@@ -25,7 +25,7 @@ namespace {
 		auto data = Transient::GetSingleton().GetActorData(giant);
 		if (data) {
 			float speed = data->Perk_BonusActionSpeed;
-			if (speed > 1.0) {
+			if (speed > 1.0f) {
 				bool CanApply = IsStomping(giant) || IsFootGrinding(giant) || IsVoring(giant) || IsTrampling(giant);
 				if (CanApply) {
 					anim_speed *= speed;
@@ -45,7 +45,7 @@ namespace Hooks
 	}
 
 	void Hook_hkbBehaviorGraph::Update(hkbBehaviorGraph* a_this, const hkbContext& a_context, float a_timestep) {
-		float anim_speed = 1.0;
+		float anim_speed = 1.0f;
 		for (auto actor: find_actors()) {
 			BSAnimationGraphManagerPtr animGraphManager;
 			if (actor->GetAnimationGraphManager(animGraphManager)) {

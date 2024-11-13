@@ -56,9 +56,9 @@ namespace {
 	}
 
 	float GetStaggerThreshold(DamageSource Cause) {
-		float StaggerThreshold = 1.0;
+		float StaggerThreshold = 1.0f;
 		if (Cause == DamageSource::HandSwipeRight || Cause == DamageSource::HandSwipeLeft) {
-			StaggerThreshold = 1.4; // harder to stagger with hand swipes
+			StaggerThreshold = 1.4f; // harder to stagger with hand swipes
 		}
 		return StaggerThreshold;
 	}
@@ -122,7 +122,7 @@ namespace Gts {
 				animspeed = AnimationManager::GetAnimSpeed(giant); 
 				// Make DLL use animspeed of GTS on Tiny
 			} else {
-				animspeed = 1.0; // 1.0 makes dll use GetAnimSpeed of tiny
+				animspeed = 1.0f; // 1.0 makes dll use GetAnimSpeed of tiny
 			}
 			// Fixes hug and boob attack states anim de-sync
 		}
@@ -246,8 +246,8 @@ namespace Gts {
 				Notify("R Finger 30 node not found");
 				return false;
 			}
-			NiPoint3 coords = (FingerA->world.translate + FingerB->world.translate) / 2.0;
-			coords.z -= 3.0;
+			NiPoint3 coords = (FingerA->world.translate + FingerB->world.translate) / 2.0f;
+			coords.z -= 3.0f;
 
 			if (tinyref->IsDead()) {
 				Notify("Vore Task ended");
@@ -284,10 +284,10 @@ namespace Gts {
 	}
 
 	void HugCrushOther(Actor* giant, Actor* tiny) {
-		AdvanceQuestProgression(giant, tiny, QuestStage::Crushing, 1.0, false);
+		AdvanceQuestProgression(giant, tiny, QuestStage::Crushing, 1.0f, false);
 		Attacked(tiny, giant);
 
-		ModSizeExperience(giant, 0.22); // Adjust Size Matter skill
+		ModSizeExperience(giant, 0.22f); // Adjust Size Matter skill
 
 		auto Node = find_node(giant, "NPC Spine2 [Spn2]"); 
 		if (!Node) {
@@ -296,27 +296,27 @@ namespace Gts {
 		}
 
 		std::string sound = "ShrinkToNothingSound";
-		Runtime::PlaySoundAtNode(sound, giant, 1.0, 1.0, "NPC Spine2 [Spn2]");
+		Runtime::PlaySoundAtNode(sound, giant, 1.0f, 1.0f, "NPC Spine2 [Spn2]");
 
 		if (!IsLiving(tiny)) {
-			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);
+			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6f);
 		} else {
 			if (!LessGore()) {
 				auto root = find_node(tiny, "NPC Root [Root]");
 				if (root) {
-					SpawnParticle(tiny, 1.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 1.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 1.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
 				}
 				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
 				Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSetVoreMedium", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, true);
 			} else {
-				Runtime::PlaySound("BloodGushSound", tiny, 1.0, 0.5);
+				Runtime::PlaySound("BloodGushSound", tiny, 1.0f, 0.5f);
 			}
 		}
 
-		AddSMTDuration(giant, 5.0);
+		AddSMTDuration(giant, 5.0f);
 		ApplyShakeAtNode(tiny, 3, "NPC Root [Root]");
 
 		if (tiny->formID != 0x14) {
@@ -324,7 +324,7 @@ namespace Gts {
             SendDeathEvent(giant, tiny);
 		} else {
 			TriggerScreenBlood(50);
-			tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+			tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
 		}
 
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -356,9 +356,9 @@ namespace Gts {
 
 		SetSneaking(giant, false, 0);
 
-		AdjustFacialExpression(giant, 0, 0.0, "phenome");
-		AdjustFacialExpression(giant, 0, 0.0, "modifier");
-		AdjustFacialExpression(giant, 1, 0.0, "modifier");
+		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
+		AdjustFacialExpression(giant, 0, 0.0f, "modifier");
+		AdjustFacialExpression(giant, 1, 0.0f, "modifier");
 
 		AnimationManager::StartAnim("Huggies_Spare", giant); // Start "Release" animation on Giant
 
@@ -374,7 +374,7 @@ namespace Gts {
 		if (tiny) {
 			EnableCollisions(tiny);
 			SetBeingHeld(tiny, false);
-			PushActorAway(giant, tiny, 1.0);
+			PushActorAway(giant, tiny, 1.0f);
 			UpdateFriendlyHugs(giant, tiny, true); // set GTS_IsFollower (tiny) and GTS_HuggingTeammate (GTS) bools to false
 			Anims_FixAnimationDesync(giant, tiny, true); // reset anim speed override so .dll won't use it
 		}
@@ -386,11 +386,11 @@ namespace Gts {
         float giantSize = get_visual_scale(giant);
         float size_difference = std::clamp(giantSize/tinySize, 1.0f, 3.0f);
 
-		float OldMin = 1.0;
-		float OldMax = 3.0;
+		float OldMin = 1.0f;
+		float OldMax = 3.0f;
 
-		float NewMin = 0.0;
-		float NewMax = 1.0;
+		float NewMin = 0.0f;
+		float NewMax = 1.0f;
 
 		float OldValue = size_difference;
 		float NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin;
@@ -401,13 +401,13 @@ namespace Gts {
 
 	void Utils_UpdateHighHeelBlend(Actor* giant, bool reset) { // needed to blend between 2 animations so hand will go lower
 		if (!reset) {
-			float max_heel_height = 0.215; // All animations are configured with this value in mind. Blending isn't configured for heels bigger than this value.
+			float max_heel_height = 0.215f; // All animations are configured with this value in mind. Blending isn't configured for heels bigger than this value.
 			float hh_value = HighHeelManager::GetBaseHHOffset(giant)[2]/100;
 			float hh_offset = std::clamp(hh_value / max_heel_height, 0.0f, 1.0f); // reach max HH at 0.215 offset (highest i've seen and the max that we support)
 		
 			giant->SetGraphVariableFloat("GTS_HHoffset", hh_offset);
 		} else {
-			giant->SetGraphVariableFloat("GTS_HHoffset", 0.0); // reset it
+			giant->SetGraphVariableFloat("GTS_HHoffset", 0.0f); // reset it
 		}
 	}
 
@@ -503,44 +503,44 @@ namespace Gts {
 	}
 
 	void DoLaunch(Actor* giant, float radius, float power, FootEvent kind) {
-		float smt_power = 1.0;
-		float smt_radius = 1.0;
+		float smt_power = 1.0f;
+		float smt_radius = 1.0f;
 		if (HasSMT(giant)) {
-			smt_power *= 2.0;
-			smt_radius *= 1.25;
+			smt_power *= 2.0f;
+			smt_radius *= 1.25f;
 		}
 		LaunchActor::GetSingleton().ApplyLaunch_At(giant, radius * smt_radius, power * smt_power, kind);
 	}
 
 	void DoLaunch(Actor* giant, float radius, float power, NiAVObject* node) {
-		float smt_power = 1.0;
-		float smt_radius = 1.0;
+		float smt_power = 1.0f;
+		float smt_radius = 1.0f;
 		if (HasSMT(giant)) {
-			smt_power *= 2.0;
-			smt_radius *= 1.25;
+			smt_power *= 2.0f;
+			smt_radius *= 1.25f;
 		}
-		LaunchActor::GetSingleton().LaunchAtCustomNode(giant, radius * smt_radius, 0.0, power * smt_power, node);
+		LaunchActor::GetSingleton().LaunchAtCustomNode(giant, radius * smt_radius, 0.0f, power * smt_power, node);
 	}
 
 	void GrabStaminaDrain(Actor* giant, Actor* tiny, float sizedifference) {
-		float WasteMult = 1.0;
+		float WasteMult = 1.0f;
 		if (Runtime::HasPerkTeam(giant, "DestructionBasics")) {
-			WasteMult *= 0.65;
+			WasteMult *= 0.65f;
 		}
 		WasteMult *= Perk_GetCostReduction(giant);
 
 		if (giant->formID != 0x14) {
-			WasteMult *= 0.33; // less drain for non-player
+			WasteMult *= 0.33f; // less drain for non-player
 		}
 
-		float WasteStamina = (1.40 * WasteMult)/sizedifference * TimeScale();
+		float WasteStamina = (1.40f * WasteMult)/sizedifference * TimeScale();
 		DamageAV(giant, ActorValue::kStamina, WasteStamina);
 	}
 
 	void DrainStamina(Actor* giant, std::string_view TaskName, std::string_view perk, bool enable, float power) {
-		float WasteMult = 1.0;
+		float WasteMult = 1.0f;
 		if (Runtime::HasPerkTeam(giant, perk)) {
-			WasteMult -= 0.35;
+			WasteMult -= 0.35f;
 		}
 		WasteMult *= Perk_GetCostReduction(giant);
 
@@ -553,11 +553,11 @@ namespace Gts {
 				}
 				auto GiantRef = GiantHandle.get().get();
 				float stamina = GetAV(giant, ActorValue::kStamina);
-				if (stamina <= 1.0) {
+				if (stamina <= 1.0f) {
 					return false; // Abort if we don't have stamina so it won't drain it forever. Just to make sure.
 				}
 				float multiplier = AnimationManager::GetAnimSpeed(giant);
-				float WasteStamina = 0.50 * power * multiplier;
+				float WasteStamina = 0.50f * power * multiplier;
 				DamageAV(giant, ActorValue::kStamina, WasteStamina * WasteMult * TimeScale());
 				return true;
 			});
@@ -571,10 +571,10 @@ namespace Gts {
 		if (hand) {
 			if (IsLiving(grabbedActor)) {
 				if (!LessGore()) {
-					SpawnParticle(giant, 25.0, "GTS/Damage/Explode.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3* mult, 4, hand);
-					SpawnParticle(giant, 25.0, "GTS/Damage/Crush.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3 *  mult, 4, hand);
+					SpawnParticle(giant, 25.0f, "GTS/Damage/Explode.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3* mult, 4, hand);
+					SpawnParticle(giant, 25.0f, "GTS/Damage/Crush.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 3 *  mult, 4, hand);
 				} else if (LessGore()) {
-					Runtime::PlaySound("BloodGushSound", grabbedActor, 1.0, 0.5);
+					Runtime::PlaySound("BloodGushSound", grabbedActor, 1.0f, 0.5f);
 				}
 			} else {
 				SpawnDustParticle(giant, grabbedActor, "NPC L Hand [LHnd]", dustmult);
@@ -586,7 +586,7 @@ namespace Gts {
 		auto& Emotions = EmotionManager::GetSingleton();
 
 		if (type == "phenome") {
-			Emotions.OverridePhenome(giant, ph, 0.0, 0.08, target);
+			Emotions.OverridePhenome(giant, ph, 0.0f, 0.08f, target);
 		}
 		if (type == "expression") {
 			auto fgen = giant->GetFaceGenAnimationData();
@@ -598,7 +598,7 @@ namespace Gts {
 			}
 		}
 		if (type == "modifier") {
-			Emotions.OverrideModifier(giant, ph, 0.0, 0.25, target);
+			Emotions.OverrideModifier(giant, ph, 0.0f, 0.25f, target);
 		}
 	} 
 
@@ -606,7 +606,7 @@ namespace Gts {
 		auto& Emotions = EmotionManager::GetSingleton();
 
 		if (type == "phenome") {
-			Emotions.OverridePhenome(giant, ph, 0.0, speed_phenome, target);
+			Emotions.OverridePhenome(giant, ph, 0.0f, speed_phenome, target);
 		}
 		if (type == "expression") {
 			auto fgen = giant->GetFaceGenAnimationData();
@@ -618,14 +618,14 @@ namespace Gts {
 			}
 		}
 		if (type == "modifier") {
-			Emotions.OverrideModifier(giant, ph, 0.0, speed_modifier, target);
+			Emotions.OverrideModifier(giant, ph, 0.0f, speed_modifier, target);
 		}
 	}
 
 	float GetWasteMult(Actor* giant) {
-		float WasteMult = 1.0;
+		float WasteMult = 1.0f;
 		if (Runtime::HasPerk(giant, "DestructionBasics")) {
-			WasteMult *= 0.65;
+			WasteMult *= 0.65f;
 		}
 		WasteMult *= Perk_GetCostReduction(giant);
 		return WasteMult;
@@ -633,17 +633,17 @@ namespace Gts {
 
 	float GetPerkBonus_Basics(Actor* Giant) {
 		if (Runtime::HasPerkTeam(Giant, "DestructionBasics")) {
-			return 1.25;
+			return 1.25f;
 		} else {
-			return 1.0;
+			return 1.0f;
 		}
 	}
 
 	float GetPerkBonus_Thighs(Actor* Giant) {
 		if (Runtime::HasPerkTeam(Giant, "KillerThighs")) {
-			return 1.25;
+			return 1.25f;
 		} else {
-			return 1.0;
+			return 1.0f;
 		}
 	}
 
@@ -651,7 +651,7 @@ namespace Gts {
 		auto gianthandle = giant->CreateRefHandle();
 		auto tinyhandle = tiny->CreateRefHandle();
 
-		ShrinkUntil(giant, tiny, 4.2, 0.22, false);
+		ShrinkUntil(giant, tiny, 4.2f, 0.22f, false);
 
 		std::string name = std::format("FootTrample_{}", tiny->formID);
 		auto FrameA = Time::FramesElapsed();
@@ -671,11 +671,11 @@ namespace Gts {
 			auto tinyref = tinyhandle.get().get();
 
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 4.0) {
+			if (FrameB <= 4.0f) {
 				return true;
 			}
 
-			if (!IsTrampling(giantref) || coordinates.Length() <= 0.0) {
+			if (!IsTrampling(giantref) || coordinates.Length() <= 0.0f) {
 				SetBeingGrinded(tinyref, false);
 				return false;
 			}
@@ -695,7 +695,7 @@ namespace Gts {
 		auto gianthandle = giant->CreateRefHandle();
 		auto tinyhandle = tiny->CreateRefHandle();
 
-		ShrinkUntil(giant, tiny, 4.2, 0.16, false);
+		ShrinkUntil(giant, tiny, 4.2f, 0.16f, false);
 		
 		std::string name = std::format("FootGrind_{}", tiny->formID);
 		auto FrameA = Time::FramesElapsed();
@@ -711,7 +711,7 @@ namespace Gts {
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 4.0) {
+			if (FrameB <= 4.0f) {
 				return true;
 			}
 
@@ -738,7 +738,7 @@ namespace Gts {
 		auto gianthandle = giant->CreateRefHandle();
 		auto tinyhandle = tiny->CreateRefHandle();
 
-		ShrinkUntil(giant, tiny, 10.0, 0.18, false);
+		ShrinkUntil(giant, tiny, 10.0f, 0.18f, false);
 		
 		std::string name = std::format("FingerGrind_{}_{}", giant->formID, tiny->formID);
 		AnimationManager::StartAnim("Tiny_Finger_Impact_S", tiny);
@@ -758,7 +758,7 @@ namespace Gts {
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 3.0) {
+			if (FrameB <= 3.0f) {
 				return true;
 			}
 
@@ -794,7 +794,7 @@ namespace Gts {
 		float SCALE_RATIO = Action_FingerGrind;
 		bool SMT = HasSMT(giant);
 		if (SMT) {
-			SCALE_RATIO = 0.9;
+			SCALE_RATIO = 0.9f;
 		}
 
 		NiPoint3 NodePosition = node->world.translate;
@@ -803,7 +803,7 @@ namespace Gts {
 		float CheckDistance = 220 * giantScale;
 		// Make a list of points to check
 		std::vector<NiPoint3> points = {
-			NiPoint3(0.0, 0.0, 0.0), // The standard position
+			NiPoint3(0.0f, 0.0f, 0.0f), // The standard position
 		};
 		std::vector<NiPoint3> CrawlPoints = {};
 
@@ -811,7 +811,7 @@ namespace Gts {
 			CrawlPoints.push_back(NodePosition);
 		}
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
-			for (auto point: CrawlPoints) {
+			for (auto &point : CrawlPoints) {
 				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance);
 			}
 		}
@@ -822,7 +822,7 @@ namespace Gts {
 				float tinyScale = get_visual_scale(otherActor);
 				if (giantScale / tinyScale > SCALE_RATIO) {
 					NiPoint3 actorLocation = otherActor->GetPosition();
-					for (auto point: CrawlPoints) {
+					for (auto &point : CrawlPoints) {
 						if ((actorLocation-giantLocation).Length() <= CheckDistance) {
 							int nodeCollisions = 0;
 
@@ -861,20 +861,20 @@ namespace Gts {
 		}
 
 		float giantScale = get_visual_scale(actor);
-		const float BASE_CHECK_DISTANCE = 180.0;
-		float SCALE_RATIO = 3.0;
+		const float BASE_CHECK_DISTANCE = 180.0f;
+		float SCALE_RATIO = 3.0f;
 
 		float maxFootDistance = radius * giantScale;
 
 
 		if (HasSMT(actor)) {
-			SCALE_RATIO = 0.8;
+			SCALE_RATIO = 0.8f;
 		}
 		std::vector<NiPoint3> CoordsToCheck = GetFootCoordinates(actor, Right, false);
 		if (!CoordsToCheck.empty()) {
 			if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor))) {
 				for (const auto& footPoints: CoordsToCheck) {
-					DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 800, {0.0, 1.0, 0.0, 1.0});
+					DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 800, {0.0f, 1.0f, 0.0f, 1.0f});
 				}
 			}
 
@@ -888,18 +888,18 @@ namespace Gts {
 						if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
 							// Check the tiny's nodes against the giant's foot points
 							int nodeCollisions = 0;
-							float force = 0.0;
+							float force = 0.0f;
 
 							auto model = otherActor->GetCurrent3D();
 
 							if (model) {
-								for (auto point: CoordsToCheck) {
+								for (auto &point : CoordsToCheck) {
 									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
 										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
 
 										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
-											force = 1.0 - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
 										}
 										return true;
@@ -911,10 +911,10 @@ namespace Gts {
 								ActorHandle giantHandle = actor->CreateRefHandle();
 								ActorHandle tinyHandle = otherActor->CreateRefHandle();
 
-								float Start = Time::WorldTimeElapsed();
+								double Start = Time::WorldTimeElapsed();
 
 								std::string taskname = std::format("GrindCheck_{}_{}", actor->formID, otherActor->formID);
-								TaskManager::RunFor(taskname, 1.0, [=](auto& update){
+								TaskManager::RunFor(taskname, 1.0f, [=](auto& update){
 									if (!tinyHandle) {
 										return false;
 									}
@@ -922,14 +922,14 @@ namespace Gts {
 										return false;
 									}
 									
-									float Finish = Time::WorldTimeElapsed();
+									double Finish = Time::WorldTimeElapsed();
 
 									auto giant = giantHandle.get().get();
 									auto tiny = tinyHandle.get().get();
 
 									if (Finish - Start > 0.02) {
 										if (CanDoDamage(giant, tiny, false)) {
-											if (aveForce >= 0.00 && !tiny->IsDead()) {
+											if (aveForce >= 0.00f && !tiny->IsDead()) {
 												SetBeingGrinded(tiny, true);
 												if (!strong) {
 													DoFootGrind(giant, tiny, Right);
@@ -969,7 +969,7 @@ namespace Gts {
 			auto& sizemanager = SizeManager::GetSingleton();
 			float giantScale = get_visual_scale(giant);
 
-			float SCALE_RATIO = 1.0;
+			float SCALE_RATIO = 1.0f;
 			bool SMT = false;
 
 			if (NodePosition.Length() < 1) {
@@ -977,7 +977,7 @@ namespace Gts {
 			}
 
 			if (HasSMT(giant)) {
-				giantScale += 2.40; // enough to push giants around, but not mammoths/dragons
+				giantScale += 2.40f; // enough to push giants around, but not mammoths/dragons
 				SMT = true; // set SMT to true
 			}
 
@@ -985,7 +985,7 @@ namespace Gts {
 			float CheckDistance = 220 * giantScale;
 
 			if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant))) {
-				DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance, 400.0);
+				DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance, 400);
 			}
 
 			NiPoint3 giantLocation = giant->GetPosition();
@@ -998,7 +998,7 @@ namespace Gts {
 						tinyScale *= GetSizeFromBoundingBox(otherActor); // take Giant/Dragon scale into account
 
 						int nodeCollisions = 0;
-						float force = 0.0;
+						float force = 0.0f;
 
 						auto model = otherActor->GetCurrent3D();
 
@@ -1007,7 +1007,7 @@ namespace Gts {
 								float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
 								if (distance <= maxDistance) {
 									nodeCollisions += 1;
-									force = 1.0 - distance / maxDistance;
+									force = 1.0f - distance / maxDistance;
 									return false;
 								}
 								return true;
@@ -1018,27 +1018,27 @@ namespace Gts {
 							if (!allow) {
 								float aveForce = std::clamp(force, 0.16f, 0.70f);
 								float pushForce = std::clamp(force, 0.04f, 0.10f);
-								float audio = 1.0;
+								float audio = 1.0f;
 								if (SMT) {
-									pushForce *= 1.5;
-									audio = 3.0;
+									pushForce *= 1.5f;
+									audio = 3.0f;
 								}
 								if (otherActor->IsDead()) {
-									tinyScale *= 0.6;
+									tinyScale *= 0.6f;
 								}
 
 								float difference = giantScale / tinyScale;
 								float Threshold = GetStaggerThreshold(Cause);
 
 								int Random = RandomInt(0, 100);
-								int RagdollChance = (-32 + (32 / Threshold) * difference);
+								int RagdollChance = static_cast<int>(-32 + (32 / Threshold) * difference);
 								bool roll = RagdollChance > Random;
 								//log::info("Roll: {}, RandomChance {}, Threshold: {}", roll, RagdollChance, Random);
 								//eventually it reaches 100% chance to ragdoll an actor (at ~x3.0 size difference)
 
-								if (difference > 1.35 && (roll || otherActor->IsDead())) {
+								if (difference > 1.35f && (roll || otherActor->IsDead())) {
 									PushTowards(giant, otherActor, node, pushForce * pushpower, true);
-								} else if (difference > 0.88 * Threshold) {
+								} else if (difference > 0.88f * Threshold) {
 									float push = std::clamp(0.25f * (difference - 0.25f), 0.25f, 1.0f);
 									StaggerActor(giant, otherActor, push);
 								}
@@ -1047,12 +1047,11 @@ namespace Gts {
 
 								auto node = find_node(giant, GetDeathNodeName(Cause));
 								if (node) {
-									Runtime::PlaySoundAtNode("SwingImpact", giant, Volume, 1.0, node); // play swing impact sound
+									Runtime::PlaySoundAtNode("SwingImpact", giant, Volume, 1.0f, node); // play swing impact sound
+									ApplyShakeAtPoint(giant, 1.8f * pushpower * audio, node->world.translate, 0.0f);
 								}
-
 								ApplyActionCooldown(otherActor, CooldownSource::Damage_Hand);
-								ApplyShakeAtPoint(giant, 1.8 * pushpower * audio, node->world.translate, 0.0);
-								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, random, Cause, true);
+								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
 							}
 						}
 					}
@@ -1071,12 +1070,12 @@ namespace Gts {
 		auto& sizemanager = SizeManager::GetSingleton();
 		float giantScale = get_visual_scale(actor);
 		float perk = GetPerkBonus_Thighs(actor);
-		const float BASE_CHECK_DISTANCE = 90.0;
-		float SCALE_RATIO = 1.75;
+		const float BASE_CHECK_DISTANCE = 90.0f;
+		float SCALE_RATIO = 1.75f;
 
 		if (HasSMT(actor)) {
-			giantScale += 0.20;
-			SCALE_RATIO = 0.90;
+			giantScale += 0.20f;
+			SCALE_RATIO = 0.90f;
 		}
 
 		std::string_view leg = "NPC R Foot [Rft ]";
@@ -1093,7 +1092,7 @@ namespace Gts {
 		std::vector<NiPoint3> ThighPoints = GetThighCoordinates(actor, knee, leg, thigh);
 
 		float speed = AnimationManager::GetBonusAnimationSpeed(actor);
-		crush_threshold *= (1.10 - speed*0.10);
+		crush_threshold *= (1.10f - speed*0.10f);
 
 		float feet_damage = (Damage_ThighCrush_CrossLegs_FeetImpact * perk * speed);
 		
@@ -1106,7 +1105,7 @@ namespace Gts {
 
 		if (!ThighPoints.empty()) {
 			if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor) || EffectsForEveryone(actor))) {
-				for (auto point: ThighPoints) {
+				for (auto &point : ThighPoints) {
 					DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxFootDistance);
 				}
 			}
@@ -1120,17 +1119,17 @@ namespace Gts {
 
 						if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
 							int nodeCollisions = 0;
-							float force = 0.0;
+							float force = 0.0f;
 
 							auto model = otherActor->GetCurrent3D();
 							
 							if (model) {
-								for (auto point: ThighPoints) {
+								for (auto &point : ThighPoints) {
 									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
 										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
 										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
-											force = 1.0 - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
 										}
 										return true;
@@ -1143,8 +1142,8 @@ namespace Gts {
 									float pushForce = std::clamp(force, 0.04f, 0.10f);
 									bool OnCooldown = IsActionOnCooldown(otherActor, CooldownSource::Damage_Thigh);
 									if (!OnCooldown) {
-										float pushCalc = 0.06 * pushForce * speed;
-										Laugh_Chance(actor, otherActor, 1.35, "ThighCrush");
+										float pushCalc = 0.06f * pushForce * speed;
+										Laugh_Chance(actor, otherActor, 1.35f, "ThighCrush");
 										float difference = giantScale / (tinyScale * GetSizeFromBoundingBox(otherActor));
 										PushTowards(actor, otherActor, leg, pushCalc * difference, true);
 										CollisionDamage.DoSizeDamage(actor, otherActor, damage * speed * perk, bbmult, crush_threshold, random, Cause, true);
@@ -1172,10 +1171,10 @@ namespace Gts {
 		}
 		float giantScale = get_visual_scale(giant);
 
-		float SCALE_RATIO = 1.25;
+		float SCALE_RATIO = 1.25f;
 		if (HasSMT(giant)) {
-			SCALE_RATIO = 0.8;
-			giantScale *= 1.3;
+			SCALE_RATIO = 0.8f;
+			giantScale *= 1.3f;
 		}
 		NiPoint3 NodePosition = node->world.translate;
 
@@ -1183,7 +1182,7 @@ namespace Gts {
 		float CheckDistance = 220 * giantScale;
 		// Make a list of points to check
 		std::vector<NiPoint3> points = {
-			NiPoint3(0.0, 0.0, 0.0), // The standard position
+			NiPoint3(0.0f, 0.0f, 0.0f), // The standard position
 		};
 		std::vector<NiPoint3> FingerPoints = {};
 
@@ -1191,8 +1190,8 @@ namespace Gts {
 			FingerPoints.push_back(NodePosition);
 		}
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
-			for (auto point: FingerPoints) {
-				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 400.0);
+			for (auto &point : FingerPoints) {
+				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 400);
 			}
 		}
 
@@ -1204,7 +1203,7 @@ namespace Gts {
 				float tinyScale = get_visual_scale(otherActor);
 				if (giantScale / tinyScale > SCALE_RATIO) {
 					NiPoint3 actorLocation = otherActor->GetPosition();
-					for (auto point: FingerPoints) {
+					for (auto &point : FingerPoints) {
 						if ((actorLocation-giantLocation).Length() <= CheckDistance) {
 
 							int nodeCollisions = 0;
@@ -1222,16 +1221,16 @@ namespace Gts {
 								});
 							}
 							if (nodeCollisions > 0) {
-								if (get_target_scale(otherActor) > 0.08 / GetSizeFromBoundingBox(otherActor)) {
+								if (get_target_scale(otherActor) > 0.08f / GetSizeFromBoundingBox(otherActor)) {
 									update_target_scale(otherActor, Shrink, SizeEffectType::kShrink);
 								} else {
-									set_target_scale(otherActor, 0.08 / GetSizeFromBoundingBox(otherActor));
+									set_target_scale(otherActor, 0.08f / GetSizeFromBoundingBox(otherActor));
 								}
-								Laugh_Chance(giant, otherActor, 1.0, "FingerGrind"); 
+								Laugh_Chance(giant, otherActor, 1.0f, "FingerGrind"); 
 
-								Utils_PushCheck(giant, otherActor, 1.0);
+								Utils_PushCheck(giant, otherActor, 1.0f);
 
-								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, random, Cause, true);
+								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
 							}
 						}
 					}
@@ -1259,15 +1258,15 @@ namespace Gts {
 		NiPoint3 Foot_Point = Foot->world.translate;
 		NiPoint3 Thigh_Point = Thigh->world.translate;
 
-		NiPoint3 Knee_Pos_Middle = (Knee_Point + Foot_Point) / 2.0; 				// middle  |-----|-----|
-		NiPoint3 Knee_Pos_Up = (Knee_Point + Knee_Pos_Middle) / 2.0;				//         |--|--|-----|
-		NiPoint3 Knee_Pos_Down = (Knee_Pos_Middle + Foot_Point) / 2.0; 				//         |-----|--|--|
+		NiPoint3 Knee_Pos_Middle = (Knee_Point + Foot_Point) / 2.0f; 				// middle  |-----|-----|
+		NiPoint3 Knee_Pos_Up = (Knee_Point + Knee_Pos_Middle) / 2.0f;				//         |--|--|-----|
+		NiPoint3 Knee_Pos_Down = (Knee_Pos_Middle + Foot_Point) / 2.0f; 				//         |-----|--|--|
 
-		NiPoint3 Thigh_Pos_Middle = (Thigh_Point + Knee_Point) / 2.0;               // middle  |-----|-----|
-		NiPoint3 Thigh_Pos_Up = (Thigh_Pos_Middle + Thigh_Point) / 2.0;            	//         |--|--|-----|
-		NiPoint3 Thigh_Pos_Down = (Thigh_Pos_Middle + Knee_Point) / 2.0;        	//         |-----|--|--|
+		NiPoint3 Thigh_Pos_Middle = (Thigh_Point + Knee_Point) / 2.0f;               // middle  |-----|-----|
+		NiPoint3 Thigh_Pos_Up = (Thigh_Pos_Middle + Thigh_Point) / 2.0f;            	//         |--|--|-----|
+		NiPoint3 Thigh_Pos_Down = (Thigh_Pos_Middle + Knee_Point) / 2.0f;        	//         |-----|--|--|
 
-		NiPoint3 Knee_Thigh_Middle = (Thigh_Pos_Down + Knee_Pos_Up) / 2.0;          // middle between two
+		NiPoint3 Knee_Thigh_Middle = (Thigh_Pos_Down + Knee_Pos_Up) / 2.0f;          // middle between two
 
 		std::vector<NiPoint3> coordinates = { 	
 			Knee_Pos_Middle,
@@ -1333,7 +1332,7 @@ namespace Gts {
 					bool ignore = (IsStomping(actor) || IsVoring(actor) || IsTrampling(actor) || IsThighSandwiching(actor));
 					if (ignore_rotation || ignore) {
 						up = (toe->world.translate + foot->world.translate) / 2;
-						up.z += 35.0 * get_visual_scale(actor);
+						up.z += 35.0f * get_visual_scale(actor);
 						up = inverseFoot*up;
 					}
 				}
@@ -1351,11 +1350,11 @@ namespace Gts {
 		// Make a list of points to check
 		std::vector<NiPoint3> points = {
 			// x = side, y = forward, z = up/down      
-			NiPoint3(0.0, hh/10, -(1.0 + hh * 0.25)), 	// basic foot pos
+			NiPoint3(0.0f, hh/10, -(1.0f + hh * 0.25f)), 	// basic foot pos
 			// ^ Point 1: ---()  
-			NiPoint3(0.0, 8.0 + hh/10, -(0.35 + hh)), // Toe point		
+			NiPoint3(0.0f, 8.0f + hh/10, -(0.35f + hh)), // Toe point		
 			// ^ Point 2: ()---   
-			NiPoint3(0.0, hh/70, -(1.25 + hh)), // Underheel point 
+			NiPoint3(0.0f, hh/70, -(1.25f + hh)), // Underheel point 
 			//            -----
 			// ^ Point 3: ---()  
 		};
@@ -1380,8 +1379,8 @@ namespace Gts {
 			"L Breast03",
 			"R Breast03"
 		};
-		std::uint32_t bone_count = bone_names.size();
-		for (auto bone_name_A: bone_names) {
+		std::uint32_t bone_count = static_cast<uint32_t>(bone_names.size());
+		for (auto &bone_name_A : bone_names) {
 			auto bone = find_node(giant, bone_name_A);
 			if (!bone) {
 				Notify("Error: Breast Nodes could not be found.");
@@ -1389,7 +1388,7 @@ namespace Gts {
 				Notify("Suggestion: install XP32 skeleton.");
 				return NiPoint3();
 			}
-			TargetA += (bone->world.translate) * (1.0/bone_count);
+			TargetA += (bone->world.translate) * (1.0f/bone_count);
 		}
 		/*for (auto bone_name_B: bone_names) {
 			auto bone = find_node(tiny, bone_name_B);
@@ -1399,13 +1398,13 @@ namespace Gts {
 				Notify("Suggestion: install XP32 skeleton.");
 				return NiPoint3();
 			}
-			TargetB += (bone->world.translate) * (1.0/bone_count);
+			TargetB += (bone->world.translate) * (1.0f/bone_count);
 		}*/
 
 		TargetB += tiny->GetPosition();
 
 		auto targetPoint = TargetA;
-		float adjustment = 45.0 * get_visual_scale(giant);
+		float adjustment = 45.0f * get_visual_scale(giant);
 		//bool hugs = IsHugging(giant);
 		if (hugs) {
 			if (IsCrawling(giant)) { // if doing healing crawl hugs
@@ -1424,16 +1423,16 @@ namespace Gts {
 		auto random = RandomInt(0, 8);
 		if (random <= 4) {
 			if (MoanTimer.ShouldRunFrame()) {
-				ApplyShakeAtNode(giantref, 6.0, "NPC COM [COM ]");
-				ModSizeExperience(giantref, 0.14);
-				PlayMoanSound(giantref, 1.0);
+				ApplyShakeAtNode(giantref, 6.0f, "NPC COM [COM ]");
+				ModSizeExperience(giantref, 0.14f);
+				PlayMoanSound(giantref, 1.0f);
 
-				Grow(giantref, 0, 0.016 * (1 + random));
+				Grow(giantref, 0, 0.016f * (1 + random));
 
 				Runtime::CastSpell(giantref, giantref, "GtsVoreFearSpell");
 
 				SpawnCustomParticle(giantref, ParticleType::Blue, NiPoint3(), "NPC COM [COM ]", get_visual_scale(giantref));
-				Task_FacialEmotionTask_Moan(giantref, 2.0, "Absorb");
+				Task_FacialEmotionTask_Moan(giantref, 2.0f, "Absorb");
 			}	
 		}
 	}
@@ -1444,7 +1443,7 @@ namespace Gts {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		
-		float task_duration = 3.0;
+		float task_duration = 3.0f;
 		std::string name = std::format("{}_STN_Check_{}_{}", naming, giant->formID, tiny->formID);
 
 		TaskManager::RunFor(name, task_duration, [=](auto& progressData) {
@@ -1472,33 +1471,33 @@ namespace Gts {
 	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
 		float open_speed = duration/2;
 
-		AdjustFacialExpression(giant, 0, 1.0, open_speed, open_speed, "phenome"); // Start opening mouth
-		AdjustFacialExpression(giant, 1, 0.5, open_speed, open_speed, "phenome"); // Open it wider
+		AdjustFacialExpression(giant, 0, 1.0f, open_speed, open_speed, "phenome"); // Start opening mouth
+		AdjustFacialExpression(giant, 1, 0.5f, open_speed, open_speed, "phenome"); // Open it wider
 
-		AdjustFacialExpression(giant, 0, 0.80, open_speed, open_speed, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.80, open_speed, open_speed, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.80f, open_speed, open_speed, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 0.80f, open_speed, open_speed, "modifier"); // blink R
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
+			float timepassed = static_cast<float>(finish - start);
 
 			if (timepassed >= duration) {
-				float close_speed = duration / 1.75;
+				float close_speed = duration / 1.75f;
 
-				AdjustFacialExpression(giant, 0, 0.0, close_speed, close_speed, "phenome"); // Start opening mouth
-				AdjustFacialExpression(giant, 1, 0.0, close_speed, close_speed, "phenome"); // Open it wider
+				AdjustFacialExpression(giant, 0, 0.0f, close_speed, close_speed, "phenome"); // Start opening mouth
+				AdjustFacialExpression(giant, 1, 0.0f, close_speed, close_speed, "phenome"); // Open it wider
 
-				AdjustFacialExpression(giant, 0, 0.0, close_speed, close_speed, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0, close_speed, close_speed, "modifier"); // blink R
+				AdjustFacialExpression(giant, 0, 0.0f, close_speed, close_speed, "modifier"); // blink L
+				AdjustFacialExpression(giant, 1, 0.0f, close_speed, close_speed, "modifier"); // blink R
 				return false;
 			}
 			return true;
@@ -1508,25 +1507,25 @@ namespace Gts {
 	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		AdjustFacialExpression(giant, 0, 1.0, 0.0, duration/2, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 1.0, 0.0, duration/2, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 1.0, "phenome"); // open mouth
+		AdjustFacialExpression(giant, 0, 1.0f, 0.0f, duration/2, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 1.0f, 0.0f, duration/2, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 1.0f, "phenome"); // open mouth
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
+			float timepassed = static_cast<float>(finish - start);
 
 			if (timepassed >= duration) {
-				AdjustFacialExpression(giant, 0, 0.0, 0.0, 0.0, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0, 0.0, 0.0, "modifier"); // blink R
-				AdjustFacialExpression(giantref, 0, 0.0, "phenome"); // close mouth
+				AdjustFacialExpression(giant, 0, 0.0f, 0.0f, 0.0f, "modifier"); // blink L
+				AdjustFacialExpression(giant, 1, 0.0f, 0.0f, 0.0f, "modifier"); // blink R
+				AdjustFacialExpression(giantref, 0, 0.0f, "phenome"); // close mouth
 				return false;
 			}
 			return true;
@@ -1536,20 +1535,20 @@ namespace Gts {
 	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float start = Time::WorldTimeElapsed();
+		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		AdjustFacialExpression(giant, 0, 0.1, "phenome"); // Start opening mouth
+		AdjustFacialExpression(giant, 0, 0.1f, "phenome"); // Start opening mouth
 
-		AdjustFacialExpression(giant, 0, 0.40, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.40, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.40f, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 0.40f, "modifier"); // blink R
 
-		float random = (RandomInt(0, 25)) * 0.01;
-		float smile = 0.25 + random; // up to +0.50 to open mouth
+		float random = (RandomInt(0, 25)) * 0.01f;
+		float smile = 0.25f + random; // up to +0.50 to open mouth
 
 		AdjustFacialExpression(giant, 3, random, "phenome"); // Slightly open mouth
-		AdjustFacialExpression(giant, 5, 0.5, "phenome"); // Actual smile but leads to opening mouth 
-		AdjustFacialExpression(giant, 7, 1.0, "phenome"); // Close mouth stronger to counter opened mouth from smiling
+		AdjustFacialExpression(giant, 5, 0.5f, "phenome"); // Actual smile but leads to opening mouth 
+		AdjustFacialExpression(giant, 7, 1.0f, "phenome"); // Close mouth stronger to counter opened mouth from smiling
 		
 
 		// Emotion guide:
@@ -1559,18 +1558,18 @@ namespace Gts {
 			if (!giantHandle) {
 				return false;
 			}
-			float finish = Time::WorldTimeElapsed();
+			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = finish - start;
-			if (timepassed >= duration) {
-				AdjustFacialExpression(giant, 0, 0.0, "phenome"); // Start closing mouth
+			double timepassed = finish - start;
+			if (timepassed >= static_cast<double>(duration)) {
+				AdjustFacialExpression(giant, 0, 0.0f, "phenome"); // Start closing mouth
 
-				AdjustFacialExpression(giant, 0, 0.0, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0, "modifier"); // blink R
+				AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
+				AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
 
-				AdjustFacialExpression(giant, 3, 0.0, "phenome"); // Smile a bit (Mouth)
-				AdjustFacialExpression(giant, 5, 0.0, "phenome"); // Smile a bit (Mouth)
-				AdjustFacialExpression(giant, 7, 0.0, "phenome"); // Smile a bit (Mouth)
+				AdjustFacialExpression(giant, 3, 0.0f, "phenome"); // Smile a bit (Mouth)
+				AdjustFacialExpression(giant, 5, 0.0f, "phenome"); // Smile a bit (Mouth)
+				AdjustFacialExpression(giant, 7, 0.0f, "phenome"); // Smile a bit (Mouth)
 				return false;
 			}
 			return true;
@@ -1581,14 +1580,14 @@ namespace Gts {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
 			int rng = RandomInt(0, 3);
-			if (rng <= 1.0) {
-				float duration = 1.5 + ((RandomInt(0, 100)) * 0.01);
+			if (rng <= 1.0f) {
+				float duration = 1.5f + ((RandomInt(0, 100)) * 0.01f);
 				duration *= multiply;
 
 				ApplyActionCooldown(giant, CooldownSource::Emotion_Laugh);
 				
 				if (!otherActor->IsDead()) {
-					PlayLaughSound(giant, 1.0, 1);
+					PlayLaughSound(giant, 1.0f, 1);
 					Task_FacialEmotionTask_Smile(giant, duration, name);
 				}
 			}
@@ -1599,11 +1598,11 @@ namespace Gts {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
 			int rng = RandomInt(0, 3);
-			if (rng <= 1.0) {
-				float duration = 1.5 + ((RandomInt(0, 100)) * 0.01);
+			if (rng <= 1.0f) {
+				float duration = 1.5f + ((RandomInt(0, 100)) * 0.01f);
 				duration *= multiply;
 
-				PlayLaughSound(giant, 1.0, 1);
+				PlayLaughSound(giant, 1.0f, 1);
 				Task_FacialEmotionTask_Smile(giant, duration, name);
 				ApplyActionCooldown(giant, CooldownSource::Emotion_Laugh);
 			}
@@ -1611,37 +1610,37 @@ namespace Gts {
 	}
 
 	float GetHugStealRate(Actor* actor) {
-		float steal = 0.18;
+		float steal = 0.18f;
 		if (Runtime::HasPerkTeam(actor, "HugCrush_ToughGrip")) {
-			steal += 0.072;
+			steal += 0.072f;
 		}
 		if (Runtime::HasPerkTeam(actor, "HugCrush")) {
-			steal *= 1.35;
+			steal *= 1.35f;
 		}
 		return steal;
 	}
 
 	float GetHugShrinkThreshold(Actor* actor) {
-		float threshold = 2.5;
+		float threshold = 2.5f;
 		if (Runtime::HasPerkTeam(actor, "HugCrush")) {
-			threshold *= 1.25;
+			threshold *= 1.25f;
 		}
 		if (Runtime::HasPerkTeam(actor, "HugCrush_Greed")) {
-			threshold *= 1.35;
+			threshold *= 1.35f;
 		}
 		if (HasGrowthSpurt(actor)) {
-			threshold *= 2.0;
+			threshold *= 2.0f;
 		}
 		return threshold;
 	}
 
 	float GetHugCrushThreshold(Actor* giant, Actor* tiny, bool check_size) {
-		float hp = 0.12;
+		float hp = 0.12f;
 		if (Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles")) {
-			hp += 0.08;
+			hp += 0.08f;
 		}
 		if (Runtime::HasPerkTeam(giant, "HugCrush_HugsOfDeath")) {
-			hp += 0.10;
+			hp += 0.10f;
 		}
 
 		if (!check_size) {

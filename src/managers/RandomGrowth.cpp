@@ -17,10 +17,10 @@ using namespace Gts;
 
 namespace {
 	float Get_Breach_Threshold(Actor* actor) {
-		float threshold = 1.65;
+		float threshold = 1.65f;
 
 		if (Runtime::HasPerkTeam(actor, "RandomGrowthTerror")) {
-			threshold = 1.60;
+			threshold = 1.60f;
 		}
 
 		return threshold;
@@ -28,9 +28,9 @@ namespace {
 
 	float Get_size_penalty(Actor* actor) {
 		float scale = get_visual_scale(actor);
-		float penalty = 1.0;
+		float penalty = 1.0f;
 
-		if (scale >= 1.5) {
+		if (scale >= 1.5f) {
 			penalty = std::clamp(scale - 0.5f, 1.0f, 4.0f);
 		}
 
@@ -42,7 +42,7 @@ namespace {
 		if (IsTeammate(actor)) {
 			MultiplySlider = Runtime::GetFloat("RandomGrowthMultiplyNPC");
 		}
-		if (!Runtime::HasPerkTeam(actor, "RandomGrowth") || MultiplySlider <= 0.0) {
+		if (!Runtime::HasPerkTeam(actor, "RandomGrowth") || MultiplySlider <= 0.0f) {
 			return false;
 		}
 
@@ -53,12 +53,12 @@ namespace {
 		if (HasSMT(actor)) {
 			return false; // Disallow random groth during Tiny Calamity
 		}
-		if (SizeManager::GetSingleton().BalancedMode() == 2.0) {
-			MultiplySlider = 1.0; // Disable effect in Balance Mode, so slider is always 1.0
+		if (SizeManager::GetSingleton().BalancedMode() == 2.0f) {
+			MultiplySlider = 1.0f; // Disable effect in Balance Mode, so slider is always 1.0
 		}
-		float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
-		int Requirement = ((300 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
-		Requirement *= Get_size_penalty(actor);
+		float Gigantism = 1.0f + Ench_Aspect_GetPower(actor);
+		int Requirement = static_cast<int>((300 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
+		Requirement = static_cast<int>(Requirement * Get_size_penalty(actor));
 		int random = RandomInt(1, Requirement);
 		int chance = 1;
 		if (random <= chance) {
@@ -90,9 +90,9 @@ namespace Gts {
 								float scale = get_visual_scale(actor);
 								float ProgressionMultiplier = Persistent::GetSingleton().progression_multiplier;
 								int random = RandomInt(0, 80);
-								float TotalPower = (100.0 + random)/100.0;
-								float base_power = ((0.00750 * TotalPower * 25) * ProgressionMultiplier);  // The power of it
-								float Gigantism = 1.0 + Ench_Aspect_GetPower(actor);
+								float TotalPower = (100.0f + random)/100.0f;
+								float base_power = ((0.00750f * TotalPower * 25) * ProgressionMultiplier);  // The power of it
+								float Gigantism = 1.0f + Ench_Aspect_GetPower(actor);
 
 								if (Runtime::HasPerkTeam(actor, "RandomGrowthAug") && TotalPower >= Get_Breach_Threshold(actor) && !IsGtsBusy(actor)) {
 									AnimationManager::StartAnim("StartRandomGrowth", actor);
@@ -103,12 +103,12 @@ namespace Gts {
 									// Sounds
 									float Volume = std::clamp(scale/4, 0.20f, 1.0f);
 
-									PlayMoanSound(actor, 1.0);
-									Task_FacialEmotionTask_Moan(actor, 2.0, "RandomGrow");
-									Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0, "NPC COM [COM ]");
-									Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]");
+									PlayMoanSound(actor, 1.0f);
+									Task_FacialEmotionTask_Moan(actor, 2.0f, "RandomGrow");
+									Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0f, "NPC COM [COM ]");
+									Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 
-									TaskManager::RunFor(name, 0.40 * TotalPower, [=](auto& progressData) {
+									TaskManager::RunFor(name, 0.40f * TotalPower, [=](auto& progressData) {
 										if (!gianthandle) {
 											return false;
 										}
@@ -118,8 +118,8 @@ namespace Gts {
 										update_target_scale(giantref, base_power * delta_time * Gigantism, SizeEffectType::kGrow);
 
 										// Play sound
-										Rumbling::Once("RandomGrowth", giantref, base_power, 0.10);
-										RandomGrowth::RestoreStats(giantref, 0.8); // Regens Attributes if PC has perk
+										Rumbling::Once("RandomGrowth", giantref, base_power, 0.10f);
+										RandomGrowth::RestoreStats(giantref, 0.8f); // Regens Attributes if PC has perk
 										return true;
 									});
 								}
@@ -132,9 +132,9 @@ namespace Gts {
 	}
 
 	void RandomGrowth::RestoreStats(Actor* actor, float multiplier) { // Regenerate attributes
-		float HP = GetMaxAV(actor, ActorValue::kHealth) * 0.00185;
-		float MP = GetMaxAV(actor, ActorValue::kMagicka) * 0.00095;
-		float SP = GetMaxAV(actor, ActorValue::kStamina) * 0.00125;
+		float HP = GetMaxAV(actor, ActorValue::kHealth) * 0.00185f;
+		float MP = GetMaxAV(actor, ActorValue::kMagicka) * 0.00095f;
+		float SP = GetMaxAV(actor, ActorValue::kStamina) * 0.00125f;
 		actor->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, HP * TimeScale() * multiplier);
 		actor->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kMagicka, SP * TimeScale() * multiplier);
 		actor->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kStamina, MP * TimeScale() * multiplier);

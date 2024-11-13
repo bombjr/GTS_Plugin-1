@@ -26,11 +26,11 @@ namespace Gts {
 			static float AlterGetAvMod(float orginal_value, Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value);
 		private:
 			SoftPotential speed_adjustment_walk {
-				.k = 0.265, // 0.125
-				.n = 1.11, // 0.86
-				.s = 2.0, // 1.12
-				.o = 1.0,
-				.a = 0.0,  //Default is 0
+				.k = 0.265f, // 0.125
+				.n = 1.11f, // 0.86
+				.s = 2.0f, // 1.12
+				.o = 1.0f,
+				.a = 0.0f,  //Default is 0
 			};
 	};
 }

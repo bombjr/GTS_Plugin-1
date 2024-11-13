@@ -74,49 +74,49 @@ namespace {
 
 	void DoImpactRumble(Actor* giant, std::string_view node, std::string_view name) {
 		float shake_power = Rumble_Stomp_Strong;
-		float smt = 1.0;
+		float smt = 1.0f;
 		if (HasSMT(giant)) {
-			smt *= 1.5;
+			smt *= 1.5f;
 		}
 		smt *= GetHighHeelsBonusDamage(giant, true);
-		Rumbling::Once(name, giant, shake_power * smt, 0.0, node, 1.25);
+		Rumbling::Once(name, giant, shake_power * smt, 0.0f, node, 1.25f);
 	}
 
 	void StrongStomp_DoEverything(Actor* giant, float animSpeed, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float SMT = 1.0;
-		float damage = 1.0;
+		float SMT = 1.0f;
+		float damage = 1.0f;
 		if (HasSMT(giant)) {
-			SMT = 1.85; // Larger Dust
-			damage = 1.25;
+			SMT = 1.85f; // Larger Dust
+			damage = 1.25f;
 		}
 
 		std::string taskname = std::format("StrongStompAttack_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
-		TaskManager::RunFor(taskname, 1.0, [=](auto& update){ // Needed because anim has wrong timing
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 
 			if (Finish - Start > 0.07) { 
 
-				DoDamageEffect(giant, Damage_Stomp_Strong * damage * perk, Radius_Stomp_Strong, 5, 0.35, Event, 1.0, Source);
+				DoDamageEffect(giant, Damage_Stomp_Strong * damage * perk, Radius_Stomp_Strong, 5, 0.35f, Event, 1.0f, Source);
 				DoImpactRumble(giant, Node, rumble);
-				DoDustExplosion(giant, 1.33 * (SMT + (animSpeed * 0.05)), Event, Node);
+				DoDustExplosion(giant, 1.33f * (SMT + (animSpeed * 0.05f)), Event, Node);
 
-				DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 3.4);
+				DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 3.4f);
 
 				DoFootstepSound(giant, SMT + (animSpeed/10), Event, Node);
 
-				LaunchTask(giant, 1.05 * perk, 3.6 + animSpeed/2, Event);
+				LaunchTask(giant, 1.05f * perk, 3.6f + animSpeed/2, Event);
 
-				FootStepManager::DoStrongSounds(giant, 1.15 + animSpeed/20, Node);
+				FootStepManager::DoStrongSounds(giant, 1.15f + animSpeed/20, Node);
 				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 
 				return false;
@@ -132,7 +132,7 @@ namespace {
 
 	void GTS_StrongStomp_Start(AnimationEventData& data) {
 		data.stage = 1;
-		data.animSpeed = 1.35;
+		data.animSpeed = 1.35f;
 	}
 
 	void GTS_StrongStomp_LR_Start(AnimationEventData& data) {
@@ -143,7 +143,7 @@ namespace {
 			data.animSpeed += GetRandomBoost()/3;
 		}
 		ManageCamera(giant, true, CameraTracking::R_Foot);
-		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4);
+		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4f);
 	}
 
 	void GTS_StrongStomp_LL_Start(AnimationEventData& data) {
@@ -154,19 +154,19 @@ namespace {
 			data.animSpeed += GetRandomBoost()/3;
 		}
 		ManageCamera(giant, true, CameraTracking::L_Foot);
-		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4);
+		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4f);
 	}
 
 	void GTS_StrongStomp_LR_Middle(AnimationEventData& data) {
-		data.animSpeed = 1.55;
+		data.animSpeed = 1.55f;
 		if (data.giant.formID != 0x14) {
-			data.animSpeed = 1.55 + GetRandomBoost();
+			data.animSpeed = 1.55f + GetRandomBoost();
 		}
 	}
 	void GTS_StrongStomp_LL_Middle(AnimationEventData& data) {
-		data.animSpeed = 1.55;
+		data.animSpeed = 1.55f;
 		if (data.giant.formID != 0x14) {
-			data.animSpeed = 1.55 + GetRandomBoost();
+			data.animSpeed = 1.55f + GetRandomBoost();
 		}
 	}
 	void GTS_StrongStomp_LR_End(AnimationEventData& data) {
@@ -181,7 +181,7 @@ namespace {
 
 		data.stage = 0;
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 
 		StrongStomp_DoEverything(&data.giant, SavedSpeed, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "HeavyStompR");
 	}
@@ -190,13 +190,13 @@ namespace {
 
 		data.stage = 0;
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 
 		StrongStomp_DoEverything(&data.giant, SavedSpeed, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "HeavyStompL");
 	}
 
-	void GTS_StrongStomp_ReturnRL_Start(AnimationEventData& data) {StartLegRumbling("StrongStompR", data.giant, 0.25, 0.10, true);}
-	void GTS_StrongStomp_ReturnLL_Start(AnimationEventData& data) {StartLegRumbling("StrongStompL", data.giant, 0.25, 0.10, false);}
+	void GTS_StrongStomp_ReturnRL_Start(AnimationEventData& data) {StartLegRumbling("StrongStompR", data.giant, 0.25f, 0.10f, true);}
+	void GTS_StrongStomp_ReturnLL_Start(AnimationEventData& data) {StartLegRumbling("StrongStompL", data.giant, 0.25f, 0.10f, false);}
 
 	void GTS_StrongStomp_ReturnRL_End(AnimationEventData& data) {
 		StopLegRumbling("StrongStompR", data.giant, true);
@@ -230,7 +230,7 @@ namespace {
 		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
 			return;
 		}
-		float WasteStamina = 70.0 * GetWasteMult(player);
+		float WasteStamina = 70.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StrongStompRight", player);
 		} else {
@@ -243,7 +243,7 @@ namespace {
 		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
 			return;
 		}
-		float WasteStamina = 70.0 * GetWasteMult(player);
+		float WasteStamina = 70.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			//BlockFirstPerson(player, true);
 			AnimationManager::StartAnim("StrongStompLeft", player);

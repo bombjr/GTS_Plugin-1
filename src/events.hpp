@@ -7,7 +7,7 @@ using namespace RE;
 using namespace SKSE;
 
 namespace Gts {
-
+	
 	enum class FootEvent {
 		Left,
 		Right,

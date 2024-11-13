@@ -21,7 +21,7 @@ namespace Hooks { // This hook is commented out inside hooks.cpp
             [](auto* actor) {
                 float result = Skyrim_GetActorRotationX(actor);
                 float transient_rotation = GetTinyRotation_X(actor);
-                if (transient_rotation != 0.0) {
+                if (transient_rotation != 0.0f) {
                     result = transient_rotation;
                     log::info("Rotation != 0");
                 }
@@ -41,7 +41,7 @@ namespace Hooks { // This hook is commented out inside hooks.cpp
             //log::info("Raw Name Ref: {}", GetRawName(ref)); 
             //log::info("Pos: {}", Vector2Str(pos));
             float rotation = GetTinyRotation_X(ref);
-            if (rotation != 0.0) {
+            if (rotation != 0.0f) {
                 x = rotation;
                 log::info("X of {} is {}", ref->GetDisplayFullName(), x);
             }

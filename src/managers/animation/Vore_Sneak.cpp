@@ -59,10 +59,10 @@ namespace {
 		auto giant = &data.giant;
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 
-		Task_FacialEmotionTask_OpenMouth(giant, 0.6 / AnimationManager::GetAnimSpeed(giant), "SneakVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.6f / AnimationManager::GetAnimSpeed(giant), "SneakVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
-			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1);
+			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
 		}
     }
     void GTS_Sneak_Vore_Swallow(AnimationEventData& data) {
@@ -80,8 +80,8 @@ namespace {
 				VoreData.AllowToBeVored(true);
 			} else {
 				VoreData.Swallow();
-				tiny->SetAlpha(0.0);
-				Runtime::PlaySoundAtNode("VoreSwallow", giant, 1.0, 1.0, "NPC Head [Head]"); // Play sound
+				tiny->SetAlpha(0.0f);
+				Runtime::PlaySoundAtNode("VoreSwallow", giant, 1.0f, 1.0f, "NPC Head [Head]"); // Play sound
 
 				auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 				for (auto& tiny: VoreData.GetVories()) {
@@ -107,12 +107,12 @@ namespace {
     }
 
     void GTS_Sneak_Vore_SmileOn(AnimationEventData& data) {
-        AdjustFacialExpression(&data.giant, 2, 1.0, 0.32, 0.72, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.8, 0.32, 0.72, "phenome");
+        AdjustFacialExpression(&data.giant, 2, 1.0f, 0.32f, 0.72f, "expression");
+		AdjustFacialExpression(&data.giant, 3, 0.8f, 0.32f, 0.72f, "phenome");
     }
     void GTS_Sneak_Vore_SmileOff(AnimationEventData& data) {
-        AdjustFacialExpression(&data.giant, 2, 0.0, 0.32, 0.72, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.0, 0.32, 0.72, "phenome");
+        AdjustFacialExpression(&data.giant, 2, 0.0f, 0.32f, 0.72f, "expression");
+		AdjustFacialExpression(&data.giant, 3, 0.0f, 0.32f, 0.72f, "phenome");
     }
 }
 

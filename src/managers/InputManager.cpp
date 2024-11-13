@@ -106,7 +106,7 @@ namespace Gts {
 	}
 
 	float InputEventData::Duration() const {
-		return Time::WorldTimeElapsed() - this->startTime;
+		return static_cast<float>(Time::WorldTimeElapsed() - this->startTime);
 	}
 
 	bool InputEventData::AllKeysPressed(const std::unordered_set<std::uint32_t>& keys) {

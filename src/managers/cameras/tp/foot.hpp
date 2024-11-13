@@ -15,8 +15,8 @@ namespace Gts {
 		protected:
 			virtual NiPoint3 GetFootPos();
 
-			Spring3 smoothFootPos = Spring3(NiPoint3(0.0, 0.0, 0.0), 0.5);
+			Spring3 smoothFootPos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
 
-			Spring smoothScale = Spring(1.0, 0.5);
+			Spring smoothScale = Spring(1.0f, 0.5f);
 	};
 }

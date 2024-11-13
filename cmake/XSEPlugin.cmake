@@ -65,18 +65,21 @@ set(Boost_USE_STATIC_RUNTIME ON)
 add_compile_definitions(NOMINMAX)
 add_compile_definitions(_UNICODE)
 
+
+
 if(MSVC)
 
 
 	target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:DEBUG>")
-
+	#could have enabled avx for some % speed gain but alas, we still have people here with 16yo cpus playing this game
+	#set(SC_RELEASE_OPTS "/arch:AVX;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
 	set(SC_RELEASE_OPTS "/arch:SSE4.2;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
 
 	target_compile_options(
 		"${PROJECT_NAME}"
 		PRIVATE
 		/MP
-		/W1
+		/W4
 		/permissive-
 		/Zc:alignedNew
 		/Zc:auto
@@ -98,6 +101,14 @@ if(MSVC)
 		/Zc:trigraphs
 		/Zc:wchar_t
 		/wd4200 # nonstandard extension used : zero-sized array in struct/union
+		/wd4100 # 'identifier' : unreferenced formal parameter
+		/wd4101 # 'identifier': unreferenced local variable
+		/wd4458 # declaration of 'identifier' hides class member
+		/wd4459 # declaration of 'identifier' hides global declaration
+		/wd4456 # declaration of 'identifier' hides previous local declaration
+		/wd4457 # declaration of 'identifier' hides function parameter
+		/wd4189 # 'identifier' : local variable is initialized but not referenced
+
 	)
 
 	target_compile_options(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:/fp:strict>")
@@ -114,6 +125,7 @@ if(MSVC)
 		"$<$<CONFIG:RELEASE>:/LTCG;/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
 	)
 endif()
+
 
 add_subdirectory(${CommonLibPath} ${CommonLibName} EXCLUDE_FROM_ALL)
 

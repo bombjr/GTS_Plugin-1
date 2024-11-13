@@ -27,13 +27,13 @@ namespace Gts
 		// Stage a value of 0 means finished and will be cleaned up
 		std::size_t stage = 0;
 		// Anim speed, can be adjusted via the animation itself or via AdjustAnimSpeed
-		float animSpeed = 1.0;
+		float animSpeed = 1.0f;
 		// Make true during a stage of the anim to allow animSpeed adjust via AdjustAnimSpeed
 		bool canEditAnimSpeed = false;
 		// If true then hhs are disabled
 		bool disableHH = false;
 		// Speed of adjusting high heels
-		float HHspeed = 1.0;
+		float HHspeed = 1.0f;
 		AnimationEventData(Actor& giant, TESObjectREFR* tiny);
 	};
 

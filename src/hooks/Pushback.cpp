@@ -9,7 +9,7 @@
 namespace {
 
     float GetPushMult(Actor* giant) {
-		float result = 1.0;
+		float result = 1.0f;
 		if (giant->formID == 0x14 || IsTeammate(giant)) {
 			auto tranData = Transient::GetSingleton().GetData(giant);
 			if (tranData) {
@@ -17,13 +17,13 @@ namespace {
 			} else {
 				float size = get_giantess_scale(giant);
 				if (HasSMT(giant)) {
-					size *= 2.5;
+					size *= 2.5f;
 				}
 				result = std::clamp(1.0f / (size*size*size*size), 0.01f, 1.0f);
 			}
 
-			if (result <= 0.025) {
-				return 0.0;
+			if (result <= 0.025f) {
+				return 0.0f;
 			}
 		}
 
@@ -40,7 +40,7 @@ namespace Hooks
 				// TO-DO: Somwehow improve performance instead of looping through all actors
                 auto profiler = Profilers::Profile("Hook: HavokPush");
 				Actor* giant = GetCharContActor(controller);
-				float scale = 1.0;
+				float scale = 1.0f;
 				if (giant) {
 					scale = GetPushMult(giant);
 				}

@@ -40,11 +40,11 @@ namespace Gts {
 	}
 
 	void SetPercentageAV(Actor* actor, ActorValue av, float target) {
-		double currentValue = GetAV(actor, av);
-		double maxValue = GetMaxAV(actor, av);
-		double percentage = currentValue/maxValue;
-		double targetValue = target * maxValue;
-		double delta = targetValue - currentValue;
+		float currentValue = GetAV(actor, av);
+		float maxValue = GetMaxAV(actor, av);
+		float percentage = currentValue/maxValue;
+		float targetValue = target * maxValue;
+		float delta = targetValue - currentValue;
 		actor->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, av, delta);
 	}
 

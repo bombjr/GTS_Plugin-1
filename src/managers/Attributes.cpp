@@ -35,44 +35,44 @@ namespace {
 		if (transient) {
 			return transient->MovementSlowdown;
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 
 	void ManagePerkBonuses(Actor* actor) {
 		auto& SizeManager = SizeManager::GetSingleton();
 		float BalancedMode = SizeManager::GetSingleton().BalancedMode();
-		float gigantism = 1.0 + (Ench_Aspect_GetPower(actor) * 0.30);
+		float gigantism = 1.0f + (Ench_Aspect_GetPower(actor) * 0.30f);
 
 		float BaseGlobalDamage = SizeManager::GetSingleton().GetSizeAttribute(actor, SizeAttribute::Normal);
 		float BaseSprintDamage = SizeManager::GetSingleton().GetSizeAttribute(actor, SizeAttribute::Sprint);
 		float BaseFallDamage = SizeManager::GetSingleton().GetSizeAttribute(actor, SizeAttribute::JumpFall);
 
-		float ExpectedGlobalDamage = 1.0;
-		float ExpectedSprintDamage = 1.0;
-		float ExpectedFallDamage = 1.0;
+		float ExpectedGlobalDamage = 1.0f;
+		float ExpectedSprintDamage = 1.0f;
+		float ExpectedFallDamage = 1.0f;
 
 		///Normal Damage
 		if (Runtime::HasPerkTeam(actor, "Cruelty")) {
-			ExpectedGlobalDamage += 0.15/BalancedMode;
+			ExpectedGlobalDamage += 0.15f/BalancedMode;
 		}
 		if (Runtime::HasPerkTeam(actor, "RealCruelty")) {
-			ExpectedGlobalDamage += 0.35/BalancedMode;
+			ExpectedGlobalDamage += 0.35f/BalancedMode;
 		}
 		if (IsGrowthSpurtActive(actor)) {
-			ExpectedGlobalDamage *= (1.0 + (0.35/BalancedMode));
+			ExpectedGlobalDamage *= (1.0f + (0.35f/BalancedMode));
 		}
 		if (Runtime::HasPerkTeam(actor, "MightOfGiants")) {
-			ExpectedGlobalDamage *= 1.15; // +15% damage
+			ExpectedGlobalDamage *= 1.15f; // +15% damage
 		}
 
 		///Sprint Damage
 		if (Runtime::HasPerkTeam(actor, "QuickApproach")) {
-			ExpectedSprintDamage += 0.25/BalancedMode;
+			ExpectedSprintDamage += 0.25f/BalancedMode;
 		}
 		///Fall Damage
 		if (Runtime::HasPerkTeam(actor, "MightyLegs")) {
-			ExpectedFallDamage += 0.3/BalancedMode;
+			ExpectedFallDamage += 0.3f/BalancedMode;
 		}
 		///Buff by enchantment
 		ExpectedGlobalDamage *= gigantism;
@@ -137,16 +137,16 @@ namespace Gts {
 	float AttributeManager::GetAttributeBonus(Actor* actor, ActorValue av) {
 		auto profiler = Profilers::Profile("Attributes: GetAttributeBonus");
 		if (!actor) {
-			return 1.0;
+			return 1.0f;
 		}
 
 		float BalancedMode = SizeManager::GetSingleton().BalancedMode();
 		float natural_scale = get_natural_scale(actor, true);
 		float scale = get_giantess_scale(actor);
 		if (scale <= 0) {
-			scale = 1.0;
+			scale = 1.0f;
 		} 
-		if (scale < 1.0) {
+		if (scale < 1.0f) {
 			scale /= natural_scale; 
 			// Fix: negative bonuses when natural scale is < 1.0
 			// No Fix: 0.91/1.0 = 0.91   (0.91 is just example of current size)
@@ -154,14 +154,14 @@ namespace Gts {
 		}
 		switch (av) {
 			case ActorValue::kHealth: {
-				float might = 1.0 + Potion_GetMightBonus(actor);
+				float might = 1.0f + Potion_GetMightBonus(actor);
 
 				if (actor->formID == 0x14) {
 					if (HasSMT(actor)) {
-						scale += 1.0;
+						scale += 1.0f;
 					}
 					if (actor->AsActorState()->IsSprinting() && Runtime::HasPerk(actor, "QuickApproach")) {
-						scale *= 1.30;
+						scale *= 1.30f;
 					}
 				}
 
@@ -173,18 +173,18 @@ namespace Gts {
 
 			}
 			case ActorValue::kCarryWeight: {
-				float bonusCarryWeightMultiplier = Runtime::GetFloatOr("bonusCarryWeightMultiplier", 1.0);
+				float bonusCarryWeightMultiplier = Runtime::GetFloatOr("bonusCarryWeightMultiplier", 1.0f);
 				float power = (bonusCarryWeightMultiplier/BalancedMode);
 
-				float might = 1.0 + Potion_GetMightBonus(actor);
+				float might = 1.0f + Potion_GetMightBonus(actor);
 
 				if (actor->formID == 0x14 && HasSMT(actor)) {
-					scale += 3.0;
+					scale += 3.0f;
 				}
-				if (scale > 1.0) {
-					return (power*scale*might) + 1.0 - power;
+				if (scale > 1.0f) {
+					return (power*scale*might) + 1.0f - power;
 				} else {
-					return 1.0 * might; // Don't reduce it if scale is < 1.0
+					return 1.0f * might; // Don't reduce it if scale is < 1.0
 				}
 			}
 			case ActorValue::kSpeedMult: {
@@ -197,7 +197,7 @@ namespace Gts {
 				float bonusspeed = std::clamp(speed_mult_walk, 0.90f, 1.0f);
 				
 				auto actorData = Persistent::GetSingleton().GetData(actor);
-				float Bonus = 1.0;
+				float Bonus = 1.0f;
 
 				float Slowdown = GetMovementSlowdown(actor);
 
@@ -205,46 +205,46 @@ namespace Gts {
 					Bonus = actorData->smt_run_speed;
 				}
 
-				float power = 1.0 * Slowdown * (Bonus/2.2 + 1.0)/MS_mult/MS_mult_limit/Multy/bonusspeed;
-				if (scale > 1.0) {
+				float power = 1.0f * Slowdown * (Bonus/2.2f + 1.0f)/MS_mult/MS_mult_limit/Multy/bonusspeed;
+				if (scale > 1.0f) {
 					return power;
 				} else {
-					return scale * Slowdown * (Bonus/2.2 + 1.0);
+					return scale * Slowdown * (Bonus/2.2f + 1.0f);
 				}
 			}
 			case ActorValue::kAttackDamageMult: {
 				if (actor->formID == 0x14 && HasSMT(actor)) {
-					scale += 1.0;
+					scale += 1.0f;
 				}
-				float bonusDamageMultiplier = Runtime::GetFloatOr("bonusDamageMultiplier", 1.0);
-				float damage_storage = 1.0 + ((bonusDamageMultiplier) * scale - 1.0);
+				float bonusDamageMultiplier = Runtime::GetFloatOr("bonusDamageMultiplier", 1.0f);
+				float damage_storage = 1.0f + ((bonusDamageMultiplier) * scale - 1.0f);
 
-				float might = 1.0 + Potion_GetMightBonus(actor);
+				float might = 1.0f + Potion_GetMightBonus(actor);
 
-				if (scale > 1.0) {
+				if (scale > 1.0f) {
 					return damage_storage * might;
 				} else {
 					return scale * might;
 				}
 			}
 			case ActorValue::kJumpingBonus: { // Used through MCM only (display bonus jump height)
-				float power = 1.0;
-				float defaultjump = 1.0 + (1.0 * (scale - 1) * power);
-				float might = 1.0 + Potion_GetMightBonus(actor);
-				if (scale > 1.0) {
+				float power = 1.0f;
+				float defaultjump = 1.0f + (1.0f * (scale - 1) * power);
+				float might = 1.0f + Potion_GetMightBonus(actor);
+				if (scale > 1.0f) {
 					return defaultjump * might;
 				} else {
 					return scale * might;
 				}
 			}
 			default: {
-				return 1.0;
+				return 1.0f;
 			}
 		}
 	}
 
 	float AttributeManager::AlterGetAv(Actor* actor, ActorValue av, float originalValue) {
-		float bonus = 1.0;
+		float bonus = 1.0f;
 
 		auto& attributes = AttributeManager::GetSingleton();
 		switch (av) {
@@ -266,14 +266,14 @@ namespace Gts {
 
 		switch (av) {
 			case ActorValue::kHealth: { // 27.03.2024: Health boost is still applied, but for Player only and only if having matching perks
-				float bonus = 1.0;
+				float bonus = 1.0f;
 				auto& attributes = AttributeManager::GetSingleton();
 				float scale = get_giantess_scale(actor);
 				if (scale <= 0) {
-					scale = 1.0;
+					scale = 1.0f;
 				}
 
-				if (scale > 1.0) {
+				if (scale > 1.0f) {
 					bonus = attributes.GetAttributeBonus(actor, av);
 				} else {
 					//Linearly decrease such that:
@@ -310,7 +310,7 @@ namespace Gts {
 				auto transient = Transient::GetSingleton().GetData(actor);
 				if (transient) {
 					float lastEdit = transient->health_boost;
-					if (finalValue - lastEdit > 0.0) {
+					if (finalValue - lastEdit > 0.0f) {
 						finalValue -= lastEdit;
 					}
 				}
@@ -329,11 +329,11 @@ namespace Gts {
 	}
 
 	float AttributeManager::AlterMovementSpeed(Actor* actor, const NiPoint3& direction) {
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		if (actor) {
 			auto& attributes = AttributeManager::GetSingleton();
 			bonus = attributes.GetAttributeBonus(actor, ActorValue::kSpeedMult);
-			float volume = 0.0;
+			float volume = 0.0f;
 		}
 		return bonus;
 	}

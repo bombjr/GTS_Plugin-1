@@ -1,7 +1,7 @@
 /**
  * Direct Input Keys
  * These are taken from the Wine Project which is under the
- * lesser general public license 2.1
+ * lesser general public license 2.1f
  * Original is here:
  * https://github.com/wine-mirror/wine/blob/master/include/dinput.h
  *
@@ -13,7 +13,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2.1f of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of

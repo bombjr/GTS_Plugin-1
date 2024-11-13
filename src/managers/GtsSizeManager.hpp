@@ -8,22 +8,22 @@ using namespace RE;
 
 namespace Gts {
 	struct SizeManagerData {
-		float AspectOfGiantess = 0.0;
+		float AspectOfGiantess = 0.0f;
 
-		float SizeHungerBonus = 0.0;
-		float HitGrowth = 0.0;
-		float GrowthTimer = 0.0;
-		float GrowthSpurtSize = 0.0;
+		float SizeHungerBonus = 0.0f;
+		float HitGrowth = 0.0f;
+		float GrowthTimer = 0.0f;
+		float GrowthSpurtSize = 0.0f;
 
-		float NormalDamage = 1.0; // 0
-		float SprintDamage = 1.0; // 1
-		float FallDamage = 1.0; // 2
-		float HHDamage = 1.0; // 3
-		float SizeVulnerability = 0.0;
+		float NormalDamage = 1.0f; // 0
+		float SprintDamage = 1.0f; // 1
+		float FallDamage = 1.0f; // 2
+		float HHDamage = 1.0f; // 3
+		float SizeVulnerability = 0.0f;
 
 		CameraTracking TrackedBone = CameraTracking::None;
 		CameraTracking PreviousBone = CameraTracking::None;
-		float Camera_HalfLife = 0.05;
+		float Camera_HalfLife = 0.05f;
 	};
 
 	class SizeManager : public EventListener {

@@ -30,6 +30,6 @@ namespace Gts {
 		private:
 			CameraState* stateA;
 			CameraState* stateB;
-			Spring smoothIn = Spring(0.0, 0.4);
+			Spring smoothIn = Spring(0.0f, 0.4f);
 	};
 }

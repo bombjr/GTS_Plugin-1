@@ -38,8 +38,8 @@ namespace {
 	void GTS_Crawl_Knee_Trans_Impact(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 2.6, Damage_Crawl_KneeImpact_Drop, CrawlEvent::LeftKnee, "LeftKnee", 1.8, Radius_Crawl_KneeImpact_Fall, 1.15, DamageSource::KneeDropLeft);
-		DoCrawlingFunctions(giant, scale, 2.6, Damage_Crawl_KneeImpact_Drop, CrawlEvent::RightKnee, "RightKnee", 1.8, Radius_Crawl_KneeImpact_Fall, 1.15, DamageSource::KneeDropRight);
+		DoCrawlingFunctions(giant, scale, 2.6f, Damage_Crawl_KneeImpact_Drop, CrawlEvent::LeftKnee, "LeftKnee", 1.8f, Radius_Crawl_KneeImpact_Fall, 1.15f, DamageSource::KneeDropLeft);
+		DoCrawlingFunctions(giant, scale, 2.6f, Damage_Crawl_KneeImpact_Drop, CrawlEvent::RightKnee, "RightKnee", 1.8f, Radius_Crawl_KneeImpact_Fall, 1.15f, DamageSource::KneeDropRight);
 		//                                     launch power                                ^    ^ --- Size Damage Radius
 		//                                                                             Launch       ^ -- crush threshold
 		//                                                                             Radius
@@ -48,21 +48,21 @@ namespace {
 	void GTS_Crawl_Hand_Trans_Impact(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 2.15, Damage_Crawl_HandImpact_Drop, CrawlEvent::LeftHand, "LeftHand", 1.6, Radius_Crawl_HandImpact_Fall, 1.15, DamageSource::HandDropLeft);
-		DoCrawlingFunctions(giant, scale, 2.15, Damage_Crawl_HandImpact_Drop, CrawlEvent::RightHand, "RightHand", 1.6, Radius_Crawl_HandImpact_Fall, 1.15, DamageSource::HandDropRight);
+		DoCrawlingFunctions(giant, scale, 2.15f, Damage_Crawl_HandImpact_Drop, CrawlEvent::LeftHand, "LeftHand", 1.6f, Radius_Crawl_HandImpact_Fall, 1.15f, DamageSource::HandDropLeft);
+		DoCrawlingFunctions(giant, scale, 2.15f, Damage_Crawl_HandImpact_Drop, CrawlEvent::RightHand, "RightHand", 1.6f, Radius_Crawl_HandImpact_Fall, 1.15f, DamageSource::HandDropRight);
 	}
 
 	void GTSCrawl_KneeImpact_L(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.85, Damage_Crawl_KneeImpact, CrawlEvent::LeftKnee, "LeftKnee", 1.2, Radius_Crawl_KneeImpact, 1.25, DamageSource::KneeLeft);
-		ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_Crawl_KneeImpact * 0.75, 0.35, 1.0, 14, DamageSource::ThighCrushed);
+		DoCrawlingFunctions(giant, scale, 1.85f, Damage_Crawl_KneeImpact, CrawlEvent::LeftKnee, "LeftKnee", 1.2f, Radius_Crawl_KneeImpact, 1.25f, DamageSource::KneeLeft);
+		ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_Crawl_KneeImpact * 0.75f, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
 	}
 	void GTSCrawl_KneeImpact_R(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.85, Damage_Crawl_KneeImpact, CrawlEvent::RightKnee, "RightKnee", 1.2, Radius_Crawl_KneeImpact, 1.25, DamageSource::KneeRight);
-		ApplyThighDamage(giant, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_Crawl_KneeImpact * 0.75, 0.35, 1.0, 14, DamageSource::ThighCrushed);
+		DoCrawlingFunctions(giant, scale, 1.85f, Damage_Crawl_KneeImpact, CrawlEvent::RightKnee, "RightKnee", 1.2f, Radius_Crawl_KneeImpact, 1.25f, DamageSource::KneeRight);
+		ApplyThighDamage(giant, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_Crawl_KneeImpact * 0.75f, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
 	}
 	void GTSCrawl_HandImpact_L(AnimationEventData& data) {
 		auto giant = &data.giant;
@@ -70,33 +70,33 @@ namespace {
 		if (IsTransferingTiny(giant)) {
 			return; // Prevent effects from left hand
 		}
-		DoCrawlingFunctions(giant, scale, 1.70, Damage_Crawl_HandImpact, CrawlEvent::LeftHand, "LeftHand", 1.0, Radius_Crawl_HandImpact, 1.25, DamageSource::HandCrawlLeft);
+		DoCrawlingFunctions(giant, scale, 1.70f, Damage_Crawl_HandImpact, CrawlEvent::LeftHand, "LeftHand", 1.0f, Radius_Crawl_HandImpact, 1.25f, DamageSource::HandCrawlLeft);
 	}
 	void GTSCrawl_HandImpact_R(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.70, Damage_Crawl_HandImpact, CrawlEvent::RightHand, "RightHand", 1.0, Radius_Crawl_HandImpact, 1.25, DamageSource::HandCrawlRight);
+		DoCrawlingFunctions(giant, scale, 1.70f, Damage_Crawl_HandImpact, CrawlEvent::RightHand, "RightHand", 1.0f, Radius_Crawl_HandImpact, 1.25f, DamageSource::HandCrawlRight);
 		//                                                                               ^    ^ --- Size Damage Radius
 		//                                                                             Launch
 		//                                                                             Radius
 	}
 
 	void GTSCrawl_Slam_Raise_Arm_R(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", true, 1.4);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", true, 1.4f);
 		EnableHandTracking(&data.giant, CrawlEvent::RightHand, true);
 	}
 
 	void GTSCrawl_Slam_Raise_Arm_L(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", true, 1.4);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", true, 1.4f);
 		EnableHandTracking(&data.giant, CrawlEvent::LeftHand, true);
 	}
 	void GTSCrawl_SlamStrong_Raise_Arm_R(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", true, 2.3);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", true, 2.3f);
 		EnableHandTracking(&data.giant, CrawlEvent::RightHand, true);
 	}
 
 	void GTSCrawl_SlamStrong_Raise_Arm_L(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", true, 2.3);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", true, 2.3f);
 		EnableHandTracking(&data.giant, CrawlEvent::LeftHand, true);
 	}
 
@@ -112,33 +112,33 @@ namespace {
 	void GTSCrawl_Slam_Impact_R(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.4, Damage_Crawl_HandSlam, CrawlEvent::RightHand, "RightHandRumble", 0.9, Radius_Crawl_Slam, 1.15, DamageSource::HandSlamRight);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3);
+		DoCrawlingFunctions(giant, scale, 1.4f, Damage_Crawl_HandSlam, CrawlEvent::RightHand, "RightHandRumble", 0.9f, Radius_Crawl_Slam, 1.15f, DamageSource::HandSlamRight);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4f);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3f);
 	}
 	void GTSCrawl_Slam_Impact_L(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.4, Damage_Crawl_HandSlam, CrawlEvent::LeftHand, "LeftHandRumble", 0.9, Radius_Crawl_Slam, 1.15, DamageSource::HandSlamLeft);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3);
-		Grab::DamageActorInHand(giant, Damage_Crawl_HandSlam * 0.6);
+		DoCrawlingFunctions(giant, scale, 1.4f, Damage_Crawl_HandSlam, CrawlEvent::LeftHand, "LeftHandRumble", 0.9f, Radius_Crawl_Slam, 1.15f, DamageSource::HandSlamLeft);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4f);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3f);
+		Grab::DamageActorInHand(giant, Damage_Crawl_HandSlam * 0.6f);
 	}
 
 	void GTSCrawl_SlamStrong_Impact_R(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 2.1, Damage_Crawl_HandSlam_Strong, CrawlEvent::RightHand, "RightHandRumble", 1.2, Radius_Crawl_Slam_Strong, 1.0, DamageSource::HandSlamRight);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3);
+		DoCrawlingFunctions(giant, scale, 2.1f, Damage_Crawl_HandSlam_Strong, CrawlEvent::RightHand, "RightHandRumble", 1.2f, Radius_Crawl_Slam_Strong, 1.0f, DamageSource::HandSlamRight);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4f);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3f);
 	}
 	void GTSCrawl_SlamStrong_Impact_L(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 2.1, Damage_Crawl_HandSlam_Strong, CrawlEvent::LeftHand, "RightHandRumble", 1.2, Radius_Crawl_Slam_Strong, 1.0, DamageSource::HandSlamLeft);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3);
-		Grab::DamageActorInHand(giant, Damage_Crawl_HandSlam_Strong * 0.6);
+		DoCrawlingFunctions(giant, scale, 2.1f, Damage_Crawl_HandSlam_Strong, CrawlEvent::LeftHand, "RightHandRumble", 1.2f, Radius_Crawl_Slam_Strong, 1.0f, DamageSource::HandSlamLeft);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStomp", "DestructionBasics", false, 1.4f);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlStompStrong", "DestructionBasics", false, 2.3f);
+		Grab::DamageActorInHand(giant, Damage_Crawl_HandSlam_Strong * 0.6f);
 	}
 
 	void GTSCrawl_Slam_Cam_Off_R(AnimationEventData& data) {
@@ -167,11 +167,11 @@ namespace {
 			auto Uarm = find_node(giant, "NPC R Forearm [RLar]");
 			auto Arm = find_node(giant, "NPC R Hand [RHnd]");
 			if (Uarm) {
-				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Uarm, NiPoint3(0,0,0), 10, 0.30, crush, pushpower, DamageSource::HandSwipeRight);
+				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Uarm, NiPoint3(0,0,0), 10, 0.30f, crush, pushpower, DamageSource::HandSwipeRight);
 				PushObjects(Objects, giant, Uarm, pushpower, Radius_Sneak_HandSwipe, false);
 			}
 			if (Arm) {
-				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Arm, NiPoint3(0,0,0), 10, 0.30, crush, pushpower, DamageSource::HandSwipeRight);
+				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Arm, NiPoint3(0,0,0), 10, 0.30f, crush, pushpower, DamageSource::HandSwipeRight);
 				PushObjects(Objects, giant, Arm, pushpower, Radius_Sneak_HandSwipe, false);
 			}
 			return true;
@@ -192,11 +192,11 @@ namespace {
 			auto Uarm = find_node(giant, "NPC L Forearm [LLar]");
 			auto Arm = find_node(giant, "NPC L Hand [LHnd]");
 			if (Uarm) {
-				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Uarm, NiPoint3(0,0,0), 10, 0.30, crush, pushpower, DamageSource::HandSwipeLeft);
+				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Uarm, NiPoint3(0,0,0), 10, 0.30f, crush, pushpower, DamageSource::HandSwipeLeft);
 				PushObjects(Objects, giant, Uarm, pushpower, Radius_Sneak_HandSwipe, false);
 			}
 			if (Arm) {
-				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Arm, NiPoint3(0,0,0), 10, 0.30, crush, pushpower, DamageSource::HandSwipeLeft);
+				DoDamageAtPoint_Cooldown(giant, Radius_Sneak_HandSwipe, Damage_Crawl_HandSwipe * power, Arm, NiPoint3(0,0,0), 10, 0.30f, crush, pushpower, DamageSource::HandSwipeLeft);
 				PushObjects(Objects, giant, Arm, pushpower, Radius_Sneak_HandSwipe, false);
 			}
 			return true;
@@ -219,7 +219,7 @@ namespace {
 			}
 			auto giantref = gianthandle.get().get();
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 60.0/GetAnimationSlowdown(giantref)) {
+			if (FrameB <= 60.0f/GetAnimationSlowdown(giantref)) {
 				return true;
 			}
 
@@ -236,37 +236,37 @@ namespace {
 	}
 
 	void GTS_Crawl_Swipe_On_R(AnimationEventData& data) {
-		TriggerHandCollision_Right(&data.giant, 1.0, 1.6, Push_Crawl_HandSwipe);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0);
+		TriggerHandCollision_Right(&data.giant, 1.0f, 1.6f, Push_Crawl_HandSwipe);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0f);
 	}
 	void GTS_Crawl_Swipe_On_L(AnimationEventData& data) {
-		TriggerHandCollision_Left(&data.giant, 1.0, 1.6, Push_Crawl_HandSwipe);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0);
+		TriggerHandCollision_Left(&data.giant, 1.0f, 1.6f, Push_Crawl_HandSwipe);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", true, 4.0f);
 	}
 	void GTS_Crawl_Swipe_Off_R(AnimationEventData& data) {
 		DisableHandCollisions(&data.giant);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0f);
 	}
 	void GTS_Crawl_Swipe_Off_L(AnimationEventData& data) {
 		DisableHandCollisions(&data.giant);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipe", "DestructionBasics", false, 4.0f);
 	}
 
 	void GTS_Crawl_Swipe_Power_On_R(AnimationEventData& data) {
-		TriggerHandCollision_Right(&data.giant, 2.0, 1.3, Push_Crawl_HandSwipe_Strong);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0);
+		TriggerHandCollision_Right(&data.giant, 2.0f, 1.3f, Push_Crawl_HandSwipe_Strong);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0f);
 	}
 	void GTS_Crawl_Swipe_Power_On_L(AnimationEventData& data) {
-		TriggerHandCollision_Left(&data.giant, 2.0, 1.3, Push_Crawl_HandSwipe_Strong);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0);
+		TriggerHandCollision_Left(&data.giant, 2.0f, 1.3f, Push_Crawl_HandSwipe_Strong);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", true, 10.0f);
 	}
 	void GTS_Crawl_Swipe_Power_Off_R(AnimationEventData& data) {
 		DisableHandCollisions(&data.giant);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0f);
 	}
 	void GTS_Crawl_Swipe_Power_Off_L(AnimationEventData& data) {
 		DisableHandCollisions(&data.giant);
-		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0);
+		DrainStamina(&data.giant, "StaminaDrain_CrawlSwipeStrong", "DestructionBasics", false, 10.0f);
 	}
 
 	void LightSwipeLeftEvent(const InputEventData& data) {
@@ -275,7 +275,7 @@ namespace {
 			return;
 		}
 		if (player->IsSneaking()) {
-			float WasteStamina = 25.0 * GetWasteMult(player);
+			float WasteStamina = 25.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeLight_Left", player);
@@ -290,7 +290,7 @@ namespace {
 			return;
 		}
 		if (player->IsSneaking()) {
-			float WasteStamina = 25.0 * GetWasteMult(player);
+			float WasteStamina = 25.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeLight_Right", player);
@@ -306,7 +306,7 @@ namespace {
 			return;
 		}
 		if (player->IsSneaking()) {
-			float WasteStamina = 70.0 * GetWasteMult(player);
+			float WasteStamina = 70.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeHeavy_Left", player);
@@ -321,7 +321,7 @@ namespace {
 			return;
 		}
 		if (player->IsSneaking()) {
-			float WasteStamina = 70.0 * GetWasteMult(player);
+			float WasteStamina = 70.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
 				AnimationManager::StartAnim("SwipeHeavy_Right", player);

@@ -19,6 +19,6 @@ namespace Gts {
 			SwordOfSize(ActiveEffect* effect);
 
 			private:
-				float power = 0.0;
+				float power = 0.0f;
 	};
 }

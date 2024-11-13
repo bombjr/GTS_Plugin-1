@@ -20,6 +20,6 @@ namespace Gts {
 
 			MaxSizePotion(ActiveEffect* effect);
 		private:
-			float Power = 0.0;
+			float Power = 0.0f;
 	};
 }

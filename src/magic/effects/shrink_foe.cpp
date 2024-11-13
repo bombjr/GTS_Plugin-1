@@ -14,18 +14,18 @@ namespace {
 	void ResetMovementSlowdown(Actor* tiny) {
 		auto transient = Transient::GetSingleton().GetData(tiny);
 		if (transient) {
-			transient->MovementSlowdown = 1.0;
+			transient->MovementSlowdown = 1.0f;
 		}
 	}
 	void SetMovementSlowdown(Actor* giant, Actor* tiny) { 
 		auto transient = Transient::GetSingleton().GetData(tiny);
 		if (transient) {
-			float slow = 0.75;
+			float slow = 0.75f;
 			if (Runtime::HasPerkTeam(giant, "FastShrink")) {
-				slow += 0.05;
+				slow += 0.05f;
 			}
 			if (Runtime::HasPerkTeam(giant, "LethalShrink")) {
-				slow += 0.05;
+				slow += 0.05f;
 			}
 			transient->MovementSlowdown = slow;
 		}
@@ -39,16 +39,16 @@ namespace Gts {
 	}
 
 	ShrinkFoe::ShrinkFoe(ActiveEffect* effect) : Magic(effect) {
-		const float SHRINK_POWER = 2.15; // Power = Shrink Power
-		const float SHRINK_EFFIC = 0.16; // Efficiency = size steal efficiency.
-		const float SHRINK_AOE_POWER = 2.40;
-		const float SHRINK_AOE_EFFIC = 0.18;
-		const float SHRINK_AOE_MASTER_POWER = 2.70;
-		const float SHRINK_AOE_MASTER_EFFIC = 0.20;
-		const float SHRINK_BOLT_POWER = 6.0;
-		const float SHRINK_BOLT_EFFIC = 0.06;
-		const float SHRINK_STORM_POWER = 12.0;
-		const float SHRINK_STORM_EFFIC = 0.03;
+		const float SHRINK_POWER = 2.15f; // Power = Shrink Power
+		const float SHRINK_EFFIC = 0.16f; // Efficiency = size steal efficiency.
+		const float SHRINK_AOE_POWER = 2.40f;
+		const float SHRINK_AOE_EFFIC = 0.18f;
+		const float SHRINK_AOE_MASTER_POWER = 2.70f;
+		const float SHRINK_AOE_MASTER_EFFIC = 0.20f;
+		const float SHRINK_BOLT_POWER = 6.0f;
+		const float SHRINK_BOLT_EFFIC = 0.06f;
+		const float SHRINK_STORM_POWER = 12.0f;
+		const float SHRINK_STORM_EFFIC = 0.03f;
 
 		auto base_spell = GetBaseEffect();
 
@@ -66,12 +66,12 @@ namespace Gts {
 			// ShrinkBolt
 			this->power = SHRINK_BOLT_POWER;
 			this->efficiency = SHRINK_BOLT_EFFIC;
-			this->time_mult = 0.2;
+			this->time_mult = 0.2f;
 		} else if (base_spell == Runtime::GetMagicEffect("ShrinkStorm")) {
 			// ShrinkBolt
 			this->power = SHRINK_STORM_POWER;
 			this->efficiency = SHRINK_STORM_EFFIC;
-			this->time_mult = 0.2;
+			this->time_mult = 0.2f;
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace Gts {
 			return;
 		}
 		float sizediff = GetSizeDifference(caster, target, SizeType::VisualScale, true, false);
-		if (this->power >= 18.00 && sizediff > 4.0) {
+		if (this->power >= 18.00f && sizediff > 4.0f) {
 			StaggerActor(caster, target, 100.0f);
 		}
 		SetMovementSlowdown(caster, target);
@@ -109,36 +109,36 @@ namespace Gts {
 		}
 
 		auto& Persist = Persistent::GetSingleton();
-		float SizeDifference = 1.0;
-		float bonus = 1.0;
-		float balancemodebonus = 1.0;
-		float shrink = this->power * 3.2;
+		float SizeDifference = 1.0f;
+		float bonus = 1.0f;
+		float balancemodebonus = 1.0f;
+		float shrink = this->power * 3.2f;
 		float gainpower = this->efficiency;
 		auto actor_data = Persist.GetData(target);
 		
-		if (this->power >= 18.00) {
+		if (this->power >= 18.00f) {
 			if (actor_data) {
-				actor_data->half_life = 0.25; // Faster shrink, less smooth.
+				actor_data->half_life = 0.25f; // Faster shrink, less smooth.
 			}
-			SizeDifference = 1.0 / std::clamp((get_visual_scale(target) * GetSizeFromBoundingBox(target)), 0.25f, 1.0f);
-		} else if (this->power >= 10.0) {
+			SizeDifference = 1.0f / std::clamp((get_visual_scale(target) * GetSizeFromBoundingBox(target)), 0.25f, 1.0f);
+		} else if (this->power >= 10.0f) {
 			if (actor_data) {
-				actor_data->half_life = 0.50; // Faster shrink, less smooth.
+				actor_data->half_life = 0.50f; // Faster shrink, less smooth.
 			}
-			SizeDifference = 1.0 / std::clamp((get_visual_scale(target) * GetSizeFromBoundingBox(target)), 0.50f, 1.0f);
+			SizeDifference = 1.0f / std::clamp((get_visual_scale(target) * GetSizeFromBoundingBox(target)), 0.50f, 1.0f);
 		} else {
 			if (actor_data) {
-				actor_data->half_life = 1.0;
+				actor_data->half_life = 1.0f;
 			}
 		}
 
 		if (target->IsDead()) {
-			bonus = 2.5;
-			gainpower *= 0.20;
+			bonus = 2.5f;
+			gainpower *= 0.20f;
 		}
 
-		if (caster->formID == 0x14 && SizeManager::GetSingleton().BalancedMode() == 2.0) { // This is checked only if Balance Mode is enabled.
-			balancemodebonus = 0.5;
+		if (caster->formID == 0x14 && SizeManager::GetSingleton().BalancedMode() == 2.0f) { // This is checked only if Balance Mode is enabled.
+			balancemodebonus = 0.5f;
 		}
 
 		float HealthPercent = std::clamp(GetHealthPercentage(target), 0.25f, 1.0f);
@@ -148,7 +148,7 @@ namespace Gts {
 
 		Attacked(target, caster); // make it work like a hostile spell
 
-		ChanceToScare(caster, target, 5.0, 1200, true);
+		ChanceToScare(caster, target, 5.0f, 1200, true);
 
 		if (ShrinkToNothing(caster, target, true, this->time_mult)) { // STN when size difference is met and when time ticks allow to
 

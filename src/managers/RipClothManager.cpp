@@ -18,7 +18,7 @@ using namespace Gts;
 
 namespace Gts {
 
-    #define RANDOM_OFFSET RandomFloat(0.01, rip_randomOffsetMax - 0.01)
+    #define RANDOM_OFFSET RandomFloat(0.01f, rip_randomOffsetMax - 0.01f)
 	static bool RipClothManagerActive;
 
 	// List of keywords (Editor ID's) we want to ignore when stripping
@@ -99,11 +99,11 @@ namespace Gts {
 	float ClothManager::ReConstructOffset(Actor* a_actor, float scale) {
 
 		if (!a_actor) {
-			return 0.0;
+			return 0.0f;
 		}
-		float offset = 0.0;
+		float offset = 0.0f;
 
-		if (scale < 0.0) return -1.0;
+		if (scale < 0.0f) return -1.0f;
 
 		if (scale >= rip_tooBig) {
 			offset = rip_tooBig - rip_threshold + rip_randomOffsetMax;
@@ -112,7 +112,7 @@ namespace Gts {
 			offset = scale - rip_threshold + rip_randomOffsetMax;
 		}
 		else {
-			offset = 0.0;
+			offset = 0.0f;
 		}
 
 		//log::info("ReConstructOffset on: {} with offset {}", a_actor->formID, offset);
@@ -163,7 +163,7 @@ namespace Gts {
 			continue;
 		}
 
-		int ArmorCount = ArmorList.size();
+		uint32_t ArmorCount = static_cast<uint32_t>(ArmorList.size());
 		if (ArmorCount == 0) {
 			return; //No Vallid Armors Found
 		}
@@ -178,10 +178,10 @@ namespace Gts {
 		auto manager = RE::ActorEquipManager::GetSingleton();
 		manager->UnequipObject(a_actor, tesarmo, nullptr, 1, nullptr, true, false, false);
 
-		PlayMoanSound(a_actor, 0.7);
-		Task_FacialEmotionTask_Moan(a_actor, 1.0, "RipCloth");
-		Runtime::PlaySound("ClothTearSound", a_actor, 0.7, 1.0);
-		Rumbling::Once("ClothManager", a_actor, Rumble_Misc_TearClothes, 0.075);
+		PlayMoanSound(a_actor, 0.7f);
+		Task_FacialEmotionTask_Moan(a_actor, 1.0f, "RipCloth");
+		Runtime::PlaySound("ClothTearSound", a_actor, 0.7f, 1.0f);
+		Rumbling::Once("ClothManager", a_actor, Rumble_Misc_TearClothes, 0.075f);
 	}
 
 	void RipAllClothing(RE::Actor* a_actor) {
@@ -217,10 +217,10 @@ namespace Gts {
 		}
 
 		if (Ripped) {
-			PlayMoanSound(a_actor, 1.0);
-			Task_FacialEmotionTask_Moan(a_actor, 1.0, "RipCloth");
-			Runtime::PlaySound("ClothTearSound", a_actor, 1.0, 1.0);
-			Rumbling::Once("ClothManager", a_actor, Rumble_Misc_TearAllClothes, 0.095);
+			PlayMoanSound(a_actor, 1.0f);
+			Task_FacialEmotionTask_Moan(a_actor, 1.0f, "RipCloth");
+			Runtime::PlaySound("ClothTearSound", a_actor, 1.0f, 1.0f);
+			Rumbling::Once("ClothManager", a_actor, Rumble_Misc_TearAllClothes, 0.095f);
 		}
 	}
 

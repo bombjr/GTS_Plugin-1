@@ -8,11 +8,9 @@ using namespace RE;
 namespace Gts {
 	struct GrabData {
 		public:
-			GrabData(TESObjectREFR* tiny, float strength);
-			void SetGrabbed(bool enable);
-			bool GetGrabbed();
+			GrabData(TESObjectREFR* tiny, float strength);;
 			TESObjectREFR* tiny;
-			bool holding;
+			bool holding = false;
 			float strength;
 	};
 
@@ -41,8 +39,6 @@ namespace Gts {
 			static void GrabActor(Actor* giant, TESObjectREFR* tiny);
 			static void Release(Actor* giant);
 
-			bool GetHolding(Actor* giant);
-			static void SetHolding(Actor* giant, bool enable);
 			// Get object being held
 			static TESObjectREFR* GetHeldObj(Actor* giant);
 			// Same as `GetHeldObj` but with a conversion to actor if possible

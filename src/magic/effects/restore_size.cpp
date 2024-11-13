@@ -12,16 +12,16 @@
 namespace {
 	void Task_RestoreSizeTask(Actor* caster, bool dual_casted) {
 
-		float Power = 0.00120;
+		float Power = 0.00120f;
 
 		if (dual_casted) {
-			Power *= 2.0;
+			Power *= 2.0f;
 		}
 
 		std::string name = std::format("RevertSize_{}", caster->formID);
 		ActorHandle casterhandle = caster->CreateRefHandle();
 
-		TaskManager::RunFor(name, 180.0, [=](auto& progressData) {
+		TaskManager::RunFor(name, 180.0f, [=](auto& progressData) {
 			if (!casterhandle) {
 				return false;
 			}
@@ -31,12 +31,12 @@ namespace {
 			if (!BlockSound) {
 				float Volume = std::clamp(get_visual_scale(casterref) * 0.1f, 0.15f, 1.0f);
 				ApplyActionCooldown(casterref, CooldownSource::Misc_RevertSound);
-				Runtime::PlaySound("shrinkSound", casterref, Volume, 1.0);
+				Runtime::PlaySound("shrinkSound", casterref, Volume, 1.0f);
 			}
 
-			Rumbling::Once("RestoreSizeOther", casterref, 0.6, 0.05);
+			Rumbling::Once("RestoreSizeOther", casterref, 0.6f, 0.05f);
 
-			if (!Revert(casterref, Power, Power/2.5)) { // Terminate the task once revert size is complete
+			if (!Revert(casterref, Power, Power/2.5f)) { // Terminate the task once revert size is complete
 				return false;
 			}
 			return true;
@@ -55,7 +55,7 @@ namespace Gts {
 			return;
 		}
 		float Volume = std::clamp(get_visual_scale(caster) * 0.1f, 0.10f, 1.0f);
-		Runtime::PlaySound("shrinkSound", caster, Volume, 1.0);
+		Runtime::PlaySound("shrinkSound", caster, Volume, 1.0f);
 
 		//log::info("Starting Reset Size of {}", caster->GetDisplayFullName());
 

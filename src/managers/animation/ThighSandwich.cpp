@@ -101,11 +101,11 @@ namespace {
 
 		if (tiny && tiny->Is3DLoaded()) {
 			float sizedifference = get_visual_scale(giant)/ (get_visual_scale(tiny) * GetSizeFromBoundingBox(tiny));
-			float additionaldamage = 1.0 + sizemanager.GetSizeVulnerability(tiny); // Get size damage debuff from enemy
+			float additionaldamage = 1.0f + sizemanager.GetSizeVulnerability(tiny); // Get size damage debuff from enemy
 			float normaldamage = std::clamp(sizemanager.GetSizeAttribute(giant, SizeAttribute::Normal), 1.0f, 999.0f);
 			float damage = Damage_ThighSandwich_Impact * sizedifference * animSpeed * mult * normaldamage * GetPerkBonus_Thighs(giant);
 			if (HasSMT(giant)) {
-				damage *= 1.5;
+				damage *= 1.5f;
 			}
 
 			if (CanDoDamage(giant, tiny, false)) {
@@ -122,7 +122,7 @@ namespace {
 				CrushManager::GetSingleton().Crush(giant, tiny);
 				
 				PrintDeathSource(giant, tiny, DamageSource::ThighSandwiched);
-				AdvanceQuestProgression(giant, tiny, QuestStage::HandCrush, 1.0, false);
+				AdvanceQuestProgression(giant, tiny, QuestStage::HandCrush, 1.0f, false);
 				auto node = find_node(giant, "NPC R FrontThigh");
 				
 				PlayCrushSound(giant, node, false, false);
@@ -172,7 +172,7 @@ namespace {
 			sandwichdata.MoveActors(true);
 			DisableCollisions(tiny, &data.giant);
 		}
-		StartBodyRumble("BodyRumble", data.giant, 0.5, 0.25);
+		StartBodyRumble("BodyRumble", data.giant, 0.5f, 0.25f);
 	}
 	void GTSSandwich_EnableRune(AnimationEventData& data) {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
@@ -181,78 +181,78 @@ namespace {
 		sandwichdata.EnableRuneTask(&data.giant, false); // Start Growing the Rune
 	}
 	void GTSSandwich_SitStart(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", true, 0.25);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", true, 0.25f);
 	}
 	void GTSSandwich_MoveBody_end(AnimationEventData& data) {
 		StopBodyRumble("BodyRumble", data.giant);
 	}
 	void GTSSandwich_MoveLL_start(AnimationEventData& data) {
-		data.stage = 1.0;
+		data.stage = 1;
 		data.canEditAnimSpeed = true;
-		data.animSpeed = 1.66;
+		data.animSpeed = 1.66f;
 		if (data.giant.formID != 0x14) {
-			data.animSpeed = 1.66 + GetRandomBoost();
+			data.animSpeed = 1.66f + GetRandomBoost();
 		}
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		sandwichdata.EnableSuffocate(false);
-		StartLeftLegRumbling("LLSandwich", data.giant, 0.10, 0.12);
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", true, 1.0);
+		StartLeftLegRumbling("LLSandwich", data.giant, 0.10f, 0.12f);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", true, 1.0f);
 	}
 
 	void GTSSandwich_MoveLL_start_H(AnimationEventData& data) {
-		data.stage = 1.0;
+		data.stage = 1;
 		data.canEditAnimSpeed = true;
-		data.animSpeed = 1.66;
+		data.animSpeed = 1.66f;
 		if (data.giant.formID != 0x14) {
-			data.animSpeed = 1.66 + GetRandomBoost();
+			data.animSpeed = 1.66f + GetRandomBoost();
 		}
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		sandwichdata.EnableSuffocate(false);
-		StartLeftLegRumbling("LLSandwichHeavy", data.giant, 0.15, 0.15);
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", true, 2.5);
+		StartLeftLegRumbling("LLSandwichHeavy", data.giant, 0.15f, 0.15f);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", true, 2.5f);
 	}
 
 	void GTSSandwich_ThighImpact(AnimationEventData& data) {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
-		Runtime::PlaySoundAtNode("ThighSandwichImpact", &data.giant, 1.0, 1.0, "AnimObjectB");
+		Runtime::PlaySoundAtNode("ThighSandwichImpact", &data.giant, 1.0f, 1.0f, "AnimObjectB");
 		sandwichdata.EnableSuffocate(true);
 
 		
 		for (auto tiny: sandwichdata.GetActors()) {
-			DoThighDamage(&data.giant, tiny, data.animSpeed, 1.0, 1.0);
+			DoThighDamage(&data.giant, tiny, data.animSpeed, 1.0f, 1.0f);
 			tiny->NotifyAnimationGraph("ragdoll");
 			AllowToBeCrushed(tiny, true);
 		}
 		
-		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact, 0.15, "AnimObjectA", 0.0);
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 1.0);
+		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact, 0.15f, "AnimObjectA", 0.0f);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 1.0f);
 	}
 
 	void GTSSandwich_ThighImpact_H(AnimationEventData& data) {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
-		Runtime::PlaySoundAtNode("ThighSandwichImpact", &data.giant, 1.2, 1.0, "AnimObjectA");
+		Runtime::PlaySoundAtNode("ThighSandwichImpact", &data.giant, 1.2f, 1.0f, "AnimObjectA");
 		sandwichdata.EnableSuffocate(true);
 		
 		for (auto tiny: sandwichdata.GetActors()) {
-			DoThighDamage(&data.giant, tiny, data.animSpeed, 2.2, 0.75);
+			DoThighDamage(&data.giant, tiny, data.animSpeed, 2.2f, 0.75f);
 			Attacked(tiny, &data.giant);
 			tiny->NotifyAnimationGraph("ragdoll");
 			AllowToBeCrushed(tiny, true);
 		}
 		
-		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact_Heavy, 0.15, "AnimObjectA", 0.0);
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5);
+		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact_Heavy, 0.15f, "AnimObjectA", 0.0f);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5f);
 	}
 
 	void GTSSandwich_MoveLL_end(AnimationEventData& data) {
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		StopLeftLegRumbling("LLSandwich", data.giant);
 	}
 
 	void GTSSandwich_MoveLL_end_H(AnimationEventData& data) {
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 		StopLeftLegRumbling("LLSandwichHeavy", data.giant);
 	}
 
@@ -267,12 +267,12 @@ namespace {
 		sandwichdata.EnableRuneTask(&data.giant, true); // Launch Rune Shrinking
 		for (auto tiny: sandwichdata.GetActors()) {
 			SetBeingHeld(tiny, false);
-			PushActorAway(&data.giant, tiny, 1.0);
+			PushActorAway(&data.giant, tiny, 1.0f);
 			EnableCollisions(tiny);
 		}
 		sandwichdata.MoveActors(false);
 
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5f);
 	}
 
 	void GTSSandwich_ThighAttack_start(AnimationEventData& data) {
@@ -290,8 +290,8 @@ namespace {
 		
 		sandwichdata.ReleaseAll();
 
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5);
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", false, 0.25);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5f);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", false, 0.25f);
 	}
 
 	void GTSSandwich_ExitAnim(AnimationEventData& data) {
@@ -301,31 +301,31 @@ namespace {
 			SetBeingHeld(tiny, false);
 			EnableCollisions(tiny);
 		}
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5);
+		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "KillerThighs", false, 2.5f);
 		ManageCamera(&data.giant, false, CameraTracking::Thigh_Sandwich); // Allow sandwich repeat
 	}
 
 	void GTSSandwich_FootImpact(AnimationEventData& data) {
 		float perk = GetPerkBonus_Thighs(&data.giant);
-		DoFootstepSound(&data.giant, 1.05, FootEvent::Right, RNode);
-		DoFootstepSound(&data.giant, 1.05, FootEvent::Left, LNode);
-		DoDustExplosion(&data.giant, 2.0, FootEvent::Right, RNode);
-		DoDustExplosion(&data.giant, 2.0, FootEvent::Left, LNode);
-		DoDamageEffect(&data.giant, Damage_ThighSandwich_FallDownImpact * perk, Radius_ThighSandwich_FootFallDown, 10, 0.20, FootEvent::Right, 1.0, DamageSource::CrushedRight);
-		DoDamageEffect(&data.giant, Damage_ThighSandwich_FallDownImpact * perk, Radius_ThighSandwich_FootFallDown, 10, 0.20, FootEvent::Left, 1.0, DamageSource::CrushedLeft);
+		DoFootstepSound(&data.giant, 1.05f, FootEvent::Right, RNode);
+		DoFootstepSound(&data.giant, 1.05f, FootEvent::Left, LNode);
+		DoDustExplosion(&data.giant, 2.0f, FootEvent::Right, RNode);
+		DoDustExplosion(&data.giant, 2.0f, FootEvent::Left, LNode);
+		DoDamageEffect(&data.giant, Damage_ThighSandwich_FallDownImpact * perk, Radius_ThighSandwich_FootFallDown, 10, 0.20f, FootEvent::Right, 1.0f, DamageSource::CrushedRight);
+		DoDamageEffect(&data.giant, Damage_ThighSandwich_FallDownImpact * perk, Radius_ThighSandwich_FootFallDown, 10, 0.20f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft);
 
-		DoLaunch(&data.giant, 0.85 * perk, 3.2, FootEvent::Right);
-		DoLaunch(&data.giant, 0.85 * perk, 3.2, FootEvent::Left);
+		DoLaunch(&data.giant, 0.85f * perk, 3.2f, FootEvent::Right);
+		DoLaunch(&data.giant, 0.85f * perk, 3.2f, FootEvent::Left);
 
 		
 		float shake_power = Rumble_ThighSandwich_DropDown/2 * GetHighHeelsBonusDamage(&data.giant, true);
 
 		if (HasSMT(&data.giant)) {
-			shake_power *= 2.0;
+			shake_power *= 2.0f;
 		}
 
-		Rumbling::Once("ThighDropDown_R", &data.giant, shake_power, 0.10, RNode, 0.0);
-		Rumbling::Once("ThighDropDown_L", &data.giant, shake_power, 0.10, LNode, 0.0);
+		Rumbling::Once("ThighDropDown_R", &data.giant, shake_power, 0.10f, RNode, 0.0f);
+		Rumbling::Once("ThighDropDown_L", &data.giant, shake_power, 0.10f, LNode, 0.0f);
 	}
 
 	void GTSBEH_Exit(AnimationEventData& data) {
@@ -350,7 +350,7 @@ namespace {
 			Sandwiching.StartSandwiching(pred, prey);
 			auto node = find_node(pred, "GiantessRune", false);
 			if (node) {
-				node->local.scale = 0.01;
+				node->local.scale = 0.01f;
 				update_node(node);
 			}
 		}
@@ -366,9 +366,9 @@ namespace {
 		Actor* player = GetPlayerOrControlled();
 		
 		if (IsGtsBusy(player)) {
-			float WasteStamina = 20.0;
+			float WasteStamina = 20.0f;
 			if (Runtime::HasPerk(player, "KillerThighs")) {
-				WasteStamina *= 0.65;
+				WasteStamina *= 0.65f;
 			}
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim("ThighAttack", player);
@@ -383,9 +383,9 @@ namespace {
 	void ThighSandwichHeavyAttackEvent(const InputEventData& data) {
 		auto player = GetPlayerOrControlled();
 		if (IsGtsBusy(player)) {
-			float WasteStamina = 35.0;
+			float WasteStamina = 35.0f;
 			if (Runtime::HasPerk(player, "KillerThighs")) {
-				WasteStamina *= 0.65;
+				WasteStamina *= 0.65f;
 			}
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim("ThighAttack_Heavy", player);

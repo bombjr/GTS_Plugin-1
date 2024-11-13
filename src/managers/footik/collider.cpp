@@ -98,7 +98,7 @@ namespace Gts {
 			ColliderActorData* actor_data = GetActorData(actor);
 			if (actor_data) {
 				float scale = get_visual_scale(actor); // /get_natural_scale(actor);
-				if (fabs(scale - 1.0) <= 1e-4) {
+				if (fabs(scale - 1.0f) <= 1e-4) {
 					continue;
 				}
 				actor_data->ApplyPose(actor, scale);

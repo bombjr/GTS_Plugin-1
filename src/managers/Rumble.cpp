@@ -20,9 +20,9 @@ namespace Gts {
 		state(RumbleState::RampingUp),
 		duration(duration),
 		shake_duration(shake_duration),
-		currentIntensity(Spring(0.0, halflife)),
+		currentIntensity(Spring(0.0f, halflife)),
 		node(node),
-		startTime(0.0) {
+		startTime(0.0f) {
 	}
 
 	RumbleData::RumbleData(float intensity, float duration, float halflife, float shake_duration, std::string_view node) : RumbleData(intensity, duration, halflife, shake_duration, std::string(node)) {
@@ -31,12 +31,12 @@ namespace Gts {
 	void RumbleData::ChangeTargetIntensity(float intensity) {
 		this->currentIntensity.target = intensity;
 		this->state = RumbleState::RampingUp;
-		this->startTime = 0.0;
+		this->startTime = 0.0f;
 	}
 	void RumbleData::ChangeDuration(float duration) {
 		this->duration = duration;
 		this->state = RumbleState::RampingUp;
-		this->startTime = 0.0;
+		this->startTime = 0.0f;
 	}
 
 	ActorRumbleData::ActorRumbleData()  : delay(Timer(0.40)) {
@@ -59,10 +59,10 @@ namespace Gts {
 	}
 
 	void Rumbling::Start(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node) {
-		Rumbling::For(tag, giant, intensity, halflife, node, 0, 0.0);
+		Rumbling::For(tag, giant, intensity, halflife, node, 0, 0.0f);
 	}
 	void Rumbling::Start(std::string_view tag, Actor* giant, float intensity, float halflife) {
-		Rumbling::For(tag, giant, intensity, halflife, "NPC COM [COM ]", 0, 0.0);
+		Rumbling::For(tag, giant, intensity, halflife, "NPC COM [COM ]", 0, 0.0f);
 	}
 	void Rumbling::Stop(std::string_view tagsv, Actor* giant) {
 		string tag = std::string(tagsv);
@@ -84,11 +84,11 @@ namespace Gts {
 	}
 
 	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node, float shake_duration) {
-		Rumbling::For(tag, giant, intensity, halflife, node, 1.0, shake_duration);
+		Rumbling::For(tag, giant, intensity, halflife, node, 1.0f, shake_duration);
 	}
 
 	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife) {
-		Rumbling::Once(tag, giant, intensity, halflife, "NPC Root [Root]", 0.0);
+		Rumbling::Once(tag, giant, intensity, halflife, "NPC Root [Root]", 0.0f);
 	}
 
 
@@ -136,7 +136,7 @@ namespace Gts {
 			// Now collect the data
 			//    - Multiple effects can add rumble to the same node
 			//    - We sum those effects up into cummulativeIntensity
-			float duration_override = 0.0;
+			float duration_override = 0.0f;
 			std::unordered_map<NiAVObject*, float> cummulativeIntensity;
 			for (const auto &[tag, rumbleData]: data.tags) {
 				duration_override = rumbleData.shake_duration;
@@ -151,27 +151,27 @@ namespace Gts {
 			//   - Since we can only have one rumble (skyrim limitation)
 			//     we do a weighted average to find the location to rumble from
 			//     and sum the intensities
-			NiPoint3 averagePos = NiPoint3(0.0, 0.0, 0.0);
+			NiPoint3 averagePos = NiPoint3(0.0f, 0.0f, 0.0f);
 			
-			float totalWeight = 0.0;
+			float totalWeight = 0.0f;
 
 			for (const auto &[node, intensity]: cummulativeIntensity) {
 				auto& point = node->world.translate;
 				averagePos = averagePos + point*intensity;
 				totalWeight += intensity;
 
-				if (get_visual_scale(actor) >= 6.0) {
+				if (get_visual_scale(actor) >= 6.0f) {
 					float volume = 4 * get_visual_scale(actor)/get_distance_to_camera(point);
 					// Lastly play the sound at each node
 					if (data.delay.ShouldRun()) {
 						//log::info("Playing sound at: {}, Intensity: {}", actor->GetDisplayFullName(), intensity);
-						Runtime::PlaySoundAtNode("RumbleWalkSound", actor, volume, 1.0, node);
+						Runtime::PlaySoundAtNode("RumbleWalkSound", actor, volume, 1.0f, node);
 					}
 				}
 			}
 
-			averagePos = averagePos * (1.0 / totalWeight);
-			ApplyShakeAtPoint(actor, 0.4 * totalWeight, averagePos, duration_override);
+			averagePos = averagePos * (1.0f / totalWeight);
+			ApplyShakeAtPoint(actor, 0.4f * totalWeight, averagePos, duration_override);
 
 			// There is a way to patch camera not shaking more than once so we won't need totalWeight hacks, but it requires ASM hacks
 			// Done by this mod: https://github.com/jarari/ImmersiveImpactSE/blob/b1e0be03f4308718e49072b28010c38c455c394f/HitStopManager.cpp#L67

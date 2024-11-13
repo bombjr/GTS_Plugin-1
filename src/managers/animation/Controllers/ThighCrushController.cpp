@@ -23,9 +23,9 @@
 
 namespace {
 
-	const float MINIMUM_THIGH_DISTANCE = 58.0;
+	const float MINIMUM_THIGH_DISTANCE = 58.0f;
 	const float THIGH_ANGLE = 75;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 }
 
 namespace Gts {
@@ -93,18 +93,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(THIGH_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(THIGH_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(THIGH_ANGLE*PI/180.0);
+			return cosTheta <= cos(THIGH_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		// Reduce vector size
@@ -143,7 +143,7 @@ namespace Gts {
 		float MINIMUM_THIGHCRUSH_SCALE = Action_AI_ThighCrush;
 
 		if (pred->formID == 0x14) {
-			MINIMUM_THIGHCRUSH_SCALE = 1.5; // Used to freeze tinies, Player Only
+			MINIMUM_THIGHCRUSH_SCALE = 1.5f; // Used to freeze tinies, Player Only
 		}
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();

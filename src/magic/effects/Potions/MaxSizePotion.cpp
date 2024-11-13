@@ -30,13 +30,13 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("EffectSizePotionExtreme")) {
-			this->Power = 0.35;
+			this->Power = 0.35f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectSizePotionStrong")) {
-			this->Power = 0.20;
+			this->Power = 0.20f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectSizePotionNormal")) {
-			this->Power = 0.15;
+			this->Power = 0.15f;
 		} else if (base_spell == Runtime::GetMagicEffect("EffectSizePotionWeak")) {
-			this->Power = 0.10;
+			this->Power = 0.10f;
 		}
 	}
 

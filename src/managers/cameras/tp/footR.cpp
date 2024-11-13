@@ -19,7 +19,7 @@ namespace Gts {
 			auto rootModel = player->Get3D(false);
 			if (rootModel) {
 				auto playerTrans = rootModel->world;
-				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0;  // Only do translation/rotation
+				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0f;  // Only do translation/rotation
 				auto transform = playerTrans.Invert();
 				auto rightFoot = find_node(player, rightFootLookup);
 				if (rightFoot != nullptr) {
@@ -30,7 +30,7 @@ namespace Gts {
 
 					this->smoothFootPos.target.z += OFFSET*playerScale;
 					if (highheelOffset.Length() > 1e-4) {
-						this->smoothFootPos.target -= highheelOffset * 1.6;
+						this->smoothFootPos.target -= highheelOffset * 1.6f;
 					}
 				}
 			}

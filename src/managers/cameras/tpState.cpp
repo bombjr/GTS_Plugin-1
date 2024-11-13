@@ -35,7 +35,7 @@ namespace Gts {
 					auto rootModel = player->Get3D(false);
 					if (rootModel) {
 						auto playerTrans = rootModel->world;
-						playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0;  // Only do translation/rotation
+						playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0f;  // Only do translation/rotation
 						auto transform = playerTrans.Invert();
 						NiPoint3 lookAt = CompuleLookAt(boneTarget.zoomScale);
 						NiPoint3 localLookAt = transform*lookAt;
@@ -59,14 +59,14 @@ namespace Gts {
 						for (auto bone: bones) {
 							auto worldPos = bone->world * NiPoint3();
 							if (IsDebugEnabled()) {
-								DebugAPI::DrawSphere(glm::vec3(worldPos.x, worldPos.y, worldPos.z), 1.0, 10, {1.0, 1.0, 0.0, 1.0});
+								DebugAPI::DrawSphere(glm::vec3(worldPos.x, worldPos.y, worldPos.z), 1.0f, 10, {1.0f, 1.0f, 0.0f, 1.0f});
 							}
 							auto localPos = transform * worldPos;
-							bonePos += localPos * (1.0/bone_count);
+							bonePos += localPos * (1.0f/bone_count);
 						}
 						NiPoint3 worldBonePos = playerTrans * bonePos;
 						if (IsDebugEnabled()) {
-							DebugAPI::DrawSphere(glm::vec3(worldBonePos.x, worldBonePos.y, worldBonePos.z), 1.0, 10, {0.0, 1.0, 0.0, 1.0});
+							DebugAPI::DrawSphere(glm::vec3(worldBonePos.x, worldBonePos.y, worldBonePos.z), 1.0f, 10, {0.0f, 1.0f, 0.0f, 1.0f});
 						}
 						smoothedBonePos.target = bonePos;
 						pos += smoothedBonePos.value;

@@ -19,7 +19,7 @@
 
 namespace {
 	void SpawnCrawlParticle(Actor* actor, float scale, NiPoint3 position) {
-		SpawnParticle(actor, 4.60, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 1.8, 7, nullptr);
+		SpawnParticle(actor, 4.60f, "GTS/Effects/Footstep.nif", NiMatrix3(), position, scale * 1.8f, 7, nullptr);
 	}
 
 	std::string_view GetImpactNode(CrawlEvent kind) {
@@ -44,12 +44,12 @@ namespace Gts {
 			auto profiler = Profilers::Profile("CrawlSounds");
 			auto player = PlayerCharacter::GetSingleton();
 			if (actor->formID == 0x14 && HasSMT(actor)) {
-				scale *= 1.85;
+				scale *= 1.85f;
 			}
 			bool LegacySounds = Persistent::GetSingleton().legacy_sounds; // Determine if we should play old pre 2.00 update sounds
-			if (scale > 1.2 && !actor->AsActorState()->IsSwimming()) {
+			if (scale > 1.2f && !actor->AsActorState()->IsSwimming()) {
 				float movement = FootStepManager::Volume_Multiply_Function(actor, foot_kind);
-				scale *= 0.75;
+				scale *= 0.75f;
 
 				if (Runtime::GetBool("EnableGiantSounds")) {
 					FootStepManager::PlayLegacySounds(movement, node, foot_kind, scale);
@@ -73,36 +73,36 @@ namespace Gts {
 			return; // Make sure to return if node doesn't exist, no CTD in that case
 		}
 
-		float smt = 1.0;
-		float minimal_scale = 1.5;
+		float smt = 1.0f;
+		float minimal_scale = 1.5f;
 
 		LaunchActor::GetSingleton().LaunchAtCustomNode(actor, launch_dist, damage_dist, multiplier, node); // Launch actors
 		// Order matters here since we don't want to make it even stronger during SMT, so that's why SMT check is after this function
 		
 		if (actor->formID == 0x14) {
 			if (HasSMT(actor)) {
-				smt = 2.0; // Stronger Camera Shake
-				multiplier *= 1.8;
-				minimal_scale = 1.0;
-				scale += 0.75;
-				damage *= 2.0;
+				smt = 2.0f; // Stronger Camera Shake
+				multiplier *= 1.8f;
+				minimal_scale = 1.0f;
+				scale += 0.75f;
+				damage *= 2.0f;
 			}
 		}
 
 		//std::string rumbleName = std::format("{}{}", tag, actor->formID);
 		std::string rumbleName = std::format("CrawlRumble_{}", actor->formID);
-		Rumbling::Once(rumbleName, actor, Rumble_Crawl_KneeHand_Impact/2 * multiplier * smt, 0.02, name, 0.0); // Do Rumble
+		Rumbling::Once(rumbleName, actor, Rumble_Crawl_KneeHand_Impact/2 * multiplier * smt, 0.02f, name, 0.0f); // Do Rumble
 
-		DoDamageAtPoint(actor, damage_dist, damage, node, 20, 0.05, crushmult, Cause); // Do size-related damage
+		DoDamageAtPoint(actor, damage_dist, damage, node, 20, 0.05f, crushmult, Cause); // Do size-related damage
 		DoCrawlingSounds(actor, scale, node, FootEvent::Left);                      // Do impact sounds
 
 		if (scale >= minimal_scale && !actor->AsActorState()->IsSwimming()) {
 			NiPoint3 node_location = node->world.translate;
 
-			NiPoint3 ray_start = node_location + NiPoint3(0.0, 0.0, meter_to_unit(-0.05*scale)); // Shift up a little
-			NiPoint3 ray_direction(0.0, 0.0, -1.0);
+			NiPoint3 ray_start = node_location + NiPoint3(0.0f, 0.0f, meter_to_unit(-0.05f*scale)); // Shift up a little
+			NiPoint3 ray_direction(0.0f, 0.0f, -1.0f);
 			bool success = false;
-			float ray_length = meter_to_unit(std::max(1.05*scale, 1.05));
+			float ray_length = meter_to_unit(std::max(1.05f*scale, 1.05f));
 			NiPoint3 explosion_pos = CastRay(actor, ray_start, ray_direction, ray_length, success);
 
 			if (!success) {
@@ -128,10 +128,10 @@ namespace Gts {
 		}
 		float giantScale = get_visual_scale(giant);
 
-		float SCALE_RATIO = 1.25;
+		float SCALE_RATIO = 1.25f;
 		if (HasSMT(giant)) {
-			SCALE_RATIO = 0.9;
-			giantScale *= 1.3;
+			SCALE_RATIO = 0.9f;
+			giantScale *= 1.3f;
 		}
 
 		NiPoint3 NodePosition = node->world.translate;
@@ -141,7 +141,7 @@ namespace Gts {
 		// Make a list of points to check
 
 		if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
-			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance, 300.0);
+			DebugAPI::DrawSphere(glm::vec3(NodePosition.x, NodePosition.y, NodePosition.z), maxDistance, 300);
 		}
 
 		NiPoint3 giantLocation = giant->GetPosition();
@@ -154,7 +154,7 @@ namespace Gts {
 					if ((actorLocation-giantLocation).Length() <= CheckDistance) {
 						
 						int nodeCollisions = 0;
-						float force = 0.0;
+						float force = 0.0f;
 
 						auto model = otherActor->GetCurrent3D();
 
@@ -163,7 +163,7 @@ namespace Gts {
 								float distance = (NodePosition - a_obj.world.translate).Length() - Collision_Distance_Override;
 								if (distance <= maxDistance) {
 									nodeCollisions += 1;
-									force = 1.0 - distance / maxDistance;
+									force = 1.0f - distance / maxDistance;
 									return false;
 								}
 								return true;
@@ -172,11 +172,11 @@ namespace Gts {
 						if (nodeCollisions > 0) {
 							Utils_PushCheck(giant, otherActor, Get_Bone_Movement_Speed(giant, Cause)); 
 
-							if (IsButtCrushing(giant) && !IsBeingEaten(otherActor) && GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, true) > 1.2) {
-								PushActorAway(giant, otherActor, 1.0);
+							if (IsButtCrushing(giant) && !IsBeingEaten(otherActor) && GetSizeDifference(giant, otherActor, SizeType::VisualScale, false, true) > 1.2f) {
+								PushActorAway(giant, otherActor, 1.0f);
 							}
 							
-							CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, random, Cause, true);
+							CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
 						}
 					}
 				}
@@ -203,13 +203,13 @@ namespace Gts {
 		} // CTD protection
 
 
-		DoDamageAtPoint(giant, Radius_Crawl_KneeIdle, Damage_Crawl_Idle, LC, random, bonedamage, 2.5, DamageSource::KneeIdleL);         // Call Left Calf
-		DoDamageAtPoint(giant, Radius_Crawl_KneeIdle, Damage_Crawl_Idle, RC, random, bonedamage, 2.5, DamageSource::KneeIdleR);        // Call Right Calf
+		DoDamageAtPoint(giant, Radius_Crawl_KneeIdle, Damage_Crawl_Idle, LC, static_cast<float>(random), bonedamage, 2.5f, DamageSource::KneeIdleL);         // Call Left Calf
+		DoDamageAtPoint(giant, Radius_Crawl_KneeIdle, Damage_Crawl_Idle, RC, static_cast<float>(random), bonedamage, 2.5f, DamageSource::KneeIdleR);        // Call Right Calf
 
 		if (!IsTransferingTiny(giant)) { // Only do if we don't have someone in our left hand
-			DoDamageAtPoint(giant, Radius_Crawl_HandIdle, Damage_Crawl_Idle, LH, random, bonedamage, 2.5, DamageSource::HandIdleL); // Call Left Hand
+			DoDamageAtPoint(giant, Radius_Crawl_HandIdle, Damage_Crawl_Idle, LH, static_cast<float>(random), bonedamage, 2.5f, DamageSource::HandIdleL); // Call Left Hand
 		}
 
-		DoDamageAtPoint(giant, Radius_Crawl_HandIdle, Damage_Crawl_Idle, RH, random, bonedamage, 2.5, DamageSource::HandIdleR);    // Call Right Hand
+		DoDamageAtPoint(giant, Radius_Crawl_HandIdle, Damage_Crawl_Idle, RH, static_cast<float>(random), bonedamage, 2.5f, DamageSource::HandIdleR);    // Call Right Hand
 	}
 }

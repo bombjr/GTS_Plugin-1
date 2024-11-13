@@ -71,13 +71,13 @@ namespace Gts {
 		// than multiplying it ourselves
 		string node_name = "NPC Root [Root]";
 		auto node = find_node(actor, node_name, false);
-		float allScale = 1.0;
+		float allScale = 1.0f;
 		if (node) {
 			// Grab the world scale which includes all effects from root
 			// to here (the lowest scalable node)
 			allScale = node->world.scale;
 
-			float worldScale = 1.0;
+			float worldScale = 1.0f;
 			auto rootnode = actor->Get3D(false);
 			if (rootnode) {
 				auto worldNode = rootnode->parent;
@@ -120,12 +120,12 @@ namespace Gts {
 				case SizeMethod::RootScale:
 					return initScale.npc;
 				default:
-					return 1.0;
+					return 1.0f;
 				}
 			}
 		catch (exception e) {
 			logger::error("GetInitialScale Failed {}", e.what());
-		return 1.0;
+		return 1.0f;
 		}
 	}
 
@@ -133,17 +133,17 @@ namespace Gts {
 		std::string name = std::format("UpdateRace_{}", actor->formID);
 		ActorHandle gianthandle = actor->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		//double Start = Time::WorldTimeElapsed();
 		
 		TaskManager::RunOnce(name, [=](auto& progressData) { // Reset it one frame later, called by SwitchRaceHook only, inside Hooks/RaceMenu.cpp 
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			//double Finish = Time::WorldTimeElapsed();
 
 			auto& initScale = GetActorInitialScales(giantref);
-			initScale.model = 1.0 * giantref->GetScale();
+			initScale.model = 1.0f * giantref->GetScale();
 			return false;
 		});
 		
@@ -217,7 +217,7 @@ namespace Gts {
 		if (data) {
 			return data->scaleOverride;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	float get_npcnode_scale(Actor* actor) {
@@ -231,7 +231,7 @@ namespace Gts {
 		if (first_node) {
 			return first_node->local.scale;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	float get_npcparentnode_scale(Actor* actor) {
@@ -247,20 +247,20 @@ namespace Gts {
 		if (!childNode) {
 			childNode = find_node(actor, node_name, true);
 			if (!childNode) {
-				return -1.0;
+				return -1.0f;
 			}
 		}
 		auto parent = childNode->parent;
 		if (parent) {
 			return parent->local.scale;
 		}
-		return -1.0; //
+		return -1.0f; //
 	}
 
 	float get_model_scale(Actor* actor) {
 		// This will set the scale of the root npc node
 		if (!actor->Is3DLoaded()) {
-			return -1.0;
+			return -1.0f;
 		}
 
 		auto model = actor->Get3D(false);
@@ -271,7 +271,7 @@ namespace Gts {
 		if (first_model) {
 			return first_model->local.scale;
 		}
-		return -1.0;
+		return -1.0f;
 	}
 
 	float get_scale(Actor* actor) {
@@ -293,7 +293,7 @@ namespace Gts {
 					return get_model_scale(actor);
 				}
 			default:
-				return -1.0;
+				return -1.0f;
 		}
 	}
 

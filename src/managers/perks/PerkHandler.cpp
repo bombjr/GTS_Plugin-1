@@ -13,13 +13,13 @@ using namespace std;
 
 namespace {
     float Perk_Acceleration_GetBonus(Actor* giant) {
-        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.01;
-        return 1.05 + bonus;
+        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.01f;
+        return 1.05f + bonus;
     }
 
     float Perk_LifeAbsorption_GetBonus(Actor* giant) {
-        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.03;
-        return 0.25 + bonus;
+        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.03f;
+        return 0.25f + bonus;
     }
 
     void ManageSpellPerks(const AddPerkEvent& evt) {
@@ -65,14 +65,14 @@ namespace {
     void StartStackDecayTask(Actor* giant, float stack_power, TempActorData* data) {
         std::string name = std::format("StackDecay_{}_{}", giant->formID, Time::WorldTimeElapsed());
         ActorHandle gianthandle = giant->CreateRefHandle();
-        float Start = Time::WorldTimeElapsed();
+        double Start = Time::WorldTimeElapsed();
 
-        float stack_duration = 240.0;
+        double stack_duration = 240.0;
         if (!data) {
             return;
         }
-        if (data->Perk_lifeForceStolen < 0.0) {
-            data->Perk_lifeForceStolen = 0.0;
+        if (data->Perk_lifeForceStolen < 0.0f) {
+            data->Perk_lifeForceStolen = 0.0f;
         }
         if (data->Perk_lifeForceStacks < 0) {
             data->Perk_lifeForceStacks = 0;
@@ -88,7 +88,7 @@ namespace {
                 return false;
             }
             Actor* giantref = gianthandle.get().get();
-            float Finish = Time::WorldTimeElapsed();
+            double Finish = Time::WorldTimeElapsed();
 
             if (Finish - Start >= stack_duration) {
                 if (data) {
@@ -156,10 +156,10 @@ namespace Gts {
                 auto data = Transient::GetSingleton().GetActorData(actor);
                 if (data) {
                     if (evt.perk == Runtime::GetPerk("Acceleration")) {
-                        data->Perk_BonusActionSpeed = 1.0;
+                        data->Perk_BonusActionSpeed = 1.0f;
                     }
                     if (evt.perk == Runtime::GetPerk("LifeAbsorption")) {
-                        data->Perk_lifeForceStolen = 0.0;
+                        data->Perk_lifeForceStolen = 0.0f;
                         data->Perk_lifeForceStacks = 0;
                     }
                 }

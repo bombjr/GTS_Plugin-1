@@ -26,8 +26,8 @@ namespace {
 		auto object = find_node(giant, node);
 		if (object) {
 			NiPoint3 ray_start = object->world.translate;
-			ray_start.z += 40.0; // overrize .z with tiny .z + 40, so ray starts from above a bit
-			NiPoint3 ray_direction(0.0, 0.0, -1.0);
+			ray_start.z += 40.0f; // overrize .z with tiny .z + 40, so ray starts from above a bit
+			NiPoint3 ray_direction(0.0f, 0.0f, -1.0f);
 
 			float ray_length = 180 * get_visual_scale(giant);
 
@@ -36,14 +36,14 @@ namespace {
 				return endpos;
 			}
 		}
-		return NiPoint3(0.0, 0.0, 0.0);
+		return NiPoint3(0.0f, 0.0f, 0.0f);
 	}
 
 	NiPoint3 CastRayDownwards(Actor* tiny) {
 		bool success = false;
 		NiPoint3 ray_start = tiny->GetPosition();
-		ray_start.z += 90.0; // overrize .z with tiny .z + 90, so ray starts from above a bit
-		NiPoint3 ray_direction(0.0, 0.0, -1.0);
+		ray_start.z += 90.0f; // overrize .z with tiny .z + 90, so ray starts from above a bit
+		NiPoint3 ray_direction(0.0f, 0.0f, -1.0f);
 
 		float ray_length = 800;
 
@@ -69,7 +69,7 @@ namespace Gts {
 		}
 		auto charcont = tiny->GetCharController();
 		if (charcont) {
-			charcont->SetLinearVelocityImpl((0.0, 0.0, 0.0, 0.0)); // Needed so Actors won't fall down.
+			charcont->SetLinearVelocityImpl((0.0f, 0.0f, 0.0f, 0.0f)); // Needed so Actors won't fall down.
 		}
 		tiny->SetPosition(point, true);
 		return true;
@@ -92,11 +92,11 @@ namespace Gts {
 
 		auto charcont = tiny->GetCharController();
 		if (charcont) {
-			charcont->SetLinearVelocityImpl((0.0, 0.0, 0.0, 0.0)); // Needed so Actors won't fall down.
+			charcont->SetLinearVelocityImpl((0.0f, 0.0f, 0.0f, 0.0f)); // Needed so Actors won't fall down.
 		}
 
 		if (IsDebugEnabled()) {
-			DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), 6.0, 40, {1.0, 0.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), 6.0f, 40, {1.0f, 0.0f, 0.0f, 1.0f});
 		}
 
 		return true;
@@ -204,12 +204,12 @@ namespace Gts {
 
 		float hh = hhOffsetbase[2];
 		// Make a list of points to check
-		float Forward = 8 - (hh * 0.6); //Runtime::GetFloat("cameraAlternateX"); // 8 is ok, 5 with HH
+		float Forward = 8 - (hh * 0.6f); //Runtime::GetFloat("cameraAlternateX"); // 8 is ok, 5 with HH
 		float UpDown = 9; //Runtime::GetFloat("cameraAlternateY"); // 8 too
 
 
 		std::vector<NiPoint3> points = {
-			NiPoint3(0, Forward, -(UpDown + hh * 0.65)),
+			NiPoint3(0, Forward, -(UpDown + hh * 0.65f)),
 		};
 		std::tuple<NiAVObject*, NiMatrix3> Coords(Foot, footRotMat);
 
@@ -244,8 +244,8 @@ namespace Gts {
 			log::info("FingerB not found");
 			return false;
 		}
-		NiPoint3 coords = (FingerA->world.translate + FingerB->world.translate) / 2.0;
-		coords.z -= 3.0;
+		NiPoint3 coords = (FingerA->world.translate + FingerB->world.translate) / 2.0f;
+		coords.z -= 3.0f;
 		return AttachTo(anyGiant, anyTiny, coords);
 	}
 
@@ -274,7 +274,7 @@ namespace Gts {
 			"L Breast02",
 			"R Breast02"
 		};
-		std::uint32_t bone_count = bone_names.size();
+		std::uint32_t bone_count = static_cast<uint32_t>(bone_names.size());
 		for (auto bone_name: bone_names) {
 			auto bone = find_node(giant, bone_name);
 			if (!bone) {
@@ -282,15 +282,15 @@ namespace Gts {
 				Notify("Suggestion: install XP32 skeleton.");
 				return false;
 			}
-			targetB += (bone->world * NiPoint3()) * (1.0/bone_count);
+			targetB += (bone->world * NiPoint3()) * (1.0f/bone_count);
 		}
 
 		// scaleFactor = std::clamp(scaleFactor, 0.0f, 1.0f);
-		auto targetPoint = targetA*(scaleFactor) + targetB*(1.0 - scaleFactor);
+		auto targetPoint = targetA*(scaleFactor) + targetB*(1.0f - scaleFactor);
 		if (IsDebugEnabled()) {
-			DebugAPI::DrawSphere(glm::vec3(targetA.x, targetA.y, targetA.z), 2.0, 40, {1.0, 0.0, 0.0, 1.0});
-			DebugAPI::DrawSphere(glm::vec3(targetB.x, targetB.y, targetB.z), 2.0, 40, {0.0, 1.0, 0.0, 1.0});
-			DebugAPI::DrawSphere(glm::vec3(targetPoint.x, targetPoint.y, targetPoint.z), 2.0, 40, {0.0, 0.0, 1.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(targetA.x, targetA.y, targetA.z), 2.0f, 40, {1.0f, 0.0f, 0.0f, 1.0f});
+			DebugAPI::DrawSphere(glm::vec3(targetB.x, targetB.y, targetB.z), 2.0f, 40, {0.0f, 1.0f, 0.0f, 1.0f});
+			DebugAPI::DrawSphere(glm::vec3(targetPoint.x, targetPoint.y, targetPoint.z), 2.0f, 40, {0.0f, 0.0f, 1.0f, 1.0f});
 		}
 
 		/*if (Attachment_GetTargetNode(giant) == AttachToNode::ObjectA) {
@@ -338,7 +338,7 @@ namespace Gts {
 				return false;
 			}
 			if (IsDebugEnabled()) {
-				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0, 10, {1.0, 1.0, 1.0, 1.0});
+				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0f, 10, {1.0f, 1.0f, 1.0f, 1.0f});
 			}
 			clevagePos += (bone->world * NiPoint3()) * (1.0f / bone_names.size());
 		}
@@ -352,7 +352,7 @@ namespace Gts {
 				return false;
 			}
 			if (IsDebugEnabled()) {
-				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0, 10, {1.0, 1.0, 1.0, 1.0});
+				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0f, 10, {1.0f, 1.0f, 1.0f, 1.0f});
 			}
 			centerBonePos += bone->world.translate  * (1.0f / center_bone_names.size());
 		}
@@ -366,7 +366,7 @@ namespace Gts {
 				return false;
 			}
 			if (IsDebugEnabled()) {
-				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0, 10, {1.0, 1.0, 1.0, 1.0});
+				DebugAPI::DrawSphere(glm::vec3(bone->world.translate.x, bone->world.translate.y, bone->world.translate.z), 2.0f, 10, {1.0f, 1.0f, 1.0f, 1.0f});
 			}
 			upBonePos += bone->world.translate  * (1.0f / up_bone_names.size());
 		}
@@ -381,23 +381,23 @@ namespace Gts {
 		NiPoint3 sideways = up.Cross(forward);
 		sideways.Unitize();
 		// Reorthorg
-		forward = up.Cross(sideways * -1.0);
+		forward = up.Cross(sideways * -1.0f);
 		forward.Unitize();
 		
 		NiMatrix3 breastRotation = NiMatrix3(sideways, forward, up);
 
 
 		// Manual offsets
-		float difference = GetSizeDifference(giant, tiny, SizeType::GiantessScale, false, false) * 0.15;
-		float offset_Y = Runtime::GetFloatOr("Cleavage_OffsetY", 1.0) * get_visual_scale(giant);
-		float offset_Z = Runtime::GetFloatOr("Cleavage_OffsetZ", 1.0) * get_visual_scale(giant);
+		float difference = GetSizeDifference(giant, tiny, SizeType::GiantessScale, false, false) * 0.15f;
+		float offset_Y = Runtime::GetFloatOr("Cleavage_OffsetY", 1.0f) * get_visual_scale(giant);
+		float offset_Z = Runtime::GetFloatOr("Cleavage_OffsetZ", 1.0f) * get_visual_scale(giant);
 
 		// FIX tiny falling into breasts based on size
 		offset_Y += difference;
 		offset_Z += difference;
 
 		// Sermite: Offset adjustment HERE
-		NiPoint3 offset = NiPoint3(0.0, offset_Y, offset_Z);
+		NiPoint3 offset = NiPoint3(0.0f, offset_Y, offset_Z);
 
 		
 
@@ -414,7 +414,7 @@ namespace Gts {
 		clevagePos += globalOffset;
 
 		if (IsDebugEnabled()) {
-			DebugAPI::DrawSphere(glm::vec3(clevagePos.x, clevagePos.y, clevagePos.z), 2.0, 10, {1.0, 0.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(clevagePos.x, clevagePos.y, clevagePos.z), 2.0f, 10, {1.0f, 0.0f, 0.0f, 1.0f});
 		}
 
 		if (IsCleavageZIgnored(giant)) {

@@ -17,6 +17,7 @@ namespace Gts {
 	float Time::WorldTimeDelta() {
 		return (*g_delta_time);
 	}
+
 	double Time::WorldTimeElapsed() {
 		return Time::GetSingleton().worldTimeElapsed;
 	}

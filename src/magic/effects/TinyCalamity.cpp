@@ -18,7 +18,7 @@ namespace {
 		if (transient) {
 			return transient->SMT_Bonus_Duration;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	float GetSMTPenalty(Actor* actor) {
@@ -26,14 +26,14 @@ namespace {
 		if (transient) {
 			return transient->SMT_Penalty_Duration;
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	void NullifySMTDuration(Actor* actor) {
 		auto transient = Transient::GetSingleton().GetData(actor);
 		if (transient) {
-			transient->SMT_Bonus_Duration = 0.0;
-			transient->SMT_Penalty_Duration = 0.0;
+			transient->SMT_Bonus_Duration = 0.0f;
+			transient->SMT_Penalty_Duration = 0.0f;
 		}
 	}
 }
@@ -53,7 +53,7 @@ namespace Gts {
 		}
 		
 		
-		Runtime::PlaySoundAtNode("TinyCalamitySound", caster, 1.0, 1.0, "NPC COM [COM ]");
+		Runtime::PlaySoundAtNode("TinyCalamitySound", caster, 1.0f, 1.0f, "NPC COM [COM ]");
 		auto node = find_node(caster, "NPC Root [Root]");
 		StartShrinkingGaze(caster);
 
@@ -62,14 +62,14 @@ namespace Gts {
 			float scale = get_visual_scale(caster);
 			TinyCalamityExplosion(caster, 84);
 
-			SpawnParticle(caster, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0, 7, nullptr); // Spawn
-			Rumbling::For("TinyCalamity", caster, 4.0, 0.14, "NPC COM [COM ]", 0.10, 0.0);
+			SpawnParticle(caster, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0f, 7, nullptr); // Spawn
+			Rumbling::For("TinyCalamity", caster, 4.0f, 0.14f, "NPC COM [COM ]", 0.10f, 0.0f);
 		}
 	}
 
 	void TinyCalamity::OnUpdate() {
-		const float BASE_POWER = 0.00035;
-		const float DUAL_CAST_BONUS = 2.0;
+		const float BASE_POWER = 0.00035f;
+		const float DUAL_CAST_BONUS = 2.0f;
 		auto caster = GetCaster();
 		if (!caster) {
 			return;
@@ -81,19 +81,19 @@ namespace Gts {
 
 		float naturalscale = get_natural_scale(caster);
 
-		if (bonus > 0.5) {
+		if (bonus > 0.5f) {
 			GetActiveEffect()->duration += bonus;
 
 			NullifySMTDuration(caster);
 		}
-		if (penalty > 0.5) {
+		if (penalty > 0.5f) {
 			GetActiveEffect()->duration -= penalty;
 			NullifySMTDuration(caster);
 		}
-		if (CasterScale < 1.0) {// Disallow to be smaller than 1.5 to avoid weird interactions with others
-			set_target_scale(caster, 1.0);
-		} else if (CasterScale > 1.5) {
-			update_target_scale(caster, -0.0300, SizeEffectType::kNeutral);
+		if (CasterScale < 1.0f) {// Disallow to be smaller than 1.5 to avoid weird interactions with others
+			set_target_scale(caster, 1.0f);
+		} else if (CasterScale > 1.5f) {
+			update_target_scale(caster, -0.0300f, SizeEffectType::kNeutral);
 			if (warningtimer.ShouldRun() && caster->formID == 0x14) {
 				Notify("Im getting too big, it becomes hard to handle such power.");
 			}

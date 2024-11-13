@@ -43,9 +43,9 @@ namespace {
 	const float BASE_CHECK_DISTANCE = 20.0f;
 
 	float GetLaunchThreshold(Actor* giant) {
-		float threshold = 8.0;
+		float threshold = 8.0f;
 		if (Runtime::HasPerkTeam(giant, "RumblingFeet")) {
-			threshold *= 0.75;
+			threshold *= 0.75f;
 		}
 		return threshold;
 	}
@@ -74,11 +74,11 @@ namespace {
 
 	void LaunchWithDistance(Actor* giant, Actor* otherActor, float min_radius, float distance, float maxDistance, float power) {
 		// Manually used with Hand Attacks. Goal of this function is to prevent launching if actor is inside the hand
-		if (min_radius > 0.0 && distance < min_radius) {
+		if (min_radius > 0.0f && distance < min_radius) {
 			return;
 		}
 		if (AllowStagger(giant, otherActor)) {
-			float force = 1.0 - distance / maxDistance;
+			float force = 1.0f - distance / maxDistance;
 			LaunchActor::GetSingleton().ApplyLaunchTo(giant, otherActor, force, power);
 		}
 	}
@@ -105,25 +105,25 @@ namespace Gts {
 			return; // Disallow to launch if we're grinding an actor
 		}
 
-		float DamageMult = 0.5;
+		float DamageMult = 0.5f;
 		float giantSize = get_visual_scale(giant);
 		float tinySize = std::clamp(get_visual_scale(tiny), 0.5f, 999999.0f); // clamp else they will fly into the sky
 		float highheel = GetHighHeelsBonusDamage(tiny, true);
 
-		float startpower = Push_Actor_Upwards * highheel * (1.0 + Potion_GetMightBonus(giant)); // determines default power of launching someone
+		float startpower = Push_Actor_Upwards * highheel * (1.0f + Potion_GetMightBonus(giant)); // determines default power of launching someone
 		
 		if (Runtime::HasPerkTeam(giant, "RumblingFeet")) {
-			startpower *= 1.25;
+			startpower *= 1.25f;
 		}
 
-		float threshold = 6.0;
-		float SMT = 1.0;
+		float threshold = 6.0f;
+		float SMT = 1.0f;
 
 		bool OwnsPerk = false;
 
 		if (HasSMT(giant)) {
-			threshold = 0.92;
-			force += 0.02;
+			threshold = 0.92f;
+			force += 0.02f;
 		}
 		float Adjustment = GetSizeFromBoundingBox(tiny);
 		
@@ -132,12 +132,12 @@ namespace Gts {
 		bool IsLaunching = IsActionOnCooldown(tiny, CooldownSource::Damage_Launch);
 		if (!IsLaunching) {
 			if (sizeRatio > threshold) {
-				if (force >= 0.10) {
-					float power = (1.0 * launch_power) / Adjustment;
+				if (force >= 0.10f) {
+					float power = (1.0f * launch_power) / Adjustment;
 					if (Runtime::HasPerkTeam(giant, "DisastrousTremor")) {
-						DamageMult *= 2.0;
+						DamageMult *= 2.0f;
 						OwnsPerk = true;
-						power *= 1.5;
+						power *= 1.5f;
 					}
 
 					ApplyActionCooldown(tiny, CooldownSource::Damage_Launch);
@@ -148,13 +148,13 @@ namespace Gts {
 						if (OwnsPerk) { // Apply only when we have DisastrousTremor perk
 							update_target_scale(tiny, -(damage / 1500) * GetDamageSetting(), SizeEffectType::kShrink);
 
-							if (get_target_scale(tiny) < 0.12/Adjustment) {
-								set_target_scale(tiny, 0.12/Adjustment);
+							if (get_target_scale(tiny) < 0.12f/Adjustment) {
+								set_target_scale(tiny, 0.12f/Adjustment);
 							}
 						}
 					}
 
-					PushActorAway(giant, tiny, 1.0);
+					PushActorAway(giant, tiny, 1.0f);
 					NiPoint3 Push = NiPoint3(0, 0, startpower * GetLaunchPower(giant, sizeRatio) * force * power);
 
 					std::string name = std::format("LaunchOther_{}_{}", giant->formID, tiny->formID);
@@ -166,7 +166,7 @@ namespace Gts {
 							double endTime = Time::WorldTimeElapsed();
 							auto tinyref = tinyHandle.get().get();
 							if ((endTime - startTime) > 0.05) {
-								ApplyManualHavokImpulse(tinyref, Push.x, Push.y, Push.z, 1.0);
+								ApplyManualHavokImpulse(tinyref, Push.x, Push.y, Push.z, 1.0f);
 								return false;
 							}
 							return true;
@@ -174,7 +174,7 @@ namespace Gts {
 						return true;
 					});
 				}
-			} else if (sizeRatio > threshold * 0.86 && sizeRatio < threshold) {
+			} else if (sizeRatio > threshold * 0.86f && sizeRatio < threshold) {
 				ApplyActionCooldown(tiny, CooldownSource::Damage_Launch);
 				StaggerActor(tiny, 0.25f);
 			}
@@ -204,12 +204,12 @@ namespace Gts {
 	void LaunchActor::LaunchAtNode(Actor* giant, float radius, float power, std::string_view node) {
 		auto bone = find_node(giant, node);
 		if (bone) {
-			LaunchActor::LaunchAtCustomNode(giant, radius, 0.0, power, bone);
+			LaunchActor::LaunchAtCustomNode(giant, radius, 0.0f, power, bone);
 		}
 	}
 
 	void LaunchActor::LaunchAtNode(Actor* giant, float radius, float power, NiAVObject* node) {
-		LaunchActor::LaunchAtCustomNode(giant, radius, 0.0, power, node);
+		LaunchActor::LaunchAtCustomNode(giant, radius, 0.0f, power, node);
 	}
 
 	void LaunchActor::LaunchAtCustomNode(Actor* giant, float radius, float min_radius, float power, NiAVObject* node) {
@@ -225,8 +225,8 @@ namespace Gts {
 
 			float SCALE_RATIO = GetLaunchThreshold(giant)/GetMovementModifier(giant);
 			if (HasSMT(giant)) {
-				SCALE_RATIO = 1.0/GetMovementModifier(giant);
-				giantScale *= 1.5;
+				SCALE_RATIO = 1.0f/GetMovementModifier(giant);
+				giantScale *= 1.5f;
 			}
 
 			NiPoint3 point = node->world.translate;
@@ -234,7 +234,7 @@ namespace Gts {
 			float maxDistance = BASE_CHECK_DISTANCE * radius * giantScale;
 			
 			if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
-				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 600, {0.0, 0.0, 1.0, 1.0});
+				DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxDistance, 600, {0.0f, 0.0f, 1.0f, 1.0f});
 			}
 			
 			std::vector<NiPoint3> LaunchObjectPoints = {point};
@@ -268,8 +268,8 @@ namespace Gts {
 		float giantScale = get_visual_scale(giant);
 		float SCALE_RATIO = GetLaunchThreshold(giant)/GetMovementModifier(giant);
 		if (HasSMT(giant)) {
-			SCALE_RATIO = 1.0 / GetMovementModifier(giant);
-			giantScale *= 1.5;
+			SCALE_RATIO = 1.0f / GetMovementModifier(giant);
+			giantScale *= 1.5f;
 		}
 
 		radius *= GetHighHeelsBonusDamage(giant, true);
@@ -283,7 +283,7 @@ namespace Gts {
 			if (IsDebugEnabled() && (giant->formID == 0x14 || IsTeammate(giant) || EffectsForEveryone(giant))) {
 				for (auto footPoints: CoordsToCheck) {
 					footPoints.z -= HH;
-					DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 600, {0.0, 0.0, 1.0, 1.0});
+					DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 600, {0.0f, 0.0f, 1.0f, 1.0f});
 				}
 			}
 
@@ -300,7 +300,7 @@ namespace Gts {
 							float distance = (point - actorLocation).Length();
 							if (distance <= maxFootDistance) {
 								if (AllowStagger(giant, otherActor)) {
-									float force = 1.0 - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+									float force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 									ApplyLaunchTo(giant, otherActor, force, power);
 								}
 							}

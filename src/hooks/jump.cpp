@@ -18,16 +18,16 @@ namespace {
 	void Jump_ApplyExtraJumpEffects(Actor* actor, float size, float Might) {
 		if (!actor->IsInMidair()) {
 			NiPoint3 pos = actor->GetPosition(); 
-			pos.z += 4.0; //shift it up a little
+			pos.z += 4.0f; //shift it up a little
 
 			if (HasSMT(actor)) {
-				size += 2.8;
+				size += 2.8f;
 			}
 
-			float calc_radius = ((54.0 / 3.0) * size) - 54.0;
+			float calc_radius = ((54.0f / 3.0f) * size) - 54.0f;
 			float stagger_radius = std::clamp(calc_radius, 0.0f, 54.0f); // Should start to appear at the scale of x3.0
 
-			if (stagger_radius > 1.0) {
+			if (stagger_radius > 1.0f) {
 				
 				float power = stagger_radius / 54;
 
@@ -35,14 +35,14 @@ namespace {
 					pos,
 				};
 
-				SpawnParticle(actor, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), pos, size * power * 2.0, 7, nullptr);
-				PushObjectsUpwards(actor, position, stagger_radius * size * Might * power, 1.25 * power, true); // Launch cabbages and stuff up
+				SpawnParticle(actor, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), pos, size * power * 2.0f, 7, nullptr);
+				PushObjectsUpwards(actor, position, stagger_radius * size * Might * power, 1.25f * power, true); // Launch cabbages and stuff up
 				StaggerActor_Around(actor, stagger_radius * Might, true); // Launch actors up, Radius is scaled inside the function
 
 				//log::info("Jump Power: {}", power);
 				//log::info("Jump Radius: {}", stagger_radius);
 
-				Rumbling::Once("MassiveJump", actor, Rumble_Default_MassiveJump * power * Might, 0.035 * power);
+				Rumbling::Once("MassiveJump", actor, Rumble_Default_MassiveJump * power * Might, 0.035f * power);
 			}
 		}
 	}
@@ -86,13 +86,13 @@ namespace Hooks {
 					if (a_in < 0) {
 						auto actor = skyrim_cast<Actor*>(graph);
 						if (actor) {
-							const float CRITICALHEIGHT = 9.70;
-							const float ACTORHEIGHT = 1.82*70.0;
-							const float FACTOR = 0.20;
+							const float CRITICALHEIGHT = 9.70f;
+							const float ACTORHEIGHT = 1.82f*70.0f;
+							const float FACTOR = 0.20f;
 							float scale = get_giantess_scale(actor);
 							float newCriticalHeight = ACTORHEIGHT*scale*FACTOR;
 
-							float jump_factor = pow(CRITICALHEIGHT/newCriticalHeight,0.5);
+							float jump_factor = pow(CRITICALHEIGHT/newCriticalHeight,0.5f);
 							
 							a_in *= jump_factor;
 						}
@@ -111,7 +111,7 @@ namespace Hooks {
 				if (actor) {
 					if (actor->formID == 0x14) {
 						float size = get_giantess_scale(actor);
-						float might = 1.0 + Potion_GetMightBonus(actor);
+						float might = 1.0f + Potion_GetMightBonus(actor);
 						float modifier = size * might; // Compensate it, since SetScale() already boosts jump height by default
 						float scaled = std::clamp(modifier, 1.0f, 99999.0f); // Can't have smaller jump heigh than x1.0
 

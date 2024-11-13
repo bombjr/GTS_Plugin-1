@@ -26,9 +26,9 @@
 
 namespace {
 
-	const float MINIMUM_BUTTCRUSH_DISTANCE = 95.0;
+	const float MINIMUM_BUTTCRUSH_DISTANCE = 95.0f;
 	const float BUTTCRUSH_ANGLE = 70;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 
 	void AttachToObjectBTask(Actor* giant, Actor* tiny) {
 		std::string name = std::format("ButtCrush_{}", tiny->formID);
@@ -50,7 +50,7 @@ namespace {
 				return false;
 			}
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 10.0) {
+			if (FrameB <= 10.0f) {
 				return true;
 			}
 			auto giantref = gianthandle.get().get();
@@ -65,7 +65,7 @@ namespace {
 				auto node_tiny = find_node(tinyref, "NPC Root [Root]");
 				if (node_tiny) {
 					float rune_scale = get_visual_scale(tinyref) * GetSizeFromBoundingBox(tinyref);
-					SpawnParticle(tinyref, 3.00, "GTS/gts_tinyrune.nif", NiMatrix3(), node_tiny->world.translate, rune_scale, 7, node_tiny); 
+					SpawnParticle(tinyref, 3.00f, "GTS/gts_tinyrune.nif", NiMatrix3(), node_tiny->world.translate, rune_scale, 7, node_tiny); 
 				}
 				ApplyActionCooldown(giantref, CooldownSource::Misc_ShrinkParticle_Animation);
 			}
@@ -75,27 +75,27 @@ namespace {
 			float Difference = std::clamp(GetSizeDifference(giantref, tinyref, SizeType::VisualScale, true, false), 1.0f, 10.0f);
 
 			
-			DamageAV(giantref, ActorValue::kStamina, 0.04 * GetButtCrushCost(giantref, false));
-			DamageAV(giantref, ActorValue::kMagicka, 1.4 * (GetButtCrushCost(giantref, true)) / Difference);
+			DamageAV(giantref, ActorValue::kStamina, 0.04f * GetButtCrushCost(giantref, false));
+			DamageAV(giantref, ActorValue::kMagicka, 1.4f * (GetButtCrushCost(giantref, true)) / Difference);
 
 			ApplyActionCooldown(giantref, CooldownSource::Action_ButtCrush); // Set butt crush on the cooldown
 
-			if (stamina <= 2.0 && !IsChangingSize(giantref)) {
+			if (stamina <= 2.0f && !IsChangingSize(giantref)) {
 				AnimationManager::StartAnim("ButtCrush_Attack", giantref); // Try to Abort it
 			}
 
-			if (GetAV(giantref, ActorValue::kHealth) <= 1.0 || giantref->IsDead()) {
-				SetButtCrushSize(giantref, 0.0, true);
-				PushActorAway(giantref, giantref, 1.0);
-				PushActorAway(tinyref, tinyref, 1.0);
+			if (GetAV(giantref, ActorValue::kHealth) <= 1.0f || giantref->IsDead()) {
+				SetButtCrushSize(giantref, 0.0f, true);
+				PushActorAway(giantref, giantref, 1.0f);
+				PushActorAway(tinyref, tinyref, 1.0f);
 
 				SetBeingEaten(tinyref, false);
 				EnableCollisions(tiny);
 
-				SpawnCustomParticle(giantref, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 3.0);
-				SpawnParticle(giantref, 4.60, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), giantref->GetPosition(), get_visual_scale(giantref) * 4.0, 7, nullptr);
-				Runtime::PlaySoundAtNode_FallOff("TinyCalamity_Impact", giantref, 1.0, 1.0, "NPC COM [COM ]", 0.10 * get_visual_scale(giantref));
-				Rumbling::Once("ButtCrushDeath", giantref, 128.0, 0.25, "NPC Root [Root]", 0.0);
+				SpawnCustomParticle(giantref, ParticleType::Red, NiPoint3(), "NPC Root [Root]", 3.0f);
+				SpawnParticle(giantref, 4.60f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), giantref->GetPosition(), get_visual_scale(giantref) * 4.0f, 7, nullptr);
+				Runtime::PlaySoundAtNode_FallOff("TinyCalamity_Impact", giantref, 1.0f, 1.0f, "NPC COM [COM ]", 0.10f * get_visual_scale(giantref));
+				Rumbling::Once("ButtCrushDeath", giantref, 128.0f, 0.25f, "NPC Root [Root]", 0.0f);
 
 				AnimationBoobCrush::GetSingleton().Reset();
 
@@ -148,7 +148,7 @@ namespace Gts {
 	}
 
 	void ButtCrushController::ButtCrush_OnCooldownMessage(Actor* giant) {
-		float cooldown = GetRemainingCooldown(giant, CooldownSource::Action_ButtCrush);
+		double cooldown = GetRemainingCooldown(giant, CooldownSource::Action_ButtCrush);
 		std::string message;
 		if (giant->formID == 0x14) {
 			if (!IsCrawling(giant) && !giant->IsSneaking()) {
@@ -158,7 +158,7 @@ namespace Gts {
 			} else {
 				message = std::format("Breast Crush is on a cooldown: {:.1f} sec", cooldown);
 			}
-			shake_camera(giant, 0.45, 0.30);
+			shake_camera(giant, 0.45f, 0.30f);
 			NotifyWithSound(giant, message);
 		} else if (IsTeammate(giant) && !IsGtsBusy(giant)) {
 			if (!IsCrawling(giant) && !giant->IsSneaking()) {
@@ -231,18 +231,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(BUTTCRUSH_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(BUTTCRUSH_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(BUTTCRUSH_ANGLE*PI/180.0);
+			return cosTheta <= cos(BUTTCRUSH_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		if (numberOfPrey == 1) {
@@ -275,19 +275,19 @@ namespace Gts {
 		float MINIMUM_BUTTCRUSH_SCALE = Action_ButtCrush;
 		float MINIMUM_DISTANCE = MINIMUM_BUTTCRUSH_DISTANCE;
 		if (IsCrawling(pred)) {
-			MINIMUM_BUTTCRUSH_SCALE *= 1.5;
+			MINIMUM_BUTTCRUSH_SCALE *= 1.5f;
 		}
 
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
 		if (prey_distance <= MINIMUM_DISTANCE * pred_scale && sizedifference < MINIMUM_BUTTCRUSH_SCALE) {
 			if (pred->formID == 0x14) {
-				std::string_view message = std::format("{} is too big for Butt Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+				std::string_view message = fmt::format("{} is too big for Butt Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				if (!IsCrawling(pred) && pred->IsSneaking()) {
-					message = std::format("{} is too big for Knee Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+					message = fmt::format("{} is too big for Knee Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				} else if (IsCrawling(pred)) {
-					message = std::format("{} is too big for Breast Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+					message = fmt::format("{} is too big for Breast Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				} 
-				shake_camera(pred, 0.45, 0.30);
+				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
 				CantButtCrushPlayerMessage(pred, prey, sizedifference);
@@ -320,13 +320,13 @@ namespace Gts {
 			prey->NotifyAnimationGraph("GTS_EnterFear");
 			
 			if (GetSizeDifference(pred, prey, SizeType::VisualScale, false, false) < Action_ButtCrush) {
-				ShrinkUntil(pred, prey, 3.4, 0.25, true);
+				ShrinkUntil(pred, prey, 3.4f, 0.25f, true);
 				return;
 			}
 
 			DisableCollisions(prey, pred);
 
-			float WasteStamina = 60.0 * GetButtCrushCost(pred, false);
+			float WasteStamina = 60.0f * GetButtCrushCost(pred, false);
 
 			AttachToObjectBTask(pred, prey);
 			ApplyActionCooldown(pred, CooldownSource::Action_ButtCrush); // Set butt crush on the cooldown

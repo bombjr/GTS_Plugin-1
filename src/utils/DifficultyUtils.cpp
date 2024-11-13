@@ -30,7 +30,7 @@ namespace {
 
 namespace Gts {
     float GetSettingValue(const char* setting) {
-		float modifier = 1.0;
+		float modifier = 1.0f;
 		auto GameSetting = GameSettingCollection::GetSingleton();
 		if (GameSetting) {
 			modifier = GameSetting->GetSetting(setting)->GetFloat();
@@ -49,6 +49,6 @@ namespace Gts {
             //log::info("Current To PC Difficulty: {}", Difficulty_ToPC[currentdiff]);
 			return GetSettingValue(Difficulty_ToPC[currentdiff]);
 		}
-		return 1.0;
+		return 1.0f;
 	}
 }

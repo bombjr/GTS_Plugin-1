@@ -79,8 +79,8 @@ namespace Gts {
 					};
 				} else {
 					update = TaskUpdate {
-						.runtime = 0.0,
-						.delta = 0.0,
+						.runtime = 0.0f,
+						.delta = 0.0f,
 					};
 					this->initRun = true;
 				}

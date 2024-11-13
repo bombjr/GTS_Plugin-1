@@ -22,7 +22,7 @@ namespace Gts {
 
 	Actor* GetCharContActor(bhkCharacterController* charCont);
 
-	void Task_AdjustHalfLifeTask(Actor* tiny, float halflife, float revert_after);
+	void Task_AdjustHalfLifeTask(Actor* tiny, float halflife, double revert_after);
 
 	float GetLaunchPower(Actor* giant, float sizeRatio);
 
@@ -199,7 +199,6 @@ namespace Gts {
 	float GetHighHeelsBonusDamage(Actor* actor, bool multiply);
 	float GetHighHeelsBonusDamage(Actor* actor, bool multiply, float adjust);
 
-	void ApplyShake(Actor* caster, float modifier);
 	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view node);
 	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override);
 	void EnableFreeCamera();
@@ -236,10 +235,6 @@ namespace Gts {
 	void DoDustExplosion(Actor* giant, float modifier, FootEvent kind, std::string_view node);
 	void SpawnParticle(Actor* actor, float lifetime, const char* modelName, const NiMatrix3& rotation, const NiPoint3& position, float scale, std::uint32_t flags, NiAVObject* target);
 	void SpawnDustParticle(Actor* giant, Actor* tiny, std::string_view node, float size);
-	void SpawnDustExplosion(Actor* giant, Actor* tiny, std::string_view node, float size);
-
-	bool CanPush(Actor* tiny);
-	void SetCanBePushed(Actor* tiny, bool prevent);
 
 	void Utils_PushCheck(Actor* giant, Actor* tiny, float force);
 
@@ -313,11 +308,8 @@ namespace Gts {
 	void StaggerActor_Directional(Actor* giant, float power, Actor* tiny);
 	void SetLinearImpulse(bhkRigidBody* body, const hkVector4& a_impulse);
 	void SetAngularImpulse(bhkRigidBody* body, const hkVector4& a_impulse);
-	void SetLinearVelocity(bhkRigidBody* body, const hkVector4& a_newVel);
 
 	std::int16_t GetItemCount(InventoryChanges* changes, RE::TESBoundObject* a_obj);
 	int GetCombatState(Actor* actor);
 	bool IsMoving(Actor* giant);
-
-	void ForEachReferenceInRange_Custom(RE::TESObjectREFR* origin, float radius, std::function<RE::BSContainer::ForEachResult(RE::TESObjectREFR& ref)> callback);
 }

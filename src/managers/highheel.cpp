@@ -96,20 +96,20 @@ namespace Gts {
 		}
 		this->data.try_emplace(actor);
 		auto& hhData = this->data[actor];
-		float speedup = 1.0;
+		float speedup = 1.0f;
 		if (IsCrawling(actor) || IsProning(actor) || BehaviorGraph_DisableHH(actor)) {
-			speedup = 4.0; // To shift down a lot faster
+			speedup = 4.0f; // To shift down a lot faster
 		} else if (!IsGtsBusy(actor)) {
-			speedup = 3.0;
+			speedup = 3.0f;
 		}
 		// Should disable HH?
 		bool disableHH = DisableHighHeels(actor);
 
 		if (disableHH) {
-			hhData.multiplier.target = 0.0;
+			hhData.multiplier.target = 0.0f;
 			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 		} else {
-			hhData.multiplier.target = 1.0;
+			hhData.multiplier.target = 1.0f;
 			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 		}
 
@@ -194,16 +194,16 @@ namespace Gts {
 							std::string posString = stringDataStr.substr(posStart, posEnd - posStart);
 
 							auto posValueStart = 0;
-							auto posValueEnd = posString.find(",", posValueStart);
+							auto posValueEnd = static_cast<int>(posString.find(",", posValueStart));
 							
-							double pos_x = std::stod(posString.substr(posValueStart, posValueEnd - posValueStart));
-							
-							posValueStart = posValueEnd + 1;
-							posValueEnd = posString.find(",", posValueStart);
-							double pos_y = std::stod(posString.substr(posValueStart, posValueEnd - posValueStart));
+							float pos_x = static_cast<float>(std::stod(posString.substr(posValueStart, posValueEnd - posValueStart)));
 							
 							posValueStart = posValueEnd + 1;
-							double pos_z = std::stod(posString.substr(posValueStart));
+							posValueEnd = static_cast<int>(posString.find(",", posValueStart));
+							float pos_y = static_cast<float>(std::stod(posString.substr(posValueStart, posValueEnd - posValueStart)));
+							
+							posValueStart = posValueEnd + 1;
+							float pos_z = static_cast<float>(std::stod(posString.substr(posValueStart)));
 
 							result = NiPoint3(pos_x, pos_y, pos_z);
 							return false;

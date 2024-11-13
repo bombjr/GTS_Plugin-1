@@ -24,39 +24,39 @@ using namespace REL;
 using namespace SKSE;
 
 namespace {
-	const double LAUNCH_COOLDOWN = 0.8f;
-	const double DAMAGE_COOLDOWN = 2.0f;
-	const double HANDDAMAGE_COOLDOWN = 0.6f;
-	const double THIGHDAMAGE_COOLDOWN = 1.2f;
-	const double HEALTHGATE_COOLDOWN = 60.0f;
-	const double SCARE_COOLDOWN = 6.0f;
-	const double BUTTCRUSH_COOLDOWN = 30.0f;
-	const double HUGS_COOLDOWN = 8.0f;
+	const float LAUNCH_COOLDOWN = 0.8f;
+	const float DAMAGE_COOLDOWN = 2.0f;
+	const float HANDDAMAGE_COOLDOWN = 0.6f;
+	const float THIGHDAMAGE_COOLDOWN = 1.2f;
+	const float HEALTHGATE_COOLDOWN = 60.0f;
+	const float SCARE_COOLDOWN = 6.0f;
+	const float BUTTCRUSH_COOLDOWN = 30.0f;
+	const float HUGS_COOLDOWN = 8.0f;
 
 	float Calculate_Halflife(CameraTracking Bone) {
 		if (Bone == CameraTracking::Thigh_Crush) { // Thigh Crushing
-			return 0.15;
+			return 0.15f;
 		} else if (Bone == CameraTracking::VoreHand_Right || Bone == CameraTracking::Hand_Left || Bone == CameraTracking::Hand_Right) { // Voring / using hands
-			return 0.10;
+			return 0.10f;
 		} else if (Bone == CameraTracking::ObjectA || Bone == CameraTracking::ObjectB) { // pretty much vore/ hands too
-			return 0.10;
+			return 0.10f;
 		} else if (Bone == CameraTracking::R_Foot || Bone == CameraTracking::L_Foot) { // Feet
-			return 0.08;
+			return 0.08f;
 		} else if (Bone == CameraTracking::Butt || Bone == CameraTracking::Mid_Butt_Legs) { // Butt
-			return 0.08;
+			return 0.08f;
 		} else if (Bone == CameraTracking::Breasts_02) { // Breasts
-			return 0.10;
+			return 0.10f;
 		} else if (Bone == CameraTracking::Knees) { // Knees
-			return 0.10;
+			return 0.10f;
 		} else if (Bone == CameraTracking::Finger_Right || Bone == CameraTracking::Finger_Left) {
-			return 0.08;
+			return 0.08f;
 		} else {
-			return 0.05;
+			return 0.05f;
 		}
 	}
 
 	float Get_LifeForceBonus(Actor* giant) {
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		auto data = Transient::GetSingleton().GetActorData(giant);
 		if (data) {
 			bonus = data->Perk_lifeForceStolen;
@@ -84,7 +84,7 @@ namespace Gts {
 
 	float SizeManager::GetEnchantmentBonus(Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		float EB = std::clamp(this->GetData(actor).AspectOfGiantess, 0.0f, 1000.0f);
 		EB += Get_LifeForceBonus(actor);
@@ -110,7 +110,7 @@ namespace Gts {
 
 	float SizeManager::GetSizeHungerBonus(Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		float SHB = std::clamp(this->GetData(actor).SizeHungerBonus, 0.0f, 1000.0f);
 		return SHB;
@@ -134,9 +134,9 @@ namespace Gts {
 
 	float SizeManager::GetGrowthSpurt(Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
-		float GS = clamp (0.0, 999999.0, this->GetData(actor).GrowthSpurtSize);
+		float GS = clamp (0.0f, 999999.0f, this->GetData(actor).GrowthSpurtSize);
 		return GS;
 	}
 
@@ -173,14 +173,14 @@ namespace Gts {
 
 	float SizeManager::GetSizeAttribute(Actor* actor, SizeAttribute attribute) {
 		if (!actor) {
-			return 1.0;
+			return 1.0f;
 		}
 		auto Persistent = Persistent::GetSingleton().GetData(actor);
 		if (Persistent) {
-			float Normal = clamp (1.0, 999999.0, Persistent->NormalDamage);
-			float Sprint = clamp (1.0, 999999.0, Persistent->SprintDamage);
-			float Fall = clamp (1.0, 999999.0, Persistent->FallDamage);
-			float HH = clamp (1.0, 999999.0, Persistent->HHDamage);
+			float Normal = clamp (1.0f, 999999.0f, Persistent->NormalDamage);
+			float Sprint = clamp (1.0f, 999999.0f, Persistent->SprintDamage);
+			float Fall = clamp (1.0f, 999999.0f, Persistent->FallDamage);
+			float HH = clamp (1.0f, 999999.0f, Persistent->HHDamage);
 			switch (attribute) {
 				case SizeAttribute::Normal: 
 					return Normal;
@@ -196,7 +196,7 @@ namespace Gts {
 				break;
 				}
 			}
-		return 1.0;
+		return 1.0f;
 	}
 
 	//===============Size-Related Attribute End
@@ -220,14 +220,14 @@ namespace Gts {
 				return std::clamp(Transient->SizeVulnerability, 0.0f, 0.35f);
 			}
 		}
-		return 0.0;
+		return 0.0f;
 	}
 
 	void SizeManager::ModSizeVulnerability(Actor* actor, float amt) {
 		if (actor) {
 			auto Transient = Transient::GetSingleton().GetData(actor);
 			if (Transient) {
-				if (Transient->SizeVulnerability < 0.35) {
+				if (Transient->SizeVulnerability < 0.35f) {
 					Transient->SizeVulnerability += amt;
 				}
 			}
@@ -239,11 +239,11 @@ namespace Gts {
 
 	float SizeManager::GetHitGrowth(Actor* actor) {
 		if (!actor) {
-			return 0.0;
+			return 0.0f;
 		}
 		auto Persistent = Persistent::GetSingleton().GetData(actor);
 		if (!Persistent) {
-			return 0.0;
+			return 0.0f;
 		}
 		
 		return Persistent->AllowHitGrowth;
@@ -305,9 +305,9 @@ namespace Gts {
 	float SizeManager::BalancedMode()
 	{
 		if (Runtime::GetBool("BalanceMode")) {
-			return 2.0;
+			return 2.0f;
 		} else {
-			return 1.0;
+			return 1.0f;
 		}
 	}
 

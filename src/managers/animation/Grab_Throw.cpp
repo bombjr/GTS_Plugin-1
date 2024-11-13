@@ -77,8 +77,8 @@ namespace {
 				NiPoint3 vector = endCoords - startCoords;
 
 				float distanceTravelled = vector.Length();
-				float timeTaken = endTime - startTime;
-				float speed = (distanceTravelled/timeTaken) * 10; // Standing throw default power
+				double timeTaken = endTime - startTime;
+				float speed = static_cast<float>((distanceTravelled / timeTaken) * 10); // Standing throw default power
 
 				if (!giant->IsSneaking()) { // Goal is to fix standing throw direction
 
@@ -86,13 +86,13 @@ namespace {
 					float angle_y = 0;//Runtime::GetFloat("cameraAlternateY");
 					float angle_z = 0;//::GetFloat("combatCameraAlternateX"); // 0
 
-					speed *= 1.35;
+					speed *= 1.35f;
 
 					// Conversion to radians
-					const float PI = 3.141592653589793;
-					float angle_x_rad = angle_x * 180.0 / PI;
-					float angle_y_rad = angle_y * 180.0 / PI;
-					float angle_z_rad = angle_z * 180.0 / PI;
+					const float PI = 3.141592653589793f;
+					float angle_x_rad = angle_x * 180.0f / PI;
+					float angle_y_rad = angle_y * 180.0f / PI;
+					float angle_z_rad = angle_z * 180.0f / PI;
 
 					// Work out direction from angles and an initial (forward) vector;
 					//
@@ -103,38 +103,38 @@ namespace {
 					//
 					// The order of operation is pitch > yaw > roll
 					NiMatrix3 customRot = NiMatrix3(angle_x_rad, angle_y_rad, angle_z_rad);
-					NiPoint3 forward = NiPoint3(0.0, 0.0, 1.0);
+					NiPoint3 forward = NiPoint3(0.0f, 0.0f, 1.0f);
 					NiPoint3 customDirection = customRot * forward;
 
 					NiMatrix3 giantRot = giant->GetCurrent3D()->world.rotate;
 					direction = giantRot * (customDirection / customDirection.Length());
 				} else {
 				    if (IsCrawling(giant)) { // Strongest throw, needs custom throw direction again
-						speed *= 0.20; // Hand travels fast so it's a good idea to decrease its power
+						speed *= 0.20f; // Hand travels fast so it's a good idea to decrease its power
 
 						float angle_x = 0; // Runtime::GetFloat("cameraAlternateX")
-						float angle_y = 0.008; // Runtime::GetFloat("cameraAlternateY");
-						float angle_z = 0.0;// Runtime::GetFloat("combatCameraAlternateX"); // 0
+						float angle_y = 0.008f; // Runtime::GetFloat("cameraAlternateY");
+						float angle_z = 0.0f;// Runtime::GetFloat("combatCameraAlternateX"); // 0
 
 						// Conversion to radians
-						const float PI = 3.141592653589793;
-						float angle_x_rad = angle_x * 180.0 / PI;
-						float angle_y_rad = angle_y * 180.0 / PI;
-						float angle_z_rad = angle_z * 180.0 / PI;
+						const float PI = 3.141592653589793f;
+						float angle_x_rad = angle_x * 180.0f / PI;
+						float angle_y_rad = angle_y * 180.0f / PI;
+						float angle_z_rad = angle_z * 180.0f / PI;
 
 						NiMatrix3 customRot = NiMatrix3(angle_x_rad, angle_y_rad, angle_z_rad);
-						NiPoint3 forward = NiPoint3(0.0, 0.0, 1.0);
+						NiPoint3 forward = NiPoint3(0.0f, 0.0f, 1.0f);
 						NiPoint3 customDirection = customRot * forward;
 
 						NiMatrix3 giantRot = giant->GetCurrent3D()->world.rotate;
 						direction = giantRot * (customDirection / customDirection.Length());
 					} else { // Else perform Slight Sneak Throw calc
 						direction = vector / vector.Length();
-						speed *= 0.10; // Hand also travels fast and we don't want this anim to feel strong
+						speed *= 0.10f; // Hand also travels fast and we don't want this anim to feel strong
 					}
 				}
 
-				float Time = (1.0 / Time::GetTimeMultiplier()); // read SGTM value and / speed by it, so tinies still fly far even with sgtm 0.15
+				float Time = (1.0f / Time::GetTimeMultiplier()); // read SGTM value and / speed by it, so tinies still fly far even with sgtm 0.15
 				log::info("Time Mult: {}", Time);
 
 
@@ -172,7 +172,7 @@ namespace {
 				auto giant = giantHandle.get().get();
 				auto tiny = tinyHandle.get().get();
 				float health = GetAV(tiny, ActorValue::kHealth);
-				if (health <= 1.0 || tiny->IsDead()) {
+				if (health <= 1.0f || tiny->IsDead()) {
 					OverkillManager::GetSingleton().Overkill(giant, tiny);
 				}
 			});
@@ -201,55 +201,55 @@ namespace {
 
     void GTSGrab_Throw_MoveStart(AnimationEventData& data) {
 		auto giant = &data.giant;
-		DrainStamina(giant, "GrabThrow", "DestructionBasics", true, 1.25);
+		DrainStamina(giant, "GrabThrow", "DestructionBasics", true, 1.25f);
 		ManageCamera(giant, true, CameraTracking::Grab_Left);
-		StartLHandRumble("GrabThrowL", data.giant, 0.5, 0.10);
+		StartLHandRumble("GrabThrowL", data.giant, 0.5f, 0.10f);
 	}
 
 	void GTSGrab_Throw_FS_R(AnimationEventData& data) {
 		if (IsUsingThighAnimations(&data.giant) || IsCrawling(&data.giant)) {
 			return; // Needed to not apply it during animation blending for thigh/crawling animations
 		}
-		float smt = 1.0;
-		float launch = 1.0;
-		float dust = 0.9;
+		float smt = 1.0f;
+		float launch = 1.0f;
+		float dust = 0.9f;
 		float perk = GetPerkBonus_Basics(&data.giant);
 		if (HasSMT(&data.giant)) {
-			smt = 1.5;
-			launch = 1.5;
-			dust = 1.25;
+			smt = 1.5f;
+			launch = 1.5f;
+			dust = 1.25f;
 		}
 
 		float shake_power = Rumble_Grab_Throw_Footstep * smt * GetHighHeelsBonusDamage(&data.giant, true);
 
-		Rumbling::Once("Stomp", &data.giant, shake_power, 0.05, RNode, 0.0);
-		DoDamageEffect(&data.giant, 1.1 * launch * data.animSpeed * perk, 1.0 * launch * data.animSpeed, 10, 0.20, FootEvent::Right, 1.0, DamageSource::CrushedRight);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Right, RNode);
+		Rumbling::Once("Stomp", &data.giant, shake_power, 0.05f, RNode, 0.0f);
+		DoDamageEffect(&data.giant, 1.1f * launch * data.animSpeed * perk, 1.0f * launch * data.animSpeed, 10, 0.20f, FootEvent::Right, 1.0f, DamageSource::CrushedRight);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Right, RNode);
 		DoDustExplosion(&data.giant, dust, FootEvent::Right, RNode);
-		DoLaunch(&data.giant, 0.75 * perk, 1.55, FootEvent::Right);
+		DoLaunch(&data.giant, 0.75f * perk, 1.55f, FootEvent::Right);
 	}
 
 	void GTSGrab_Throw_FS_L(AnimationEventData& data) {
 		if (IsUsingThighAnimations(&data.giant) || IsCrawling(&data.giant)) {
 			return; // Needed to not apply it during animation blending for thigh/crawling animations
 		}
-		float smt = 1.0;
-		float launch = 1.0;
-		float dust = 0.9;
+		float smt = 1.0f;
+		float launch = 1.0f;
+		float dust = 0.9f;
 		float perk = GetPerkBonus_Basics(&data.giant);
 		if (HasSMT(&data.giant)) {
-			smt = 1.5;
-			launch = 1.5;
-			dust = 1.25;
+			smt = 1.5f;
+			launch = 1.5f;
+			dust = 1.25f;
 		}
 
 		float shake_power = Rumble_Grab_Throw_Footstep * smt * GetHighHeelsBonusDamage(&data.giant, true);
 
-		Rumbling::Once("Stomp", &data.giant, shake_power, 0.05, LNode, 0.0);
-		DoDamageEffect(&data.giant, 1.1 * launch * data.animSpeed * perk, 1.0 * launch * data.animSpeed, 10, 0.20, FootEvent::Left, 1.0, DamageSource::CrushedLeft);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Left, LNode);
+		Rumbling::Once("Stomp", &data.giant, shake_power, 0.05f, LNode, 0.0f);
+		DoDamageEffect(&data.giant, 1.1f * launch * data.animSpeed * perk, 1.0f * launch * data.animSpeed, 10, 0.20f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Left, LNode);
 		DoDustExplosion(&data.giant, dust, FootEvent::Left, LNode);
-		DoLaunch(&data.giant, 0.75 * perk, 1.55, FootEvent::Left);
+		DoLaunch(&data.giant, 0.75f * perk, 1.55f, FootEvent::Left);
 	}
 
 	void GTSGrab_Throw_Throw_Pre(AnimationEventData& data) {// Throw frame 0
@@ -266,7 +266,7 @@ namespace {
 
 			auto charcont = otherActor->GetCharController();
 			if (charcont) {
-				charcont->SetLinearVelocityImpl((0.0, 0.0, 0.0, 0.0)); // Needed so Actors won't fall down.
+				charcont->SetLinearVelocityImpl((0.0f, 0.0f, 0.0f, 0.0f)); // Needed so Actors won't fall down.
 			}
 
 			auto bone = find_node(giant, "NPC L Hand [LHnd]"); 
@@ -310,11 +310,11 @@ namespace {
 				SetBeingHeld(tiny, false);
 				EnableCollisions(tiny);
 
-				PushActorAway(giant, tiny, 1.0);
+				PushActorAway(giant, tiny, 1.0f);
 
 				auto charcont = tiny->GetCharController();
 				if (charcont) {
-					charcont->SetLinearVelocityImpl((0.0, 0.0, 0.0, 0.0)); // Stop actor moving in space, just in case
+					charcont->SetLinearVelocityImpl((0.0f, 0.0f, 0.0f, 0.0f)); // Stop actor moving in space, just in case
 				}
 				Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name);
 				
@@ -332,7 +332,7 @@ namespace {
 		giant->SetGraphVariableInt("GTS_GrabbedTiny", 0);
 		giant->SetGraphVariableInt("GTS_Grab_State", 0);
 		ManageCamera(giant, false, CameraTracking::Grab_Left);
-		Rumbling::Once("ThrowFoe", &data.giant, 2.50, 0.10, "NPC L Hand [LHnd]", 0.0);
+		Rumbling::Once("ThrowFoe", &data.giant, 2.50f, 0.10f, "NPC L Hand [LHnd]", 0.0f);
 		AnimationManager::StartAnim("TinyDied", giant);
 
 		Grab::DetachActorTask(giant);
@@ -344,7 +344,7 @@ namespace {
 
 	void GTSGrab_Throw_MoveStop(AnimationEventData& data) { // Throw Frame 3
 		auto giant = &data.giant;
-		DrainStamina(giant, "GrabThrow", "DestructionBasics", false, 1.25);
+		DrainStamina(giant, "GrabThrow", "DestructionBasics", false, 1.25f);
 		StopLHandRumble("GrabThrowL", data.giant);
 	}
 

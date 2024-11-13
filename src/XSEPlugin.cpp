@@ -102,6 +102,7 @@ namespace {
 	{
 		if (!GetMessagingInterface()->RegisterListener([](MessagingInterface::Message *message) {
 			auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
+			auto buildDate = std::format("{} {}",__DATE__,__TIME__);
 			switch (message->type)
 			{
 				// Skyrim lifecycle events.
@@ -113,7 +114,7 @@ namespace {
 					break;
 				case MessagingInterface::kDataLoaded: // All ESM/ESL/ESP plugins have loaded, main menu is now active.
 					// It is now safe to access form data.
-					Cprint("[GTSPlugin.dll]: [ Giantess Mod v 2.00 {} Beta was succesfully initialized. Waiting for New Game/Save Load. ]", gitData);
+					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Build({}) Git({}) Beta was succesfully initialized. Waiting for New Game/Save Load. ]", buildDate, gitData);
 					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
 					break;

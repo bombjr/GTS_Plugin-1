@@ -42,7 +42,7 @@ namespace Gts {
 
 	float ZoomFactor();
 	float MaxZoom();
-	NiPoint3 CompuleLookAt(float zoomScale = 0.95);
+	NiPoint3 CompuleLookAt(float zoomScale = 0.95f);
 
 	// Get's camera position relative to the player
 	NiPoint3 GetCameraPosLocal();
