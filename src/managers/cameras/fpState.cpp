@@ -13,13 +13,13 @@ namespace  Gts {
 		auto player = GetCameraActor();
 		auto playerData = Persistent::GetSingleton().GetData(player);
 		if (playerData) {
-			playerData->scaleOverride = -1.0;
+			playerData->scaleOverride = -1.0f;
 		}
 	}
 
 	float FirstPersonCameraState::GetScale() {
 		// Dont need to scale as we follow the head bone in fp
-		return 1.0;
+		return 1.0f;
 	}
 
 	bool FirstPersonCameraState::PermitManualEdit() {

@@ -19,7 +19,7 @@ namespace Gts {
 
 		this->hits.push_back(output);
 
-		this->earlyOutHitFraction = 1.0;
+		this->earlyOutHitFraction = 1.0f;
 	}
 
 	unique_ptr<AllRayCollector> AllRayCollector::Create() {

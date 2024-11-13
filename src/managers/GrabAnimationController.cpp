@@ -22,9 +22,9 @@
 
 namespace {
 
-	const float MINIMUM_GRAB_DISTANCE = 85.0;
+	const float MINIMUM_GRAB_DISTANCE = 85.0f;
 	const float GRAB_ANGLE = 70;
-	const float PI = 3.14159;
+	const float PI = 3.14159f;
 
 	void CantGrabPlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Grab) {
@@ -102,18 +102,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(GRAB_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(GRAB_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(GRAB_ANGLE*PI/180.0);
+			return cosTheta <= cos(GRAB_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		if (numberOfPrey == 1) {
@@ -151,7 +151,7 @@ namespace Gts {
 		float MINIMUM_DISTANCE = MINIMUM_GRAB_DISTANCE;
 
 		if (HasSMT(pred) || IsCrawling(pred)) {
-			MINIMUM_DISTANCE *= 1.6;
+			MINIMUM_DISTANCE *= 1.6f;
 		}
 
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
@@ -160,7 +160,7 @@ namespace Gts {
 		if (prey_distance <= MINIMUM_DISTANCE * pred_scale && sizedifference < MINIMUM_GRAB_SCALE) {
 			if (pred->formID == 0x14) {
 				std::string_view message = std::format("{} is too big to be grabbed: x{:.2f}/{:.2f}.", prey->GetDisplayFullName(), sizedifference, MINIMUM_GRAB_SCALE);
-				shake_camera(pred, 0.45, 0.30);
+				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);
 			} else if (this->allow_message && prey->formID == 0x14 && IsTeammate(pred)) {
 				CantGrabPlayerMessage(pred, prey, sizedifference);
@@ -187,14 +187,14 @@ namespace Gts {
 			return;
 		}
 
-		float shrinkrate = 0.18;
+		float shrinkrate = 0.18f;
 
 		if (pred->IsSneaking()) {
-			shrinkrate = 0.13;
+			shrinkrate = 0.13f;
 		}
 
 		if (GetSizeDifference(pred, prey, SizeType::VisualScale, false, false) < Action_Grab) {
-			ShrinkUntil(pred, prey, 10.2, shrinkrate, true);
+			ShrinkUntil(pred, prey, 10.2f, shrinkrate, true);
 			return;
 		}
 

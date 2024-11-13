@@ -38,30 +38,30 @@ namespace {
 	void CancelGrowth(Actor* actor) {
 		std::string name = std::format("ManualGrowth_{}", actor->formID);
 		TaskManager::Cancel(name);
-		//SetHalfLife(actor, 1.0);
+		//SetHalfLife(actor, 1.0f);
 	}
 
 	void GrowthTask(Actor* actor) {
 		if (!actor) {
 			return;
 		}
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle gianthandle = actor->CreateRefHandle();
 		std::string name = std::format("ManualGrowth_{}", actor->formID);
 
 		float Volume = std::clamp(get_visual_scale(actor)/8.0f, 0.20f, 1.0f);
-		Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]");
+		Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 
-		//SetHalfLife(actor, 0.0);
+		//SetHalfLife(actor, 0.0f);
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto caster = gianthandle.get().get();
-			float timepassed = Time::WorldTimeElapsed() - Start;
+			double timepassed = Time::WorldTimeElapsed() - Start;
 			float animspeed = AnimationManager::GetAnimSpeed(caster);
-			float elapsed = std::clamp(timepassed * animspeed, 0.01f, 1.2f);
-			float multiply = bezier_curve(elapsed, 0, 1.9, 0.6, 0, 2.0, 1.0);
+			float elapsed = static_cast<float>(std::clamp(timepassed * animspeed, 0.01, 1.2));
+			float multiply = bezier_curve(elapsed, 0, 1.9f, 0.6f, 0, 2.0f, 1.0f);
 			//                            ^value   x1  x2  x3  x4  i     k
 
 			float caster_scale = get_visual_scale(caster);
@@ -69,35 +69,35 @@ namespace {
 
 			float perk = Perk_GetCostReduction(caster);  
 			
-			DamageAV(caster, ActorValue::kStamina, 0.60 * perk * caster_scale * stamina * TimeScale() * multiply);
+			DamageAV(caster, ActorValue::kStamina, 0.60f * perk * caster_scale * stamina * TimeScale() * multiply);
 
-			float modify = CalcPower(actor, 0.0080 * stamina * multiply * animspeed, 0.0, false);
+			float modify = CalcPower(actor, 0.0080f * stamina * multiply * animspeed, 0.0f, false);
 
 			override_actor_scale(caster, modify, SizeEffectType::kGrow);
 			// value*scale ^  ; ^ static value, not affected by scale
 			
-			Rumbling::Once("GrowButton", caster, 2.0 * stamina, 0.05, "NPC Pelvis [Pelv]", 0.0);
-			if (elapsed >= 0.99) {
-				//SetHalfLife(caster, 1.0);
+			Rumbling::Once("GrowButton", caster, 2.0f * stamina, 0.05f, "NPC Pelvis [Pelv]", 0.0f);
+			if (elapsed >= 0.99f) {
+				//SetHalfLife(caster, 1.0f);
 				return false;
 			}
 			return true;
 		});
 	}
 	void GtsGrowth_Moan(AnimationEventData& data) {
-		PlayMoanSound(&data.giant, 1.0);
+		PlayMoanSound(&data.giant, 1.0f);
 	}
 	void GtsGrowth_Mouth_Open(AnimationEventData& data) {
 		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 1.0, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 1.0, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 0.75, "phenome");
+		AdjustFacialExpression(giant, 0, 1.0f, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 1.0f, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.75f, "phenome");
 	}
 	void GtsGrowth_Mouth_Close(AnimationEventData& data) {
 		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 0.0, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.0, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 0.0, "phenome");
+		AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
+		AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
 	}
 	void GTSGrowth_Enter(AnimationEventData& data) {
 	}

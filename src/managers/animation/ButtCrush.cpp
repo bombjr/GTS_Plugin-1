@@ -80,15 +80,15 @@ namespace {
 	void DisableButtTrackTask(Actor* giant) {
 		std::string name = std::format("DisableCameraTask_{}", giant->formID);
 		auto gianthandle = giant->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
 
-			float Finish = Time::WorldTimeElapsed();
-			if ((Finish - Start) / AnimationManager::GetAnimSpeed(giantref) > 12.0 || !IsButtCrushing(giantref) && !IsGtsBusy(giantref)) {
+			double Finish = Time::WorldTimeElapsed();
+			if ((Finish - Start) / AnimationManager::GetAnimSpeed(giantref) > 12.0f || !IsButtCrushing(giantref) && !IsGtsBusy(giantref)) {
 				ManageCamera(giantref, false, CameraTracking::Butt);
 				return false;
 			}
@@ -99,20 +99,20 @@ namespace {
 
 	void ButtCrush_DoFootImpact(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float smt = 1.0;
-		float dust = 1.0;
+		float smt = 1.0f;
+		float dust = 1.0f;
 		if (HasSMT(giant)) {
-			dust = 1.25;
-			smt = 1.5;
+			dust = 1.25f;
+			smt = 1.5f;
 		}
 
 		float shake_power = Rumble_ButtCrush_FeetImpact * smt * GetHighHeelsBonusDamage(giant, true);
 
-		Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 0.33);
-		DoDamageEffect(giant, Damage_ButtCrush_FootImpact, Radius_ButtCrush_FootImpact, 10, 0.25, Event, 1.0, Source);
-		DoFootstepSound(giant, 1.0, Event, Node);
+		Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.33f);
+		DoDamageEffect(giant, Damage_ButtCrush_FootImpact, Radius_ButtCrush_FootImpact, 10, 0.25f, Event, 1.0f, Source);
+		DoFootstepSound(giant, 1.0f, Event, Node);
 		DoDustExplosion(giant, dust, Event, Node);
-		DoLaunch(giant, 0.75 * perk, 1.6, Event);
+		DoLaunch(giant, 0.75f * perk, 1.6f, Event);
 
 		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
@@ -141,24 +141,24 @@ namespace {
 		auto giant = &data.giant;
 
 		float scale = get_visual_scale(giant);
-		float gigantism = 1.0 + (Ench_Aspect_GetPower(giant) / 5);
-		float bonus = 0.24 * gigantism * (GetGrowthCount(giant) + 1.0);
+		float gigantism = 1.0f + (Ench_Aspect_GetPower(giant) / 5);
+		float bonus = 0.24f * gigantism * (GetGrowthCount(giant) + 1.0f);
 
-		ModGrowthCount(giant, 1.0, false);
+		ModGrowthCount(giant, 1.0f, false);
 		SetButtCrushSize(giant, bonus, false);
-		SpringGrow(giant, bonus, 0.3 / GetAnimationSlowdown(giant), "ButtCrushGrowth", false);
+		SpringGrow(giant, bonus, 0.3f / GetAnimationSlowdown(giant), "ButtCrushGrowth", false);
 
-		float WasteStamina = 100.0 * GetButtCrushCost(giant, false);
+		float WasteStamina = 100.0f * GetButtCrushCost(giant, false);
 
 		if (giant->formID != 0x14) {
-			WasteStamina *= 0.25;
+			WasteStamina *= 0.25f;
 		}
 		
 		DamageAV(giant, ActorValue::kStamina, WasteStamina);
 
-		Runtime::PlaySoundAtNode("growthSound", giant, 1.0, 1.0, "NPC Pelvis [Pelv]");
+		Runtime::PlaySoundAtNode("growthSound", giant, 1.0f, 1.0f, "NPC Pelvis [Pelv]");
 
-		StartRumble("BCRumble", data.giant, 1.25, 0.30);
+		StartRumble("BCRumble", data.giant, 1.25f, 0.30f);
 	}
 
 	void GTSBEH_ButtCrush_GrowthFinish(AnimationEventData& data) {
@@ -178,9 +178,9 @@ namespace {
 
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Moan);
 		if (!Blocked) {
-			PlayMoanSound(giant, 1.0);
+			PlayMoanSound(giant, 1.0f);
 			ApplyActionCooldown(giant, CooldownSource::Emotion_Moan);
-			Task_FacialEmotionTask_Moan(giant, 1.8, "ButtCrush_Growth");
+			Task_FacialEmotionTask_Moan(giant, 1.8f, "ButtCrush_Growth");
 		}
 
 		StopRumble("BCRumble", data.giant);
@@ -190,59 +190,59 @@ namespace {
 		// do footsteps
 		//Rumbling::Stop("FS_L", &data.giant);
 		ButtCrush_DoFootImpact(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "FS_L");
-		data.HHspeed = 1.0;
+		data.HHspeed = 1.0f;
 	}
 
 	void GTSButtCrush_FootstepL(AnimationEventData& data) {
 		// do footsteps
 		//Rumbling::Stop("FS_R", &data.giant);
 		ButtCrush_DoFootImpact(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "FS_L");
-		data.HHspeed = 1.0;
+		data.HHspeed = 1.0f;
 	}
 
 	void GTSButtCrush_HandImpactR(AnimationEventData& data) {
 		auto giant = &data.giant;
 		float scale = get_visual_scale(giant);
-		DoCrawlingFunctions(giant, scale, 1.0, Damage_ButtCrush_HandImpact, CrawlEvent::RightHand, "RightHand", 0.8, Radius_ButtCrush_HandImpact, 1.0, DamageSource::HandCrawlRight);
+		DoCrawlingFunctions(giant, scale, 1.0f, Damage_ButtCrush_HandImpact, CrawlEvent::RightHand, "RightHand", 0.8f, Radius_ButtCrush_HandImpact, 1.0f, DamageSource::HandCrawlRight);
 		data.disableHH = false;
-		data.HHspeed = 4.0;
+		data.HHspeed = 4.0f;
 	}
 
 	void GTSButtCrush_FallDownStart(AnimationEventData& data) {
 		data.stage = 1;
 		data.disableHH = true;
-		data.HHspeed = 1.0;
+		data.HHspeed = 1.0f;
 	}
 
 	void GTSButtCrush_FallDownImpact(AnimationEventData& data) {
 		auto giant = &data.giant;
 
 		float perk = GetPerkBonus_Basics(&data.giant);
-		float dust = 1.0;
-		float smt = 1.0;
+		float dust = 1.0f;
+		float smt = 1.0f;
 
 		if (HasSMT(giant)) {
-			dust = 1.25;
-			smt = 1.5;
+			dust = 1.25f;
+			smt = 1.5f;
 		}
 		std::string taskname = std::format("ButtCrushAttack_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
 		ManageCamera(giant, true, CameraTracking::Butt);
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
-		TaskManager::RunFor(taskname, 1.0, [=](auto& update){ // Needed because anim has wrong timing
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
 
 			if (Finish - Start > 0.04) { 
 
-				SetButtCrushSize(giant, 0.0, true);
+				SetButtCrushSize(giant, 0.0f, true);
 
 				float damage = GetButtCrushDamage(giantref);
 				auto ThighL = find_node(giantref, "NPC L Thigh [LThg]");
@@ -250,22 +250,22 @@ namespace {
 				auto ButtR = find_node(giantref, "NPC R Butt");
 				auto ButtL = find_node(giantref, "NPC L Butt");
 
-				ApplyThighDamage(giantref, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35, 1.0, 14, DamageSource::ThighCrushed);
-				ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35, 1.0, 14, DamageSource::ThighCrushed);
+				ApplyThighDamage(giantref, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
+				ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
 
 				float shake_power = Rumble_ButtCrush_ButtImpact/2 * dust * damage;
 
 				if (ButtR && ButtL) {
 					if (ThighL && ThighR) {
-						DoDamageAtPoint(giantref, Radius_ButtCrush_Impact, Damage_ButtCrush_ButtImpact * damage, ThighL, 4, 0.70, 0.8, DamageSource::Booty);
-						DoDamageAtPoint(giantref, Radius_ButtCrush_Impact, Damage_ButtCrush_ButtImpact * damage, ThighR, 4, 0.70, 0.8, DamageSource::Booty);
-						DoDustExplosion(giantref, 1.45 * dust * damage, FootEvent::Butt, "NPC R Butt");
-						DoDustExplosion(giantref, 1.45 * dust * damage, FootEvent::Butt, "NPC L Butt");
-						DoLaunch(giantref, 2.25 * perk, 5.0, FootEvent::Butt);
-						DoFootstepSound(giantref, 1.25, FootEvent::Right, RNode);
+						DoDamageAtPoint(giantref, Radius_ButtCrush_Impact, Damage_ButtCrush_ButtImpact * damage, ThighL, 4, 0.70f, 0.8f, DamageSource::Booty);
+						DoDamageAtPoint(giantref, Radius_ButtCrush_Impact, Damage_ButtCrush_ButtImpact * damage, ThighR, 4, 0.70f, 0.8f, DamageSource::Booty);
+						DoDustExplosion(giantref, 1.45f * dust * damage, FootEvent::Butt, "NPC R Butt");
+						DoDustExplosion(giantref, 1.45f * dust * damage, FootEvent::Butt, "NPC L Butt");
+						DoLaunch(giantref, 2.25f * perk, 5.0f, FootEvent::Butt);
+						DoFootstepSound(giantref, 1.25f, FootEvent::Right, RNode);
 						
-						Rumbling::Once("Butt_L", giantref, shake_power * smt, 0.075, "NPC R Butt", 0.0);
-						Rumbling::Once("Butt_R", giantref, shake_power * smt, 0.075, "NPC L Butt", 0.0);
+						Rumbling::Once("Butt_L", giantref, shake_power * smt, 0.075f, "NPC R Butt", 0.0f);
+						Rumbling::Once("Butt_R", giantref, shake_power * smt, 0.075f, "NPC L Butt", 0.0f);
 					}
 				} else {
 					if (!ButtR) {
@@ -324,7 +324,7 @@ namespace {
 			} 
 			return;
 		} else if (CanDoButtCrush(player, true) && !Runtime::HasPerk(player, "ButtCrush_NoEscape")) {
-			float WasteStamina = 100.0 * GetButtCrushCost(player, false);
+			float WasteStamina = 100.0f * GetButtCrushCost(player, false);
 			DamageAV(player, ActorValue::kStamina, WasteStamina);
 			AnimationManager::StartAnim("ButtCrush_StartFast", player);
 		} else if (!CanDoButtCrush(player, false) && !Runtime::HasPerk(player, "ButtCrush_NoEscape")) {

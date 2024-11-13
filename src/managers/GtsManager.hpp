@@ -24,7 +24,7 @@ namespace Gts {
 			 */
 			[[nodiscard]] static GtsManager& GetSingleton() noexcept;
 
-			float experiment = 1.0;
+			float experiment = 1.0f;
 
 			virtual void DragonSoulAbsorption() override;
 

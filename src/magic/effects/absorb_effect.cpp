@@ -33,7 +33,7 @@ namespace Gts {
 	}
 
 	void Absorb::OnUpdate() {
-		const float SMT_BONUS = 1.0;
+		const float SMT_BONUS = 1.0f;
 
 		auto caster = GetCaster();
 		if (!caster) {
@@ -58,22 +58,22 @@ namespace Gts {
 		} // More shrink with SMT
 
 		
-		if (size_difference >= 3.0) {
-			size_difference = 3.0;
+		if (size_difference >= 3.0f) {
+			size_difference = 3.0f;
 		} // Cap Size Difference
 
-		float shrink_power = 2.5 * size_difference;
-		float gain_size = 0.0025;
+		float shrink_power = 2.5f * size_difference;
+		float gain_size = 0.0025f;
 
 		if (target->IsDead()) {
-			shrink_power *= 3.0;
-			gain_size *= 0.20;
+			shrink_power *= 3.0f;
+			gain_size *= 0.20f;
 		}
 
 		
 		Attacked(target, caster);// make it seen as hostile action
 
-		if (ShrinkToNothing(caster, target, false, 1.0)) { // chance to receive more size xp and grow even bigger
+		if (ShrinkToNothing(caster, target, false, 1.0f)) { // chance to receive more size xp and grow even bigger
 			AbsorbShout_BuffCaster(caster, target);
 		} else {
 			TransferSize(caster, target, true, shrink_power, gain_size, false, ShrinkSource::Magic);
@@ -90,6 +90,6 @@ namespace Gts {
 		if (!target) {
 			return;
 		}
-		Task_TrackSizeTask(caster, target, "Absorb", false, 1.0);
+		Task_TrackSizeTask(caster, target, "Absorb", false, 1.0f);
 	}
 }

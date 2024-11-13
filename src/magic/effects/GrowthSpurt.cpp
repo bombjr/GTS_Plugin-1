@@ -12,54 +12,54 @@
 namespace {
 	void PlayShrinkAudio(Actor* actor, bool timer_1, bool timer_2, float power) {
 		float scale = get_visual_scale(actor);
-		float falloff = 0.18 * scale;
-		Rumbling::Once("GrowthSpurt", actor, Rumble_Shrink_GrowthSpurt, 0.05);
+		float falloff = 0.18f * scale;
+		Rumbling::Once("GrowthSpurt", actor, Rumble_Shrink_GrowthSpurt, 0.05f);
 		if (timer_1) {
-			Runtime::PlaySoundAtNode_FallOff("xlRumble", actor, power/20, 1.0, "NPC Pelvis [Pelv]", falloff);
+			Runtime::PlaySoundAtNode_FallOff("xlRumble", actor, power/20, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 		if (timer_2) {
 			float Volume = std::clamp(get_visual_scale(actor) * 0.10f, 0.10f, 1.0f);
-			Runtime::PlaySoundAtNode_FallOff("shrinkSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]", falloff);
+			Runtime::PlaySoundAtNode_FallOff("shrinkSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 	}
 
 	void PlayGrowthAudio(Actor* actor, bool timer_1, bool timer_2, float power) {
 		float scale = get_visual_scale(actor);
-		float falloff = 0.18 * scale;
-		Rumbling::Once("GrowthSpurt", actor, Rumble_Growth_GrowthSpurt, 0.05);
+		float falloff = 0.18f * scale;
+		Rumbling::Once("GrowthSpurt", actor, Rumble_Growth_GrowthSpurt, 0.05f);
 		if (timer_1) {
-			Runtime::PlaySoundAtNode_FallOff("xlRumble", actor, power/20, 1.0, "NPC Pelvis [Pelv]", falloff);
+			Runtime::PlaySoundAtNode_FallOff("xlRumble", actor, power/20, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 		if (timer_2) {
 			float Volume = std::clamp(scale * 0.10f, 0.20f, 1.0f);
-			Runtime::PlaySoundAtNode_FallOff("growthSound", actor, Volume, 1.0, "NPC Pelvis [Pelv]", falloff);
+			Runtime::PlaySoundAtNode_FallOff("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 	}
 
 	float Get_Perk_Bonus(Actor* giant) {
-		float bonus = 1.0;
-		float basic = 0.0;
+		float bonus = 1.0f;
+		float basic = 0.0f;
 		
 		if (Runtime::HasPerk(giant, "ExtraGrowth")) {
-			basic += 0.50;
+			basic += 0.50f;
 		}
 		if (Runtime::HasPerk(giant, "ExtraGrowthMax")) {
-			float perkbonus = 1.0 + ((GetGtsSkillLevel(giant) * 0.015) + (giant->GetLevel() * 0.030));
+			float perkbonus = 1.0f + ((GetGtsSkillLevel(giant) * 0.015f) + (giant->GetLevel() * 0.030f));
 			basic *= perkbonus;
 		}
 		return bonus + basic;
 	}
 
 	float Get_Growth_Limit(Actor* giant, int rank) {
-		float basic = 1.0 * get_natural_scale(giant, true);
-		float bonus = 0.0;
+		float basic = 1.0f * get_natural_scale(giant, true);
+		float bonus = 0.0f;
 
 		if (rank == 1) {
-			bonus = 0.25;
+			bonus = 0.25f;
 		} else if (rank == 2) {
-			bonus = 0.50;
+			bonus = 0.50f;
 		} else if (rank == 3) {
-			bonus = 1.0;
+			bonus = 1.0f;
 		}
 
 		bonus *= Get_Perk_Bonus(giant);
@@ -68,10 +68,10 @@ namespace {
 	}
 
 	void GrowthSpurt_RegenerateAttributes(Actor* caster) {
-		float HpRegen = GetMaxAV(caster, ActorValue::kHealth) * 0.00020;
+		float HpRegen = GetMaxAV(caster, ActorValue::kHealth) * 0.00020f;
 		
 		if (Runtime::HasPerk(caster, "HealthRegenPerk")) {
-			HpRegen *= 2.0;
+			HpRegen *= 2.0f;
 		}
 
 		caster->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, HpRegen * TimeScale());
@@ -99,9 +99,9 @@ namespace Gts {
 		if (!caster) {
 			return;
 		}
-		const float GROWTH_1_POWER = 0.00125;
-		const float GROWTH_2_POWER = 0.00145;
-		const float GROWTH_3_POWER = 0.00175;
+		const float GROWTH_1_POWER = 0.00125f;
+		const float GROWTH_2_POWER = 0.00145f;
+		const float GROWTH_3_POWER = 0.00175f;
 
 		auto base_spell = GetBaseEffect();
 
@@ -117,19 +117,19 @@ namespace Gts {
 			this->grow_limit = Get_Growth_Limit(caster, 3);
 		}
 
-		float Gigantism = 1.0 + Ench_Aspect_GetPower(caster);
+		float Gigantism = 1.0f + Ench_Aspect_GetPower(caster);
 		float scale = get_target_scale(caster);
 
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		float limit = this->grow_limit * Gigantism;
-		float MaxSize = get_max_scale(caster) - 0.004;
+		float MaxSize = get_max_scale(caster) - 0.004f;
 		
 
 		GrowthSpurt_RegenerateAttributes(caster);
 
 		if (scale < limit && scale < MaxSize) {
 			if (Runtime::HasMagicEffect(caster, "EffectSizeAmplifyPotion")) {
-				bonus = get_visual_scale(caster) * 0.25 + 0.75;
+				bonus = get_visual_scale(caster) * 0.25f + 0.75f;
 			}
 			DoGrowth(caster, this->power * bonus);
 		}
@@ -163,7 +163,7 @@ namespace Gts {
 			set_target_scale(actor, naturalscale);
 		}
 
-		SizeManager::GetSingleton().SetGrowthSpurt(actor, 0.0);
+		SizeManager::GetSingleton().SetGrowthSpurt(actor, 0.0f);
 
 		this->AllowStacking = true;
 		PlayShrinkAudio(actor, this->timer.ShouldRun(), this->timerSound.ShouldRunFrame(), this->power);

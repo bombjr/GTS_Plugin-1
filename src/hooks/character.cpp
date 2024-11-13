@@ -16,13 +16,13 @@ using namespace Gts;
 namespace {
 	float Get_Speed_Override(Actor* giant, float incoming_speed) {
 		float new_speed = incoming_speed;
-		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant) && get_visual_scale(giant) > 1.5) {
+		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant) && get_visual_scale(giant) > 1.5f) {
 			float speed_cap = 400.0f / get_visual_scale(giant);
 			float speed = AnimationManager::GetAnimSpeed(giant);
 			new_speed *= speed * speed;
 			//log::info("Adjusting speed for {}", giant->GetDisplayFullName());
 			if (giant->AsActorState()->IsSprinting()) {
-				speed_cap *= 2.0;
+				speed_cap *= 2.0f;
 			}
 			if (new_speed < speed_cap) {
 				return speed_cap;
@@ -108,7 +108,7 @@ namespace Hooks
 		float value = _GetBaseActorValue(a_owner, a_akValue);
 		if (Plugin::InGame()) {
 			Actor* a_this = skyrim_cast<Actor*>(a_owner);
-			float bonus = 1.0;
+			float bonus = 1.0f;
 			if (a_this) {
 				if (a_akValue == ActorValue::kCarryWeight) {
 					value = AttributeManager::AlterGetBaseAv(a_this, a_akValue, value);
@@ -147,7 +147,7 @@ namespace Hooks
 		if (a_this->IsInKillMove()) {
 			return _Move(a_this, a_arg2, a_position); // Do nothing in Kill moves
 		}
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		if (a_this->Get3D1(false)) {
 			if (a_this->Is3DLoaded()) {
 				bonus = AttributeManager::AlterMovementSpeed(a_this, a_position);

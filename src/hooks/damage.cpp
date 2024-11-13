@@ -28,30 +28,30 @@ namespace {
 		ActorHandle gianthandle = actor->CreateRefHandle();
 
 		if (AllowEdits) {
-			camera->worldFOV *= 0.35;
+			camera->worldFOV *= 0.35f;
 		}
 
 		float DefaultTP = data->WorldFov_Default;
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
 			if (AllowEdits) {
-				camera->worldFOV += DefaultTP * 0.003;
+				camera->worldFOV += DefaultTP * 0.003f;
 				if (camera->worldFOV >= DefaultTP) {
 					camera->worldFOV = DefaultTP;
-					data->IsNotImmune = 1.0;
+					data->IsNotImmune = 1.0f;
 					return false; // stop it
 				}
 			} else {
-				float timepassed = Finish - Start;
+				double timepassed = Finish - Start;
 				if (timepassed > 2.6) {
-					data->IsNotImmune = 1.0;
+					data->IsNotImmune = 1.0f;
 					return false;
 				}
 			}
@@ -62,10 +62,10 @@ namespace {
 		std::string name = std::format("CheatDeath_FP_{}", actor->formID);
 		ActorHandle gianthandle = actor->CreateRefHandle();
 
-		camera->firstPersonFOV *= 0.35;
+		camera->firstPersonFOV *= 0.35f;
 		float DefaultFP = data->FpFov_Default;
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name,[=](auto& progressData) {
 			if (!gianthandle) {
@@ -73,19 +73,19 @@ namespace {
 			}
 
 			auto giantref = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
 			if (AllowEdits) {
-				camera->firstPersonFOV += DefaultFP * 0.003;
+				camera->firstPersonFOV += DefaultFP * 0.003f;
 				if (camera->firstPersonFOV >= DefaultFP) {
 					camera->firstPersonFOV = DefaultFP;
-					data->IsNotImmune = 1.0;
+					data->IsNotImmune = 1.0f;
 					return false; // stop it
 				}
 			} else {
-				float timepassed = Finish - Start;
+				double timepassed = Finish - Start;
 				if (timepassed > 2.6) {
-					data->IsNotImmune = 1.0;
+					data->IsNotImmune = 1.0f;
 					return false;
 				}
 			}
@@ -107,7 +107,7 @@ namespace {
 			if (tranData) {
 				tranData->WorldFov_Default = camera->worldFOV;
 				tranData->FpFov_Default = camera->firstPersonFOV;
-				tranData->IsNotImmune = 0.0; // make actor immune to damage
+				tranData->IsNotImmune = 0.0f; // make actor immune to damage
 				if (TP) {
 					CameraFOVTask_TP(actor, camera, tranData, AllowEdits);
 				} else if (FP) {
@@ -120,25 +120,25 @@ namespace {
 	void DoOverkill(Actor* attacker, Actor* receiver, float damage) {
 		if (damage > GetMaxAV(receiver, ActorValue::kHealth)) { // Overkill effect
 			float size_difference = GetSizeDifference(attacker, receiver, SizeType::VisualScale, true, false);
-			if (size_difference >= 12.0) {
+			if (size_difference >= 12.0f) {
 				OverkillManager::GetSingleton().Overkill(attacker, receiver);
 			}
 		}
 	}
 
 	float TinyShield(Actor* receiver) {
-		float protection = 1.0;
+		float protection = 1.0f;
 		if (receiver->formID == 0x14) {
 			auto grabbedActor = Grab::GetHeldActor(receiver);
 			if (grabbedActor) {
-				protection = 0.75; // 25% damage reduction
+				protection = 0.75f; // 25% damage reduction
 			}
 		}
 		return protection;
 	}
 
 	float HealthGate(Actor* receiver, Actor* attacker, float a_damage) {
-		float protection = 1.0;
+		float protection = 1.0f;
 		if (receiver->formID == 0x14) {
 
 			a_damage *= GetDifficultyMultiplier(attacker, receiver); // Take difficulty into account
@@ -153,20 +153,20 @@ namespace {
 
 						float scale = get_visual_scale(receiver);
 
-						update_target_scale(receiver, -0.35 * scale, SizeEffectType::kShrink);
-						if ((target <= natural) || (target - 0.35 * scale <= natural)) {
+						update_target_scale(receiver, -0.35f * scale, SizeEffectType::kShrink);
+						if ((target <= natural) || (target - 0.35f * scale <= natural)) {
 							set_target_scale(receiver, natural); // to prevent becoming < natural scale
 						}
-						//Rumbling::For("CheatDeath", receiver, 4.0, 0.10, "NPC COM [COM ]", 1.50, 2.0);
-						Runtime::PlaySound("TriggerHG", receiver, 2.0, 0.5);
-						shake_camera(receiver, 1.7, 1.5);
+						//Rumbling::For("CheatDeath", receiver, 4.0f, 0.10f, "NPC COM [COM ]", 1.50f, 2.0f);
+						Runtime::PlaySound("TriggerHG", receiver, 2.0f, 0.5f);
+						shake_camera(receiver, 1.7f, 1.5f);
 						
 						auto node = find_node(receiver, "NPC Root [Root]");
 						if (node) {
 							NiPoint3 position = node->world.translate;
-							SpawnParticle(receiver, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 5.0, 7, nullptr); 
-							SpawnParticle(receiver, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 4.0, 7, nullptr); 
-							SpawnParticle(receiver, 6.00, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0, 7, nullptr); 
+							SpawnParticle(receiver, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 5.0f, 7, nullptr); 
+							SpawnParticle(receiver, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 4.0f, 7, nullptr); 
+							SpawnParticle(receiver, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0f, 7, nullptr); 
 						}
 
 						StaggerActor(receiver, attacker, 1.0f);
@@ -176,15 +176,15 @@ namespace {
 						StartDamageIsNotImmune(receiver);
 
 						Cprint("Health Gate triggered, death avoided");
-						Cprint("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35 * scale);
+						Cprint("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35f * scale);
 						Notify("Health Gate triggered, death avoided");
-						Notify("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35 * scale);
-						protection = 0.0;
+						Notify("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35f * scale);
+						protection = 0.0f;
 					}
 				}
 			}
 		}
-		if (Runtime::HasPerk(receiver, "DarkArts_Max") && GetHealthPercentage(receiver) <= 0.40) {
+		if (Runtime::HasPerk(receiver, "DarkArts_Max") && GetHealthPercentage(receiver) <= 0.40f) {
 			bool OnCooldown = IsActionOnCooldown(receiver, CooldownSource::Misc_ShrinkOutburst_Forced);
 			if (!OnCooldown) {
 				ApplyActionCooldown(receiver, CooldownSource::Misc_ShrinkOutburst_Forced);
@@ -195,16 +195,16 @@ namespace {
 	}
 
 	float GrowthDamageResistance(Actor* receiver) {
-		float reduction = 1.0;
+		float reduction = 1.0f;
 		if (IsGrowing(receiver)) {
 			int growthtype = 0;
 			receiver->GetGraphVariableInt("GTS_Growth_Roll", growthtype);
 			if (growthtype > 0) {
 				if (Runtime::HasPerk(receiver, "RandomGrowthAug")) {
-					reduction -= 0.6;
+					reduction -= 0.6f;
 				}
 				if (Runtime::HasPerk(receiver, "RandomGrowthTerror")) {
-					reduction -= 0.25;
+					reduction -= 0.25f;
 				}
 			}
 		}
@@ -212,13 +212,13 @@ namespace {
 	}
 
 	float HugDamageResistance(Actor* receiver) {
-		float reduction = 1.0;
+		float reduction = 1.0f;
 		if (HugShrink::GetHuggiesActor(receiver)) {
 			if (Runtime::HasPerk(receiver, "HugCrush_ToughGrip")) {
-				reduction -= 0.25; // 25% resistance
+				reduction -= 0.25f; // 25% resistance
 			}
 			if (Runtime::HasPerk(receiver, "HugCrush_HugsOfDeath")) {
-				reduction -= 0.35; // 35% additional resistance
+				reduction -= 0.35f; // 35% additional resistance
 			}
 		}
 		return reduction;
@@ -227,10 +227,10 @@ namespace {
 	float GetTotalDamageResistance(Actor* receiver, Actor* aggressor) {
 		float resistance = GetDamageResistance(receiver) * HugDamageResistance(receiver) * GrowthDamageResistance(receiver);
 		float multiplier = GetDamageMultiplier(aggressor) / game_getactorscale(aggressor); // take GetScale into account since it boosts damage as well
-		float tiny = 1.0;
-		float IsNotImmune = 1.0;
+		float tiny = 1.0f;
+		float IsNotImmune = 1.0f;
 
-		float mult = 1.0;
+		float mult = 1.0f;
 
 		auto transient = Transient::GetSingleton().GetData(receiver);
 
@@ -254,12 +254,12 @@ namespace {
 			float giant_scale = get_visual_scale(giant);
 			
 			if (HasSMT(giant)) {
-			    giant_scale *= 2.5;
+			    giant_scale *= 2.5f;
 		    }
 
 			float difference = giant_scale/tiny_scale;
 
-			float pushResult = 1.0 / (difference*difference*difference);
+			float pushResult = 1.0f / (difference*difference*difference);
 
 			float result = std::clamp(pushResult, 0.01f, 1.0f);
 

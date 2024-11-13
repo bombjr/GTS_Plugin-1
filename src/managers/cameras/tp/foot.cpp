@@ -16,10 +16,10 @@ namespace Gts {
 		auto player = GetCameraActor();
 		if (player) {
 			float playerScale = get_visual_scale(player);
-			if (playerScale > 0.0) {
+			if (playerScale > 0.0f) {
 				this->smoothScale.value = playerScale;
 				this->smoothScale.target = playerScale;
-				this->smoothScale.velocity = 0.0;
+				this->smoothScale.velocity = 0.0f;
 			}
 		}
 	}
@@ -28,7 +28,7 @@ namespace Gts {
 		auto player = GetCameraActor();
 		float playerScale = get_visual_scale(player);
 
-		NiPoint3 lookAt = CompuleLookAt(0.45); // float is zoom scale
+		NiPoint3 lookAt = CompuleLookAt(0.45f); // float is zoom scale
 
 		NiPoint3 footPos = this->GetFootPos();
 
@@ -36,7 +36,7 @@ namespace Gts {
 			auto rootModel = player->Get3D(false);
 			if (rootModel) {
 				auto playerTrans = rootModel->world;
-				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0;  // Only do translation/rotation
+				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0f;  // Only do translation/rotation
 				auto transform = playerTrans.Invert();
 				NiPoint3 localLookAt = transform*lookAt;
 				this->smoothScale.target = playerScale;
@@ -59,19 +59,19 @@ namespace Gts {
 			auto rootModel = player->Get3D(false);
 			if (rootModel) {
 				auto playerTrans = rootModel->world;
-				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0;  // Only do translation/rotation
+				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0f;  // Only do translation/rotation
 				auto transform = playerTrans.Invert();
 				auto leftFoot = find_node(player, leftFootLookup);
 				auto rightFoot = find_node(player, rightFootLookup);
 				if (leftFoot != nullptr && rightFoot != nullptr) {
 					auto leftPosLocal = transform * (leftFoot->world * NiPoint3());
 					auto rightPosLocal = transform * (rightFoot->world * NiPoint3());
-					this->smoothFootPos.target = (leftPosLocal + rightPosLocal) / 2.0;
+					this->smoothFootPos.target = (leftPosLocal + rightPosLocal) / 2.0f;
 
 					NiPoint3 highheelOffset = HighHeelManager::GetHHOffset(player) * HighHeelManager::GetHHMultiplier(player);
 					this->smoothFootPos.target.z += OFFSET*playerScale;
 					if (highheelOffset.Length() > 1e-4) {
-						this->smoothFootPos.target -= highheelOffset * 1.6;
+						this->smoothFootPos.target -= highheelOffset * 1.6f;
 					}
 					
 				}

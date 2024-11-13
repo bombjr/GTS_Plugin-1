@@ -38,16 +38,16 @@ namespace Gts {
 	}
 
 	Voice::Voice(const toml::value& data) {
-		this->_maxVoiceFrequency = toml::find_or<float>(data, "maxVoiceFrequency", 1.0);
+		this->_maxVoiceFrequency = toml::find_or<float>(data, "maxVoiceFrequency", 1.0f);
 	}
 
 	Tremor::Tremor(const toml::value& data) {
 		this->_method = toml::find_or<std::string>(data, "method", "linear");
-		this->_halfScale = toml::find_or<float>(data, "halfScale", 0.91);
-		this->_powerAtMin = toml::find_or<float>(data, "powerAtMin", 0.0);
-		this->_powerAtMax = toml::find_or<float>(data, "powerAtMax", 8.25);
-		this->_maxScale = toml::find_or<float>(data, "maxScale", 30.0);
-		this->_minScale = toml::find_or<float>(data, "minScale", 0.0);
+		this->_halfScale = toml::find_or<float>(data, "halfScale", 0.91f);
+		this->_powerAtMin = toml::find_or<float>(data, "powerAtMin", 0.0f);
+		this->_powerAtMax = toml::find_or<float>(data, "powerAtMax", 8.25f);
+		this->_maxScale = toml::find_or<float>(data, "maxScale", 30.0f);
+		this->_minScale = toml::find_or<float>(data, "minScale", 0.0f);
 	}
 
 	Config::Config(const toml::value& data) {

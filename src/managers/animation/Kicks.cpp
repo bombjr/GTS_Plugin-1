@@ -61,7 +61,7 @@ namespace {
 			if (Leg) {
 				auto coords = GetFootCoordinates(actor, Right, false);
 				if (!coords.empty()) {
-					DoDamageAtPoint_Cooldown(giant, Radius_Kick, power, Leg, coords[1], 10, 0.30, crush, pushpower, Source); // At Toe point
+					DoDamageAtPoint_Cooldown(giant, Radius_Kick, power, Leg, coords[1], 10, 0.30f, crush, pushpower, Source); // At Toe point
 					PushObjects(Objects, giant, Leg, pushpower, Radius_Kick, true);
 				}
 			}
@@ -71,8 +71,8 @@ namespace {
 
 	void StopAllDamageAndStamina(Actor* actor) {
 		std::string name = std::format("LegKick_{}", actor->formID);
-		DrainStamina(actor, "StaminaDrain_StrongKick", "DestructionBasics", false, 8.0);
-		DrainStamina(actor, "StaminaDrain_Kick", "DestructionBasics", false, 4.0);
+		DrainStamina(actor, "StaminaDrain_StrongKick", "DestructionBasics", false, 8.0f);
+		DrainStamina(actor, "StaminaDrain_Kick", "DestructionBasics", false, 4.0f);
 		TaskManager::Cancel(name);
 	}
 
@@ -95,12 +95,12 @@ namespace {
 	}
 
 	void GTS_Kick_HitBox_On_R(AnimationEventData& data) {
-		StartDamageAt(&data.giant, Damage_Kick, 1.8, Push_Kick_Normal, true, "NPC R Toe0 [RToe]", DamageSource::KickedRight);
-		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 4.0);
+		StartDamageAt(&data.giant, Damage_Kick, 1.8f, Push_Kick_Normal, true, "NPC R Toe0 [RToe]", DamageSource::KickedRight);
+		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 4.0f);
 	}
 	void GTS_Kick_HitBox_On_L(AnimationEventData& data) {
-		StartDamageAt(&data.giant, Damage_Kick, 1.8, Push_Kick_Normal, false, "NPC L Toe0 [LToe]", DamageSource::KickedLeft);
-		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 4.0);
+		StartDamageAt(&data.giant, Damage_Kick, 1.8f, Push_Kick_Normal, false, "NPC L Toe0 [LToe]", DamageSource::KickedLeft);
+		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 4.0f);
 	}
 	void GTS_Kick_HitBox_Off_R(AnimationEventData& data) {
 		StopAllDamageAndStamina(&data.giant);
@@ -110,12 +110,12 @@ namespace {
 	}
 
 	void GTS_Kick_HitBox_Power_On_R(AnimationEventData& data) {
-		StartDamageAt(&data.giant, Damage_Kick_Strong, 1.8, Push_Kick_Strong, true, "NPC R Toe0 [RToe]", DamageSource::KickedRight);
-		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 8.0);
+		StartDamageAt(&data.giant, Damage_Kick_Strong, 1.8f, Push_Kick_Strong, true, "NPC R Toe0 [RToe]", DamageSource::KickedRight);
+		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 8.0f);
 	}
 	void GTS_Kick_HitBox_Power_On_L(AnimationEventData& data) {
-		StartDamageAt(&data.giant, Damage_Kick_Strong, 1.8, Push_Kick_Strong, false, "NPC L Toe0 [LToe]", DamageSource::KickedLeft);
-		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 8.0);
+		StartDamageAt(&data.giant, Damage_Kick_Strong, 1.8f, Push_Kick_Strong, false, "NPC L Toe0 [LToe]", DamageSource::KickedLeft);
+		DrainStamina(&data.giant, "StaminaDrain_StrongKick", "DestructionBasics", true, 8.0f);
 	}
 	void GTS_Kick_HitBox_Power_Off_R(AnimationEventData& data) {
 		StopAllDamageAndStamina(&data.giant);
@@ -128,24 +128,24 @@ namespace {
 	//  Animation Triggers
 	// ======================================================================================
 	void LightKickLeftEvent(const InputEventData& data) {
-		PerformKick("SwipeLight_Left", 35.0);
+		PerformKick("SwipeLight_Left", 35.0f);
 	}
 	void LightKickRightEvent(const InputEventData& data) {
-		PerformKick("SwipeLight_Right", 35.0);
+		PerformKick("SwipeLight_Right", 35.0f);
 	}
 
 	void HeavyKickLeftEvent(const InputEventData& data) {
-		PerformKick("SwipeHeavy_Left", 110.0);
+		PerformKick("SwipeHeavy_Left", 110.0f);
 	}
 	void HeavyKickRightEvent(const InputEventData& data) {
-		PerformKick("SwipeHeavy_Right", 110.0);
+		PerformKick("SwipeHeavy_Right", 110.0f);
 	}
 
 	void HeavyKickRightLowEvent(const InputEventData& data) {
-		PerformKick("StrongKick_Low_Right", 110.0);
+		PerformKick("StrongKick_Low_Right", 110.0f);
 	}
 	void HeavyKickLeftLowEvent(const InputEventData& data) {
-		PerformKick("StrongKick_Low_Left", 110.0);
+		PerformKick("StrongKick_Low_Left", 110.0f);
 	}
 }
 

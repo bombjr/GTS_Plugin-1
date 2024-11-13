@@ -28,7 +28,7 @@ namespace Gts {
 		private:
 			mutable std::mutex _lock;
 
-			float last_scale = -1.0;
+			float last_scale = -1.0f;
 
 			std::atomic_uint64_t last_update_frame = std::atomic_uint64_t(0);
 

@@ -32,14 +32,14 @@ namespace {
 					float scaling = get_visual_scale(owner_get);
 					float shake_power = scaling * (node->world.translate.Length() / distance);
 
-					shake_camera_at_node(node->world.translate, shake_power, 1.5);
+					shake_camera_at_node(node->world.translate, shake_power, 1.5f);
 
 					auto cell = projectile->GetParentCell();
 
 					if (cell) {
 						// Crashes if called like that, too lazy to fix it
 						log::info("Spawning footstep.nif");
-						BSTempEffectParticle::Spawn(cell, 6.0, "GTS/Effects/Footstep.nif", node->world.rotate, node->world.translate, scaling, 7, nullptr);
+						BSTempEffectParticle::Spawn(cell, 6.0f, "GTS/Effects/Footstep.nif", node->world.rotate, node->world.translate, scaling, 7, nullptr);
 					}
 				}
 			}
@@ -126,7 +126,7 @@ namespace Hooks
 		// Unused
 		log::info("Projectile True");
 		_GetLinearVelocityProjectile(a_this, a_outVelocity);
-		ScaleProjectile(a_this, 10000.0, true);
+		ScaleProjectile(a_this, 10000.0f, true);
 	}
 
 	void Hook_Projectiles::Handle3DLoaded_Arrow(RE::Projectile* a_this)
@@ -134,7 +134,7 @@ namespace Hooks
 		// Scale Arrow projectile once (when it first spawns). Affects only visuals.
 		//log::info("Arrow True");
 		_Handle3DLoaded_Arrow(a_this);
-		ScaleProjectile(a_this, 1.0, false);
+		ScaleProjectile(a_this, 1.0f, false);
 	}
 
 	void Hook_Projectiles::AddImpact_Arrow(RE::Projectile* a_this, TESObjectREFR* a_ref, const NiPoint3& a_targetLoc, const NiPoint3& a_velocity, hkpCollidable* a_collidable, std::int32_t a_arg6, std::uint32_t a_arg7) {
@@ -151,35 +151,35 @@ namespace Hooks
 		// Scale Missile-like projectiles once (when they first spawn). Affects only visuals.
 		log::info("Missile True");
 		_Handle3DLoaded_Missile(a_this);
-		ScaleProjectile(a_this, 10000.0, true);
+		ScaleProjectile(a_this, 10000.0f, true);
 	}
 
 	void Hook_Projectiles::Handle3DLoaded_Beam(RE::Projectile* a_this, RE::NiPoint3& a_outVelocity) {	
 		// Scale Beam-like projectiles once (when they first spawn). Affects only visuals.
 		log::info("Beam True");
 		_Handle3DLoaded_Beam(a_this, a_outVelocity);
-		ScaleProjectile(a_this, 10000.0, true);
+		ScaleProjectile(a_this, 10000.0f, true);
 	}
 
 	void Hook_Projectiles::Handle3DLoaded_Barrier(RE::Projectile* a_this, RE::NiPoint3& a_outVelocity) {
 		// Scale Barrier-like projectiles once (when they first spawn). Affects only visuals.
 		log::info("Barrier True");
 		_Handle3DLoaded_Barrier(a_this, a_outVelocity);
-		ScaleProjectile(a_this, 10000.0, true);
+		ScaleProjectile(a_this, 10000.0f, true);
 	}
 
 	void Hook_Projectiles::Handle3DLoaded_Cone(RE::Projectile* a_this) {
 		// Scale Cone-like projectiles once (when they first spawn). Affects only visuals.
 		log::info("Cone True: {}", a_this->GetDisplayFullName());
 		_Handle3DLoaded_Cone(a_this);
-		ScaleProjectile(a_this, 10000.0, true);
+		ScaleProjectile(a_this, 10000.0f, true);
 	}
 
 	void Hook_Projectiles::Handle3DLoaded_Flame(RE::Projectile* a_this) {
 		// Scale Flame-like projectiles once (when they first spawn). Affects only visuals.
 		log::info("Flame True: {}", a_this->GetDisplayFullName());
 		_Handle3DLoaded_Flame(a_this);
-		ScaleProjectile(a_this, 10000.0, false);
+		ScaleProjectile(a_this, 10000.0f, false);
 	}
 
 	void Hook_Projectiles::Initialize_Explosion(RE::Explosion* a_this, TESObjectCELL& a_cell) {

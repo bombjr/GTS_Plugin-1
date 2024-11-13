@@ -83,7 +83,7 @@ namespace {
 		if (charCont) {
 			float scale = get_visual_scale(actor);
 			float falltime = charCont->fallTime;
-			float threshold = 0.04 * scale;
+			float threshold = 0.04f * scale;
 			//log::info("Fall time of {} is {}", actor->GetDisplayFullName(), falltime);
 			if (falltime < threshold) {
 				//log::info("Blocking anim");
@@ -145,7 +145,7 @@ namespace {
 
 	bool PreventSprinting(FormID idle, Actor* performer) {
 		if (idle == SprintRootStart) {
-			if (IsTeammate(performer) && get_visual_scale(performer) > 2.0) {
+			if (IsTeammate(performer) && get_visual_scale(performer) > 2.0f) {
 				return true;
 			}
 			return false;

@@ -16,8 +16,8 @@ using namespace RE;
 namespace Gts {
 
 	struct HeadtrackingData {
-		Spring spineSmooth = Spring(0.0, 0.70);
-		Spring casterSmooth = Spring(0.0, 1.0);
+		Spring spineSmooth = Spring(0.0f, 0.70f);
+		Spring casterSmooth = Spring(0.0f, 1.0f);
 	};
 
 	class Headtracking : public EventListener  {

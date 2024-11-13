@@ -23,10 +23,10 @@ namespace {
 	float GetPushPower(float sizeRatio) {
 		// https://www.desmos.com/calculator/wh0vwgljfl
 		SoftPotential push {
-			.k = 1.42,
-			.n = 0.78,
-			.s = 0.50,
-			.a = 0.0,
+			.k = 1.42f,
+			.n = 0.78f,
+			.s = 0.50f,
+			.a = 0.0f,
 		};
 		float power = soft_power(sizeRatio, push);
 		return power;
@@ -87,24 +87,24 @@ namespace Gts {
 		float size_difference = attackerscale/receiverscale;
 
 		if (HasSMT(player)) {
-			size_difference += 3.0;
+			size_difference += 3.0f;
 		}
 
 		// Apply it
 		float pushpower = GetPushPower(size_difference);
-		if (attacker->formID == 0x14 && size_difference >= 4.0) {
+		if (attacker->formID == 0x14 && size_difference >= 4.0f) {
 			FormType formType = HitId->GetFormType();
 			if (formType != FormType::Weapon) {
 				return;
 			}
 			if (wasPowerAttack || hitName.find("Bow") != std::string::npos) {
-				size_difference *= 2.0;
-				pushpower *= 2.0;
+				size_difference *= 2.0f;
+				pushpower *= 2.0f;
 			}
 			if (hitName.find("Bow") == std::string::npos) {
-				shake_camera(attacker, size_difference * 0.20, 0.35);
+				shake_camera(attacker, size_difference * 0.20f, 0.35f);
 			}
-			PushForward(attacker, receiver, pushpower * 25.0);
+			PushForward(attacker, receiver, pushpower * 25.0f);
 			//log::info("Size difference is met, pushing actor away");
 		}
 	}

@@ -42,39 +42,39 @@ namespace {
 		bool ForceCrush = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles");
 		float staminapercent = GetStaminaPercentage(giant);
 		float stamina = GetAV(giant, ActorValue::kStamina);
-		if (ForceCrush && staminapercent >= 0.75) {
+		if (ForceCrush && staminapercent >= 0.75f) {
 			AnimationManager::StartAnim("Huggies_HugCrush", giant);
 			AnimationManager::StartAnim("Huggies_HugCrush_Victim", huggedActor);
-			DamageAV(giant, ActorValue::kStamina, stamina * 1.10);
+			DamageAV(giant, ActorValue::kStamina, stamina * 1.10f);
 			return true;
 		}
 		return false;
 	}
 
 	void ShrinkPulse_DecreaseSize(Actor* tiny, float scale) {
-		float min_scale = 0.04;
+		float min_scale = 0.04f;
 		float target_scale = get_target_scale(tiny);
 		if (target_scale > min_scale) {
-			set_target_scale(tiny, scale*0.48);
+			set_target_scale(tiny, scale*0.48f);
 		} else {
 			set_target_scale(tiny, min_scale);
 		}
 	}
 
 	void ShrinkPulse_GainSize(Actor* giant, Actor* tiny, bool task) {
-		float increase = 1.0;
+		float increase = 1.0f;
 		if (Runtime::HasPerkTeam(giant, "HugCrush_Greed")) {
-			increase = 1.15;
+			increase = 1.15f;
 		}
 
 		if (!task) {
-			float steal = get_visual_scale(tiny) * 0.035 * increase * 0.6;
+			float steal = get_visual_scale(tiny) * 0.035f * increase * 0.6f;
 			if (IsCrawling(giant)) {
-				steal *= 0.8; // Crawl has one more shrink event so we compensate
+				steal *= 0.8f; // Crawl has one more shrink event so we compensate
 			}
 			update_target_scale(giant, steal, SizeEffectType::kGrow);
 		} else {
-			float Start = Time::WorldTimeElapsed();
+			double Start = Time::WorldTimeElapsed();
 			ActorHandle gianthandle = giant->CreateRefHandle();
 			float original_scale = Vore::ReadOriginalScale(tiny);
 			std::string name = std::format("HugCrushGrowth_{}_{}", giant->formID, tiny->formID);
@@ -86,16 +86,16 @@ namespace {
 
 				auto giantref = gianthandle.get().get();
 
-				float Elapsed = Time::WorldTimeElapsed() - Start;
-				float formula = bezier_curve(Elapsed, 0.2, 1.9, 0, 0, 3.0, 4.0); // Reuse formula from GrowthAnimation::Growth_2/5
+				float Elapsed = static_cast<float>(Time::WorldTimeElapsed() - Start);
+				float formula = bezier_curve(Elapsed, 0.2f, 1.9f, 0, 0, 3.0f, 4.0f); // Reuse formula from GrowthAnimation::Growth_2/5
 				// https://www.desmos.com/calculator/reqejljy19
-				if (formula >= 1.0) {
-					formula = 1.0;
+				if (formula >= 1.0f) {
+					formula = 1.0f;
 				}
 				
-				float grow = 0.000235 * 8 * original_scale * increase * TimeScale() * formula * 0.6;
+				float grow = 0.000235f * 8 * original_scale * increase * TimeScale() * formula * 0.6f;
 
-				if (Elapsed <= 0.95) {
+				if (Elapsed <= 0.95f) {
 					override_actor_scale(giantref, grow, SizeEffectType::kNeutral);
 					return true;
 				} 
@@ -106,10 +106,10 @@ namespace {
 
 	void Hugs_ShakeCamera(Actor* giant) {
 		if (giant->formID == 0x14) {
-			shake_camera(giant, 0.75, 0.35);
+			shake_camera(giant, 0.75f, 0.35f);
 		} else {
-			Rumbling::Once("HugGrab_L", giant, Rumble_Hugs_Catch, 0.15, "NPC L Hand [LHnd]", 0.0);
-			Rumbling::Once("HugGrab_R", giant, Rumble_Hugs_Catch, 0.15, "NPC R Hand [RHnd]", 0.0);
+			Rumbling::Once("HugGrab_L", giant, Rumble_Hugs_Catch, 0.15f, "NPC L Hand [LHnd]", 0.0f);
+			Rumbling::Once("HugGrab_R", giant, Rumble_Hugs_Catch, 0.15f, "NPC R Hand [RHnd]", 0.0f);
 		}
 	}
 
@@ -174,26 +174,26 @@ namespace {
 
 	void GTS_Hug_Moan(AnimationEventData& data) {
 		auto giant = &data.giant;
-		PlayMoanSound(giant, 1.0);
-		Task_FacialEmotionTask_Moan(giant, 2.75, "HugMoan");
+		PlayMoanSound(giant, 1.0f);
+		Task_FacialEmotionTask_Moan(giant, 2.75f, "HugMoan");
 	}
 
 	void GTS_Hug_Moan_End(AnimationEventData& data) {
 	}
 
 	void GTS_Hug_FacialOn(AnimationEventData& data) { // Smug or something
-		AdjustFacialExpression(&data.giant, 2, 1.0, "expression");
+		AdjustFacialExpression(&data.giant, 2, 1.0f, "expression");
 	}
 
 	void GTS_Hug_FacialOff(AnimationEventData& data) { // Disable smug
-		AdjustFacialExpression(&data.giant, 2, 0.0, "expression");
+		AdjustFacialExpression(&data.giant, 2, 0.0f, "expression");
 	}
 
 	void GTS_Hug_PullBack(AnimationEventData& data) { // When we pull actor back to chest, used to play laugh
 		int Random = RandomInt(0, 5);
 		if (Random >= 4) {
-			PlayLaughSound(&data.giant, 1.0, 1);
-			Task_FacialEmotionTask_Smile(&data.giant, 2.25, "HugSmile");
+			PlayLaughSound(&data.giant, 1.0f, 1);
+			Task_FacialEmotionTask_Smile(&data.giant, 2.25f, "HugSmile");
 		}
 	}
 
@@ -211,7 +211,7 @@ namespace {
 			ShrinkPulse_DecreaseSize(huggedActor, scale);
 			ShrinkPulse_GainSize(giant, huggedActor, false);
 
-			Rumbling::For("ShrinkPulse", giant, Rumble_Hugs_Shrink, 0.10, "NPC COM [COM ]", 0.50 / AnimationManager::GetAnimSpeed(giant), 0.0);
+			Rumbling::For("ShrinkPulse", giant, Rumble_Hugs_Shrink, 0.10f, "NPC COM [COM ]", 0.50f / AnimationManager::GetAnimSpeed(giant), 0.0f);
 			ModSizeExperience(giant, scale/6);
 		}
 	}
@@ -228,12 +228,12 @@ namespace {
 		}
 		HugCrushOther(giant, huggedActor);
 		PrintDeathSource(giant, huggedActor, DamageSource::Hugs);
-		Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10, "NPC COM [COM ]", 0.15, 0.0);
+		Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f);
 		HugShrink::DetachActorTask(giant);
 
-		AdjustFacialExpression(giant, 0, 0.0, "phenome");
-		AdjustFacialExpression(giant, 0, 0.0, "modifier");
-		AdjustFacialExpression(giant, 1, 0.0, "modifier");
+		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
+		AdjustFacialExpression(giant, 0, 0.0f, "modifier");
+		AdjustFacialExpression(giant, 1, 0.0f, "modifier");
 
 		Task_ApplyAbsorbCooldown(giant); // Start Cooldown right after crush
 		ShrinkPulse_GainSize(giant, huggedActor, true);
@@ -241,9 +241,9 @@ namespace {
 		if (giant->formID == 0x14) {
 			auto caster = giant;
 			float target_scale = get_visual_scale(huggedActor);
-			AdjustSizeReserve(caster, 0.0225);
-			AdjustSizeLimit(0.0060, caster);
-			AdjustMassLimit(0.0060, caster);
+			AdjustSizeReserve(caster, 0.0225f);
+			AdjustSizeLimit(0.0060f, caster);
+			AdjustMassLimit(0.0060f, caster);
 		}
 		HugShrink::Release(giant);
 	}
@@ -270,12 +270,12 @@ namespace {
 	}
 
 	void GTS_CH_Tiny_FXStart(AnimationEventData& data) { // Spawn Runes on Tiny
-		float scale = get_visual_scale(&data.giant) * 0.33;
+		float scale = get_visual_scale(&data.giant) * 0.33f;
 		for (std::string_view hand_nodes: {"NPC L Hand [LHnd]", "NPC R Hand [RHnd]"}) {
 			auto node = find_node(&data.giant, hand_nodes);
 			if (node) {
 				NiPoint3 position = node->world.translate;
-				SpawnParticle(&data.giant, 6.00, "GTS/gts_tinyrune_bind.nif", NiMatrix3(), position, scale, 7, node); 
+				SpawnParticle(&data.giant, 6.00f, "GTS/gts_tinyrune_bind.nif", NiMatrix3(), position, scale, 7, node); 
 			}
 		}
 
@@ -283,7 +283,7 @@ namespace {
 			auto node = find_node(&data.giant, leg_nodes);
 			if (node) {
 				NiPoint3 position = node->world.translate;
-				SpawnParticle(&data.giant, 6.00, "GTS/gts_tinyrune_bind_leg.nif", NiMatrix3(), position, scale, 7, node); 
+				SpawnParticle(&data.giant, 6.00f, "GTS/gts_tinyrune_bind_leg.nif", NiMatrix3(), position, scale, 7, node); 
 			}
 		}
 	}
@@ -294,7 +294,7 @@ namespace {
 			auto ObjectB = find_node(huggedActor, "AnimObjectB");
 			if (ObjectB) {
 				NiPoint3 position = ObjectB->world.translate;
-				SpawnParticle(huggedActor, 3.00, "GTS/gts_chugrune.nif", NiMatrix3(), position, get_visual_scale(huggedActor), 7, ObjectB); 
+				SpawnParticle(huggedActor, 3.00f, "GTS/gts_chugrune.nif", NiMatrix3(), position, get_visual_scale(huggedActor), 7, ObjectB); 
 			}
 		}
 	}
@@ -343,7 +343,7 @@ namespace {
 		if (CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player)) {
 			auto& Hugging = HugAnimationController::GetSingleton();
 
-			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1.0);
+			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1);
 			for (auto prey: preys) {
 				Hugging.StartHug(player, prey);
 			}
@@ -370,7 +370,7 @@ namespace {
 				} else if (HasSMT(player)) {
 					AnimationManager::StartAnim("Huggies_HugCrush", player);
 					AnimationManager::StartAnim("Huggies_HugCrush_Victim", huggedActor);
-					AddSMTPenalty(player, 10.0); // Mostly called inside ShrinkUntil
+					AddSMTPenalty(player, 10.0f); // Mostly called inside ShrinkUntil
 					DamageAV(player, ActorValue::kStamina, 60);
 					return;
 				} else {
@@ -378,13 +378,13 @@ namespace {
 						return;
 					}
 					std::string message = std::format("{} is too healthy to be hug crushed", huggedActor->GetDisplayFullName());
-					shake_camera(player, 0.45, 0.30);
+					shake_camera(player, 0.45f, 0.30f);
 					NotifyWithSound(player, message);
 
-					Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0, HpThreshold * 100.0);
+					Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0f, HpThreshold * 100.0f);
 				}
 			} else {
-				float cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
+				double cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
                 std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
 				NotifyWithSound(player, message);
 			}
@@ -400,7 +400,7 @@ namespace {
 		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
 				NotifyWithSound(player, "All available size was drained");
-				shake_camera(player, 0.45, 0.30);
+				shake_camera(player, 0.45f, 0.30f);
 			}
 			return;
 		}
@@ -419,7 +419,7 @@ namespace {
 		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
 				NotifyWithSound(player, "All available size was drained");
-				shake_camera(player, 0.45, 0.30);
+				shake_camera(player, 0.45f, 0.30f);
 			}
 			return;
 		}
@@ -488,7 +488,7 @@ namespace Gts {
 
 		UpdateFriendlyHugs(giant, tiny, true);
 
-		const float duration = 2.0;
+		const float duration = 2.0f;
 		TaskManager::RunFor(name, duration, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
@@ -498,29 +498,30 @@ namespace Gts {
 			}
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
+
 			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, false, true);
-			float steal = GetHugStealRate(giantref) * 0.85;
+			float steal = GetHugStealRate(giantref) * 0.85f;
 			
-			float stamina = 0.35;
-			float shrink = 14.0;
+			float stamina = 0.35f;
+			float shrink = 14.0f;
 			if (Runtime::HasPerkTeam(giantref, "HugCrush_Greed")) {
-				shrink *= 1.25;
-				stamina *= 0.75;
+				shrink *= 1.25f;
+				stamina *= 0.75f;
 			}
 			stamina *= Perk_GetCostReduction(giantref);
 
 			if (sizedifference >= GetHugShrinkThreshold(giantref)) {
-				std::string_view message = std::format("{} stole all available size", giantref->GetDisplayFullName());
+				std::string_view message = fmt::format("{} stole all available size", giantref->GetDisplayFullName());
 				Notify(message);
 				return false;
 			}
-			DamageAV(tinyref, ActorValue::kStamina, (0.60 * TimeScale())); // Drain Stamina
-			DamageAV(giantref, ActorValue::kStamina, 0.50 * stamina * TimeScale()); // Damage GTS Stamina
+			DamageAV(tinyref, ActorValue::kStamina, (0.60f * TimeScale())); // Drain Stamina
+			DamageAV(giantref, ActorValue::kStamina, 0.50f * stamina * TimeScale()); // Damage GTS Stamina
 			
 			TransferSize(giantref, tinyref, false, shrink, steal, false, ShrinkSource::Hugs); // Shrink foe, enlarge gts
-			ModSizeExperience(giantref, 0.00020);
+			ModSizeExperience(giantref, 0.00020f);
 			Attacked(tinyref, giantref); // make it look like we attack the tiny
-			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Shrink, 0.12, "NPC COM [COM ]", 0.0);
+			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Shrink, 0.12f, "NPC COM [COM ]", 0.0f);
 			
 			return true;
 		});
@@ -549,7 +550,7 @@ namespace Gts {
 			
 			bool GTS_HuggingAlly = false;
 			bool Tiny_HuggedAsAlly = false;
-			float DrainReduction = 3.4;
+			float DrainReduction = 3.4f;
 			tinyref->GetGraphVariableBool("GTS_IsFollower", Tiny_HuggedAsAlly);
 			giantref->GetGraphVariableBool("GTS_HuggingTeammate", GTS_HuggingAlly);
 
@@ -558,7 +559,7 @@ namespace Gts {
 			bool HuggingAlly = GTS_HuggingAlly && Tiny_HuggedAsAlly;
 
 			if (HuggingAlly) {
-				DrainReduction *= 1.5; // less stamina drain for friendlies
+				DrainReduction *= 1.5f; // less stamina drain for friendlies
 			}
 
 			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, false, true);
@@ -578,8 +579,8 @@ namespace Gts {
 			}
 			
 			GrabStaminaDrain(giantref, tinyref, sizedifference * DrainReduction);
-			DamageAV(tinyref, ActorValue::kStamina, 0.125 * TimeScale()); // Drain Tiny Stamina
-			ModSizeExperience(giantref, 0.00005);
+			DamageAV(tinyref, ActorValue::kStamina, 0.125f * TimeScale()); // Drain Tiny Stamina
+			ModSizeExperience(giantref, 0.00005f);
 			
 			bool TinyAbsorbed;
 			giantref->GetGraphVariableBool("GTS_TinyAbsorbed", TinyAbsorbed);
@@ -605,7 +606,7 @@ namespace Gts {
 			bool IsDead = (giantref->IsDead() || tinyref->IsDead());
 			
 			if (!IsHugCrushing(giantref)) {
-				if (sizedifference < Action_Hug || IsDead || stamina <= 2.0 || !GotTiny) {
+				if (sizedifference < Action_Hug || IsDead || stamina <= 2.0f || !GotTiny) {
 					if (HuggingAlly) { 
 						// this is needed to still attach the actor while we have ally hugged (with Loving Embrace Perk)
 					    // It fixes the Tiny not being moved around during Gentle Release animation for friendlies
@@ -647,7 +648,7 @@ namespace Gts {
 	void HugShrink::HugActor(Actor* giant, TESObjectREFR* tiny) {
 		// Default strength 1.0: normal grab for actor of their size
 		//
-		HugShrink::HugActor_Actor(giant, tiny, 1.0);
+		HugShrink::HugActor_Actor(giant, tiny, 1.0f);
 	}
 
 	void HugShrink::Reset() {
@@ -667,12 +668,12 @@ namespace Gts {
 		if (!huggedActor) {
 			return;
 		}
-		std::string_view message = std::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
+		std::string_view message = fmt::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
 		float sizedifference = get_visual_scale(giant)/get_visual_scale(huggedActor);
 		if (giant->formID == 0x14) {
-			shake_camera(giant, 0.25 * sizedifference, 0.35);
+			shake_camera(giant, 0.25f * sizedifference, 0.35f);
 		} else {
-			Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10);
+			Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10f);
 		}
 		Notify(message);
 		AbortHugAnimation(giant, huggedActor);

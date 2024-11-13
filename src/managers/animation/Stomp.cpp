@@ -59,18 +59,18 @@ namespace {
 				float tinyScale = get_visual_scale(tiny);
 				float scaleRatio = giantScale / tinyScale;
 				
-				float actorRadius = 35.0;
+				float actorRadius = 35.0f;
 				auto bounds = get_bound_values(tiny);
-				actorRadius = (bounds.x + bounds.y + bounds.z) / 6.0;
+				actorRadius = (bounds.x + bounds.y + bounds.z) / 6.0f;
 				
 
 				actorRadius *= tinyScale;
 				
-				if (scaleRatio > 3.5) {
+				if (scaleRatio > 3.5f) {
 					// 3.5 times bigger
 					auto tinyLoc = tiny->GetPosition();
 					auto distance = (giantLoc - tinyLoc).Length() - actorRadius;
-					if (distance < giantScale * 15.0) {
+					if (distance < giantScale * 15.0f) {
 						// About 1.5 the foot size
 						result.push_back(tiny);
 					}
@@ -88,15 +88,15 @@ namespace {
 	void Stomp_ResetAnimSpeed(AnimationEventData& data) {
 		data.stage = 0;
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
+		data.animSpeed = 1.0f;
 	}
 
 	void Stomp_IncreaseAnimSpeed(AnimationEventData& data) {
 		data.stage = 1;
 		data.canEditAnimSpeed = true;
-		data.animSpeed = 1.35;
+		data.animSpeed = 1.35f;
 		if (data.giant.formID != 0x14) {
-			data.animSpeed = 1.35 + GetRandomBoost()/2;
+			data.animSpeed = 1.35f + GetRandomBoost()/2;
 		}
 	}
 
@@ -105,10 +105,10 @@ namespace {
 		if (footNode) {
 			auto footPos = footNode->world.translate;
 			for (auto tiny: FindSquished(giant)) {
-				std::uniform_real_distribution<> dist(-10, 10);
+				std::uniform_real_distribution<float> dist(-10.f, 10.f);
 				float dx = dist(e2);
 				float dy = dist(e2);
-				auto randomOffset = NiPoint3(dx, dy, 0.0);
+				auto randomOffset = NiPoint3(dx, dy, 0.0f);
 				tiny->SetPosition(footPos + randomOffset, true);
 			}
 		}
@@ -139,16 +139,16 @@ namespace {
 		std::string taskname = std::format("DelayLaunch_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(taskname, [=](auto& update){ // Needed to prioritize grind over launch
 			if (!giantHandle) {
 				return false;
 			}
 			Actor* giantref = giantHandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
-			float timepassed = Finish - Start;
+			double timepassed = Finish - Start;
 
 			if (timepassed > 0.03) {
 				LaunchTask(giantref, radius, power, Event);
@@ -161,11 +161,11 @@ namespace {
 
 	void Stomp_Footsteps_DoEverything(Actor* giant, bool right, float animSpeed, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float smt = 1.0;
-		float dust = 1.25;
+		float smt = 1.0f;
+		float dust = 1.25f;
 		if (HasSMT(giant)) {
-			smt = 1.5;
-			dust = 1.45;
+			smt = 1.5f;
+			dust = 1.45f;
 		}
 
 		// TO ANDY: i commented it out for tests
@@ -176,28 +176,28 @@ namespace {
 		std::string taskname = std::format("StompAttack_{}", giant->formID);
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
-		TaskManager::RunFor(taskname, 1.0, [=](auto& update){ // Needed because anim has a wrong timing
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has a wrong timing
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto giant = giantHandle.get().get();
 		
 			if (Finish - Start > 0.02) { 
 
-				Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 1.10);
-				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 10, 0.25, Event, 1.0, Source);
-				DoDustExplosion(giant, dust + (animSpeed * 0.05), Event, Node);
-				DoFootstepSound(giant, 1.0, Event, Node);
+				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.10f);
+				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 10, 0.25f, Event, 1.0f, Source);
+				DoDustExplosion(giant, dust + (animSpeed * 0.05f), Event, Node);
+				DoFootstepSound(giant, 1.0f, Event, Node);
 				
-				DrainStamina(giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8); // cancel stamina drain
+				DrainStamina(giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8f); // cancel stamina drain
 
 				FootGrindCheck(giant, Radius_Stomp, false, right);
 
-				DelayedLaunch(giant, 0.80 * perk, 2.0* animSpeed, Event);
+				DelayedLaunch(giant, 0.80f * perk, 2.0f* animSpeed, Event);
 
 				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 
@@ -209,12 +209,12 @@ namespace {
 
 	void Stomp_Land_DoEverything(Actor* giant, float animSpeed, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		float smt = 1.0;
-		float dust = 0.85;
+		float smt = 1.0f;
+		float dust = 0.85f;
 		
 		if (HasSMT(giant)) {
-			dust = 1.35;
-			smt = 1.5;
+			dust = 1.35f;
+			smt = 1.5f;
 		}
 		float hh = GetHighHeelsBonusDamage(giant, true);
 		float shake_power = Rumble_Stomp_Land_Normal * smt * hh;
@@ -222,24 +222,24 @@ namespace {
 		std::string taskname = std::format("StompLand_{}_{}", giant->formID, Time::WorldTimeElapsed());
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		
-		TaskManager::RunFor(taskname, 1.0, [=](auto& update){ // Needed because anim has a bit too early timings
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& update){ // Needed because anim has a bit too early timings
 			if (!giantHandle) {
 				return false;
 			}
 
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
 			if (Finish - Start > 0.025) { 
 				auto giant = giantHandle.get().get();
 
-				Rumbling::Once(rumble, giant, shake_power, 0.0, Node, 0.0);
-				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 25, 0.25, Event, 1.0, DamageSource::CrushedRight);
-				DoDustExplosion(giant, dust + (animSpeed * 0.05), Event, Node);
-				DoFootstepSound(giant, 1.0 + animSpeed/14, Event, RNode);
+				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);
+				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 25, 0.25f, Event, 1.0f, DamageSource::CrushedRight);
+				DoDustExplosion(giant, dust + (animSpeed * 0.05f), Event, Node);
+				DoFootstepSound(giant, 1.0f + animSpeed/14, Event, RNode);
 
-				LaunchTask(giant, 0.90 * perk, 3.2 + animSpeed/2, Event);
+				LaunchTask(giant, 0.90f * perk, 3.2f + animSpeed/2, Event);
 
 				FootStepManager::PlayVanillaFootstepSounds(giant, right);
 				return false;
@@ -253,16 +253,16 @@ namespace {
 ///////////////////////////////////////////////////////////////////////////////////////////////////// Events
 
 	void GTSstompstartR(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8);
-		Rumbling::Start("StompR_Loop", &data.giant, 0.25, 0.15, RNode);
+		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8f);
+		Rumbling::Start("StompR_Loop", &data.giant, 0.25f, 0.15f, RNode);
 		ManageCamera(&data.giant, true, CameraTracking::R_Foot);
 		Stomp_IncreaseAnimSpeed(data);
 	}
 
 	void GTSstompstartL(AnimationEventData& data) {
 		
-		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8);
-		Rumbling::Start("StompL_Loop", &data.giant, 0.25, 0.15, LNode);
+		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8f);
+		Rumbling::Start("StompL_Loop", &data.giant, 0.25f, 0.15f, LNode);
 		ManageCamera(&data.giant, true, CameraTracking::L_Foot);
 		Stomp_IncreaseAnimSpeed(data);
 	}
@@ -302,8 +302,8 @@ namespace {
 	}
 
 	void GTSBEH_Exit(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8);
-		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 2.8);
+		DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8f);
+		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 2.8f);
 		ManageCamera(&data.giant, false, CameraTracking::L_Foot);
 		ManageCamera(&data.giant, false, CameraTracking::R_Foot);
 		StopLoopRumble(&data.giant);
@@ -314,9 +314,9 @@ namespace {
 		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
 			return;
 		}
-		float WasteStamina = 25.0;
+		float WasteStamina = 25.0f;
 		if (Runtime::HasPerk(player, "DestructionBasics")) {
-			WasteStamina *= 0.65;
+			WasteStamina *= 0.65f;
 		}
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StompRight", player);
@@ -330,9 +330,9 @@ namespace {
 		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
 			return;
 		}
-		float WasteStamina = 25.0;
+		float WasteStamina = 25.0f;
 		if (Runtime::HasPerk(player, "DestructionBasics")) {
-			WasteStamina *= 0.65;
+			WasteStamina *= 0.65f;
 		}
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StompLeft", player);

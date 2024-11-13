@@ -74,8 +74,8 @@ namespace {
 	//
 
 
-	const float DEFAULT_MAX_SCALE = 65535.0;
-	const float DEFAULT_HALF_LIFE = 1.0;
+	const float DEFAULT_MAX_SCALE = 65535.0f;
+	const float DEFAULT_HALF_LIFE = 1.0f;
 }
 
 namespace Gts {
@@ -135,25 +135,25 @@ namespace Gts {
 						float native_scale;
 						serde->ReadRecordData(&native_scale, sizeof(native_scale));
 						if (std::isnan(native_scale)) {
-							native_scale = 1.0;
+							native_scale = 1.0f;
 						}
 
 						float visual_scale;
 						serde->ReadRecordData(&visual_scale, sizeof(visual_scale));
 						if (std::isnan(visual_scale)) {
-							visual_scale = 1.0;
+							visual_scale = 1.0f;
 						}
 
 						float visual_scale_v;
 						serde->ReadRecordData(&visual_scale_v, sizeof(visual_scale_v));
 						if (std::isnan(visual_scale_v)) {
-							visual_scale_v = 0.0;
+							visual_scale_v = 0.0f;
 						}
 
 						float target_scale;
 						serde->ReadRecordData(&target_scale, sizeof(target_scale));
 						if (std::isnan(target_scale)) {
-							target_scale = 1.0;
+							target_scale = 1.0f;
 						}
 
 						float max_scale;
@@ -176,129 +176,129 @@ namespace Gts {
 						if (version >= 3) {
 							serde->ReadRecordData(&anim_speed, sizeof(anim_speed));
 						} else {
-							anim_speed = 1.0;
+							anim_speed = 1.0f;
 						}
 						if (std::isnan(anim_speed)) {
-							anim_speed = 1.0;
+							anim_speed = 1.0f;
 						}
 
 						float effective_multi;
 						if (version >= 4) {
 							serde->ReadRecordData(&effective_multi, sizeof(effective_multi));
 						} else {
-							effective_multi = 1.0;
+							effective_multi = 1.0f;
 						}
 						if (std::isnan(effective_multi)) {
-							effective_multi = 1.0;
+							effective_multi = 1.0f;
 						}
 
 						float bonus_hp;
 						if (version >= 5) {
 							serde->ReadRecordData(&bonus_hp, sizeof(bonus_hp));
 						} else {
-							bonus_hp = 0.0;
+							bonus_hp = 0.0f;
 						}
 						if (std::isnan(bonus_hp)) {
-							bonus_hp = 0.0;
+							bonus_hp = 0.0f;
 						}
 
 						float bonus_carry;
 						if (version >= 5) {
 							serde->ReadRecordData(&bonus_carry, sizeof(bonus_carry));
 						} else {
-							bonus_carry = 0.0;
+							bonus_carry = 0.0f;
 						}
 						if (std::isnan(bonus_carry)) {
-							bonus_carry = 0.0;
+							bonus_carry = 0.0f;
 						}
 
 						float bonus_max_size;
 						if (version >= 5) {
 							serde->ReadRecordData(&bonus_max_size, sizeof(bonus_max_size));
 						} else {
-							bonus_max_size = 0.0;
+							bonus_max_size = 0.0f;
 						}
 						if (std::isnan(bonus_max_size)) {
-							bonus_max_size = 0.0;
+							bonus_max_size = 0.0f;
 						}
 						float smt_run_speed;
 						if (version >= 6) {
 							serde->ReadRecordData(&smt_run_speed, sizeof(smt_run_speed));
 						} else {
-							smt_run_speed = 0.0;
+							smt_run_speed = 0.0f;
 						}
 						if (std::isnan(smt_run_speed)) {
-							smt_run_speed = 0.0;
+							smt_run_speed = 0.0f;
 						}
 
 						float NormalDamage; //0
 						if (version >= 6) {
 							serde->ReadRecordData(&NormalDamage, sizeof(NormalDamage));
 						} else {
-							NormalDamage = 0.0;
+							NormalDamage = 0.0f;
 						}
 						if (std::isnan(NormalDamage)) {
-							NormalDamage = 0.0;
+							NormalDamage = 0.0f;
 						}
 
 						float SprintDamage; //1
 						if (version >= 6) {
 							serde->ReadRecordData(&SprintDamage, sizeof(SprintDamage));
 						} else {
-							SprintDamage = 0.0;
+							SprintDamage = 0.0f;
 						}
 						if (std::isnan(SprintDamage)) {
-							SprintDamage = 0.0;
+							SprintDamage = 0.0f;
 						}
 
 						float FallDamage; //2
 						if (version >= 6) {
 							serde->ReadRecordData(&FallDamage, sizeof(FallDamage));
 						} else {
-							FallDamage = 0.0;
+							FallDamage = 0.0f;
 						}
 						if (std::isnan(FallDamage)) {
-							FallDamage = 0.0;
+							FallDamage = 0.0f;
 						}
 
 						float HHDamage; //3
 						if (version >= 6) {
 							serde->ReadRecordData(&HHDamage, sizeof(HHDamage));
 						} else {
-							HHDamage = 0.0;
+							HHDamage = 0.0f;
 						}
 						if (std::isnan(HHDamage)) {
-							HHDamage = 0.0;
+							HHDamage = 0.0f;
 						}
 
 						float SizeVulnerability;
 						if (version >= 6) {
 							serde->ReadRecordData(&SizeVulnerability, sizeof(SizeVulnerability));
 						} else {
-							SizeVulnerability = 0.0;
+							SizeVulnerability = 0.0f;
 						}
 						if (std::isnan(SizeVulnerability)) {
-							SizeVulnerability = 0.0;
+							SizeVulnerability = 0.0f;
 						}
 
 						float AllowHitGrowth;
 						if (version >= 6) {
 							serde->ReadRecordData(&AllowHitGrowth, sizeof(AllowHitGrowth));
 						} else {
-							AllowHitGrowth = 1.0;
+							AllowHitGrowth = 1.0f;
 						}
 						if (std::isnan(AllowHitGrowth)) {
-							AllowHitGrowth = 0.0;
+							AllowHitGrowth = 0.0f;
 						}
 
 						float SizeReserve;
 						if (version >= 6) {
 							serde->ReadRecordData(&SizeReserve, sizeof(SizeReserve));
 						} else {
-							SizeReserve = 0.0;
+							SizeReserve = 0.0f;
 						}
 						if (std::isnan(SizeReserve)) {
-							SizeReserve = 0.0;
+							SizeReserve = 0.0f;
 						}
 
 
@@ -306,50 +306,50 @@ namespace Gts {
 						if (version >= 7) {
 							serde->ReadRecordData(&target_scale_v, sizeof(target_scale_v));
 						} else {
-							target_scale_v = 0.0;
+							target_scale_v = 0.0f;
 						}
 						if (std::isnan(target_scale_v)) {
-							target_scale_v = 0.0;
+							target_scale_v = 0.0f;
 						}
 
 						float scaleOverride;
 						if (version >= 8) {
 							serde->ReadRecordData(&scaleOverride, sizeof(scaleOverride));
 						} else {
-							scaleOverride = -1.0;
+							scaleOverride = -1.0f;
 						}
 						if (std::isnan(scaleOverride)) {
-							scaleOverride = -1.0;
+							scaleOverride = -1.0f;
 						}
 
 						float stolen_attributes;
 						if (version >= 8) {
 							serde->ReadRecordData(&stolen_attributes, sizeof(stolen_attributes));
 						} else {
-							stolen_attributes = 0.0;
+							stolen_attributes = 0.0f;
 						}
 						if (std::isnan(stolen_attributes)) {
-							stolen_attributes = 0.0;
+							stolen_attributes = 0.0f;
 						}
 
 						float stolen_health;
 						if (version >= 8) {
 							serde->ReadRecordData(&stolen_health, sizeof(stolen_health));
 						} else {
-							stolen_health = 0.0;
+							stolen_health = 0.0f;
 						}
 						if (std::isnan(stolen_health)) {
-							stolen_health = 0.0;
+							stolen_health = 0.0f;
 						}
 
 						float stolen_magick;
 						if (version >= 8) {
 							serde->ReadRecordData(&stolen_magick, sizeof(stolen_magick));
 						} else {
-							stolen_magick = 0.0;
+							stolen_magick = 0.0f;
 						}
 						if (std::isnan(stolen_magick)) {
-							stolen_magick = 0.0;
+							stolen_magick = 0.0f;
 						}
 
 
@@ -357,10 +357,10 @@ namespace Gts {
 						if (version >= 8) {
 							serde->ReadRecordData(&stolen_stamin, sizeof(stolen_stamin));
 						} else {
-							stolen_stamin = 0.0;
+							stolen_stamin = 0.0f;
 						}
 						if (std::isnan(stolen_stamin)) {
-							stolen_stamin = 0.0;
+							stolen_stamin = 0.0f;
 						}
 
 
@@ -627,7 +627,7 @@ namespace Gts {
 					float s;
 					serde->ReadRecordData(&s, sizeof(s));
 					GetSingleton().speed_adjustment.s = s;
-					float o = 1.0;
+					float o = 1.0f;
 					GetSingleton().speed_adjustment.o = o;
 				}
 			} else if (type == ProgressionMult) {
@@ -1168,31 +1168,31 @@ namespace Gts {
 	}
 	ActorData::ActorData(Actor* actor) {
 		// DEFAULT VALUES FOR NEW ACTORS
-		auto scale = 1.0;//get_scale(actor);
+		auto scale = 1.0f;//get_scale(actor);
 		this->native_scale = scale;
 		this->visual_scale = scale;
-		this->visual_scale_v = 0.0;
+		this->visual_scale_v = 0.0f;
 		this->target_scale = scale;
 		this->max_scale = DEFAULT_MAX_SCALE;
 		this->half_life = DEFAULT_HALF_LIFE;
-		this->anim_speed = 1.0;
-		this->bonus_hp = 0.0;
-		this->bonus_carry = 0.0;
-		this->bonus_max_size = 0.0;
-		this->smt_run_speed = 0.0;
-		this->NormalDamage = 1.0;
-		this->SprintDamage = 1.0;
-		this->FallDamage = 1.0;
-		this->HHDamage = 1.0;
-		this->SizeVulnerability = 0.0;
-		this->AllowHitGrowth = 1.0;
-		this->SizeReserve = 0.0;
-		this->scaleOverride = -1.0;
+		this->anim_speed = 1.0f;
+		this->bonus_hp = 0.0f;
+		this->bonus_carry = 0.0f;
+		this->bonus_max_size = 0.0f;
+		this->smt_run_speed = 0.0f;
+		this->NormalDamage = 1.0f;
+		this->SprintDamage = 1.0f;
+		this->FallDamage = 1.0f;
+		this->HHDamage = 1.0f;
+		this->SizeVulnerability = 0.0f;
+		this->AllowHitGrowth = 1.0f;
+		this->SizeReserve = 0.0f;
+		this->scaleOverride = -1.0f;
 
-		this->stolen_attributes = 0.0;
-		this->stolen_health = 0.0;
-		this->stolen_magick = 0.0;
-		this->stolen_stamin = 0.0;
+		this->stolen_attributes = 0.0f;
+		this->stolen_health = 0.0f;
+		this->stolen_magick = 0.0f;
+		this->stolen_stamin = 0.0f;
 	}
 
 	ActorData* Persistent::GetActorData(Actor* actor) {
@@ -1213,7 +1213,7 @@ namespace Gts {
 				return nullptr;
 			}
 			auto scale = get_scale(&actor);
-			if (scale < 0.0) {
+			if (scale < 0.0f) {
 				return nullptr;
 			}
 			this->_actor_data.try_emplace(key, &actor);
@@ -1245,31 +1245,31 @@ namespace Gts {
 		//  actor values etc when the cell resets
 		auto data = this->GetData(actor);
 		if (data) {
-			// 10.12.2023: changed visual and target scale to 1.0 instead of data->native... stuff
+			// 10.12.2023: changed visual and target scale to 1.0
 			// Attempt to fix actors spawning with their old size basically
-			data->visual_scale = 1.0; //data->native_scale;
-			data->target_scale = 1.0; //data->native_scale;
+			data->visual_scale = 1.0f; //data->native_scale;
+			data->target_scale = 1.0f; //data->native_scale;
 			data->max_scale = DEFAULT_MAX_SCALE;
-			data->visual_scale_v = 0.0;
+			data->visual_scale_v = 0.0f;
 			data->half_life = DEFAULT_HALF_LIFE;
-			data->anim_speed = 1.0;
-			data->bonus_hp = 0.0;
-			data->bonus_carry = 0.0;
-			data->bonus_max_size = 0.0;
-			data->smt_run_speed = 0.0;
-			data->NormalDamage = 1.0;
-			data->SprintDamage = 1.0;
-			data->FallDamage = 1.0;
-			data->HHDamage = 1.0;
-			data->SizeVulnerability = 0.0;
-			data->AllowHitGrowth = 1.0;
-			data->SizeReserve = 0.0;
-			data->scaleOverride = -1.0;
+			data->anim_speed = 1.0f;
+			data->bonus_hp = 0.0f;
+			data->bonus_carry = 0.0f;
+			data->bonus_max_size = 0.0f;
+			data->smt_run_speed = 0.0f;
+			data->NormalDamage = 1.0f;
+			data->SprintDamage = 1.0f;
+			data->FallDamage = 1.0f;
+			data->HHDamage = 1.0f;
+			data->SizeVulnerability = 0.0f;
+			data->AllowHitGrowth = 1.0f;
+			data->SizeReserve = 0.0f;
+			data->scaleOverride = -1.0f;
 
-			data->stolen_attributes = 0.0;
-			data->stolen_health = 0.0;
-			data->stolen_magick = 0.0;
-			data->stolen_stamin = 0.0;
+			data->stolen_attributes = 0.0f;
+			data->stolen_health = 0.0f;
+			data->stolen_magick = 0.0f;
+			data->stolen_stamin = 0.0f;
 		}
     ResetToInitScale(actor);
 	}

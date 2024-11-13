@@ -32,23 +32,23 @@ using namespace SKSE;
 using namespace std;
 
 namespace {
-	const float REDUCTION_FACTOR = 0.44;
-	const float PI = 3.14159;
+	const float REDUCTION_FACTOR = 0.44f;
+	const float PI = 3.14159f;
 
 	NiPoint3 HeadLocation(TESObjectREFR& obj, const float& scale) {
-		NiPoint3 headOffset(0.0, 0.0, 0.0);
+		NiPoint3 headOffset(0.0f, 0.0f, 0.0f);
 		auto location = obj.GetPosition();
 		auto asActor = skyrim_cast<Actor*>(&obj);
 		if (asActor) {
 			auto charCont = asActor->GetCharController();
 			if (charCont) {
-				headOffset.z = charCont->actorHeight * 70.0 * scale;// * get_natural_scale(asActor, true);
+				headOffset.z = charCont->actorHeight * 70.0f * scale;// * get_natural_scale(asActor, true);
 			}
 		}
 		return location + headOffset;
 	}
 	NiPoint3 HeadLocation(TESObjectREFR& obj) {
-		float scale = 1.0;
+		float scale = 1.0f;
 		auto asActor = skyrim_cast<Actor*>(&obj);
 		if (asActor) {
 			scale = get_visual_scale(asActor);
@@ -120,15 +120,15 @@ namespace {
 		if (giant->formID == 0x14) {
 			return;
 		}
-		float finalAngle = 0.0;
+		float finalAngle = 0.0f;
 		if (tiny) { // giant is the actor that is looking, tiny is the one that is being looked at (Player for example)
 			//log::info("Tiny is: {}", tiny->GetDisplayFullName());
 			bool Collision_Installed = false; //Detects 'Precision' mod
-			float Collision_PitchMult = 0.0;
+			float Collision_PitchMult = 0.0f;
 			giant->GetGraphVariableBool("Collision_Installed", Collision_Installed);
 			if (Collision_Installed == true) {
 				giant->GetGraphVariableFloat("Collision_PitchMult", Collision_PitchMult); // If true, obtain value to apply it
-				//giant->SetGraphVariableFloat("Collision_PitchMult", 0.0);
+				//giant->SetGraphVariableFloat("Collision_PitchMult", 0.0f);
 				//log::info("Collision Pitch Mult: {}", Collision_PitchMult);
 			}
 			auto dialoguetarget = giant->GetActorRuntimeData().dialogueItemTarget;
@@ -145,12 +145,12 @@ namespace {
 					//log::info("  - directionToLook: {}", Vector2Str(directionToLook));
 					directionToLook = directionToLook * (1/directionToLook.Length());
 					//log::info("  - Norm(directionToLook): {}", Vector2Str(directionToLook));
-					NiPoint3 upDirection = NiPoint3(0.0, 0.0, 1.0);
+					NiPoint3 upDirection = NiPoint3(0.0f, 0.0f, 1.0f);
 					auto sinAngle = directionToLook.Dot(upDirection);
 					//log::info("  - cosAngle: {}", sinAngle);
-					auto angleFromUp = fabs(acos(sinAngle) * 180.0 / PI);
+					auto angleFromUp = fabs(acos(sinAngle) * 180.0f / PI);
 					//log::info("  - angleFromUp: {}", angleFromUp);
-					float angleFromForward = -(angleFromUp - 90.0) * REDUCTION_FACTOR;
+					float angleFromForward = -(angleFromUp - 90.0f) * REDUCTION_FACTOR;
 					//log::info("  - angleFromForward: {}", angleFromForward);
 
 					finalAngle = std::clamp(angleFromForward * REDUCTION_FACTOR, -60.f, 60.f);
@@ -172,11 +172,11 @@ namespace {
 	}
 
 	/*void RotateCaster(Actor* giant, HeadtrackingData& data) { // Unused
-		const float PI = 3.14159;
+		const float PI = 3.14159f;
 		if (!giant) {
 			return;
 		}
-		float finalAngle = 0.0;
+		float finalAngle = 0.0f;
 		auto combatController = giant->GetActorRuntimeData().combatController;
 		if (combatController) {
 			auto& targetHandle = combatController->targetHandle;
@@ -190,15 +190,15 @@ namespace {
 						if (casterNode) {
 							auto sourceLoc = casterNode->world.translate;
 							auto scaleTiny = get_visual_scale(tiny);
-							auto targetLoc = HeadLocation(tiny, scaleTiny*0.5); // 50% up tiny body
+							auto targetLoc = HeadLocation(tiny, scaleTiny*0.5f); // 50% up tiny body
 
 							auto directionToLook = targetLoc - sourceLoc;
 							//log::info("Combat: Direction: {}", Vector2Str(directionToLook));
 							directionToLook = directionToLook * (1/directionToLook.Length());
-							NiPoint3 upDirection = NiPoint3(0.0, 0.0, 1.0);
+							NiPoint3 upDirection = NiPoint3(0.0f, 0.0f, 1.0f);
 							auto sinAngle = directionToLook.Dot(upDirection);
 							auto angleFromUp = fabs(acos(sinAngle));
-							float angleFromForward = -(angleFromUp - PI/2.0);
+							float angleFromForward = -(angleFromUp - PI/2.0f);
 
 							//log::info("angleFromForward: {}", angleFromForward);
 							finalAngle = std::clamp(angleFromForward, -60.0f * PI /180.0f, 60.f * PI /180.0f);
@@ -209,7 +209,7 @@ namespace {
 			}
 		}
 		// data.casterSmooth.target = finalAngle;
-		data.casterSmooth.target = PI*1.5;
+		data.casterSmooth.target = PI*1.5f;
 
 		for (auto casterSourceType: {MagicSystem::CastingSource::kLeftHand, MagicSystem::CastingSource::kRightHand}) {
 			auto casterSource = giant->GetMagicCaster(casterSourceType);
@@ -218,7 +218,7 @@ namespace {
 				if (casterNode) {
 					auto targetRotation = NiMatrix3();
 					if (data.casterSmooth.value > 1e-3) {
-						targetRotation.SetEulerAnglesXYZ(data.casterSmooth.value, 0.0, 0.0);
+						targetRotation.SetEulerAnglesXYZ(data.casterSmooth.value, 0.0f, 0.0f);
 					}
 					casterNode->local.rotate = targetRotation;
 					casterNode->world.rotate = targetRotation;

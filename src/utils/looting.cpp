@@ -38,13 +38,13 @@ using namespace Gts;
 
 namespace {
 
-	void RunScaleTask(ObjectRefHandle dropboxHandle, Actor* actor, const float Start, const float Scale, const bool soul, const NiPoint3 TotalPos) {
+	void RunScaleTask(ObjectRefHandle dropboxHandle, Actor* actor, const double Start, const float Scale, const bool soul, const NiPoint3 TotalPos) {
 		std::string taskname = std::format("Dropbox {}", actor->formID); // create task name for main task
 		TaskManager::RunFor(taskname, 16, [=](auto& progressData) { // Spawn loot piles
 			if (!dropboxHandle) {
 				return false;
 			}
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 			auto dropboxPtr = dropboxHandle.get().get();
 			if (!dropboxPtr->Is3DLoaded()) {
 				return true;
@@ -53,21 +53,21 @@ namespace {
 			if (!dropbox3D) {
 				return true; // Retry next frame
 			} else {
-				float timepassed = Finish - Start;
+				double timepassed = Finish - Start;
 				if (soul) {
 					timepassed *= 1.33; // faster soul scale
 				}
 				auto node = find_object_node(dropboxPtr, "GorePile_Obj");
 				auto trigger = find_object_node(dropboxPtr, "Trigger_Obj");
 				if (node) {
-					node->local.scale = (Scale * 0.33) + (timepassed*0.18);
+					node->local.scale = (Scale * 0.33f) + static_cast<float>(timepassed*0.18);
 					if (!soul) {
 						node->world.translate.z = TotalPos.z;
 					}
 					update_node(node);
 				}
 				if (trigger) {
-					trigger->local.scale = (Scale * 0.33) + (timepassed*0.18);
+					trigger->local.scale = (Scale * 0.33f) + static_cast<float>(timepassed*0.18);
 					if (!soul) {
 						trigger->world.translate.z = TotalPos.z;
 					}
@@ -95,7 +95,7 @@ namespace {
 			if (!dropbox3D) {
 				return true; // Retry next frame
 			} else {
-				Runtime::PlaySound("DefaultCrush", dropboxPtr, 1.0, 1.0);
+				Runtime::PlaySound("DefaultCrush", dropboxPtr, 1.0f, 1.0f);
 				return false;
 			}
 		});
@@ -107,8 +107,8 @@ namespace Gts {
 		bool success_first = false;
 		bool success_second = false;
 		NiPoint3 ray_start = tiny->GetPosition();
-		ray_start.z += 40.0; // overrize .z with giant .z + 40, so ray starts from above
-		NiPoint3 ray_direction(0.0, 0.0, -1.0);
+		ray_start.z += 40.0f; // overrize .z with giant .z + 40, so ray starts from above
+		NiPoint3 ray_direction(0.0f, 0.0f, -1.0f);
 
 		float ray_length = 40000;
 
@@ -118,7 +118,7 @@ namespace Gts {
 			return endpos;
 		} else if (!success_first) {
 			NiPoint3 ray_start_second = giant->GetPosition();
-			ray_start_second.z += 40.0;
+			ray_start_second.z += 40.0f;
 			pos = CastRayStatics(giant, ray_start_second, ray_direction, ray_length, success_second);
 			if (!success_second) {
 				pos = giant->GetPosition();
@@ -142,13 +142,13 @@ namespace Gts {
 		}
 		// ^ we generally do not want to transfer loot in that case: 2 loot piles will spawn if actor was resurrected
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		ActorHandle gianthandle = to->CreateRefHandle();
 		ActorHandle tinyhandle = from->CreateRefHandle();
 		bool PCLoot = Runtime::GetBool("GtsEnableLooting");
 		bool NPCLoot = Runtime::GetBool("GtsNPCEnableLooting");
 
-		float expectedtime = 0.15;
+		double expectedtime = 0.15;
 		if (IsDragon(from)) {
 			expectedtime = 0.45; // Because dragons don't spawn loot right away...sigh...
 		}
@@ -157,7 +157,7 @@ namespace Gts {
 			StartResetTask(from); // reset actor data.
 		}
 
-		TaskManager::RunFor(name, 3.0, [=](auto& progressData) {
+		TaskManager::RunFor(name, 3.0f, [=](auto& progressData) {
 			if (!tinyhandle) {
 				return false;
 			}
@@ -173,9 +173,9 @@ namespace Gts {
 
 			float hp = GetAV(tiny, ActorValue::kHealth);
 
-			if (tiny && (tiny->IsDead() || hp <= 0.0)) {
-				float Finish = Time::WorldTimeElapsed();
-				float timepassed = Finish - Start;
+			if (tiny && (tiny->IsDead() || hp <= 0.0f)) {
+				double Finish = Time::WorldTimeElapsed();
+				double timepassed = Finish - Start;
 				if (timepassed < expectedtime) {
 					return true; // retry, not enough time has passed yet
 				}
@@ -196,7 +196,7 @@ namespace Gts {
 	}
 
 	void TransferInventory_Normal(Actor* giant, Actor* tiny, bool removeQuestItems) {
-		int32_t quantity = 1.0;
+		int32_t quantity = 1;
 
 		for (auto &[a_object, invData]: tiny->GetInventory()) { // transfer loot
 			if (a_object->GetPlayable() && a_object->GetFormType() != FormType::LeveledItem) {
@@ -253,14 +253,14 @@ namespace Gts {
 
 		NiPoint3 TotalPos = GetContainerSpawnLocation(giant, actor); // obtain goal of container position by doing ray-cast
 		if (IsDebugEnabled()) {
-			DebugAPI::DrawSphere(glm::vec3(TotalPos.x, TotalPos.y, TotalPos.z), 8.0, 6000, {1.0, 1.0, 0.0, 1.0});
+			DebugAPI::DrawSphere(glm::vec3(TotalPos.x, TotalPos.y, TotalPos.z), 8.0f, 6000, {1.0f, 1.0f, 0.0f, 1.0f});
 		}
 		auto dropbox = Runtime::PlaceContainerAtPos(actor, TotalPos, container); // Place chosen container
 
 		if (!dropbox) {
 			return;
 		}
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 		dropbox->SetDisplayName(name, false); // Rename container to match chosen name
 
 		ObjectRefHandle dropboxHandle = dropbox->CreateRefHandle();
@@ -270,14 +270,14 @@ namespace Gts {
 		}
 		if (dropboxHandle) {
 			float scale_up = std::clamp(Scale, 0.10f, 1.0f);
-			TotalPos.z += (200.0 - (200.0 * scale_up)); // move it a bit upwards
+			TotalPos.z += (200.0f - (200.0f * scale_up)); // move it a bit upwards
 			RunScaleTask(dropboxHandle, actor, Start, Scale, soul, TotalPos); // Scale our pile over time
 		}
 		MoveItemsTowardsDropbox(actor, dropbox, removeQuestItems); // Launch transfer items task with a bit of delay
 	}
 
 	void MoveItemsTowardsDropbox(Actor* actor, TESObjectREFR* dropbox, bool removeQuestItems) {
-		int32_t quantity = 1.0;
+		int32_t quantity = 1;
 		for (auto &[a_object, invData]: actor->GetInventory()) { // transfer loot
 			if (a_object->GetPlayable() && a_object->GetFormType() != FormType::LeveledItem) { // We don't want to move Leveled Items
 				if ((!invData.second->IsQuestObject() || removeQuestItems)) {

@@ -33,7 +33,7 @@ namespace Gts {
 			return {};
 		}
 		auto model = actor->Get3D();
-		auto name = model->name;
+		auto &name = model->name;
 
 		std::deque<NiAVObject*> queue;
 		std::vector<NiAVObject*> nodes = {};
@@ -51,7 +51,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							nodes.push_back(child.get());
 							// Depth first search
@@ -88,7 +88,7 @@ namespace Gts {
 			return;
 		}
 		auto model = actor->Get3D();
-		auto name = model->name;
+		auto &name = model->name;
 
 		std::deque<NiAVObject*> queue;
 		queue.push_back(model);
@@ -105,7 +105,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							queue.push_back(child.get());
 							// Depth first search
@@ -165,7 +165,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							if (child) {
 								queue.push_back(child.get());
@@ -233,7 +233,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							if (child) {
 								queue.push_back(child.get());
@@ -299,7 +299,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							if (child) {
 								queue.push_back(child.get());
@@ -384,7 +384,7 @@ namespace Gts {
 				if (currentnode) {
 					auto ninode = currentnode->AsNode();
 					if (ninode) {
-						for (auto child: ninode->GetChildren()) {
+						for (auto &child : ninode->GetChildren()) {
 							// Bredth first search
 							if (child) {
 								queue.push_back(child.get());
@@ -408,14 +408,14 @@ namespace Gts {
 										if (shape->type == hkpShapeType::kCapsule) {
 											const hkpCapsuleShape* orig_capsule = static_cast<const hkpCapsuleShape*>(shape);
 											hkTransform identity;
-											identity.rotation.col0 = hkVector4(1.0,0.0,0.0,0.0);
-											identity.rotation.col1 = hkVector4(0.0,1.0,0.0,0.0);
-											identity.rotation.col2 = hkVector4(0.0,0.0,1.0,0.0);
-											identity.translation   = hkVector4(0.0,0.0,0.0,1.0);
+											identity.rotation.col0 = hkVector4(1.0f,0.0f,0.0f,0.0f);
+											identity.rotation.col1 = hkVector4(0.0f,1.0f,0.0f,0.0f);
+											identity.rotation.col2 = hkVector4(0.0f,0.0f,1.0f,0.0f);
+											identity.translation   = hkVector4(0.0f,0.0f,0.0f,1.0f);
 											hkAabb out;
-											orig_capsule->GetAabbImpl(identity, 1e-3, out);
-											float min[4];
-											float max[4];
+											orig_capsule->GetAabbImpl(identity, 1e-3f, out);
+											float min[4] = {0.0f};
+											float max[4] = {0.0f};
 											_mm_store_ps(&min[0], out.min.quad);
 											_mm_store_ps(&max[0], out.max.quad);
 											log::trace(" - Current bounds: {},{},{}<{},{},{}", min[0], min[1],min[2], max[0],max[1],max[2]);
@@ -428,7 +428,7 @@ namespace Gts {
 											capsule->vertexB = capsule->vertexB * vec_scale;
 											capsule->radius *= scale_factor;
 
-											capsule->GetAabbImpl(identity, 1e-3, out);
+											capsule->GetAabbImpl(identity, 1e-3f, out);
 											_mm_store_ps(&min[0], out.min.quad);
 											_mm_store_ps(&max[0], out.max.quad);
 											log::trace(" - New bounds: {},{},{}<{},{},{}", min[0], min[1],min[2], max[0],max[1],max[2]);
@@ -516,7 +516,7 @@ namespace Gts {
 	}
 
 	NiPoint3 get_bound_values(Actor* actor) {
-		NiPoint3 result = NiPoint3(22.0, 14.0, 64.0); // Default human scale that we return if actor for some reason doesn't have BBX data
+		NiPoint3 result = NiPoint3(22.0f, 14.0f, 64.0f); // Default human scale that we return if actor for some reason doesn't have BBX data
 		if (actor) {
 			auto bound = get_bound(actor);
 			if (bound) {
@@ -593,7 +593,7 @@ namespace Gts {
 			if (currentnode) {
 				auto ninode = currentnode->AsNode();
 				if (ninode) {
-					for (auto child: ninode->GetChildren()) {
+					for (auto &child : ninode->GetChildren()) {
 						// Bredth first search
 						if (child) {
 							queue.push_back(child.get());

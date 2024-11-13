@@ -45,8 +45,8 @@ namespace Gts {
 			bool RuneScale = false;
 			bool RuneShrink = false;
 
-			Spring ScaleRune = Spring(0.0, 1.5);
-			Spring ShrinkRune = Spring(0.0, 1.5);
+			Spring ScaleRune = Spring(0.0f, 1.5f);
+			Spring ShrinkRune = Spring(0.0f, 1.5f);
 			inline static Timer SandwichTimer = Timer(0.45);
 
 

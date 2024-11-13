@@ -10,11 +10,11 @@ namespace Gts {
 	}
 
 	void GrowOther::OnUpdate() {
-		const float BASE_POWER = 0.00045;
-		const float BONUS = 0.00045;
-		const float SMT_BONUS = 2.0;
-		const float DUAL_CAST_BONUS = 2.0;
-		const float CRUSH_GROWTH_CHECK = 1.4;
+		const float BASE_POWER = 0.00045f;
+		const float BONUS = 0.00045f;
+		const float SMT_BONUS = 2.0f;
+		const float DUAL_CAST_BONUS = 2.0f;
+		const float CRUSH_GROWTH_CHECK = 1.4f;
 
 		auto caster = GetCaster();
 		if (!caster) {
@@ -30,9 +30,9 @@ namespace Gts {
 		auto base_spell = GetBaseEffect();
 
 		if (base_spell == Runtime::GetMagicEffect("GrowAllyAdept")) {
-			power *= 1.32;
+			power *= 1.32f;
 		} else if (base_spell == Runtime::GetMagicEffect("GrowAllyExpert")) {
-			power *= 1.75;
+			power *= 1.75f;
 		}
 
 		float caster_scale = get_visual_scale(caster);
@@ -48,8 +48,8 @@ namespace Gts {
 		if (HasSMT(caster)) {
 			power *= SMT_BONUS;
 		}
-		float Gain = power * ((caster_scale * 0.50 + 0.50) * target_scale);
-		float Lose = power * (target_scale * 0.25);
+		float Gain = power * ((caster_scale * 0.50f + 0.50f) * target_scale);
+		float Lose = power * (target_scale * 0.25f);
 
 		Grow_Ally(caster, target, Gain, Lose);
 	}

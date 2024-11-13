@@ -50,7 +50,7 @@ namespace {
                 return false;
             }
             auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 10.0) {
+			if (FrameB <= 10.0f) {
 				return true;
 			}
 

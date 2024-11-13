@@ -39,8 +39,8 @@ namespace Hooks {
 		//
 		// 		if (actor) {
 		//       float scale = get_visual_scale(actor);
-		//       if (scale > 10.0) {
-		//         result = 0.0;
+		//       if (scale > 10.0f) {
+		//         result = 0.0f;
 		//       }
 		// 		}
 		// 		return result;

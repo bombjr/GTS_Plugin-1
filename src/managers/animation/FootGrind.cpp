@@ -29,10 +29,10 @@ namespace {
 	const std::string_view LNode = "NPC L Foot [Lft ]";
 
 	float GetGrindEventLimit(Actor* giant) {
-		float limit = 7.0;
+		float limit = 7.0f;
 
 		if (IsUsingAlternativeStomp(giant)) {
-			limit = 15.0;
+			limit = 15.0f;
 		}
 
 		return limit;
@@ -62,49 +62,49 @@ namespace {
 			if (!IsFootGrinding(giantref)) {
 				return false; 
 			}
-			Laugh_Chance(giantref, 2.2, "FootGrind");
+			Laugh_Chance(giantref, 2.2f, "FootGrind");
 
-			Rumbling::Once(r_name, giantref, Rumble_FootGrind_DOT, 0.025, RNode, 0.0);
+			Rumbling::Once(r_name, giantref, Rumble_FootGrind_DOT, 0.025f, RNode, 0.0f);
 			float speed = AnimationManager::GetBonusAnimationSpeed(giant) * TimeScale();
-			DoDamageEffect(giantref, Damage_Foot_Grind_DOT * speed, Radius_Foot_Grind_DOT, 10000, 0.025, Event, 2.5, DamageSource::FootGrindedRight);
+			DoDamageEffect(giantref, Damage_Foot_Grind_DOT * speed, Radius_Foot_Grind_DOT, 10000, 0.025f, Event, 2.5f, DamageSource::FootGrindedRight);
 			return true;
 		});
 	}
 
 	void ApplyRotateDamage(Actor* giant, std::string_view node, FootEvent kind, DamageSource source) {
-		Laugh_Chance(giant, 2.2, "FootGrind");
+		Laugh_Chance(giant, 2.2f, "FootGrind");
 		float speed = AnimationManager::GetBonusAnimationSpeed(giant);
-		float damage_mult = 1.0;
+		float damage_mult = 1.0f;
 
 		if (IsUsingAlternativeStomp(giant)) {
-			damage_mult = 0.6; // Since there's more total rotate events (15 vs 7)
+			damage_mult = 0.6f; // Since there's more total rotate events (15 vs 7)
 		}
 
 		std::string r_name = std::format("FootGrindRot_{}", giant->formID);
 
-		Rumbling::Once(r_name, giant, Rumble_FootGrind_Rotate * speed, 0.025, node, 0.0);
-		DoDamageEffect(giant, Damage_Foot_Grind_Rotate, Radius_Foot_Grind_DOT, 10, 0.15, kind, 1.6, source);
+		Rumbling::Once(r_name, giant, Rumble_FootGrind_Rotate * speed, 0.025f, node, 0.0f);
+		DoDamageEffect(giant, Damage_Foot_Grind_Rotate, Radius_Foot_Grind_DOT, 10, 0.15f, kind, 1.6f, source);
 
-		ApplyDustRing(giant, kind, node, 0.9);
+		ApplyDustRing(giant, kind, node, 0.9f);
 	}
 
 	void Footgrind_DoImpact(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
-		ApplyDustRing(giant, Event, Node, 1.05);
-		DoFootstepSound(giant, 1.0, Event, Node);
+		ApplyDustRing(giant, Event, Node, 1.05f);
+		DoFootstepSound(giant, 1.0f, Event, Node);
 
-		DoDamageEffect(giant, Damage_Foot_Grind_Impact, Radius_Foot_Grind_Impact, 20, 0.15, Event, 1.0, Source);
-		LaunchTask(giant, 0.75 * perk, 1.35 * perk, Event);
+		DoDamageEffect(giant, Damage_Foot_Grind_Impact, Radius_Foot_Grind_Impact, 20, 0.15f, Event, 1.0f, Source);
+		LaunchTask(giant, 0.75f * perk, 1.35f * perk, Event);
 
 		DamageAV(giant, ActorValue::kStamina, 30 * GetWasteMult(giant));
 
 		float shake_power = Rumble_FootGrind_Impact * GetHighHeelsBonusDamage(giant, true);
 
 		if (HasSMT(giant)) {
-			shake_power *= 1.5;
+			shake_power *= 1.5f;
 		}
 		
-		Rumbling::Once(rumble, giant, shake_power, 0.05, Node, 0.0);
+		Rumbling::Once(rumble, giant, shake_power, 0.05f, Node, 0.0f);
 		FootStepManager::PlayVanillaFootstepSounds(giant, right);
 	}
 
@@ -129,42 +129,42 @@ namespace {
 	void GTSstomp_FootGrindL_Enter(AnimationEventData& data) {
 		data.stage = 1;
 		data.canEditAnimSpeed = true;
-		data.animSpeed = 1.0;
-		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", true, 0.25);
+		data.animSpeed = 1.0f;
+		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", true, 0.25f);
 		ApplyDamageOverTime(&data.giant, LNode, FootEvent::Left, "Left_Light");
 	}
 
 	void GTSstomp_FootGrindR_Enter(AnimationEventData& data) {
 		data.stage = 1;
 		data.canEditAnimSpeed = true;
-		data.animSpeed = 1.0;
-		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", true, 0.25);
+		data.animSpeed = 1.0f;
+		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", true, 0.25f);
 		ApplyDamageOverTime(&data.giant, RNode, FootEvent::Right, "Right_Light");
 	}
 
 	void GTSstomp_FootGrindL_MV_S(AnimationEventData& data) { // Feet starts to move: Left
 		ApplyRotateDamage(&data.giant, LNode, FootEvent::Left, DamageSource::FootGrindedLeft);
-		data.stage += 1.0; // Rotation is done 6 times in total
+		data.stage += 1; // Rotation is done 6 times in total
 	}
 
 	void GTSstomp_FootGrindR_MV_S(AnimationEventData& data) { // Feet start to move: Right
 		ApplyRotateDamage(&data.giant, RNode, FootEvent::Right, DamageSource::FootGrindedRight);
-		data.stage += 1.0; // Rotation is done 6 times in total
+		data.stage += 1; // Rotation is done 6 times in total
 	}
 
 	void GTSstomp_FootGrindL_MV_E(AnimationEventData& data) { // When movement ends: Left
-		ApplyDustRing(&data.giant, FootEvent::Left, LNode, 0.9);
+		ApplyDustRing(&data.giant, FootEvent::Left, LNode, 0.9f);
 		if (data.stage >= GetGrindEventLimit(&data.giant)) { // It is a MUST to fix Tiny still being attached to our foot when Grind ends and we remove the leg
 			CancelGrindTasks(&data.giant);
-			data.stage = 1.0; // reset stage
+			data.stage = 1; // reset stage
 		}
 	}
 
 	void GTSstomp_FootGrindR_MV_E(AnimationEventData& data) { // When movement ends: Right
-		ApplyDustRing(&data.giant, FootEvent::Right, RNode, 0.9);
+		ApplyDustRing(&data.giant, FootEvent::Right, RNode, 0.9f);
 		if (data.stage >= GetGrindEventLimit(&data.giant)) { // It is a MUST to fix Tiny still being attached to our foot when Grind ends and we remove the leg
 			CancelGrindTasks(&data.giant);
-			data.stage = 1.0; // reset stage
+			data.stage = 1; // reset stage
 		}
 	}
 
@@ -179,15 +179,15 @@ namespace {
 	void GTSstomp_FootGrindR_Exit(AnimationEventData& data) { // Remove foot from enemy: Right
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
-		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", false, 0.25);
+		data.animSpeed = 1.0f;
+		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", false, 0.25f);
 	}
 
 	void GTSstomp_FootGrindL_Exit(AnimationEventData& data) { // Remove foot from enemy: Left
 		data.stage = 1;
 		data.canEditAnimSpeed = false;
-		data.animSpeed = 1.0;
-		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", false, 0.25);
+		data.animSpeed = 1.0f;
+		DrainStamina(&data.giant, "StaminaDrain_FootGrind", "DestructionBasics", false, 0.25f);
 	}
 }
 

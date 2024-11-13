@@ -53,7 +53,7 @@ namespace Gts {
 		bool enable_static = true;
 		bool enable_terrain = true;
 		bool enable_actor = false;
-		float above_scale = 5.0;
+		float above_scale = 5.0f;
 	};
 
 	class Persistent : public Gts::EventListener {
@@ -110,45 +110,45 @@ namespace Gts {
 			bool EnableIcons = true;
 			bool allow_weight_gain = true;
 
-			float tremor_scale = 1.0;
-			float npc_tremor_scale = 1.0;
-			float size_related_damage_mult = 1.0;
-			float experience_mult = 1.0;
-			float progression_multiplier = 0.55;
+			float tremor_scale = 1.0f;
+			float npc_tremor_scale = 1.0f;
+			float size_related_damage_mult = 1.0f;
+			float experience_mult = 1.0f;
+			float progression_multiplier = 0.55f;
 
 			////Quest Progression
-			float HugStealCount = 0.0; // Stage 1, Hugs
-			float CrushCount = 0.0; // Stage 2
-			float STNCount = 0.0; // Stage 3, Shrink to nothing
-			float StolenSize = 0.0; // Stage 4,
-			float HandCrushed = 0.0; // Stage 5, Crushed with hand
-			float VoreCount = 0.0; // Stage 6, Fully Vored
-			float GiantCount = 0.0; // Stage 7, Giant Count
+			float HugStealCount = 0.0f; // Stage 1, Hugs
+			float CrushCount = 0.0f; // Stage 2
+			float STNCount = 0.0f; // Stage 3, Shrink to nothing
+			float StolenSize = 0.0f; // Stage 4,
+			float HandCrushed = 0.0f; // Stage 5, Crushed with hand
+			float VoreCount = 0.0f; // Stage 6, Fully Vored
+			float GiantCount = 0.0f; // Stage 7, Giant Count
 			///
 
-			float stolen_attributes = 0.0;
+			float stolen_attributes = 0.0f;
 
-			float stolen_health = 0.0;
-			float stolen_magick = 0.0;
-			float stolen_stamin = 0.0;
+			float stolen_health = 0.0f;
+			float stolen_magick = 0.0f;
+			float stolen_stamin = 0.0f;
 
-			float BalanceMode_SizeGain_Penalty = 1.0;
-			float BalanceMode_ShrinkRate_Base = 1.0;
-			float BalanceMode_ShrinkRate_Combat = 0.08;
+			float BalanceMode_SizeGain_Penalty = 1.0f;
+			float BalanceMode_ShrinkRate_Base = 1.0f;
+			float BalanceMode_ShrinkRate_Combat = 0.08f;
 
 			SoftPotential speed_adjustment {
-				.k = 0.125, // 0.125
-				.n = 0.86, // 0.86
-				.s = 1.12, // 1.12
-				.o = 1.0,
-				.a = 0.0,  //Default is 0
+				.k = 0.125f,//0.125
+				.n = 0.86f, //0.86
+				.s = 1.12f, //1.12
+				.o = 1.0f,
+				.a = 0.0f,  //Default is 0
 			};
 			SoftPotential MS_adjustment {
-				.k = 0.132, // 0.132
-				.n = 0.86, // 0.86
-				.s = 1.12, // 1.12
-				.o = 1.0,
-				.a = 0.0, //Default is 0
+				.k = 0.132f, //0.132
+				.n = 0.86f,  //0.86
+				.s = 1.12f,  //1.12
+				.o = 1.0f,
+				.a = 0.0f, //Default is 0
 			};
 			SizeMethod size_method = SizeMethod::ModelScale;
 			CameraCollisions camera_collisions;

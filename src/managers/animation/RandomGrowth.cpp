@@ -40,52 +40,52 @@ namespace {
 
 	float get_growth_multiplier(Actor* giant) {
 		int growth_roll = static_cast<int>(GetGrowthType(giant));
-		float multiplier = 1.0;
+		float multiplier = 1.0f;
 
 		if (Runtime::HasPerkTeam(giant, "RandomGrowthTerror")) {
-			multiplier = 1.3;
+			multiplier = 1.3f;
 		}
 
 		switch (growth_roll) {
 			case 1:
-				return 0.38 * multiplier * 1.45; // ~62% without * 1.25
+				return 0.38f * multiplier * 1.45f; // ~62% without * 1.25
 			case 5:
 			case 2:
-			 	return 0.26 * multiplier * 1.40; // ~40% without * 1.25
+			 	return 0.26f * multiplier * 1.40f; // ~40% without * 1.25
 			case 6:
 			case 3:
-				return 0.28 * multiplier * 1.35; // ~42% without * 1.25
+				return 0.28f * multiplier * 1.35f; // ~42% without * 1.25
 			case 4:
-				return 0.34 * multiplier * 1.25; // ~62% without * 1.25
+				return 0.34f * multiplier * 1.25f; // ~62% without * 1.25
 			break;
 		}
 
-		return 0.9 * multiplier;
+		return 0.9f * multiplier;
 	}
 
 	float get_growth_formula(Actor* giant, float elapsed, GrowthAnimation anim) {
-		float formula = 0.0;
+		float formula = 0.0f;
 		switch (anim) {
 			case GrowthAnimation::None:
 				log::info("Formula = 0");
-				return 0.0;
+				return 0.0f;
 			break;
 			case GrowthAnimation::Growth_1:
-				formula = bezier_curve(elapsed * 0.32, 0.2, 2.1, -0.2, 0, 3.0, 7.0); // https://www.desmos.com/calculator/aqbzm5e97p
+				formula = bezier_curve(elapsed * 0.32f, 0.2f, 2.1f, -0.2f, 0, 3.0f, 7.0f); // https://www.desmos.com/calculator/aqbzm5e97p
 			break;
 			case GrowthAnimation::Growth_5: // 5 is copy-pasted 2 for now
 			case GrowthAnimation::Growth_2:
-				formula = bezier_curve(elapsed * 0.33, 0.2, 1.9, 0, 0, 3.0, 4.0);  // https://www.desmos.com/calculator/reqejljy19
+				formula = bezier_curve(elapsed * 0.33f, 0.2f, 1.9f, 0, 0, 3.0f, 4.0f);  // https://www.desmos.com/calculator/reqejljy19
 				//log::info("Formula = 2");
 			break;
 			case GrowthAnimation::Growth_6: // 6 is copy-pasted 3 for now
 			case GrowthAnimation::Growth_3:
 				elapsed = std::clamp(elapsed, 0.0f, 2.0f); // Fix formula going into positives, causing growth once everything is done
-				formula = bezier_curve(elapsed * 0.48, 0.4, 3, 0, 0, 3.0, 1.9); // https://www.desmos.com/calculator/liko5e9kca
+				formula = bezier_curve(elapsed * 0.48f, 0.4f, 3, 0, 0, 3.0f, 1.9f); // https://www.desmos.com/calculator/liko5e9kca
 				//log::info("Formula = 3");
 			break;
 			case GrowthAnimation::Growth_4:
-				formula = bezier_curve(elapsed * 0.275, 0, 3.5, 0.2, 0, 1.0, 0.68); // https://www.desmos.com/calculator/7ynul48a93
+				formula = bezier_curve(elapsed * 0.275f, 0, 3.5f, 0.2f, 0, 1.0f, 0.68f); // https://www.desmos.com/calculator/7ynul48a93
 				//log::info("Formula = 4");
 			break;
 		}
@@ -102,37 +102,37 @@ namespace {
 		
 		GrowthAnimation GrowthType = GetGrowthType(actor);
 
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			auto giant = gianthandle.get().get();
-			float timepassed = Time::WorldTimeElapsed() - Start;
+			double timepassed = Time::WorldTimeElapsed() - Start;
 			float animspeed = AnimationManager::GetAnimSpeed(giant);
 
-			float elapsed = std::clamp(timepassed * animspeed, 0.0f, 4.4f);
+			float elapsed = static_cast<float>(std::clamp(timepassed * animspeed, 0.0, 4.4));
 			float gain = std::clamp(get_growth_formula(giant, elapsed, GrowthType), -0.01f, 1.0f);
 
-			float growth = CalcPower(actor, 0.0080 * growth_mult * gain * animspeed, 0.0, false);
+			float growth = CalcPower(actor, 0.0080f * growth_mult * gain * animspeed, 0.0f, false);
 
 			if (gain > 0) {
 				override_actor_scale(giant, growth, SizeEffectType::kGrow);
 				RandomGrowth::RestoreStats(giant, gain);
 			}
 			
-			Rumbling::Once("RandomGrowth", giant, 2.0 * gain, 0.0, "NPC Pelvis [Pelv]", 0.0);
+			Rumbling::Once("RandomGrowth", giant, 2.0f * gain, 0.0f, "NPC Pelvis [Pelv]", 0.0f);
 
 			//log::info("elapsed: {}, mult: {}, IsGrowing: {}", elapsed, gain, IsGrowing(giant));
 			if (!IsActionOnCooldown(giant, CooldownSource::Misc_GrowthSound)) {
 				ApplyActionCooldown(giant, CooldownSource::Misc_GrowthSound);
 
 				float Volume = std::clamp(get_visual_scale(actor)/8.0f, 0.20f, 1.0f);
-				Runtime::PlaySoundAtNode("growthSound", actor, Volume * gain, 1.0, "NPC Pelvis [Pelv]");
+				Runtime::PlaySoundAtNode("growthSound", actor, Volume * gain, 1.0f, "NPC Pelvis [Pelv]");
 			}
 			
-			if (!IsGrowing(giant) || elapsed > 1.8 && gain < 0.0) {
+			if (!IsGrowing(giant) || elapsed > 1.8f && gain < 0.0f) {
 				return false;
 			}
 			return true;
@@ -145,8 +145,8 @@ namespace {
 	void GTS_RandomGrowth_Peak(AnimationEventData& data) {
 		Actor* giant = &data.giant;
 
-		PlayMoanSound(giant, 1.0);
-		Task_FacialEmotionTask_Moan(giant, 2.0, "RandomGrow");
+		PlayMoanSound(giant, 1.0f);
+		Task_FacialEmotionTask_Moan(giant, 2.0f, "RandomGrow");
 
 		if (Runtime::HasPerkTeam(giant, "RandomGrowthTerror")) {
 			for (auto tiny: find_actors()) {

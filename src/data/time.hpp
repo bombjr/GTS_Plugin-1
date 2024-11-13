@@ -19,6 +19,6 @@ namespace Gts {
 			void Update();
 		private:
 			double worldTimeElapsed = 0.0;
-			std::uint64_t framesElapsed = 0.0;
+			std::uint64_t framesElapsed = 0;
 	};
 }

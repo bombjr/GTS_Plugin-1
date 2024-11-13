@@ -42,17 +42,17 @@ namespace Gts {
 
 							float volume = std::clamp(scale + 0.5f, 0.35f, 1.0f);
 
-							float size = (scale * 0.20) + 0.8;
-							float frequence = (1.0 / size) / (1.0 * size);
+							float size = (scale * 0.20f) + 0.8f;
+							float frequence = (1.0f / size) / (1.0f * size);
 
 							
 
 							auto config = Config::GetSingleton().GetVoice();
 							float config_param = config.GetVoiceFrequency();
 
-							float freq_high = 1.0 / std::clamp(config_param, 1.0f, 10.0f);
+							float freq_high = 1.0f / std::clamp(config_param, 1.0f, 10.0f);
 
-							float freq_low = 1.5;
+							float freq_low = 1.5f;
 
 							float freq = std::clamp(frequence, freq_high, freq_low);
 							// < 1  = deep voice, below 0.5 = audio bugs out, not recommended

@@ -23,13 +23,13 @@ namespace {
 
 	float Get_Speed_Override(Actor* giant, float incoming_speed) {
 		float new_speed = incoming_speed;
-		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant) && get_visual_scale(giant) > 1.5) {
+		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant) && get_visual_scale(giant) > 1.5f) {
 			float speed_cap = 400.0f / get_visual_scale(giant);
 			float speed = AnimationManager::GetAnimSpeed(giant);
 			new_speed *= speed * speed;
 			//log::info("Adjusting speed for {}", giant->GetDisplayFullName());
 			if (giant->AsActorState()->IsSprinting()) {
-				speed_cap *= 2.0;
+				speed_cap *= 2.0f;
 			}
 			if (new_speed < speed_cap) {
 				return speed_cap;
@@ -132,7 +132,7 @@ namespace Hooks
 
 	float Hook_Actor::GetBaseActorValue(ActorValueOwner* a_owner, ActorValue a_akValue) { // Override Health
 		float value = _GetBaseActorValue(a_owner, a_akValue);
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		if (Plugin::InGame()) {
 			Actor* a_this = skyrim_cast<Actor*>(a_owner);
 			if (a_this) {
@@ -179,7 +179,7 @@ namespace Hooks
 
 	float Hook_Actor::GetActorValueModifier_1(Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value) {
 		float original_value = _GetActorValueModifier_1(a_this, a_modifier, a_value);
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		if (Plugin::InGame() && a_this) {
 			if (a_this->formID == 0x14 && a_value == ActorValue::kHealth) {
 				float value = (a_this->AsActorValueOwner()->GetBaseActorValue(ActorValue::kHealth)) - original_value;
@@ -192,7 +192,7 @@ namespace Hooks
 
 	float Hook_Actor::GetActorValueModifier_2(Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value) {
 		float original_value = _GetActorValueModifier_1(a_this, a_modifier, a_value);
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		if (Plugin::InGame() && a_this) {
 			if (a_this->formID == 0x14 && a_value == ActorValue::kHealth) {
 				float value = (a_this->AsActorValueOwner()->GetBaseActorValue(ActorValue::kHealth)) - original_value;
@@ -205,7 +205,7 @@ namespace Hooks
 
 	float Hook_Actor::GetActorValueModifier_3(Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value) {
 		float original_value = _GetActorValueModifier_1(a_this, a_modifier, a_value);
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		if (Plugin::InGame() && a_this) {
 			if (a_this->formID == 0x14 && a_value == ActorValue::kHealth) {
 				float value = (a_this->AsActorValueOwner()->GetBaseActorValue(ActorValue::kHealth)) - original_value;
@@ -218,7 +218,7 @@ namespace Hooks
 
 	float Hook_Actor::GetActorValueModifier_4(Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value) {
 		float original_value = _GetActorValueModifier_1(a_this, a_modifier, a_value);
-		float bonus = 0.0;
+		float bonus = 0.0f;
 		if (Plugin::InGame() && a_this) {
 			if (a_this->formID == 0x14 && a_value == ActorValue::kHealth) {
 				float value = (a_this->AsActorValueOwner()->GetBaseActorValue(ActorValue::kHealth)) - original_value;

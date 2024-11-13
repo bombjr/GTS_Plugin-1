@@ -41,10 +41,10 @@ using namespace Gts;
 namespace {
     void Absorb_GrowInSize(Actor* giant, Actor* tiny, float multiplier) {
         if (Runtime::HasPerkTeam(giant, "HugCrush_Greed")) {
-			multiplier *= 1.15;
+			multiplier *= 1.15f;
 		}
-        float grow_value = 0.08 * multiplier * 0.845;
-        float original = Vore::ReadOriginalScale(tiny) + 0.875; // Compensate
+        float grow_value = 0.08f * multiplier * 0.845f;
+        float original = Vore::ReadOriginalScale(tiny) + 0.875f; // Compensate
         update_target_scale(giant, grow_value * original, SizeEffectType::kGrow);
     }
 
@@ -54,7 +54,7 @@ namespace {
         if (tiny) {
             KillActor(giant, tiny);
             PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
-            DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75);
+            DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75f);
             tiny->SetGraphVariableBool("GTSBEH_T_InStorage", false);
             SetBetweenBreasts(tiny, false);
             SetBeingEaten(tiny, false);
@@ -73,7 +73,7 @@ namespace {
         float value = Percent * percentage;
 
         if (Runtime::HasPerk(giant, "Breasts_Predominance")) {
-            value *= 1.5;
+            value *= 1.5f;
         }
 
         DamageAV(giant, Attribute, -value);
@@ -82,7 +82,7 @@ namespace {
     void ShrinkTinyWithCleavage(Actor* giant, float scale_limit, float shrink_for, float stamina_damage, bool hearts, bool damage_stamina) {
         Actor* tiny = Grab::GetHeldActor(giant);
         if (tiny) {
-            if (get_target_scale(tiny) > scale_limit && shrink_for < 1.0) {
+            if (get_target_scale(tiny) > scale_limit && shrink_for < 1.0f) {
                 DamageAV(giant, ActorValue::kHealth, -get_target_scale(tiny) * 10); // Heal GTS
                 set_target_scale(tiny, get_target_scale(tiny) * shrink_for);
             } else {
@@ -93,14 +93,14 @@ namespace {
                 DamageAV(tiny, ActorValue::kStamina, stamina_damage);
             }
             if (hearts) {
-                SpawnHearts(giant, tiny, 35, 0.5, false);
+                SpawnHearts(giant, tiny, 35, 0.5f, false);
             }
         }
     }
     void SuffocateTinyFor(Actor* giant, Actor* tiny, float DamageMult, float Shrink, float StaminaDrain) {
         float TotalHP = GetMaxAV(tiny, ActorValue::kHealth);
         float CurrentHP = GetAV(tiny, ActorValue::kHealth);
-        float Threshold = 1.0;
+        float Threshold = 1.0f;
         
         float damage = TotalHP * DamageMult; // 100% hp by default
         
@@ -109,7 +109,7 @@ namespace {
                 DamageAV(tiny, ActorValue::kHealth, damage);
             } else {
                 if (DamageMult > 0) {
-                    SetAV(tiny, ActorValue::kHealth, 1.0);
+                    SetAV(tiny, ActorValue::kHealth, 1.0f);
                 }
             }
             DamageAV(tiny, ActorValue::kStamina, StaminaDrain);
@@ -136,8 +136,8 @@ namespace {
 			if (!tinyref) {
 				return false; // end task in that case
 			}
-            float damage = 0.0;//0.0015 * starting_hppercentage * TimeScale();
-            SuffocateTinyFor(giantref, tinyref, damage, 0.998, 0.0035 * TimeScale());
+            float damage = 0.0f;//0.0015f * starting_hppercentage * TimeScale();
+            SuffocateTinyFor(giantref, tinyref, damage, 0.998f, 0.0035f * TimeScale());
 
             if (tinyref->IsDead() || GetAV(tinyref, ActorValue::kHealth) <= 0) {
                 return false;
@@ -168,7 +168,7 @@ namespace {
                 Attacked(tiny, giant); // force combat
             }
 
-            float bonus = 1.0;
+            float bonus = 1.0f;
             auto& sizemanager = SizeManager::GetSingleton();
 
 			float tiny_scale = get_visual_scale(tiny) * GetSizeFromBoundingBox(tiny);
@@ -176,35 +176,35 @@ namespace {
 
 			float sizeDiff = gts_scale/tiny_scale;
 			float power = std::clamp(sizemanager.GetSizeAttribute(giant, SizeAttribute::Normal), 1.0f, 999999.0f);
-			float additionaldamage = 1.0 + sizemanager.GetSizeVulnerability(tiny);
+			float additionaldamage = 1.0f + sizemanager.GetSizeVulnerability(tiny);
 			float damage = (Damage_Breast_Squish * damage_mult) * power * additionaldamage * additionaldamage * sizeDiff;
 			float experience = std::clamp(damage/1600, 0.0f, 0.06f);
 
 			if (HasSMT(giant)) {
-				bonus = 1.65;
+				bonus = 1.65f;
 			}
 
             if (CanDoDamage(giant, tiny, false)) {
                 if (Runtime::HasPerkTeam(giant, "GrowingPressure")) {
                     auto& sizemanager = SizeManager::GetSingleton();
-                    sizemanager.ModSizeVulnerability(tiny, damage * 0.0010);
+                    sizemanager.ModSizeVulnerability(tiny, damage * 0.0010f);
                 }
 
-                TinyCalamity_ShrinkActor(giant, tiny, damage * 0.20 * GetDamageSetting());
+                TinyCalamity_ShrinkActor(giant, tiny, damage * 0.20f * GetDamageSetting());
 
-                SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, tiny, damage * 0.15, 6);
+                SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, tiny, damage * 0.15f, 6);
                 if (!IsTeammate(tiny) || IsHostile(giant, tiny)) {
                     InflictSizeDamage(giant, tiny, damage);
-                    DamageAV(tiny, ActorValue::kStamina, damage * 0.25);
+                    DamageAV(tiny, ActorValue::kStamina, damage * 0.25f);
                 } else {
                     tiny->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, damage * 5);
                 }
 
-                DamageAV(giant, ActorValue::kHealth, -damage * 0.33);
+                DamageAV(giant, ActorValue::kHealth, -damage * 0.33f);
             }
 			
-			Rumbling::Once("GrabAttack", tiny, Rumble_Grab_Hand_Attack * bonus * damage_mult, 0.05, "NPC Root [Root]", 0.0);
-            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, 1.0, 1.0, "NPC Root [Root]");
+			Rumbling::Once("GrabAttack", tiny, Rumble_Grab_Hand_Attack * bonus * damage_mult, 0.05f, "NPC Root [Root]", 0.0f);
+            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, 1.0f, 1.0f, "NPC Root [Root]");
 
             Utils_CrushTask(giant, tiny, bonus, false, false, DamageSource::BreastImpact, QuestStage::Crushing);
             ModSizeExperience(giant, experience);
@@ -232,28 +232,28 @@ namespace {
     void GTS_BS_DamageTiny_L(const AnimationEventData& data) {
         DamageAV(&data.giant, ActorValue::kStamina, 30 * GetWasteMult(&data.giant));
 
-        Rumbling::Once("HandImpact_L", &data.giant, 0.3, 0.0, "L Breast02", 0.0);
-        Rumbling::Once("HandImpact_R", &data.giant, 0.3, 0.0, "R Breast02", 0.0);
+        Rumbling::Once("HandImpact_L", &data.giant, 0.3f, 0.0f, "L Breast02", 0.0f);
+        Rumbling::Once("HandImpact_R", &data.giant, 0.3f, 0.0f, "R Breast02", 0.0f);
 
-        Deal_breast_damage(&data.giant, 1.0);
+        Deal_breast_damage(&data.giant, 1.0f);
     }
     void GTS_BS_DamageTiny_H(const AnimationEventData& data) {
         DamageAV(&data.giant, ActorValue::kStamina, 45 * GetWasteMult(&data.giant));
 
-        Rumbling::Once("HandImpactH_L", &data.giant, 0.55, 0.0, "L Breast02", 0.0);
-        Rumbling::Once("HandImpactH_R", &data.giant, 0.55, 0.0, "R Breast02", 0.0);
+        Rumbling::Once("HandImpactH_L", &data.giant, 0.55f, 0.0f, "L Breast02", 0.0f);
+        Rumbling::Once("HandImpactH_R", &data.giant, 0.55f, 0.0f, "R Breast02", 0.0f);
 
-        Deal_breast_damage(&data.giant, 2.25);
+        Deal_breast_damage(&data.giant, 2.25f);
     }
 
     void GTS_BS_Shake(const AnimationEventData& data) {
-        ShrinkTinyWithCleavage(&data.giant, 0.035, 0.980, 25.0, true, true);
+        ShrinkTinyWithCleavage(&data.giant, 0.035f, 0.980f, 25.0f, true, true);
 
-        Rumbling::Once("BreastShake_L", &data.giant, 0.3, 0.0, "L Breast02", 0.0);
-        Rumbling::Once("BreastShake_R", &data.giant, 0.3, 0.0, "R Breast02", 0.0);
+        Rumbling::Once("BreastShake_L", &data.giant, 0.3f, 0.0f, "L Breast02", 0.0f);
+        Rumbling::Once("BreastShake_R", &data.giant, 0.3f, 0.0f, "R Breast02", 0.0f);
 
         if (!IsActionOnCooldown(&data.giant, CooldownSource::Emotion_Laugh)) {
-            Task_FacialEmotionTask_Smile(&data.giant, 6.0 / AnimationManager::GetAnimSpeed(&data.giant), "ShakeSmile");
+            Task_FacialEmotionTask_Smile(&data.giant, 6.0f / AnimationManager::GetAnimSpeed(&data.giant), "ShakeSmile");
             ApplyActionCooldown(&data.giant, CooldownSource::Emotion_Laugh);
         }
     }
@@ -270,9 +270,9 @@ namespace {
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 		if (tiny) {
 			SetBeingEaten(tiny, true);
-			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1);
+			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
 		}
-		Task_FacialEmotionTask_OpenMouth(giant, 0.66 / AnimationManager::GetAnimSpeed(giant), "PrepareVore");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.66f / AnimationManager::GetAnimSpeed(giant), "PrepareVore");
     }
     void GTS_BS_CloseMouth(const AnimationEventData& data) {
     }
@@ -289,12 +289,12 @@ namespace {
         auto tiny = Grab::GetHeldActor(&data.giant);
 		auto& VoreData = Vore::GetSingleton().GetVoreData(&data.giant);
 		if (tiny) {
-            Runtime::PlaySoundAtNode("VoreSwallow", &data.giant, 1.0, 1.0, "NPC Head [Head]"); // Play sound
+            Runtime::PlaySoundAtNode("VoreSwallow", &data.giant, 1.0f, 1.0f, "NPC Head [Head]"); // Play sound
 			for (auto& tiny: VoreData.GetVories()) {
 				if (!AllowDevourment()) {
 					VoreData.Swallow();
 					if (IsCrawling(&data.giant)) {
-						tiny->SetAlpha(0.0); // Hide Actor
+						tiny->SetAlpha(0.0f); // Hide Actor
 					}
 				} else {
 					CallDevourment(&data.giant, tiny);
@@ -302,9 +302,9 @@ namespace {
 			}
 		}
 
-        RecoverAttributes(&data.giant, ActorValue::kHealth, 0.07);
-        RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.07);
-        RecoverAttributes(&data.giant, ActorValue::kStamina, 0.07);
+        RecoverAttributes(&data.giant, ActorValue::kHealth, 0.07f);
+        RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.07f);
+        RecoverAttributes(&data.giant, ActorValue::kStamina, 0.07f);
     }
     void GTS_BS_KillAll(const AnimationEventData& data) {
         auto giant = &data.giant;
@@ -328,7 +328,7 @@ namespace {
     ///=================================================================== Absorb
 
     void GTS_BS_AbsorbStart(const AnimationEventData& data) {
-        Task_FacialEmotionTask_Smile(&data.giant, 3.2 / AnimationManager::GetAnimSpeed(&data.giant), "AbsorbStart");
+        Task_FacialEmotionTask_Smile(&data.giant, 3.2f / AnimationManager::GetAnimSpeed(&data.giant), "AbsorbStart");
         Task_ApplyAbsorbCooldown(&data.giant);
 
         auto tiny = Grab::GetHeldActor(&data.giant);
@@ -341,24 +341,24 @@ namespace {
         auto giant = &data.giant;
 		auto tiny = Grab::GetHeldActor(&data.giant);
 
-        float growth = 0.0625;
+        float growth = 0.0625f;
 
 		if (tiny) {
-            Rumbling::Once("AbsorbPulse_R", giant, 0.45, 0.0, "L Breast02", 0.0);
-            Rumbling::Once("AbsorbPulse_L", giant, 0.45, 0.0, "R Breast02", 0.0);
+            Rumbling::Once("AbsorbPulse_R", giant, 0.45f, 0.0f, "L Breast02", 0.0f);
+            Rumbling::Once("AbsorbPulse_L", giant, 0.45f, 0.0f, "R Breast02", 0.0f);
 
             float volume = std::clamp(0.12f * get_visual_scale(giant), 0.12f, 1.0f);
 
-            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, volume, 1.0, "NPC Root [Root]");
+            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, volume, 1.0f, "NPC Root [Root]");
 
             bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
             if (!Blocked) {
                 ApplyActionCooldown(giant, CooldownSource::Emotion_Laugh);
-                PlayLaughSound(giant, 0.6, 1);
+                PlayLaughSound(giant, 0.6f, 1);
             }
 
-            ShrinkTinyWithCleavage(giant, 0.010, 0.66, 45.0, true, true);
-            RecoverAttributes(giant, ActorValue::kHealth, 0.025);
+            ShrinkTinyWithCleavage(giant, 0.010f, 0.66f, 45.0f, true, true);
+            RecoverAttributes(giant, ActorValue::kHealth, 0.025f);
 
             Absorb_GrowInSize(giant, tiny, growth);
         }
@@ -366,27 +366,27 @@ namespace {
 
     void GTS_BS_FinishAbsorb(const AnimationEventData& data) {
         Actor* giant = &data.giant;
-        Task_FacialEmotionTask_Moan(giant, 1.1 / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
+        Task_FacialEmotionTask_Moan(giant, 1.1f / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
         auto tiny = Grab::GetHeldActor(giant);
-        float growth = 0.95;
+        float growth = 0.95f;
 
 		if (tiny) {
-            SpawnHearts(giant, tiny, 35, 0.75, false);
-            PlayMoanSound(giant, 0.8);
+            SpawnHearts(giant, tiny, 35, 0.75f, false);
+            PlayMoanSound(giant, 0.8f);
             Attacked(tiny, giant);
 
-            AdvanceQuestProgression(giant, tiny, QuestStage::HugSteal, 1.0, false);
+            AdvanceQuestProgression(giant, tiny, QuestStage::HugSteal, 1.0f, false);
 
-            Rumbling::Once("AbsorbTiny_R", giant, 0.8, 0.05, "L Breast02", 0.0);
-            Rumbling::Once("AbsorbTiny_L", giant, 0.8, 0.05, "R Breast02", 0.0);
+            Rumbling::Once("AbsorbTiny_R", giant, 0.8f, 0.05f, "L Breast02", 0.0f);
+            Rumbling::Once("AbsorbTiny_L", giant, 0.8f, 0.05f, "R Breast02", 0.0f);
 
             DamageAV(giant, ActorValue::kHealth, -30); // Heal GTS
             Absorb_GrowInSize(giant, tiny, growth);
             PrintBreastAbsorbed(giant, tiny);
 
-            AdjustSizeReserve(giant, 0.00425);
-			AdjustSizeLimit(0.0095, giant);
-			AdjustMassLimit(0.0095, giant);
+            AdjustSizeReserve(giant, 0.00425f);
+			AdjustSizeLimit(0.0095f, giant);
+			AdjustMassLimit(0.0095f, giant);
 
             if (tiny->formID != 0x14) {
                 Disintegrate(tiny);
@@ -417,8 +417,8 @@ namespace {
                 // Actor Reset is done inside TransferInventory:StartResetTask!
             });
             
-            RecoverAttributes(giant, ActorValue::kHealth, 0.05);
-            ModSizeExperience(giant, 0.235);
+            RecoverAttributes(giant, ActorValue::kHealth, 0.05f);
+            ModSizeExperience(giant, 0.235f);
         }
     }
     void GTS_BS_GrowBoobs(const AnimationEventData& data) {
@@ -433,54 +433,54 @@ namespace {
         Actor* giant = &data.giant;
         auto tiny = Grab::GetHeldActor(giant);
         if (tiny) {
-            SuffocateTinyFor(&data.giant, tiny, 0.10, 0.85, 25.0);
+            SuffocateTinyFor(&data.giant, tiny, 0.10f, 0.85f, 25.0f);
             Task_RunSuffocateTask(giant, tiny);
-            SpawnHearts(giant, tiny, 35, 0.35, false);
+            SpawnHearts(giant, tiny, 35, 0.35f, false);
         }
-        Task_FacialEmotionTask_Smile(&data.giant, 1.8 / AnimationManager::GetAnimSpeed(&data.giant), "SufoStart");
+        Task_FacialEmotionTask_Smile(&data.giant, 1.8f / AnimationManager::GetAnimSpeed(&data.giant), "SufoStart");
     }
     void GTS_BS_SufoStop(const AnimationEventData& data) {}
 
     void GTS_BS_SufoKill(const AnimationEventData& data) {
         Animation_Cleavage::LaunchCooldownFor(&data.giant, CooldownSource::Action_Breasts_Suffocate);
-        ModSizeExperience(&data.giant, 0.235);
+        ModSizeExperience(&data.giant, 0.235f);
         CancelAnimation(&data.giant);
     }
     void GTS_BS_SufoPress(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.035);
-            SuffocateTinyFor(&data.giant, tiny, 0.35, 0.85, 25.0);
-            SpawnHearts(&data.giant, tiny, 35, 0.50, false);
+            RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.035f);
+            SuffocateTinyFor(&data.giant, tiny, 0.35f, 0.85f, 25.0f);
+            SpawnHearts(&data.giant, tiny, 35, 0.50f, false);
         }
-        Task_FacialEmotionTask_Smile(&data.giant, 1.2 / AnimationManager::GetAnimSpeed(&data.giant), "SufoPress");
+        Task_FacialEmotionTask_Smile(&data.giant, 1.2f / AnimationManager::GetAnimSpeed(&data.giant), "SufoPress");
     }
     
     void GTS_BS_PullTiny(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            Task_FacialEmotionTask_Smile(&data.giant, 1.6 / AnimationManager::GetAnimSpeed(&data.giant), "SufoPullOut");
-            Rumbling::Once("PullOut_R", &data.giant, 0.75, 0.0, "L Breast02", 0.0);
-            Rumbling::Once("PullOut_L", &data.giant, 0.75, 0.0, "R Breast02", 0.0);
+            Task_FacialEmotionTask_Smile(&data.giant, 1.6f / AnimationManager::GetAnimSpeed(&data.giant), "SufoPullOut");
+            Rumbling::Once("PullOut_R", &data.giant, 0.75f, 0.0f, "L Breast02", 0.0f);
+            Rumbling::Once("PullOut_L", &data.giant, 0.75f, 0.0f, "R Breast02", 0.0f);
 
             Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectL);
 
             ManageCamera(&data.giant, true, CameraTracking::ObjectB);
-            SpawnHearts(&data.giant, tiny, 35, 0.50, false);
+            SpawnHearts(&data.giant, tiny, 35, 0.50f, false);
         }
     }
 
     void GTS_BS_HandsLand(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.045);
-            SuffocateTinyFor(&data.giant, tiny, 0.20, 0.75, 20.0);
+            RecoverAttributes(&data.giant, ActorValue::kMagicka, 0.045f);
+            SuffocateTinyFor(&data.giant, tiny, 0.20f, 0.75f, 20.0f);
 
-            Rumbling::Once("HandLand_R", &data.giant, 0.45, 0.0, "L Breast02", 0.0);
-            Rumbling::Once("HandLand_L", &data.giant, 0.45, 0.0, "R Breast02", 0.0);
+            Rumbling::Once("HandLand_R", &data.giant, 0.45f, 0.0f, "L Breast02", 0.0f);
+            Rumbling::Once("HandLand_L", &data.giant, 0.45f, 0.0f, "R Breast02", 0.0f);
 
             float volume = std::clamp(0.12f * get_visual_scale(&data.giant), 0.12f, 1.0f);
-            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, volume, 1.0, "NPC Root [Root]");
+            Runtime::PlaySoundAtNode("ThighSandwichImpact", tiny, volume, 1.0f, "NPC Root [Root]");
         }
     }
 
@@ -501,13 +501,13 @@ namespace {
     void GTS_BS_Poke(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            SpawnHearts(&data.giant, tiny, 35, 0.4, false);
+            SpawnHearts(&data.giant, tiny, 35, 0.4f, false);
         }
     }
     void GTS_BS_Pat(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            SpawnHearts(&data.giant, tiny, 35, 0.4, false);
+            SpawnHearts(&data.giant, tiny, 35, 0.4f, false);
 
             if (IsHostile(&data.giant, tiny)) {
 				AnimationManager::StartAnim("Breasts_Idle_Unwilling", tiny);
@@ -527,7 +527,7 @@ namespace {
             SetBeingHeld(tiny, false);
         }
 
-        DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75);
+        DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75f);
         giant->SetGraphVariableInt("GTS_GrabbedTiny", 0); // Tell behaviors 'we have nothing in our hands'. A must.
         giant->SetGraphVariableInt("GTS_Grab_State", 0);
         giant->SetGraphVariableInt("GTS_Storing_Tiny", 0);

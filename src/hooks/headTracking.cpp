@@ -98,7 +98,7 @@ namespace {
 						auto transInv = trans.Invert();
 						auto scale = get_visual_scale(actor) / game_getactorscale(actor);
 
-						auto unscaledHeadPos = trans * (transInv*headPos * (1.0/scale));
+						auto unscaledHeadPos = trans * (transInv*headPos * (1.0f/scale));
 
 						//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
 

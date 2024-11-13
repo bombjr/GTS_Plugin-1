@@ -21,9 +21,9 @@ using namespace Gts;
 
 namespace {
 	float GetXPModifier(Actor* tiny) {
-		float mult = 1.0;
+		float mult = 1.0f;
 		if (tiny->IsDead()) {
-			mult = 0.25;
+			mult = 0.25f;
 		}
 		
 		return mult;
@@ -31,23 +31,23 @@ namespace {
 
 	void SpawnDeathEffects(Actor* tiny) {
 		if (!IsLiving(tiny)) {
-			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6);
+			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6f);
 		} else {
 			if (!LessGore()) {
 				std::random_device rd;
 				std::mt19937 gen(rd());
-				std::uniform_real_distribution<float> dis(-0.2, 0.2);
+				std::uniform_real_distribution<float> dis(-0.2f, 0.2f);
 				auto root = find_node(tiny, "NPC Root [Root]");
 				if (root) {
-					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0, 7, root);
-					SpawnParticle(tiny, 1.20, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
 				}
 				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "BloodExplosion");
 				Runtime::PlayImpactEffect(tiny, "GtsBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
 			} else {
-				Runtime::PlaySound("BloodGushSound", tiny, 1.0, 1.0);
+				Runtime::PlaySound("BloodGushSound", tiny, 1.0f, 1.0f);
 			}
 		}
 	}
@@ -59,7 +59,7 @@ namespace {
 
 		float currentSize = get_visual_scale(tiny);
 
-		Runtime::PlaySound("ShrinkToNothingSound", giant, 1.0, 1.0);
+		Runtime::PlaySound("ShrinkToNothingSound", giant, 1.0f, 1.0f);
 
 		TaskManager::RunOnce(taskname, [=](auto& update){
 			if (!tinyHandle) {
@@ -77,7 +77,7 @@ namespace {
 			Disintegrate(tiny); // Set critical stage 4 on actors
 		} else {
 			TriggerScreenBlood(50);
-			tiny->SetAlpha(0.0); // Player can't be disintegrated, so we make player Invisible
+			tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
 		}
 	}
 }
@@ -112,7 +112,7 @@ namespace Gts {
 				SetReanimatedState(tiny);
 				data.state = ShrinkState::Shrinking;
 			} else if (data.state == ShrinkState::Shrinking) {
-				ModSizeExperience(giant, 0.24 * GetXPModifier(tiny)); // Adjust Size Matter skill
+				ModSizeExperience(giant, 0.24f * GetXPModifier(tiny)); // Adjust Size Matter skill
 				Attacked(tiny, giant);
 				if (giant->formID == 0x14 && IsDragon(tiny)) {
 					CompleteDragonQuest(tiny, ParticleType::Red, tiny->IsDead());
@@ -123,7 +123,7 @@ namespace Gts {
 
 				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
-				AddSMTDuration(giant, 5.0);
+				AddSMTDuration(giant, 5.0f);
 
 				TransferInventoryTask(giant, tiny); // Also plays STN sound
 

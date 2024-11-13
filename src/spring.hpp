@@ -15,10 +15,10 @@ namespace Gts {
 
 	class Spring : public SpringBase {
 		public:
-			float value = 0.0;
-			float target = 0.0;
-			float velocity = 0.0;
-			float halflife = 1.0;
+			float value = 0.0f;
+			float target = 0.0f;
+			float velocity = 0.0f;
+			float halflife = 1.0f;
 
 			void Update(float delta) override;
 
@@ -30,10 +30,10 @@ namespace Gts {
 
 	class Spring3 : public SpringBase {
 		public:
-			NiPoint3 value = NiPoint3(0.0, 0.0, 0.0);
-			NiPoint3 target = NiPoint3(0.0, 0.0, 0.0);
-			NiPoint3 velocity = NiPoint3(0.0, 0.0, 0.0);
-			float halflife = 1.0;
+			NiPoint3 value = NiPoint3(0.0f, 0.0f, 0.0f);
+			NiPoint3 target = NiPoint3(0.0f, 0.0f, 0.0f);
+			NiPoint3 velocity = NiPoint3(0.0f, 0.0f, 0.0f);
+			float halflife = 1.0f;
 
 			void Update(float delta) override;
 

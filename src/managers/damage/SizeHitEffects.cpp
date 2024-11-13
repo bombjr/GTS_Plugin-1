@@ -42,8 +42,8 @@ namespace {
 				return; // Don't kill teammates
 			}
 
-			DamageAV(grabbedActor, ActorValue::kHealth, a_damage * 0.50);
-			if (grabbedActor->IsDead() || GetAV(grabbedActor, ActorValue::kHealth) < a_damage * 0.50) {
+			DamageAV(grabbedActor, ActorValue::kHealth, a_damage * 0.50f);
+			if (grabbedActor->IsDead() || GetAV(grabbedActor, ActorValue::kHealth) < a_damage * 0.50f) {
 				if (!IsBetweenBreasts(grabbedActor)) {
 					PrintDeathSource(receiver, grabbedActor, DamageSource::BlockDamage);
 				} else {
@@ -56,21 +56,21 @@ namespace {
 				auto hand = find_node(receiver, "NPC L Hand [LHnd]");
 				if (hand) {
 					if (IsLiving(grabbedActor)) {
-						SpawnParticle(receiver, 25.0, "GTS/Damage/Explode.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 5, 4, hand);
-						SpawnParticle(receiver, 25.0, "GTS/Damage/Crush.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 5, 4, hand);
+						SpawnParticle(receiver, 25.0f, "GTS/Damage/Explode.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 5, 4, hand);
+						SpawnParticle(receiver, 25.0f, "GTS/Damage/Crush.nif", hand->world.rotate, hand->world.translate, get_visual_scale(grabbedActor) * 5, 4, hand);
 					} else {
-						SpawnDustParticle(receiver, grabbedActor, "NPC L Hand [LHnd]", 3.0);
+						SpawnDustParticle(receiver, grabbedActor, "NPC L Hand [LHnd]", 3.0f);
 					}
 				}
 				CrushManager::Crush(receiver, grabbedActor);
 				if (!LessGore()) {
-					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0, 1.0, "NPC L Hand [LHnd]");
-					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0, 1.0, "NPC L Hand [LHnd]");
-					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0, 1.0, "NPC L Hand [LHnd]");
+					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0f, 1.0f, "NPC L Hand [LHnd]");
+					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0f, 1.0f, "NPC L Hand [LHnd]");
+					Runtime::PlaySoundAtNode("CrunchImpactSound", receiver, 1.0f, 1.0f, "NPC L Hand [LHnd]");
 				} else {
-					Runtime::PlaySoundAtNode("SoftHandAttack", receiver, 1.0, 1.0, "NPC L Hand [LHnd]");
+					Runtime::PlaySoundAtNode("SoftHandAttack", receiver, 1.0f, 1.0f, "NPC L Hand [LHnd]");
 				}
-				Rumbling::Once("GrabAttackKill", receiver, 8.0, 0.15, "NPC L Hand [LHnd]", 0.0);
+				Rumbling::Once("GrabAttackKill", receiver, 8.0f, 0.15f, "NPC L Hand [LHnd]", 0.0f);
 				AnimationManager::StartAnim("GrabAbort", receiver); // Abort Grab animation
 				Grab::Release(receiver);
 			}
@@ -80,20 +80,20 @@ namespace {
 
 	void DropTinyChance(Actor* receiver, float damage, float scale) {
 		static Timer DropTimer = Timer(0.33); // Check once per .33 sec
-		float bonus = 1.0;
+		float bonus = 1.0f;
 		if (Runtime::HasPerkTeam(receiver, "HugCrush_HugsOfDeath")) {
 			return; // Full immunity
 		}
 		if (Runtime::HasPerkTeam(receiver, "HugCrush_Greed")) {
-			bonus = 4.0; // 4 times bigger damage threshold to cancel hugs
+			bonus = 4.0f; // 4 times bigger damage threshold to cancel hugs
 		}
 		if (Runtime::HasPerkTeam(receiver, "HugCrush_ToughGrip")) {
 			float GetHP = GetHealthPercentage(receiver);
-			if (GetHP >= 0.85) {
+			if (GetHP >= 0.85f) {
 				return; // Drop only if hp is < 85%
 			}
 		}
-		if (damage < 6.0 * bonus * scale) {
+		if (damage < 6.0f * bonus * scale) {
 			return;
 		}
 		HugShrink::CallRelease(receiver); // Else release
@@ -101,9 +101,9 @@ namespace {
 
 	void DoHitShake(Actor* receiver, float value) {
 		if (IsFirstPerson()) {
-			value *= 0.05;
+			value *= 0.05f;
 		}
-		Rumbling::Once("HitGrowth", receiver, value, 0.15);
+		Rumbling::Once("HitGrowth", receiver, value, 0.15f);
 	}
 
 	void HitGrowth(Actor* receiver, Actor* attacker, float GrowthValue, float SizeDifference, float BalanceMode) {
@@ -112,12 +112,12 @@ namespace {
 		int LaughChance = RandomInt(0, 12);
 		int ShrinkChance = RandomInt(0, 5);
 
-		float particlescale = 1.0;
-		float shrinkmult = 1.0;
+		float particlescale = 1.0f;
+		float shrinkmult = 1.0f;
 
 		static Timer soundtimer = Timer(1.5);
 
-		float Adjustment = 1.0 * GetSizeFromBoundingBox(attacker);
+		float Adjustment = 1.0f * GetSizeFromBoundingBox(attacker);
 
 		bool BlockParticle = IsActionOnCooldown(attacker, CooldownSource::Misc_BeingHit);
 		bool LaughBlocked = IsActionOnCooldown(receiver, CooldownSource::Emotion_Laugh);
@@ -126,26 +126,26 @@ namespace {
 		update_target_scale(receiver, GrowthValue, SizeEffectType::kNeutral);
 		
 		if (soundtimer.ShouldRunFrame()) {
-			Runtime::PlaySoundAtNode("growthSound", receiver, GrowthValue * 2, 1.0, "NPC Pelvis [Pelv]");
+			Runtime::PlaySoundAtNode("growthSound", receiver, GrowthValue * 2, 1.0f, "NPC Pelvis [Pelv]");
 		}
 		if (ShrinkChance >= 2) {
-			if (SizeDifference >= 4.0 && LaughChance >= 11 && !LaughBlocked) {
-				Task_FacialEmotionTask_Smile(receiver, 1.4, "HitGrowthSmile");
+			if (SizeDifference >= 4.0f && LaughChance >= 11 && !LaughBlocked) {
+				Task_FacialEmotionTask_Smile(receiver, 1.4f, "HitGrowthSmile");
 				ApplyActionCooldown(receiver, CooldownSource::Emotion_Laugh);
-				PlayLaughSound(receiver, 1.0, 1);
-				particlescale = 2.2;
-				shrinkmult = 6.0;
+				PlayLaughSound(receiver, 1.0f, 1);
+				particlescale = 2.2f;
+				shrinkmult = 6.0f;
 			}
-			update_target_scale(attacker, -GrowthValue/(3.0 * Adjustment*BalanceMode) * shrinkmult, SizeEffectType::kShrink); // Shrink Attacker
-			update_target_scale(receiver, GrowthValue/(3.0 * Adjustment*BalanceMode), SizeEffectType::kGrow); // Grow receiver
+			update_target_scale(attacker, -GrowthValue/(3.0f * Adjustment*BalanceMode) * shrinkmult, SizeEffectType::kShrink); // Shrink Attacker
+			update_target_scale(receiver, GrowthValue/(3.0f * Adjustment*BalanceMode), SizeEffectType::kGrow); // Grow receiver
 
 			if (!BlockParticle) {
 				SpawnCustomParticle(attacker, ParticleType::Red, NiPoint3(), "NPC Root [Root]", particlescale);
 				ApplyActionCooldown(attacker, CooldownSource::Misc_BeingHit);
 			}
 
-			if (get_target_scale(attacker) <= 0.12/Adjustment) {
-				set_target_scale(attacker, 0.12/Adjustment);
+			if (get_target_scale(attacker) <= 0.12f/Adjustment) {
+				set_target_scale(attacker, 0.12f/Adjustment);
 			}
 			
 		}
@@ -156,7 +156,7 @@ namespace {
 		float scale = get_target_scale(receiver);
 		float naturalscale = get_natural_scale(receiver, true);
 
-		float lossmod = Runtime::GetFloatOr("SizeLossModifier", 1.0);
+		float lossmod = Runtime::GetFloatOr("SizeLossModifier", 1.0f);
 		float modifier = std::clamp(lossmod, 0.10f, 25.0f); // * size loss value
 
 		ShrinkValue *= modifier;
@@ -185,21 +185,21 @@ namespace {
 			
 			auto& sizemanager = SizeManager::GetSingleton();
 			float BalanceMode = sizemanager.BalancedMode();
-			float SizeHunger = 1.0 + Ench_Hunger_GetPower(receiver);
-			float Gigantism = 1.0 + Ench_Aspect_GetPower(receiver);
+			float SizeHunger = 1.0f + Ench_Hunger_GetPower(receiver);
+			float Gigantism = 1.0f + Ench_Aspect_GetPower(receiver);
 			float SizeDifference = get_visual_scale(receiver)/get_visual_scale(attacker);
-			float DamageReduction = 1.0; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
+			float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
 
 			float resistance = Potion_GetShrinkResistance(receiver);
 		
 			damage *= DamageReduction;
 
-			if ((receiver->formID == 0x14 || (IsTeammate(receiver) && IsFemale(receiver))) && Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk") && sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0) { // if has perk
+			if ((receiver->formID == 0x14 || (IsTeammate(receiver) && IsFemale(receiver))) && Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk") && sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f) { // if has perk
 				//log::info("Applying hitgrowth for {}", damage);
 				float GrowthValue = std::clamp((-damage/2000) * SizeHunger * Gigantism, 0.0f, 0.25f * Gigantism);
 				HitGrowth(receiver, attacker, GrowthValue, SizeDifference, BalanceMode);
 				return;
-			} else if (BalanceMode >= 2.0 && receiver->formID == 0x14 && !Runtime::HasPerk(receiver, "GrowthOnHitPerk")) { // Shrink us
+			} else if (BalanceMode >= 2.0f && receiver->formID == 0x14 && !Runtime::HasPerk(receiver, "GrowthOnHitPerk")) { // Shrink us
 				if (scale > naturalscale) {
 					float sizebonus = std::clamp(get_visual_scale(attacker), 0.10f, 1.0f);
 					float ShrinkValue = std::clamp(((-damage/850)/SizeHunger/Gigantism * sizebonus) * resistance, 0.0f, 0.25f / Gigantism); // affect limit by decreasing it
@@ -239,27 +239,27 @@ namespace Gts {
 			if (random > 0) {
 
 				if (Runtime::HasPerkTeam(giant, "DevastatingSprint") && giant->AsActorState()->IsSprinting() && !IsGtsBusy(giant)) {
-					damage *= 3.0;
+					damage *= 3.0f;
 					random = 1; // always apply
 				}
 
 				int rng = (RandomInt(0, random));
 				if (rng <= 2) {
 					float sizediff = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, true);
-					if (sizediff < 3.0) {
+					if (sizediff < 3.0f) {
 						return;
 					}
 
 					if (!IsLiving(tiny)) {
-						SpawnDustParticle(giant, tiny, "NPC Root [Root]", 1.0);
+						SpawnDustParticle(giant, tiny, "NPC Root [Root]", 1.0f);
 					} else {
 						auto root = find_node(tiny, "NPC Root [Root]");
 						if (root) {
-							SpawnParticle(tiny, 0.20, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, get_visual_scale(tiny), 7, root);
+							SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", root->world.rotate, root->world.translate, get_visual_scale(tiny), 7, root);
 						}
 					}
 					if (damage > 0) {
-						InflictSizeDamage(giant, tiny, damage * 1.5);
+						InflictSizeDamage(giant, tiny, damage * 1.5f);
 					}
 				}
 			}

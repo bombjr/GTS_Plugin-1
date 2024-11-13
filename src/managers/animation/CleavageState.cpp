@@ -71,18 +71,18 @@ namespace {
         bool ForceCrush = Runtime::HasPerkTeam(giant, "HugCrush_MightyCuddles");
         float staminapercent = GetStaminaPercentage(giant);
         float stamina = GetAV(giant, ActorValue::kStamina);
-        if (ForceCrush && staminapercent >= 0.50) {
+        if (ForceCrush && staminapercent >= 0.50f) {
             AnimationManager::StartAnim(pass_anim, giant);
-            DamageAV(giant, ActorValue::kStamina, stamina * 1.10);
+            DamageAV(giant, ActorValue::kStamina, stamina * 1.10f);
             return true;
         }
         return false;
     }
 
     float GetMasteryReduction(Actor* giant) {
-        float hp_reduction = 0.0;
+        float hp_reduction = 0.0f;
         if (Runtime::HasPerk(giant, "Breasts_Predominance")) {
-            float level = GetGtsSkillLevel(giant) - 60.0;
+            float level = GetGtsSkillLevel(giant) - 60.0f;
             hp_reduction = std::clamp(level * 0.015f, 0.0f, 0.6f);
         }
 
@@ -105,7 +105,7 @@ namespace {
                 bool OnCooldown = IsActionOnCooldown(player, Source);
                 if (!OnCooldown) {
                     if (Runtime::HasPerkTeam(player, perk)) {
-                        float HpThreshold = (GetHugCrushThreshold(player, tiny, false) * 1.5) + GetMasteryReduction(player);
+                        float HpThreshold = (GetHugCrushThreshold(player, tiny, false) * 1.5f) + GetMasteryReduction(player);
                         float health = GetHealthPercentage(tiny);
                         if (health <= HpThreshold) {
                             AnimationManager::StartAnim(pass_anim, player);
@@ -113,23 +113,23 @@ namespace {
                         } else if (HasSMT(player)) {
                             DamageAV(player, ActorValue::kStamina, 60);
                             AnimationManager::StartAnim(pass_anim, player);
-                            AddSMTPenalty(player, 10.0);
+                            AddSMTPenalty(player, 10.0f);
                             return true;
                         } else {
                             if (CanForceAction(player, tiny, pass_anim)) {
                                 return true;
                             }
                             std::string message = std::format("{} is too healthy for {}", tiny->GetDisplayFullName(), cooldown_msg);
-                            shake_camera(player, 0.45, 0.30);
+                            shake_camera(player, 0.45f, 0.30f);
                             NotifyWithSound(player, message);
 
-                            Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0, HpThreshold * 100.0);
+                            Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0f, HpThreshold * 100.0f);
                             return false;
                         }
                     }
                 } else {
                     std::string message = std::format("{} is on a cooldown: {:.1f} sec", cooldown_msg, GetRemainingCooldown(player, Source));
-                    shake_camera(player, 0.45, 0.30);
+                    shake_camera(player, 0.45f, 0.30f);
                     NotifyWithSound(player, message);
                     return false;
                 }

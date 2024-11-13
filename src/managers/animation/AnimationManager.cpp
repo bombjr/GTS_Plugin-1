@@ -176,7 +176,7 @@ namespace Gts {
 	}
 
 	float AnimationManager::GetHighHeelSpeed(Actor* actor) {
-		float Speed = 1.0;
+		float Speed = 1.0f;
 		try {
 			for (auto& [tag, data]: AnimationManager::GetSingleton().data.at(actor)) {
 				Speed *= data.HHspeed;
@@ -187,7 +187,7 @@ namespace Gts {
 	}
 
 	float AnimationManager::GetBonusAnimationSpeed(Actor* actor) {
-		float totalSpeed = 1.0;
+		float totalSpeed = 1.0f;
 		try {
 			for (auto& [tag, data]: AnimationManager::GetSingleton().data.at(actor)) {
 				totalSpeed *= data.animSpeed;
@@ -210,20 +210,20 @@ namespace Gts {
 	}
 
 	float AnimationManager::GetAnimSpeed(Actor* actor) {
-		float speed = 1.0;
+		float speed = 1.0f;
 		if (!Persistent::GetSingleton().is_speed_adjusted) {
-			return 1.0;
+			return 1.0f;
 		}
 		if (actor) {
 			auto saved_data = Gts::Persistent::GetSingleton().GetData(actor);
 			if (saved_data) {
-				if (saved_data->anim_speed > 0.0) {
+				if (saved_data->anim_speed > 0.0f) {
 					speed *= saved_data->anim_speed;
 				}
 			}
 
 			try {
-				float totalSpeed = 1.0;
+				float totalSpeed = 1.0f;
 				for (auto& [tag, data]: AnimationManager::GetSingleton().data.at(actor)) {
 					totalSpeed *= data.animSpeed;
 				}
@@ -265,7 +265,8 @@ namespace Gts {
 
 	void AnimationManager::StartAnim(std::string_view trigger, Actor& giant, TESObjectREFR* tiny) {
 		if (giant.formID == 0x14) {
-			if (IsFirstPerson() || IsInRaceMenu()) { //Time::WorldTimeElapsed() > 1.0
+			if (IsFirstPerson() || IsInRaceMenu()) { 
+				//Time::WorldTimeElapsed() > 1.0
 				//ForceThirdPerson(&giant);
 				// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.
 				// Better to wait for full support someday

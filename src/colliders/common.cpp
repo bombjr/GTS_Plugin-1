@@ -122,8 +122,8 @@ namespace Gts {
 		for (auto& rb: GetRigidBodies()) {
 			// Disable gravity
 			// log::info("Disable gravity (was {})", rb->motion.gravityFactor);
-			rb->motion.gravityFactor = 0.0;
-			rb->motion.SetMassInv(0.0);
+			rb->motion.gravityFactor = 0.0f;
+			rb->motion.SetMassInv(0.0f);
 		}
 
 		for (auto& ent: GetWorldObjects()) {
@@ -147,8 +147,8 @@ namespace Gts {
 	void ColliderData::EnableCollisions() {
 		for (auto& rb: GetRigidBodies()) {
 			// Enable gravity
-			rb->motion.gravityFactor = 1.0;
-			rb->motion.SetMassInv(1.0);
+			rb->motion.gravityFactor = 1.0f;
+			rb->motion.SetMassInv(1.0f);
 		}
 
 		for (auto& ent: GetWorldObjects()) {

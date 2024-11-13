@@ -23,9 +23,9 @@
 
 namespace {
 
-	const float MINIMUM_HUG_DISTANCE = 110.0;
-	const float GRAB_ANGLE = 70;
-	const float PI = 3.14159;
+	const float MINIMUM_HUG_DISTANCE = 110.0f;
+	const float GRAB_ANGLE = 70.0f;
+	const float PI = 3.14159f;
 
 	bool DisallowHugs(Actor* actor) {
 		bool jumping = IsJumping(actor);
@@ -108,10 +108,10 @@ namespace Gts {
 	}
 
 	void HugAnimationController::Hugs_OnCooldownMessage(Actor* giant) {
-		float cooldown = GetRemainingCooldown(giant, CooldownSource::Action_Hugs);
+		double cooldown = GetRemainingCooldown(giant, CooldownSource::Action_Hugs);
 		if (giant->formID == 0x14) {
 			std::string message = std::format("Hugs are on a cooldown: {:.1f} sec", cooldown);
-			shake_camera(giant, 0.75, 0.35);
+			shake_camera(giant, 0.75f, 0.35f);
 			NotifyWithSound(giant, message);
 		} else if (IsTeammate(giant) && !IsGtsBusy(giant)) {
 			std::string message = std::format("Follower's Hugs are on a cooldown: {:.1f} sec", cooldown);
@@ -179,18 +179,18 @@ namespace Gts {
 		//   | pred |  <- Based on width of pred
 		//   |______|
 		float predWidth = 70 * get_visual_scale(pred);
-		float shiftAmount = fabs((predWidth / 2.0) / tan(GRAB_ANGLE/2.0));
+		float shiftAmount = fabs((predWidth / 2.0f) / tan(GRAB_ANGLE/2.0f));
 
 		NiPoint3 coneStart = predPos - predDir * shiftAmount;
 		preys.erase(std::remove_if(preys.begin(), preys.end(),[coneStart, predWidth, predDir](auto prey)
 		{
 			NiPoint3 preyDir = prey->GetPosition() - coneStart;
-			if (preyDir.Length() <= predWidth*0.4) {
+			if (preyDir.Length() <= predWidth*0.4f) {
 				return false;
 			}
 			preyDir = preyDir / preyDir.Length();
 			float cosTheta = predDir.Dot(preyDir);
-			return cosTheta <= cos(GRAB_ANGLE*PI/180.0);
+			return cosTheta <= cos(GRAB_ANGLE*PI/180.0f);
 		}), preys.end());
 
 		// Reduce vector size
@@ -234,14 +234,14 @@ namespace Gts {
 
 		if (pred->IsSneaking()) {
 			if (IsCrawling(pred)) {
-				MINIMUM_DISTANCE *= 2.25;
+				MINIMUM_DISTANCE *= 2.25f;
 			} else {
-				MINIMUM_DISTANCE *= 1.6;
+				MINIMUM_DISTANCE *= 1.6f;
 			}
 		}
 
 		if (HasSMT(pred)) {
-			MINIMUM_HUG_SCALE *= 0.80;
+			MINIMUM_HUG_SCALE *= 0.80f;
 		}
 
 		float balancemode = SizeManager::GetSingleton().BalancedMode();
@@ -257,7 +257,7 @@ namespace Gts {
 					if (pred->formID == 0x14) {
 						std::string_view message = std::format("You have no desire to hug {}", prey->GetDisplayFullName());
 						NotifyWithSound(pred, message); // Just no. We don't have Creature Anims.
-						shake_camera(pred, 0.45, 0.30);
+						shake_camera(pred, 0.45f, 0.30f);
 					}
 					return false;
 				}
@@ -265,7 +265,7 @@ namespace Gts {
 			} else {
 				if (pred->formID == 0x14) {
 					std::string_view message = std::format("{} is too big to be hugged: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_HUG_SCALE);
-					shake_camera(pred, 0.45, 0.30);
+					shake_camera(pred, 0.45f, 0.30f);
 					NotifyWithSound(pred, message);
 				} else if (prey->formID == 0x14 && IsTeammate(pred)) {
 					CantHugPlayerMessage(pred, prey, sizedifference, this->allow_message);

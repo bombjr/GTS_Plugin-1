@@ -27,7 +27,7 @@ namespace Gts {
 
     float frequency_function(float scale, const VolumeParams& params) {
         float a = params.a;
-        return soft_core(scale, 0.01, 1.0, 1.0, a, 0.0)*0.5+0.5;
+        return soft_core(scale, 0.01f, 1.0f, 1.0f, a, 0.0f)*0.5f+0.5f;
     }
 
     BSISoundDescriptor* get_lFootstep_sounddesc(const FootEvent& foot_kind) {
@@ -119,82 +119,82 @@ namespace Gts {
     }
 
     BSISoundDescriptor* GetNormalSound(float scale) {
-        if (scale == 2.0) {
+        if (scale == 2.0f) {
             return Runtime::GetSound("Normal_x2");
-        } else if (scale == 4.0) {
+        } else if (scale == 4.0f) {
             return Runtime::GetSound("Normal_x4");
-        } else if (scale == 8.0) {
+        } else if (scale == 8.0f) {
             return Runtime::GetSound("Normal_x8");
-        } else if (scale == 12.0) {
+        } else if (scale == 12.0f) {
             return Runtime::GetSound("Normal_x12");
-        } else if (scale == 24.0) {
+        } else if (scale == 24.0f) {
             return Runtime::GetSound("Normal_x24");
-        } else if (scale == 48.0) {
+        } else if (scale == 48.0f) {
             return Runtime::GetSound("Normal_x48");
-        } else if (scale == 96.0) {
+        } else if (scale == 96.0f) {
             return Runtime::GetSound("Normal_x96");
-        } else if (scale > 96.0) {
+        } else if (scale > 96.0f) {
             return Runtime::GetSound("Normal_Mega");
         }
         return nullptr;
     }
     BSISoundDescriptor* GetNormalSound_Jump(float scale) {
-        if (scale == 2.0) {
+        if (scale == 2.0f) {
             return Runtime::GetSound("NormalLand_x2");
-        } else if (scale == 4.0) {
+        } else if (scale == 4.0f) {
             return Runtime::GetSound("NormalLand_x4");
-        } else if (scale == 8.0) {
+        } else if (scale == 8.0f) {
             return Runtime::GetSound("NormalLand_x8");
-        } else if (scale == 12.0) {
+        } else if (scale == 12.0f) {
             return Runtime::GetSound("NormalLand_x12");
-        } else if (scale == 24.0) {
+        } else if (scale == 24.0f) {
             return Runtime::GetSound("NormalLand_x24");
-        } else if (scale == 48.0) {
+        } else if (scale == 48.0f) {
             return Runtime::GetSound("NormalLand_x48");
-        } else if (scale == 96.0) {
+        } else if (scale == 96.0f) {
             return Runtime::GetSound("NormalLand_x96");
-        } else if (scale > 96.0) {
+        } else if (scale > 96.0f) {
             return Runtime::GetSound("NormalLand_Mega");
         }
         return nullptr;
     }
 
     BSISoundDescriptor* GetHHSound_Normal(float scale) {
-        if (scale == 2.0) {
+        if (scale == 2.0f) {
             return Runtime::GetSound("HighHeel_x2");
-        } else if (scale == 4.0) {
+        } else if (scale == 4.0f) {
             return Runtime::GetSound("HighHeel_x4");
-        } else if (scale == 8.0) {
+        } else if (scale == 8.0f) {
             return Runtime::GetSound("HighHeel_x8");
-        } else if (scale == 12.0) {
+        } else if (scale == 12.0f) {
             return Runtime::GetSound("HighHeel_x12");
-        } else if (scale == 24.0) {
+        } else if (scale == 24.0f) {
             return Runtime::GetSound("HighHeel_x24");
-        } else if (scale == 48.0) {
+        } else if (scale == 48.0f) {
             return Runtime::GetSound("HighHeel_x48");
-        } else if (scale == 96.0) {
+        } else if (scale == 96.0f) {
             return Runtime::GetSound("HighHeel_x96");
-        } else if (scale > 96.0) {
+        } else if (scale > 96.0f) {
             return Runtime::GetSound("HighHeel_Mega");
         }
         return nullptr;
     }
     BSISoundDescriptor* GetHHSound_Jump(float scale) {
-        if (scale == 2.0) {
+        if (scale == 2.0f) {
             return Runtime::GetSound("HighHeelLand_x2");
-        } else if (scale == 4.0) {
+        } else if (scale == 4.0f) {
             return Runtime::GetSound("HighHeelLand_x4");
-        } else if (scale == 8.0) {
+        } else if (scale == 8.0f) {
             return Runtime::GetSound("HighHeelLand_x8");
-        } else if (scale == 12.0) {
+        } else if (scale == 12.0f) {
             return Runtime::GetSound("HighHeelLand_x12");
-        } else if (scale == 24.0) {
+        } else if (scale == 24.0f) {
             return Runtime::GetSound("HighHeelLand_x24");
-        } else if (scale == 48.0) {
+        } else if (scale == 48.0f) {
             return Runtime::GetSound("HighHeelLand_x48");
-        } else if (scale == 96.0) {
+        } else if (scale == 96.0f) {
             return Runtime::GetSound("HighHeelLand_x96");
-        } else if (scale > 96.0) {
+        } else if (scale > 96.0f) {
             return Runtime::GetSound("HighHeelLand_Mega");
         }
         return nullptr;

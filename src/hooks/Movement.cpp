@@ -33,7 +33,7 @@ namespace Hooks
             // 0x1404fe820 : 32703
             // 0x1404fed71 - 0x1404fe820 = 0x551
 			[](auto* param_1) {
-				float result = 1.0;
+				float result = 1.0f;
 				return result; // Always return 1.0, We don't want to scale that: breaks dodge mods
                 // And we alter it by havok hook anyway.
             }
@@ -48,7 +48,7 @@ namespace Hooks
                 // ---------------AE:
                 // FUN_140630510 :  37943
                 // 0x140630561 - 0x140630510 = 0x51
-                float result = 1.0; // force it to 1.0. We DON'T want the SetScale() to affect it.
+                float result = 1.0f; // force it to 1.0. We DON'T want the SetScale() to affect it.
                 //log::info("(21) - Hooked Alter Movement Speed, value * 0.15");
                 return result;
             }
@@ -68,7 +68,7 @@ namespace Hooks
 				// FUN_140746b40 : 42768
 				// 0x140746b71 - 0x140746b40 = 0x31   // wow it's the same
 
-				float result = 1.0; // Override it
+				float result = 1.0f; // Override it
 				
 				return result;
             }

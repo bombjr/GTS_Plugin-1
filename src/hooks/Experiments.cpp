@@ -59,7 +59,7 @@ namespace {
 				return size;
 			}
 		}
-		return 1.0;
+		return 1.0f;
 	}
 
 	bool AllowAttack(TESActionData* data) { // Credits to Kaputt source code (by Pentalimbed)
@@ -88,14 +88,14 @@ namespace {
 	void FixScaleTask(Actor* actor) {
 		std::string name = std::format("ScaleFix_{}", actor->formID);
 		ActorHandle gianthandle = actor->CreateRefHandle();
-		float Start = Time::WorldTimeElapsed();
+		double Start = Time::WorldTimeElapsed();
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
 			}
 			Actor* target = gianthandle.get().get();
-			float Finish = Time::WorldTimeElapsed();
+			double Finish = Time::WorldTimeElapsed();
 
 			if (Finish - Start > 0.10) {
 				float natural_scale = get_natural_scale(target);
@@ -116,8 +116,8 @@ namespace {
 		auto thirdPersonState = reinterpret_cast<RE::ThirdPersonState*>(playerCamera->cameraStates[RE::CameraState::kThirdPerson].get());
 		auto isInThirdPerson = playerCamera->currentState->id == RE::CameraState::kThirdPerson;
 		if (isInThirdPerson) {
-			float GlobalX = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-			float GlobalY = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+			float GlobalX = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+			float GlobalY = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 			NiPoint3& offset_actual = thirdPersonState->posOffsetActual; // Directly offsets the camera, so it respects collisions. 
 			NiPoint3& offset_expected = thirdPersonState->posOffsetExpected; 
 
@@ -145,7 +145,7 @@ namespace Hooks {
 		const std::array targets_1 = { 0x0F, 0x28, 0xD8, 0x90, 0x90, 0x90, 0x90, 0x90 };
 		const std::array targets_2 = { 0x0F, 0x28, 0xD3, 0x90, 0x90, 0x90, 0x90, 0x90 };
 
-		float value = 0.0;
+		float value = 0.0f;
 
 		for (int i = 0; i < targets_1.size(); i++) {
 			REL::safe_write(ShakeCamera_GetOffset_SE_Hook.address() + 0x12 + i, &targets_1[i], sizeof(value));
@@ -209,7 +209,7 @@ namespace Hooks {
 					// This hook was an attempt to always keep actor loaded outside of cells
 					// It prevents manual disable, but actors still get disabled outside of cells :(
 					if (AsActor) {
-						if (get_visual_scale(AsActor) >= 2.0) {
+						if (get_visual_scale(AsActor) >= 2.0f) {
 							return;
 						}
 						log::info("Disabling {}", AsActor->GetDisplayFullName());
@@ -279,10 +279,10 @@ namespace Hooks {
 				log::info("--Param 2: {}", Vector2Str(param_2)); 
 				log::info("--Param 3: {}", param_3);
 
-				param_2->quad.m128_f32[0] *= 0.0;
-				param_2->quad.m128_f32[1] *= 0.0;
-				param_2->quad.m128_f32[2] *= 0.0;
-				param_2->quad.m128_f32[3] *= 0.0;
+				param_2->quad.m128_f32[0] *= 0.0f;
+				param_2->quad.m128_f32[1] *= 0.0f;
+				param_2->quad.m128_f32[2] *= 0.0f;
+				param_2->quad.m128_f32[3] *= 0.0f;
 			
 				return sub_140DC0C90(param_1, param_2, param_3);  
             }
@@ -405,9 +405,9 @@ namespace Hooks {
 			[](auto* param_1) {
 				float result = FUN_14080d560(param_1);
 
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 0.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 0.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 0");
 				}
 
@@ -423,9 +423,9 @@ namespace Hooks {
 			// 0x1407bf2de - 0x1407BF260 = 0x7E
 			[](auto* param_1) {
 				float result = sub_1407BF260(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 1.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 1.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 1");
 				}
 				log::info("(1) sub_1407BF260 Hooked");
@@ -439,9 +439,9 @@ namespace Hooks {
 			// 0x1407bf13d - 0x1407BF0C0 = 0x7D
 			[](auto* param_1) {
 				float result = sub_1407BF0C0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 2.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 2.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 2");
 				}
 				log::info("(2) sub_1407BF0C0 Hooked");
@@ -457,9 +457,9 @@ namespace Hooks {
 			// 0x1407becb7 - 0x1407BEB90 = 0x127
 			[](auto* param_1) {
 				float result = sub_1407BEB90(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 3.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 3.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 3");
 				}
 				log::info("(3 - 1) sub_1407BEB90_1 Hooked"); // not sure what they do, seem to be called rarely
@@ -474,9 +474,9 @@ namespace Hooks {
 			REL::RelocationID(46068, 46068), REL::Relocate(0x3E, 0x3E),
 			[](auto* param_1) {
 				float result = sub_1407BEB90_2(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 4.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 4.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 4");
 				}
 				log::info("(3 - 2) sub_1407BEB90_2 Hooked");
@@ -495,9 +495,9 @@ namespace Hooks {
 			// 0x1407bab55 - 0x1407BAB40 = 0x15
 			[](auto* param_1) {
 				float result = sub_1407BAB40(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 5.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 5.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 5");
 				}
 				//log::info("(5) sub_1407BAB40 Hooked");	
@@ -521,9 +521,9 @@ namespace Hooks {
 			// 0x1407baa5c - 0x1407BA9C0 = 0x9C
 			[](auto* param_1) {
 				float result = sub_1407BA9C0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 6.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 6.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 6");
 				}
 				log::info("(6 - 1) sub_1407BA9C0_1 Hooked");
@@ -538,9 +538,9 @@ namespace Hooks {
 				// 0x1407baa17 - 0x1407BA9C0 = 0x57
 				
 				float result = sub_1407BA9C0_2(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 7.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 7.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 7");
 				}
 				log::info("(6 - 2) sub_1407BA9C0 Hooked");
@@ -559,9 +559,9 @@ namespace Hooks {
 				// 46014
 				// 0x1407ba9a4 - 0x1407BA910 = 0x94
 				float result = sub_1407BA910(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 8.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 8.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 8");
 				}
 				log::info("(8) sub_1407BA910 Hooked");
@@ -575,9 +575,9 @@ namespace Hooks {
 				// 46013
 				// 0x1407ba8f4 - 0x1407BA8B0 = 0x44
 				float result = sub_1407BA8B0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 9.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 9.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 9");
 				}
 				log::info("(9) sub_1407BA8B0 Hooked");
@@ -592,9 +592,9 @@ namespace Hooks {
 				// 43242
 				// 0x1407600c4 - 0x140760070 = 0x54
 				float result = FUN_140760070(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 10.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 10.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 10");
 				}
 				log::info("(10) FUN_140760070 Hooked");
@@ -617,9 +617,9 @@ namespace Hooks {
 				// 0x14076001e - 0x14075ffa0 = 0x7E
 				log::info("(11) FUN_14075ffa0 Hooked");
 				float result = FUN_14075ffa0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 11.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 11.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 11");
 				}
 				return result;
@@ -634,9 +634,9 @@ namespace Hooks {
 				// 41811 V
 				// 0x14072336d - 0x140723320 = 0x4D
 				float result = Handle_140723320(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 12.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 12.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 12");
 				}
 				log::info("(12) Handle_140723320 Hooked");
@@ -660,7 +660,7 @@ namespace Hooks {
 				float result = FUN_14071b230(param_1);
 				if (param_1->formID == 0x14) {
 					log::info("(13) FUN_14071b230 Hooked, value: {}", result);
-					float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
+					float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
 					log::info("(13) Overriding value to {}", Global);
 					result = Global;
 				}
@@ -676,9 +676,9 @@ namespace Hooks {
 				// 0x1406b0aab - 0x1406b0a00 = 0xAB
 				log::info("(14) FUN_1406b0a00 Hooked");
 				float result = FUN_1406b0a00(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 14.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 14.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 14");
 				}
 				return result;
@@ -693,9 +693,9 @@ namespace Hooks {
 				// 0x1406aa4d1 - 0x1406AA410 = 0xC1
 				log::info("(15) sub_1406AA410 Hooked");
 				float result = sub_1406AA410(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 15.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 15.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 15");
 				}
 				return result;
@@ -716,9 +716,9 @@ namespace Hooks {
 				// 38564
 				// 0x14065c552 - 0x14065c4a0 = 0xB2
 				float result = FUN_14065c4a0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 16.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 16.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 16");
 				}
 				log::info("(16) FUN_14065c4a0 Hooked");
@@ -733,9 +733,9 @@ namespace Hooks {
 				// 37752
 				// 0x14062e4d3 - 0x14062E390 = 0x143
 				float result = sub_14062E390(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 17.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 17.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 17");
 				}
 				log::info("(17) sub_14062E390 Hooked");
@@ -750,9 +750,9 @@ namespace Hooks {
 				// 37588
 				// 0x140623f7b - 0x140623F10 = 0x6B
 				float result = sub_140623F10(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 18.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 18.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 18");
 				}
 				log::info("(18) sub_140623F10 Hooked");
@@ -767,9 +767,9 @@ namespace Hooks {
 				// 37323
 				// 0x1406191be - 0x140619040 = 0x17E
 				float result = sub_140619040(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 19.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 19.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 19");
 				}
 				log::info("(19) sub_140619040 Hooked");
@@ -802,7 +802,7 @@ namespace Hooks {
 			[](auto* param_1) {
 				// sub_14060EEF0 : 37013
 				// 0x14060ef0a - 0x14060EEF0 = 0x1A
-				float result = 1.0; // force it to 1.0. We DON'T want the SetScale() to affect it.
+				float result = 1.0f; // force it to 1.0. We DON'T want the SetScale() to affect it.
 				//log::info("(21) Scale_AlterMovementSpeed Hooked");
 				return result;
             }
@@ -815,9 +815,9 @@ namespace Hooks {
 				// 36957
 				// 0x140609e0d - 0x140609D50 = 0xBD
 				float result = Func7_140609D50(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 22.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 22.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 22");
 				}
 				log::info("(22) Func7_140609D50 Hooked");
@@ -831,7 +831,7 @@ namespace Hooks {
 			[](auto* param_1) {
 				// 36845
 				// 0x140601eb1 - 0x140601E40 = 0x71
-				float result = GetEyeHeight_140601E40(param_1) * 10.0;
+				float result = GetEyeHeight_140601E40(param_1) * 10.0f;
 				log::info("(23) GetEyeHeight_140601E40 Hooked");
 				return result;
             }
@@ -844,9 +844,9 @@ namespace Hooks {
 				// 36844
 				// 0x140601dc7 - 0x140601D80 = 0x47
 				float result = sub_140601D80(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 24.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 24.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 24");
 				}
 				log::info("(24) sub_140601D80 Hooked");
@@ -861,9 +861,9 @@ namespace Hooks {
 				// 36843
 				// 0x140601d14 - 0x140601CD0 = 0x44
 				float result = sub_140601CD0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 25.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 25.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 25");
 				}
 				log::info("(25) sub_140601CD0 Hooked");
@@ -885,9 +885,9 @@ namespace Hooks {
 				// 36842
 				// 0x140601c64 - 0x140601C20 = 0x44
 				float result = sub_140601C20(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 26.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 26.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 26");
 				}
 				//log::info("(26) sub_140601C20 Hooked");
@@ -902,9 +902,9 @@ namespace Hooks {
 				// 36841
                 // 0x140601ba8 - 0x140601B50 = 0x58
 				float result = sub_140601B50(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 27.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 27.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 27");
 				}
 				log::info("(27) sub_140601B50 Hooked");
@@ -919,9 +919,9 @@ namespace Hooks {
 				// 36838
 				// 0x140601902 - 0x1406018a0 = 0x62
 				float result = UndefinedFunction_1406018a0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 28.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 28.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 28");
 				}
 				log::info("(28) UndefinedFunction_1406018a0 Hooked");
@@ -936,9 +936,9 @@ namespace Hooks {
 				// 36628
 				// 0x1405f1f4c - 0x1405F1DE0 = 0x16C
 				float result = sub_1405F1DE0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 29.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 29.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 29");
 				}
 				log::info("(29) sub_1405F1DE0 Hooked");
@@ -960,9 +960,9 @@ namespace Hooks {
 				// 36595
 				// 0x1405ed94e - 0x1405ED870 = 0xDE
 				float result = sub_1405ED870_1(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 30.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 30.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 30");
 				}
 				log::info("(30 - 1) sub_1405ED870 Hooked");
@@ -977,9 +977,9 @@ namespace Hooks {
 				// 36595
 				// 0x1405ed943 - 0x1405ED870 = 0xD3
 				float result = sub_1405ED870_2(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 31.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 31.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 31");
 				}
 				log::info("(30 - 2) sub_1405ED870 Hooked");
@@ -1001,9 +1001,9 @@ namespace Hooks {
 				// 36594
 				// 0x1405ed807 - 0x1405ED750 = 0xB7
 				float result = sub_1405ED750(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 32.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 32.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 32");
 				}
 				//log::info("(32) sub_1405ED750 Hooked");
@@ -1018,9 +1018,9 @@ namespace Hooks {
 				// 36593
 				// 0x1405ed723 - 0x1405ED6D0 = 0x53
 				float result = sub_1405ED6D0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 33.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 33.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 33");
 				}
 				log::info("(33) sub_1405ED6D0 Hooked");
@@ -1035,9 +1035,9 @@ namespace Hooks {
 				// 36592
 				// 0x1405ed6b4 - 0x1405ED680 = 0x34
 				float result = sub_1405ED680(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 35.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 35.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 35");
 				}
 				log::info("(34) sub_1405ED680 Hooked");
@@ -1100,9 +1100,9 @@ namespace Hooks {
 			// 0x1405d89ed - 0x1405D87F0 = 0x1FD
 			[](auto* param_1) {
 				float result = sub_1405D87F0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 38.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 38.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 38");
 				}
 				log::info("(38) sub_1405D87F0 Hooked");
@@ -1128,9 +1128,9 @@ namespace Hooks {
 			// 0x1405513f0 - 0x1405513a0 = 0x50
 			[](auto* param_1) {
 				float result = FUN_1405513a0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 40.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 40.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 40");
 				}
 				log::info("(40) FUN_1405513a0 Hooked");
@@ -1145,9 +1145,9 @@ namespace Hooks {
 			// 0x14054c7d0 - 0x14054c740 = 0x90
 			[](auto* param_1) {
 				float result = UndefinedFunction_14054c740(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 41.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 41.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 41");
 				}
 				log::info("(41) UndefinedFunction_14054c740 Hooked");
@@ -1170,9 +1170,9 @@ namespace Hooks {
 				// 31951
 				// 0x1404e6d29 - 0x1404E6B30 = 0x1F9
 				float result = sub_1404E6B30_1(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global >= 42.0 && Global <= 45.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global >= 42.0f && Global <= 45.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 42");
 				}
 				log::info("(42 - 1) sub_1404E6B30 Hooked");
@@ -1187,9 +1187,9 @@ namespace Hooks {
 				// 31951
 				// 0x1404e6c0d - 0x1404E6B30 = 0xDD
 				float result = sub_1404E6B30_2(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global >= 42.0 && Global <= 45.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global >= 42.0f && Global <= 45.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 43");
 				}
 				log::info("(42 - 2) sub_1404E6B30 Hooked");
@@ -1205,9 +1205,9 @@ namespace Hooks {
 				// 31951
 				// 0x1404e6b8b - 0x1404E6B30 = 0x5B
 				float result = sub_1404E6B30_3(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global >= 42.0 && Global <= 45.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global >= 42.0f && Global <= 45.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 44");
 				}
 				log::info("(42 - 3) sub_1404E6B30 Hooked");
@@ -1226,9 +1226,9 @@ namespace Hooks {
 			// HOOKED INSIDE Movement.cpp!
 			[](auto* param_1) {
 				float result = sub_1404E6360(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 46.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 46.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 45");
 				}
 				//log::info("(45) Hooked");
@@ -1247,9 +1247,9 @@ namespace Hooks {
 			// 0x14047461a - 0x140474420 = 0x1FA
 			[](auto* param_1) {
 				float result = sub_140474420(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 46.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 46.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 46");
 				}
 				log::info("(46 - 1) sub_140474420 Hooked");
@@ -1264,9 +1264,9 @@ namespace Hooks {
 			// 0x140474570 - 0x140474420 = 0x150
 			[](auto* param_1) {
 				float result = sub_140474420_2(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 47.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 47.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 47");
 				}
 				log::info("(46 - 2) sub_140474420 Hooked");
@@ -1288,9 +1288,9 @@ namespace Hooks {
 			// 0x140359a95 - 0x140359960 = 0x135
 			[](auto* param_1) {
 				float result = sub_140359960(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 48.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 48.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 48");
 				}
 				log::info("(48) sub_140359960 Hooked");
@@ -1329,9 +1329,9 @@ namespace Hooks {
 			// 0x1402aa40c - 0x1402AA350 = 0xBC
 			[](auto* param_1) {
 				float result = sub_1402AA350(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 51.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 51.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 51");
 				}
 				log::info("(51) sub_1402AA350 Hooked");
@@ -1348,9 +1348,9 @@ namespace Hooks {
 			// 0x1402a97ee - 0x1402A9740 = 0xAE
 			[](auto* param_1) {
 				float result = sub_1402A9740(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 52.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 52.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 52");
 				}
 				log::info("(52) sub_1402A9740 Hooked");
@@ -1378,9 +1378,9 @@ namespace Hooks {
 			// 0x14027827e - 0x140278070 = 0x20E
 			[](auto* param_1) {
 				float result = FUN_140278070(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 54.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 54.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 54");
 				}
 				log::info("(54) FUN_140278070 Hooked");
@@ -1395,9 +1395,9 @@ namespace Hooks {
 			// 0x140239bb5 - 0x140239B20 = 0x95
 			[](auto* param_1) {
 				float result = sub_140239B20(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 55.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 55.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 55");
 				}
 				//log::info("(55) sub_140239B20 Hooked");
@@ -1475,9 +1475,9 @@ namespace Hooks {
 			// 0x140220d00 - 0x140220CA0 = 0x60
 			[](auto* param_1) {
 				float result = sub_140220CA0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 60.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 60.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 60");
 				}
 				log::info("(60) sub_140220CA0");
@@ -1492,9 +1492,9 @@ namespace Hooks {
 			// 0x140220a83 - 0x140220A30 = 0x53
 			[](auto* param_1) {
 				float result = sub_140220A30(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 61.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 61.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 61");
 				}
 				//log::info("(61) sub_140220A30");
@@ -1510,9 +1510,9 @@ namespace Hooks {
 			// 0x14021eda9 - 0x14021ecb0 = 0xF9
 			[](auto* param_1) {
 				float result = UndefinedFunction_14021ecb0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 62.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 62.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 62");
 				}
 				log::info("(62) UndefinedFunction_14021ecb0");
@@ -1527,9 +1527,9 @@ namespace Hooks {
 			// 0x1401aa5cb - 0x1401aa570 = 0x5B
 			[](auto* param_1) {
 				float result = FUN_1401aa570(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 63.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 63.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 63");
 				}
 				log::info("(63) FUN_1401aa570 hooked");
@@ -1544,9 +1544,9 @@ namespace Hooks {
 			// 0x14018454b - 0x1401844D0 = 0x7B
 			[](auto* param_1) {
 				float result = sub_1401844D0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 64.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 64.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 64");
 				}
 				log::info("(64) sub_1401844D0 hooked");
@@ -1561,9 +1561,9 @@ namespace Hooks {
 			// 0x140183ded - 0x1401834F0 = 0x8FD
 			[](auto* param_1) {
 				float result = sub_1401834F0(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 65.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 65.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 65");
 				}
 				log::info("(65) sub_1401834F0 hooked");
@@ -1578,9 +1578,9 @@ namespace Hooks {
 			// 0x1401458c6 - 0x140145840 = 0x86
 			[](auto* param_1) {
 				float result = UndefinedFunction_140145840(param_1);
-				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0);
-				if (Global == 66.0) {
-					result = Runtime::GetFloatOr("cameraAlternateY", 1.0);
+				float Global = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+				if (Global == 66.0f) {
+					result = Runtime::GetFloatOr("cameraAlternateY", 1.0f);
 					log::info("Altering hook 66");
 				}
 				log::info("(66) UndefinedFunction_140145840");
@@ -1647,7 +1647,7 @@ namespace Hooks {
 				//log::info("Camera hook is running");
 				NiPoint3 result = Skyrim_FactorCameraOffset(camera);
 				log::info("Hook Result: {}", Vector2Str(result));
-				result.x += 5.0;
+				result.x += 5.0f;
 				result *= camera_getplayersize();
 				log::info("Hook Result altered: {}", Vector2Str(result));
                 return result;
@@ -1784,7 +1784,7 @@ namespace Hooks {
 		    float result = Skyrim_NiNode(node);
 			log::info("Original Node Value: {}", result);
 		    if (node) {
-				float scale = 10.0;
+				float scale = 10.0f;
 				result *= scale;
 				
 				log::info("Node Value: {}", result);
@@ -1818,7 +1818,7 @@ namespace Hooks {
 			if (giant) {
 				if (giant->formID == 0x14 || IsTeammate(giant)) {
 					float scale = get_visual_scale(giant);
-					if (scale > 0.0) {
+					if (scale > 0.0f) {
 						result *= scale;
 						log::info("Found Actor: {}, scale: {}", giant->GetDisplayFullName(), scale);
 					}

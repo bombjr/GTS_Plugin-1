@@ -70,10 +70,10 @@ namespace {
 		if (!giant) {
 			return;
 		}
-		float BASE_CHECK_DISTANCE = 90.0;
-		float SCALE_RATIO = 3.0;
+		float BASE_CHECK_DISTANCE = 90.0f;
+		float SCALE_RATIO = 3.0f;
 		if (HasSMT(giant)) {
-			SCALE_RATIO = 0.8;
+			SCALE_RATIO = 0.8f;
 		}
 		float giantScale = get_visual_scale(giant);
 		NiPoint3 giantLocation = giant->GetPosition();
@@ -140,13 +140,13 @@ namespace {
 	void GTS_FootSwipe_L_ON(AnimationEventData& data) { // Compatibility with NickNack's upcoming Hand 2 Hand mod
 		auto giant = &data.giant;
 		std::string name = std::format("FootSwipeL_{}", giant->formID);
-		RunThighCollisionTask(&data.giant, false, true, Radius_ThighCrush_Idle, Damage_ThighCrush_CrossLegs_Out, 0.1, 0.95, 10, name);
+		RunThighCollisionTask(&data.giant, false, true, Radius_ThighCrush_Idle, Damage_ThighCrush_CrossLegs_Out, 0.1f, 0.95f, 10, name);
 	}
 
 	void GTS_FootSwipe_R_ON(AnimationEventData& data) { // Compatibility with NickNack's upcoming Hand 2 Hand mod
 	auto giant = &data.giant;
 		std::string name = std::format("FootSwipeR_{}", giant->formID);
-		RunThighCollisionTask(&data.giant, true, true, Radius_ThighCrush_Idle, Damage_ThighCrush_CrossLegs_Out, 0.1, 0.95, 10, name);
+		RunThighCollisionTask(&data.giant, true, true, Radius_ThighCrush_Idle, Damage_ThighCrush_CrossLegs_Out, 0.1f, 0.95f, 10, name);
 	}
 
 	void GTS_FootSwipe_L_OFF(AnimationEventData& data) { // Compatibility with NickNack's upcoming Hand 2 Hand mod
@@ -164,28 +164,28 @@ namespace {
 	void MCO_SecondDodge(AnimationEventData& data) {
 		data.stage = 0;
 		float scale = get_visual_scale(&data.giant);
-		float volume = scale * 0.20;
-		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20, FootEvent::Right, 1.0, DamageSource::CrushedRight);
-		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20, FootEvent::Left, 1.0, DamageSource::CrushedLeft);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Right, RNode);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Left, LNode);
-		DoDustExplosion(&data.giant, 1.0, FootEvent::Right, RNode);
-		DoDustExplosion(&data.giant, 1.0, FootEvent::Left, LNode);
-		DoLaunch(&data.giant, 0.90, 1.35, FootEvent::Right);
-		DoLaunch(&data.giant, 0.90, 1.35, FootEvent::Left);
+		float volume = scale * 0.20f;
+		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20f, FootEvent::Right, 1.0f, DamageSource::CrushedRight);
+		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Right, RNode);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Left, LNode);
+		DoDustExplosion(&data.giant, 1.0f, FootEvent::Right, RNode);
+		DoDustExplosion(&data.giant, 1.0f, FootEvent::Left, LNode);
+		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Right);
+		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Left);
 	}
 	void MCO_DodgeSound(AnimationEventData& data) {
 		data.stage = 0;
 		float scale = get_visual_scale(&data.giant);
-		float volume = scale * 0.20;
-		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20, FootEvent::Right, 1.0, DamageSource::CrushedRight);
-		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20, FootEvent::Left, 1.0, DamageSource::CrushedLeft);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Right, RNode);
-		DoFootstepSound(&data.giant, 1.0, FootEvent::Left, LNode);
-		DoDustExplosion(&data.giant, 1.0, FootEvent::Right, RNode);
-		DoDustExplosion(&data.giant, 1.0, FootEvent::Left, LNode);
-		DoLaunch(&data.giant, 0.90, 1.35, FootEvent::Right);
-		DoLaunch(&data.giant, 0.90, 1.35, FootEvent::Left);
+		float volume = scale * 0.20f;
+		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20f, FootEvent::Right, 1.0f, DamageSource::CrushedRight);
+		DoDamageEffect(&data.giant, Damage_Stomp, Radius_Stomp, 10, 0.20f, FootEvent::Left, 1.0f, DamageSource::CrushedLeft);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Right, RNode);
+		DoFootstepSound(&data.giant, 1.0f, FootEvent::Left, LNode);
+		DoDustExplosion(&data.giant, 1.0f, FootEvent::Right, RNode);
+		DoDustExplosion(&data.giant, 1.0f, FootEvent::Left, LNode);
+		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Right);
+		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Left);
 	}
 }
 

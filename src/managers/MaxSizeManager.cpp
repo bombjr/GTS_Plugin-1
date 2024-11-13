@@ -16,9 +16,9 @@
 
 namespace {
     float get_endless_height(Actor* actor) {
-		float endless = 0.0;
+		float endless = 0.0f;
 		if (Runtime::HasPerk(actor, "ColossalGrowth")) {
-			endless = 99999999.0;
+			endless = 99999999.0f;
 		}
 		return endless;
 	}
@@ -32,7 +32,7 @@ namespace {
 
     float get_mass_based_limit(Actor* actor, float NaturalScale) { // get mass based size limit for Player if using Mass Based mode
         float low_limit = get_endless_height(actor);
-        if (low_limit <= 0.0) {
+        if (low_limit <= 0.0f) {
             low_limit = Runtime::GetFloat("sizeLimit"); // Cap max size through normal size rules
             // Else max possible size is unlimited
         }
@@ -62,7 +62,7 @@ namespace Gts {
         auto profiler = Profilers::Profile("SizeManager: Update");
 		for (auto actor: find_actors()) {
 			// 2023 + 2024: TODO: move away from polling
-			float Endless = 0.0;
+			float Endless = 0.0f;
 			if (actor->formID == 0x14) {
 				Endless = get_endless_height(actor);
 			}
@@ -70,22 +70,22 @@ namespace Gts {
             float NaturalScale = get_natural_scale(actor, true);
             float QuestStage = Runtime::GetStage("MainQuest");
 
-			float BaseLimit = Runtime::GetFloatOr("sizeLimit", 1.0);
-            float NPCLimit = Runtime::GetFloatOr("NPCSizeLimit", 1.0); // 0 by default
-			float IsMassBased = Runtime::GetIntOr("SelectedSizeFormula", 0.0); // Should DLL use mass based formula for Player?
-			float FollowerLimit = Runtime::GetFloatOr("FollowersSizeLimit", 1.0); // 0 by default
+			float BaseLimit = Runtime::GetFloatOr("sizeLimit", 1.0f);
+            float NPCLimit = Runtime::GetFloatOr("NPCSizeLimit", 1.0f); // 0 by default
+			float IsMassBased = Runtime::GetFloatOr("SelectedSizeFormula", 0.0f); // Should DLL use mass based formula for Player?
+			float FollowerLimit = Runtime::GetFloatOr("FollowersSizeLimit", 1.0f); // 0 by default
 
             float GetLimit = get_default_size_limit(NaturalScale, BaseLimit); // Default size limit
 			
-			if (actor->formID == 0x14 && IsMassBased >= 1.0) { 
+			if (actor->formID == 0x14 && IsMassBased >= 1.0f) { 
 				GetLimit = get_mass_based_limit(actor, NaturalScale); // Apply Player Mass-Based max size
-			} else if (QuestStage > 100 && FollowerLimit > 0.0 && FollowerLimit != 1.0 && actor->formID != 0x14 && IsTeammate(actor)) { 
+			} else if (QuestStage > 100 && FollowerLimit > 0.0f && FollowerLimit != 1.0f && actor->formID != 0x14 && IsTeammate(actor)) { 
 				GetLimit = get_follower_size_limit(NaturalScale, FollowerLimit); // Apply Follower Max Size
-			} else if (QuestStage > 100 && NPCLimit > 0.0 && NPCLimit != 1.0 && actor->formID != 0x14 && !IsTeammate(actor)) { 
+			} else if (QuestStage > 100 && NPCLimit > 0.0f && NPCLimit != 1.0f && actor->formID != 0x14 && !IsTeammate(actor)) { 
                 GetLimit = get_npc_size_limit(NaturalScale, NPCLimit); // Apply Other NPC's max size
 			}
 
-			float TotalLimit = (GetButtCrushSize(actor) + ((GetLimit * Potion_GetSizeMultiplier(actor)) * (1.0 + Ench_Aspect_GetPower(actor))));// / GameScale;
+			float TotalLimit = (GetButtCrushSize(actor) + ((GetLimit * Potion_GetSizeMultiplier(actor)) * (1.0f + Ench_Aspect_GetPower(actor))));// / GameScale;
             //                ^ Add Butt Crush to base     ^          Multiply size with potions              ^ Aspect Of Giantess *'es it again
 
 			if (get_max_scale(actor) < TotalLimit + Endless || get_max_scale(actor) > TotalLimit + Endless) {
