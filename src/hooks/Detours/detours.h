@@ -2,7 +2,7 @@
 //
 //  Core Detours Functionality (detours.h of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0f.1
+//  Microsoft Research Detours Package, Version 4.0.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
@@ -134,10 +134,10 @@ typedef LONG LONG_PTR;
 typedef ULONG ULONG_PTR;
  #endif
 
-///////////////////////////////////////////////// SAL 2.0f Annotations w/o SAL.
+///////////////////////////////////////////////// SAL 2.0 Annotations w/o SAL.
 //
 //  These definitions are include so that Detours will build even if the
-//  compiler doesn't have full SAL 2.0f support.
+//  compiler doesn't have full SAL 2.0 support.
 //
  #ifndef DETOURS_DONT_REMOVE_SAL_20
 

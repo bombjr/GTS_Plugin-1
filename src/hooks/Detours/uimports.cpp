@@ -2,7 +2,7 @@
 //
 //  Add DLLs to a module import table (uimports.cpp of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0f.1
+//  Microsoft Research Detours Package, Version 4.0.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //

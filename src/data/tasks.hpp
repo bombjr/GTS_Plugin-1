@@ -100,7 +100,7 @@ namespace Gts {
 		double runtime;
 		// Time delta since last runtime
 		double delta;
-		// How close to completion on a scale of 0.0f...1.0f
+		// How close to completion on a scale of 0.0...1.0
 		double progress;
 		// How much progress has been gained since last time
 		double progressDelta;

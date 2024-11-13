@@ -137,16 +137,16 @@ namespace Gts {
 			float BalanceMode_ShrinkRate_Combat = 0.08f;
 
 			SoftPotential speed_adjustment {
-				.k = 0.125f, // 0.125f
-				.n = 0.86f, // 0.86f
-				.s = 1.12f, // 1.12f
+				.k = 0.125f,//0.125
+				.n = 0.86f, //0.86
+				.s = 1.12f, //1.12
 				.o = 1.0f,
 				.a = 0.0f,  //Default is 0
 			};
 			SoftPotential MS_adjustment {
-				.k = 0.132f, // 0.132f
-				.n = 0.86f, // 0.86f
-				.s = 1.12f, // 1.12f
+				.k = 0.132f, //0.132
+				.n = 0.86f,  //0.86
+				.s = 1.12f,  //1.12
 				.o = 1.0f,
 				.a = 0.0f, //Default is 0
 			};

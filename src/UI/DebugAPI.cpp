@@ -755,7 +755,7 @@ void DebugAPI::CacheMenuData()
 //
 // void DebugAPI::ClampPointToScreen(glm::vec2& point, float lineAngle)
 // {
-// 	if (point.y < 0.0f)
+// 	if (point.y < 0.0)
 // 	{
 // 		float overshootY = point.y;
 // 		float overshootX = glm::tan(lineAngle) * overshootY;
@@ -772,7 +772,7 @@ void DebugAPI::CacheMenuData()
 // 		point.x -= overshootX;
 // 	}
 //
-// 	if (point.x < 0.0f)
+// 	if (point.x < 0.0)
 // 	{
 // 		float overshootX = point.x;
 // 		float overshootY = glm::tan(lineAngle) * overshootX;

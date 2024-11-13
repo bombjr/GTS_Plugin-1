@@ -2,7 +2,7 @@
 //
 //  Detours Disassembler (disasm.cpp of detours.lib)
 //
-//  Microsoft Research Detours Package, Version 4.0f.1
+//  Microsoft Research Detours Package, Version 4.0.1
 //
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
@@ -1649,7 +1649,7 @@ const DETOUR_IA64_BUNDLE::DETOUR_IA64_METADATA DETOUR_IA64_BUNDLE::s_rceCopyTabl
 //  f.  e.  d. c. b. a. 9. 8. 7. 6. 5. 4. 3. 2. 1. 0.
 
 //                                      00
-// f.e. d.c. b.a. 9.8f. 7.6f. 5.4f. 3.2f. 1.0f.
+// f.e. d.c. b.a. 9.8. 7.6. 5.4. 3.2. 1.0.
 // 0000 0000 0000 0000 0000 0000 0000 001f : Template [4..0]
 // 0000 0000 0000 0000 0000 03ff ffff ffe0 : Zero [ 41..  5]
 // 0000 0000 0000 0000 0000 3c00 0000 0000 : Zero [ 45.. 42]
