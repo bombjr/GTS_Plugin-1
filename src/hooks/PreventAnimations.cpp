@@ -11,7 +11,7 @@ using namespace SKSE;
 
 namespace {
     const float KillMove_Threshold_High = 2.00f; // If GTS/Tiny size ratio is > than 2 times = disallow killmove on Tiny
-    const float KillMove_Threshold_Low = 0.75f; // If Tiny/GTS size ratio is < than 0.75f = disallow killmove on GTS
+    const float KillMove_Threshold_Low = 0.75f; // If Tiny/GTS size ratio is < than 0.75 = disallow killmove on GTS
 
 	// Actions that we want to prevent
 	const auto DefaultSheathe = 			0x46BB2;

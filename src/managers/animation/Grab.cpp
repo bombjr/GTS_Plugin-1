@@ -808,7 +808,7 @@ namespace Gts {
 		Grab::GetSingleton().data.try_emplace(giant, tiny, strength);
 	}
 	void Grab::GrabActor(Actor* giant, TESObjectREFR* tiny) {
-		// Default strength 1.0f: normal grab for actor of their size
+		// Default strength 1.0: normal grab for actor of their size
 		//
 		Grab::GrabActor(giant, tiny, 1.0f);
 	}

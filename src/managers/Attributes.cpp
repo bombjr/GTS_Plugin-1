@@ -113,9 +113,9 @@ namespace Gts {
 	}
 
 	void AttributeManager::Update() {
-		static Timer timer = Timer(0.5f);
+		static Timer timer = Timer(0.5);
 
-		if (timer.ShouldRunFrame()) { // Run once per 0.5f sec
+		if (timer.ShouldRunFrame()) { // Run once per 0.5 sec
 			for (auto actor: find_actors()) {
 				if (actor) {
 					if (actor->Is3DLoaded()) {
@@ -148,9 +148,9 @@ namespace Gts {
 		} 
 		if (scale < 1.0f) {
 			scale /= natural_scale; 
-			// Fix: negative bonuses when natural scale is < 1.0f
-			// No Fix: 0.91f/1.0f = 0.91f   (0.91f is just example of current size)
-			// Fix:    0.91f/0.91f(natural size) = 1.0f
+			// Fix: negative bonuses when natural scale is < 1.0
+			// No Fix: 0.91/1.0 = 0.91   (0.91 is just example of current size)
+			// Fix:    0.91/0.91(natural size) = 1.0
 		}
 		switch (av) {
 			case ActorValue::kHealth: {
@@ -167,7 +167,7 @@ namespace Gts {
 
 				scale *= might;
 
-				float resistance = std::clamp(1.0f / scale, 0.001f, 3.0f); // 0.001f% as max resistance, -300% is a max vulnerability.
+				float resistance = std::clamp(1.0f / scale, 0.001f, 3.0f); // 0.001% as max resistance, -300% is a max vulnerability.
 
 				return resistance;
 
@@ -184,7 +184,7 @@ namespace Gts {
 				if (scale > 1.0f) {
 					return (power*scale*might) + 1.0f - power;
 				} else {
-					return 1.0f * might; // Don't reduce it if scale is < 1.0f
+					return 1.0f * might; // Don't reduce it if scale is < 1.0
 				}
 			}
 			case ActorValue::kSpeedMult: {
@@ -265,7 +265,7 @@ namespace Gts {
 		float finalValue = originalValue;
 
 		switch (av) {
-			case ActorValue::kHealth: { // 27.03f.2024: Health boost is still applied, but for Player only and only if having matching perks
+			case ActorValue::kHealth: { // 27.03.2024: Health boost is still applied, but for Player only and only if having matching perks
 				float bonus = 1.0f;
 				auto& attributes = AttributeManager::GetSingleton();
 				float scale = get_giantess_scale(actor);
@@ -277,7 +277,7 @@ namespace Gts {
 					bonus = attributes.GetAttributeBonus(actor, av);
 				} else {
 					//Linearly decrease such that:
-					//at zero scale health=0.0f
+					//at zero scale health=0.0
 					bonus = scale;
 				}
 				float perkbonus = GetStolenAttributes_Values(actor, ActorValue::kHealth); // calc health from the perk bonuses

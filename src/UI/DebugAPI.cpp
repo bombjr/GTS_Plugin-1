@@ -458,7 +458,7 @@ void DebugAPI::DrawLine2D(RE::GPtr<RE::GFxMovieView> movie, glm::vec2 from, glm:
 	FastClampToScreen(from);
 	FastClampToScreen(to);
 
-	// lineStyle(thickness:Number = NaN, color : uint = 0, alpha : Number = 1.0f, pixelHinting : Boolean = false,
+	// lineStyle(thickness:Number = NaN, color : uint = 0, alpha : Number = 1.0, pixelHinting : Boolean = false,
 	// scaleMode : String = "normal", caps : String = null, joints : String = null, miterLimit : Number = 3) :void
 	//
 	// CapsStyle values: 'NONE', 'ROUND', 'SQUARE'

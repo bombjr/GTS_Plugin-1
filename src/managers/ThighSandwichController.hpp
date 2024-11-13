@@ -47,7 +47,7 @@ namespace Gts {
 
 			Spring ScaleRune = Spring(0.0f, 1.5f);
 			Spring ShrinkRune = Spring(0.0f, 1.5f);
-			inline static Timer SandwichTimer = Timer(0.45f);
+			inline static Timer SandwichTimer = Timer(0.45);
 
 
 			// True if in grabbed state

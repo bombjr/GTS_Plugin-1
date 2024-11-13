@@ -182,7 +182,7 @@ namespace Gts {
 	}
 
 	ShrinkData::ShrinkData(Actor* giant) :
-		delay(Timer(0.01f)),
+		delay(Timer(0.01)),
 		state(ShrinkState::Healthy),
 		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
 	}

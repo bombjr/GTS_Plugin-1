@@ -87,7 +87,7 @@ namespace Gts {
 
 					HungerNeed->value -= (restore / power);
 					if (HungerNeed->value <= 0.0f) {
-						HungerNeed->value = 0.0f; // Cap it at 0.0f
+						HungerNeed->value = 0.0f; // Cap it at 0.0
 					}
 					float value = HungerNeed->value;
 					SurvivalMode_RefreshSpells(giant, value);

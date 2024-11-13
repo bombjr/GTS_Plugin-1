@@ -309,7 +309,7 @@ namespace Gts {
 					highheelsdamage = GetHighHeelsBonusDamage(giant, true);
 				}
 
-				float sprintdamage = 1.0f; // default Sprint damage of 1.0f
+				float sprintdamage = 1.0f; // default Sprint damage of 1.0
 				float weightdamage = 1.0f + (giant->GetWeight()*0.01f);
 
 				if (giant->AsActorState()->IsSprinting()) {

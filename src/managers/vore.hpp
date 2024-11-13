@@ -51,7 +51,7 @@ namespace Gts
 			// If true the mouth kill zone is on and we shrink nodes entering the mouth
 			bool killZoneEnabled = false;
 
-			inline static Timer moantimer = Timer(6.0f);
+			inline static Timer moantimer = Timer(6.0);
 
 			// True if in grabbed state
 			bool allGrabbed = false;

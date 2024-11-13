@@ -82,7 +82,7 @@ namespace {
 
     float Calculate_AbsorbCooldown(Actor* giant) {
         float mastery = std::clamp(GetGtsSkillLevel(giant) * 0.01f, 0.0f, 1.0f) * 0.73f;
-        float reduction = 1.0f - mastery; // Up to 8.1f seconds at level 100
+        float reduction = 1.0f - mastery; // Up to 8.1 seconds at level 100
 
         return ABSORB_OTHER_COOLDOWN * reduction;
     }

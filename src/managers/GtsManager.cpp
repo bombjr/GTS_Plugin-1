@@ -87,7 +87,7 @@ namespace {
 	void FixActorFade(Actor* actor) {
 		auto profiler = Profilers::Profile("Manager: Fade Fix");
 
-		static Timer ApplyTimer = Timer(2.00f);
+		static Timer ApplyTimer = Timer(2.00);
 
 		if (!ApplyTimer.ShouldRunFrame()) {
 			return;
@@ -117,7 +117,7 @@ namespace {
 			float room_scale = GetMaxRoomScale(actor);
 			if (room_scale > (currentOtherScale - 0.05f)) {
 				// Only apply room scale if room_scale > natural_scale
-				//   This stops it from working when room_scale < 1.0f
+				//   This stops it from working when room_scale < 1.0
 				target_scale = min(target_scale, room_scale);
 			} else {
 				// Else we just scale to natural
@@ -147,7 +147,7 @@ namespace {
 		// Smooth target_scale towards max_scale if target_scale > max_scale
 		float max_scale = persi_actor_data->max_scale;
 		if (target_scale > max_scale) {
-			float minimum_scale_delta = 0.000005f; // 0.00005f%
+			float minimum_scale_delta = 0.000005f; // 0.00005f
 			if (fabs(target_scale - max_scale) < minimum_scale_delta) {
 				float target = max_scale;
 				persi_actor_data->target_scale = target;
@@ -171,7 +171,7 @@ namespace {
 		PerformRoofRaycastAdjustments(actor, target_scale, currentOtherScale);
 		
 		if (fabs(target_scale - persi_actor_data->visual_scale) > 1e-5) {
-			float minimum_scale_delta = 0.000005f; // 0.00005f%
+			float minimum_scale_delta = 0.000005f; // 0.00005f
 			if (fabs(target_scale - persi_actor_data->visual_scale) < minimum_scale_delta) {
 				persi_actor_data->visual_scale = target_scale;
 				persi_actor_data->visual_scale_v = 0.0f;
@@ -213,7 +213,7 @@ namespace {
 				if (scaleOverride > 1.0f) {
 					visual_scale *= GetProneAdjustment(); // In normal case we * it for compatibility with crawling/proning.
 				} else {
-					visual_scale = scaleOverride; // In Loot/Combat mode case, we override it with flat value (such as 0.6f).
+					visual_scale = scaleOverride; // In Loot/Combat mode case, we override it with flat value (such as 0.6).
 				}
 			}
 		}

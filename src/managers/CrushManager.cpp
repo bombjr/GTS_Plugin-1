@@ -83,7 +83,7 @@ namespace {
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
-		static Timer voicetimer = Timer(2.4f);
+		static Timer voicetimer = Timer(2.4);
 		auto randomInt = RandomInt(0, 16);
 		auto select = RandomInt(0, 2);
 		if (randomInt <= 3) {
@@ -258,7 +258,7 @@ namespace Gts {
 	}
 
 	CrushData::CrushData(Actor* giant) :
-		delay(Timer(0.01f)),
+		delay(Timer(0.01)),
 		state(CrushState::Healthy),
 		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
 	}

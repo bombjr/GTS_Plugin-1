@@ -178,7 +178,7 @@ namespace Gts {
 			}
 		}
 
-		float room_height_s = room_height_m/1.82f; // / height by 1.82f (default character height)
+		float room_height_s = room_height_m/1.82f; // / height by 1.82 (default character height)
 		float max_scale = (room_height_s * 0.78f) / stateScale; // Define max scale, make avalibale space seem bigger when prone etc
 
 		return max_scale;

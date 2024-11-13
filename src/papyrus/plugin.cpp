@@ -383,13 +383,13 @@ namespace {
 		BalanceModeInfo param = static_cast<BalanceModeInfo>(parameter);
 		auto& Persist = Persistent::GetSingleton();
 		switch (param) {
-			case BalanceModeInfo::SizeGain_Penalty: // 1.0f
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0
 				Persist.BalanceMode_SizeGain_Penalty = modifier;
 			break;
-			case BalanceModeInfo::ShrinkRate_Base: // 1.0f
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0
 				Persist.BalanceMode_ShrinkRate_Base = modifier;
 			break;
-			case BalanceModeInfo::ShrinkRate_Combat: // 0.08f
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
 				Persist.BalanceMode_ShrinkRate_Combat = modifier;
 			break;
 		}

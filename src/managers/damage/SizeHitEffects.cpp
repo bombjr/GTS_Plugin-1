@@ -32,7 +32,7 @@ namespace {
 	void Prevent_Stagger(Actor* attacker, Actor* receiver) {
 		float sizedifference = GetSizeDifference(receiver, attacker, SizeType::GiantessScale, true, true);
 		receiver->SetGraphVariableFloat("GiantessScale", sizedifference); // Manages Stagger Resistance inside Behaviors.
-		// Prevent stagger anims from playing on GTS, Behaviors read GiantessScale value and disallow stagger if value is > 1.5f
+		// Prevent stagger anims from playing on GTS, Behaviors read GiantessScale value and disallow stagger if value is > 1.5
 	}
 
 	void TinyAsShield(Actor* receiver, float a_damage) {
@@ -79,7 +79,7 @@ namespace {
 	
 
 	void DropTinyChance(Actor* receiver, float damage, float scale) {
-		static Timer DropTimer = Timer(0.33f); // Check once per .33 sec
+		static Timer DropTimer = Timer(0.33); // Check once per .33 sec
 		float bonus = 1.0f;
 		if (Runtime::HasPerkTeam(receiver, "HugCrush_HugsOfDeath")) {
 			return; // Full immunity
@@ -115,7 +115,7 @@ namespace {
 		float particlescale = 1.0f;
 		float shrinkmult = 1.0f;
 
-		static Timer soundtimer = Timer(1.5f);
+		static Timer soundtimer = Timer(1.5);
 
 		float Adjustment = 1.0f * GetSizeFromBoundingBox(attacker);
 
@@ -188,7 +188,7 @@ namespace {
 			float SizeHunger = 1.0f + Ench_Hunger_GetPower(receiver);
 			float Gigantism = 1.0f + Ench_Aspect_GetPower(receiver);
 			float SizeDifference = get_visual_scale(receiver)/get_visual_scale(attacker);
-			float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5f
+			float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
 
 			float resistance = Potion_GetShrinkResistance(receiver);
 		

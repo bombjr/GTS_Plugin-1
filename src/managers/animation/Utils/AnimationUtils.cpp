@@ -122,7 +122,7 @@ namespace Gts {
 				animspeed = AnimationManager::GetAnimSpeed(giant); 
 				// Make DLL use animspeed of GTS on Tiny
 			} else {
-				animspeed = 1.0f; // 1.0f makes dll use GetAnimSpeed of tiny
+				animspeed = 1.0f; // 1.0 makes dll use GetAnimSpeed of tiny
 			}
 			// Fixes hug and boob attack states anim de-sync
 		}
@@ -403,7 +403,7 @@ namespace Gts {
 		if (!reset) {
 			float max_heel_height = 0.215f; // All animations are configured with this value in mind. Blending isn't configured for heels bigger than this value.
 			float hh_value = HighHeelManager::GetBaseHHOffset(giant)[2]/100;
-			float hh_offset = std::clamp(hh_value / max_heel_height, 0.0f, 1.0f); // reach max HH at 0.215f offset (highest i've seen and the max that we support)
+			float hh_offset = std::clamp(hh_value / max_heel_height, 0.0f, 1.0f); // reach max HH at 0.215 offset (highest i've seen and the max that we support)
 		
 			giant->SetGraphVariableFloat("GTS_HHoffset", hh_offset);
 		} else {
@@ -899,7 +899,7 @@ namespace Gts {
 
 										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
-											force = 1.0f - distance / maxFootDistance;//force += 1.0f - distance / maxFootDistance;
+											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
 										}
 										return true;
@@ -1034,7 +1034,7 @@ namespace Gts {
 								int RagdollChance = static_cast<int>(-32 + (32 / Threshold) * difference);
 								bool roll = RagdollChance > Random;
 								//log::info("Roll: {}, RandomChance {}, Threshold: {}", roll, RagdollChance, Random);
-								//eventually it reaches 100% chance to ragdoll an actor (at ~x3.0f size difference)
+								//eventually it reaches 100% chance to ragdoll an actor (at ~x3.0 size difference)
 
 								if (difference > 1.35f && (roll || otherActor->IsDead())) {
 									PushTowards(giant, otherActor, node, pushForce * pushpower, true);
@@ -1129,7 +1129,7 @@ namespace Gts {
 										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
 										if (distance <= maxFootDistance) {
 											nodeCollisions += 1;
-											force = 1.0f - distance / maxFootDistance;//force += 1.0f - distance / maxFootDistance;
+											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 											return false;
 										}
 										return true;
@@ -1419,7 +1419,7 @@ namespace Gts {
 	}
 
 	void AbsorbShout_BuffCaster(Actor* giantref, Actor* tinyref) {
-		static Timer MoanTimer = Timer(10.0f);
+		static Timer MoanTimer = Timer(10.0);
 		auto random = RandomInt(0, 8);
 		if (random <= 4) {
 			if (MoanTimer.ShouldRunFrame()) {
@@ -1439,7 +1439,7 @@ namespace Gts {
 
 	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming, bool check_ticks, float time_mult) { 
 		// A fail-safe task. The goal of it is to kill actor
-		// if half-life puts actor below shrink to nothing threshold, so we won't have < x0.01f actors
+		// if half-life puts actor below shrink to nothing threshold, so we won't have < x0.01 actors
 		ActorHandle giantHandle = giant->CreateRefHandle();
 		ActorHandle tinyHandle = tiny->CreateRefHandle();
 		
@@ -1544,7 +1544,7 @@ namespace Gts {
 		AdjustFacialExpression(giant, 1, 0.40f, "modifier"); // blink R
 
 		float random = (RandomInt(0, 25)) * 0.01f;
-		float smile = 0.25f + random; // up to +0.50f to open mouth
+		float smile = 0.25f + random; // up to +0.50 to open mouth
 
 		AdjustFacialExpression(giant, 3, random, "phenome"); // Slightly open mouth
 		AdjustFacialExpression(giant, 5, 0.5f, "phenome"); // Actual smile but leads to opening mouth 

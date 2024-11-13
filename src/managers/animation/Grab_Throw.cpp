@@ -134,7 +134,7 @@ namespace {
 					}
 				}
 
-				float Time = (1.0f / Time::GetTimeMultiplier()); // read SGTM value and / speed by it, so tinies still fly far even with sgtm 0.15f
+				float Time = (1.0f / Time::GetTimeMultiplier()); // read SGTM value and / speed by it, so tinies still fly far even with sgtm 0.15
 				log::info("Time Mult: {}", Time);
 
 

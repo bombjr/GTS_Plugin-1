@@ -83,7 +83,7 @@ namespace {
 			return std::clamp(power, 1.0f, 99999.0f);
 		} else {
 			return 1.0f;
-			// So it never reports values below 1.0f. Just to make sure.
+			// So it never reports values below 1.0. Just to make sure.
 		}
 	}
 
@@ -1239,7 +1239,7 @@ namespace Gts {
 		float totalscale = scale + (hh*0.10f * scale);
 		float actorweight = 1.0f + giant->GetWeight()/300;
 		float weight;
-		if (metric) { // 70.1f kg as a base
+		if (metric) { // 70.1 kg as a base
 			weight = 70.1f * actorweight * (totalscale * totalscale * totalscale);
 		} else {
 			weight = (70.1f * actorweight * (totalscale * totalscale * totalscale)) * 2.205f;
@@ -1255,7 +1255,7 @@ namespace Gts {
 		float scale = get_visual_scale(giant);
 		float smt = 1.0f;
 		float height;
-		if (metric) { // 1.82f m as a base
+		if (metric) { // 1.82 m as a base
 			height = 1.82f * bb * scale + (hh * scale); // meters
 		} else {
 			height = (1.82f * bb * scale + (hh * scale)) * 3.28f; // ft
@@ -1307,7 +1307,7 @@ namespace Gts {
 		if (!enabled) {
 			return;
 		}
-		static Timer EffectTimer = Timer(3.0f);
+		static Timer EffectTimer = Timer(3.0);
 		if (giant->formID == 0x14 && EffectTimer.ShouldRunFrame()) {
 			NiPoint3 NodePosition = giant->GetPosition();
 
@@ -1371,7 +1371,7 @@ namespace Gts {
 											if (IsCrawling(giant) && IsBeingHugged(otherActor)) {
 												bounding_z *= 0.25f; // Move the icon down
 											}
-											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35f); // 2.25f to be slightly above the head
+											Position.z += (bounding_z * get_visual_scale(otherActor) * 2.35f); // 2.25 to be slightly above the head
 											//log::info("For Actor: {}", otherActor->GetDisplayFullName());
 											//log::info("---	Position: {}", Vector2Str(Position));
 											//log::info("---	Actor Position: {}", Vector2Str(otherActor->GetPosition()));
@@ -1697,7 +1697,7 @@ namespace Gts {
 	}
 
 	void PushActorAway(Actor* source, Actor* receiver, float afKnockBackForce) {
-		// Force < 1.0f can introduce weird sliding issues to Actors, not recommended to pass force < 1.0f
+		// Force < 1.0 can introduce weird sliding issues to Actors, not recommended to pass force < 1.0
 		if (receiver->IsDead()) {
 			return;
 		}
@@ -1728,7 +1728,7 @@ namespace Gts {
 	
 	void ApplyManualHavokImpulse(Actor* target, float afX, float afY, float afZ, float Multiplier) {
 		// For this function to work, actor must be pushed away first. 
-		// It may be a good idea to wait about 0.05f sec before callind it after actor has been pushed, else it may not work
+		// It may be a good idea to wait about 0.05 sec before callind it after actor has been pushed, else it may not work
 		hkVector4 impulse = hkVector4(afX * Multiplier, afY * Multiplier, afZ * Multiplier, 1.0f);
 
 		auto collision = target->Get3D(false)->GetCollisionObject();
@@ -1834,7 +1834,7 @@ namespace Gts {
 				sizedifference = sourcesize;
 
 				if (HasSMT(caster)) {
-					sourcesize += 0.2f; // Fix SMT having no shake at x1.0f scale
+					sourcesize += 0.2f; // Fix SMT having no shake at x1.0 scale
 				}
 				if (IsFirstPerson()) {
 					tremor_scale *= 0.25f; // Less annoying FP screen shake
@@ -2185,9 +2185,9 @@ namespace Gts {
 
 		float scale = get_visual_scale(giant);
 		SoftPotential getspeed {
-			.k = 0.142f, // 0.125f
-			.n = 0.82f, // 0.86f
-			.s = 1.90f, // 1.12f
+			.k = 0.142f, // 0.125
+			.n = 0.82f, // 0.86
+			.s = 1.90f, // 1.12
 			.o = 1.0f,
 			.a = 0.0f,  //Default is 0
 		};
@@ -2705,7 +2705,7 @@ namespace Gts {
 
 	void NotifyWithSound(Actor* actor, std::string_view message) {
 		if (actor->formID == 0x14 || IsTeammate(actor)) {
-			static Timer Cooldown = Timer(1.2f);
+			static Timer Cooldown = Timer(1.2);
 			if (Cooldown.ShouldRun()) {
 				float falloff = 0.13f * get_visual_scale(actor);
 				Runtime::PlaySoundAtNode_FallOff("VoreSound_Fail", actor, 0.4f, 1.0f, "NPC COM [COM ]", falloff);

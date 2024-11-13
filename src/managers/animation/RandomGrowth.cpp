@@ -48,15 +48,15 @@ namespace {
 
 		switch (growth_roll) {
 			case 1:
-				return 0.38f * multiplier * 1.45f; // ~62% without * 1.25f
+				return 0.38f * multiplier * 1.45f; // ~62% without * 1.25
 			case 5:
 			case 2:
-			 	return 0.26f * multiplier * 1.40f; // ~40% without * 1.25f
+			 	return 0.26f * multiplier * 1.40f; // ~40% without * 1.25
 			case 6:
 			case 3:
-				return 0.28f * multiplier * 1.35f; // ~42% without * 1.25f
+				return 0.28f * multiplier * 1.35f; // ~42% without * 1.25
 			case 4:
-				return 0.34f * multiplier * 1.25f; // ~62% without * 1.25f
+				return 0.34f * multiplier * 1.25f; // ~62% without * 1.25
 			break;
 		}
 

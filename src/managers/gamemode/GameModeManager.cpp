@@ -66,11 +66,11 @@ namespace Gts {
 	float GameModeManager::GetBalanceModeInfo(BalanceModeInfo info) {
 		auto& Persist = Persistent::GetSingleton();
 		switch (info) {
-			case BalanceModeInfo::SizeGain_Penalty: // 1.0f
+			case BalanceModeInfo::SizeGain_Penalty: // 1.0
 				return Persist.BalanceMode_SizeGain_Penalty;
-			case BalanceModeInfo::ShrinkRate_Base: // 1.0f
+			case BalanceModeInfo::ShrinkRate_Base: // 1.0
 				return Persist.BalanceMode_ShrinkRate_Base;
-			case BalanceModeInfo::ShrinkRate_Combat: // 0.08f
+			case BalanceModeInfo::ShrinkRate_Combat: // 0.08
 				return Persist.BalanceMode_ShrinkRate_Combat;
 			break;
 		}
@@ -170,7 +170,7 @@ namespace Gts {
 						int StrongGrowthChance = RandomInt(0, 6);                                                        // Self-explanatory
 						int MegaGrowth = RandomInt(0, 20);                                                               // A chance to multiply growth again
 						float GrowthPower = GtsSkillLevel*0.00240f / Random;                                              // Randomized strength of growth
-						static Timer timer = Timer(1.40f * GrowthTimer);                                                  // How often it procs
+						static Timer timer = Timer(1.40 * GrowthTimer);                                                  // How often it procs
 						if (targetScale >= sizelimit || Random <= 0 || GrowthTimer <= 0) {
 							return; // Protections against infinity
 						}

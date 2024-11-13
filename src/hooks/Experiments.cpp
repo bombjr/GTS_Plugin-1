@@ -648,8 +648,8 @@ namespace Hooks {
 
 		/*static CallHook<float(TESObjectREFR* param_1)>FUN_14071b230(  // something bone related // ALREADY HOOKED INSIDE MOVEMENT.cpp!!!!!!!
 			REL::RelocationID(41683, 42768), REL::Relocate(0x31, 0x31), // Affects Animation speed of: Walk Speed, Sneak Speed
-			// There's vanilla bug: If you save at SetScale of 2.0f, load a save and perform SetScale of 1.0f = your animations will look slower
-			// Anyway, we want to always force it to 1.0f since we manage animation speed anyway.
+			// There's vanilla bug: If you save at SetScale of 2.0, load a save and perform SetScale of 1.0 = your animations will look slower
+			// Anyway, we want to always force it to 1.0 since we manage animation speed anyway.
 			// This hook seems to be called only once, on save file load
 			[](auto* param_1) {
 				// SE: 0x14071b230 : 41683
@@ -802,7 +802,7 @@ namespace Hooks {
 			[](auto* param_1) {
 				// sub_14060EEF0 : 37013
 				// 0x14060ef0a - 0x14060EEF0 = 0x1A
-				float result = 1.0f; // force it to 1.0f. We DON'T want the SetScale() to affect it.
+				float result = 1.0f; // force it to 1.0. We DON'T want the SetScale() to affect it.
 				//log::info("(21) Scale_AlterMovementSpeed Hooked");
 				return result;
             }
@@ -1615,7 +1615,7 @@ namespace Hooks {
 					}
 				}
                 return Skyrim_SetAngleX(ref, X);
-				// rotation is capped between 1.57f and - 1.57f based on prints
+				// rotation is capped between 1.57 and - 1.57 based on prints
             }
         );
 

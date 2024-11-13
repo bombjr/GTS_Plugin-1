@@ -11,7 +11,7 @@ namespace Gts {
     const float Collision_Distance_Override = 5.75f;
 //-----------------------------------------Size Limits
     const float Minimum_Actor_Scale = 0.04f;
-    const float Minimum_Actor_Crush_Scale_Idle = 16.0f; // x16.0f crush threshold for just standing still
+    const float Minimum_Actor_Crush_Scale_Idle = 16.0f; // x16.0 crush threshold for just standing still
     const float Shrink_To_Nothing_After = 3.0f; // Shrink To Nothing immunity in seconds
     const float SHRINK_TO_NOTHING_SCALE = 0.08f;
 //-----------------------------------------Default Trigger Threshold Values
@@ -240,7 +240,7 @@ namespace Gts {
     const float Rumble_Default_FootWalk = 2.10f * 1.0f; // Used for vanilla anims such as walking, running, sprinting
     const float Rumble_Default_JumpLand = 1.6f * 1.0f; // Multiplies footwalk, used for vanilla anims such as walking, running, sprinting
 
-    const float Rumble_Default_MassiveJump = 2.6f * 1.0f; // Used when player jumps and scale is >= x3.0f
+    const float Rumble_Default_MassiveJump = 2.6f * 1.0f; // Used when player jumps and scale is >= x3.0
 
     ////////////////////////////////////////////////////
 

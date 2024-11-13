@@ -100,16 +100,16 @@ namespace Gts {
 		// https://www.desmos.com/calculator/wh0vwgljfl
 		if (Launch) {
 			SoftPotential launch {
-				.k = 1.6f,//1.42f,
-				.n = 0.70f,//0.78f
+				.k = 1.6f,//1.42
+				.n = 0.70f,//0.78
 				.s = 0.6f,
 				.a = 0.0f,
 			};
 			return soft_power(sizeRatio, launch);
 		} else {
 			SoftPotential kick {
-			.k = 1.6f,//1.42f,
-			.n = 0.62f,//0.78f
+			.k = 1.6f,//1.42f
+			.n = 0.62f,//0.78
 			.s = 0.6f,
 			.a = 0.0f,
 			};

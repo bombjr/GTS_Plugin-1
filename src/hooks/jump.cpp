@@ -25,7 +25,7 @@ namespace {
 			}
 
 			float calc_radius = ((54.0f / 3.0f) * size) - 54.0f;
-			float stagger_radius = std::clamp(calc_radius, 0.0f, 54.0f); // Should start to appear at the scale of x3.0f
+			float stagger_radius = std::clamp(calc_radius, 0.0f, 54.0f); // Should start to appear at the scale of x3.0
 
 			if (stagger_radius > 1.0f) {
 				
@@ -113,7 +113,7 @@ namespace Hooks {
 						float size = get_giantess_scale(actor);
 						float might = 1.0f + Potion_GetMightBonus(actor);
 						float modifier = size * might; // Compensate it, since SetScale() already boosts jump height by default
-						float scaled = std::clamp(modifier, 1.0f, 99999.0f); // Can't have smaller jump heigh than x1.0f
+						float scaled = std::clamp(modifier, 1.0f, 99999.0f); // Can't have smaller jump heigh than x1.0
 
 						Jump_ApplyExtraJumpEffects(actor, size, might); // Push items and actors, spawn dust ring and shake the ground
 

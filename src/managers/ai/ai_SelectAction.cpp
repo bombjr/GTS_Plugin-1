@@ -167,7 +167,7 @@ namespace Gts {
 				auto& hugs = HugAnimationController::GetSingleton();
 				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, 1);
 				for (auto prey: preys) {
-					// ^ If Size > 0.92f (minimum) && Size < 2.5f + perk bonus (maximum) threshold basically
+					// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
 					AI_StartHugs(pred, prey);
 				}
 			}
@@ -205,7 +205,7 @@ namespace Gts {
 		std::string name = std::format("Huggies_Forced_{}", giant->formID);
 		ActorHandle gianthandle = giant->CreateRefHandle();
 		ActorHandle tinyhandle = tiny->CreateRefHandle();
-		static Timer ActionTimer = Timer(2.5f);
+		static Timer ActionTimer = Timer(2.5);
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
@@ -266,7 +266,7 @@ namespace Gts {
 		std::string name = std::format("ThighCrush_{}", giant->formID);
 		ActorHandle gianthandle = giant->CreateRefHandle();
 		double Start = Time::WorldTimeElapsed();
-		static Timer ActionTimer = Timer(6.0f);
+		static Timer ActionTimer = Timer(6.0);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {

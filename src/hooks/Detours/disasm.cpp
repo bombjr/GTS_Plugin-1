@@ -807,13 +807,13 @@ PBYTE CDetourDis::CopyVex3(REFCOPYENTRY, PBYTE pbDst, PBYTE pbSrc)
 	// Here is one such pairing:
 	// VFMADD132PD/VFMADD213PD/VFMADD231PD Fused Multiply-Add of Packed Double-Precision Floating-Point Values
 	//
-	// VEX.DDS.128.66f.0F38.W1 98 /r A V/V FMA Multiply packed double-precision floating-point values
+	// VEX.DDS.128.66.0F38.W1 98 /r A V/V FMA Multiply packed double-precision floating-point values
 	// from xmm0 and xmm2/mem, add to xmm1 and
 	// put result in xmm0.
 	// VFMADD132PD xmm0, xmm1, xmm2/m128
 	//
 	// VFMADD132PS/VFMADD213PS/VFMADD231PS Fused Multiply-Add of Packed Single-Precision Floating-Point Values
-	// VEX.DDS.128.66f.0F38.W0 98 /r A V/V FMA Multiply packed single-precision floating-point values
+	// VEX.DDS.128.66.0F38.W0 98 /r A V/V FMA Multiply packed single-precision floating-point values
 	// from xmm0 and xmm2/mem, add to xmm1 and put
 	// result in xmm0.
 	// VFMADD132PS xmm0, xmm1, xmm2/m128
@@ -2067,7 +2067,7 @@ UINT DETOUR_IA64_BUNDLE::RelocateBundle(_Inout_ DETOUR_IA64_BUNDLE* pDst,
 
 BOOL DETOUR_IA64_BUNDLE::IsBrl() const
 {
-	// f.e. d.c. b.a. 9.8f. 7.6f. 5. 4. 3. 2. 1. 0.
+	// f.e. d.c. b.a. 9.8. 7.6. 5. 4. 3. 2. 1. 0.
 	// c000 0070 0000 0000 0000 00 01 00 00 00 05 : brl.sptk.few
 	// c8ff fff0 007f fff0 ffff 00 01 00 00 00 05 : brl.sptk.few
 	// c000 0048 0000 0000 0001 00 00 00 00 00 05 : brl.sptk.many
@@ -2132,7 +2132,7 @@ VOID DETOUR_IA64_BUNDLE::SetBrlTarget(UINT64 target)
 
 BOOL DETOUR_IA64_BUNDLE::IsMovlGp() const
 {
-	// f.e. d.c. b.a. 9.8f. 7.6f. 5.4f. 3.2f. 1.0f.
+	// f.e. d.c. b.a. 9.8. 7.6. 5.4. 3.2. 1.0.
 	// 6fff f7f0 207f ffff ffff c001 0000 0004
 	// 6000 0000 2000 0000 0000 0001 0000 0004
 	return ((wide[0] & 0x00003ffffffffffe) == 0x0000000100000004 &&

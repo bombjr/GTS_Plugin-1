@@ -61,7 +61,7 @@ namespace Gts {
 
 			NiPoint3 manualEdit;
 
-			Timer initimer = Timer(3.00f);
+			Timer initimer = Timer(3.00);
 
 			Spring smoothScale = Spring(0.30f, 0.50f);
 			Spring3 smoothOffset = Spring3(NiPoint3(0.30f, 0.30f, 0.30f), 0.50f);

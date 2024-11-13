@@ -174,7 +174,7 @@ namespace Gts {
 			if (selectedFormula >= 1.0f) {
 				SoftPotential mod {
 					.k = 0.070f,
-					.n = 3,
+					.n = 3.0f,
 					.s = 0.54f,
 				};
 				auto globalMassSize = Runtime::GetFloat("GtsMassBasedSize");

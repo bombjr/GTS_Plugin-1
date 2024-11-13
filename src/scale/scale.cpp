@@ -137,7 +137,7 @@ namespace Gts {
 	float get_natural_scale(Actor& actor, bool game_scale) {
 		auto actor_data = Transient::GetSingleton().GetData(&actor);
 		if (actor_data) {
-			//static Timer timer = Timer(5.0f);
+			//static Timer timer = Timer(5.0);
 		    float initialScale = GetInitialScale(&actor);
 			/*if (actor.formID == 0x14 && timer.ShouldRunFrame()) {
 				log::info("Initial Scale: {}", initialScale);

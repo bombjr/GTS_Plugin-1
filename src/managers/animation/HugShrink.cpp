@@ -646,7 +646,7 @@ namespace Gts {
 		HugShrink::GetSingleton().data.try_emplace(giant, tiny, strength);
 	}
 	void HugShrink::HugActor(Actor* giant, TESObjectREFR* tiny) {
-		// Default strength 1.0f: normal grab for actor of their size
+		// Default strength 1.0: normal grab for actor of their size
 		//
 		HugShrink::HugActor_Actor(giant, tiny, 1.0f);
 	}

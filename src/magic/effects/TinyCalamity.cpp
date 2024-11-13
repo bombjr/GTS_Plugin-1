@@ -74,7 +74,7 @@ namespace Gts {
 		if (!caster) {
 			return;
 		}
-		static Timer warningtimer = Timer(3.0f);
+		static Timer warningtimer = Timer(3.0);
 		float CasterScale = get_target_scale(caster);
 		float bonus = GetSMTBonus(caster);
 		float penalty = GetSMTPenalty(caster);
@@ -90,14 +90,14 @@ namespace Gts {
 			GetActiveEffect()->duration -= penalty;
 			NullifySMTDuration(caster);
 		}
-		if (CasterScale < 1.0f) {// Disallow to be smaller than 1.5f to avoid weird interactions with others
+		if (CasterScale < 1.0f) {// Disallow to be smaller than 1.5 to avoid weird interactions with others
 			set_target_scale(caster, 1.0f);
 		} else if (CasterScale > 1.5f) {
 			update_target_scale(caster, -0.0300f, SizeEffectType::kNeutral);
 			if (warningtimer.ShouldRun() && caster->formID == 0x14) {
 				Notify("Im getting too big, it becomes hard to handle such power.");
 			}
-		} // <- Disallow having it when scale is > natural scale * 1.50f
+		} // <- Disallow having it when scale is > natural scale * 1.50
 	}
 
 	void TinyCalamity::OnFinish() {

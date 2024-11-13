@@ -96,7 +96,7 @@ namespace {
 	void GTScrush_caster(AnimationEventData& data) { 
 		// Compatibility with Thick Thighs Take Lives mod, this compatibility probably needs a revision.
 		// Mainly just need to call damage similar to how we do it with DoDamageAtPoint() function
-		// 21.01f.2024
+		// 21.01.2024
 		//data.stage = 0;
 		TriggerKillZone(&data.giant);
 	}

@@ -113,8 +113,8 @@ namespace Gts {
 
 	void AiManager::Update() {
 		auto profiler = Profilers::Profile("Ai: Update");
-		static Timer ActionTimer = Timer(0.80f);
-		static Timer VoreTimer = Timer(2.50f); // Random Vore once per 2.5f sec
+		static Timer ActionTimer = Timer(0.80);
+		static Timer VoreTimer = Timer(2.50); // Random Vore once per 2.5 sec
 		if (VoreTimer.ShouldRunFrame()) {
 			AI_ChanceToStartVore();
 		}

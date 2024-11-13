@@ -140,7 +140,7 @@ namespace Gts {
 	}
 
 	OverkillData::OverkillData(Actor* giant) :
-		delay(Timer(0.01f)),
+		delay(Timer(0.01)),
 		state(OverkillState::Healthy),
 		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
 	}

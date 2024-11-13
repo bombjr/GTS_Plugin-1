@@ -79,7 +79,7 @@ namespace Gts {
 		bool wasSneakAttack = a_event->flags.all(TESHitEvent::Flag::kSneakAttack);
 		bool wasBashAttack = a_event->flags.all(TESHitEvent::Flag::kBashAttack);
 		bool wasHitBlocked = a_event->flags.all(TESHitEvent::Flag::kHitBlocked);
-		static Timer timer = Timer(0.25f);
+		static Timer timer = Timer(0.25);
 
 		float attackerscale = get_visual_scale(attacker);
 		float receiverscale = get_visual_scale(receiver) * GetSizeFromBoundingBox(receiver);

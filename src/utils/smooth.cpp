@@ -44,7 +44,7 @@ namespace Gts {
 		return pow((((1-x)*(1-x)*(1-x)*x1) + (3.0f*(1-x)*(1-x)*x*x2) + (3.0f*(1-x)*x*x*x3) + (x*x*x*x4)),i)*k;
 		//i determines the steepness of the curve - how slow or fast it accelerates and decelerates. Should be between two and three (two might be the best one)
 		//x1 should always be 0, x3 and x4 should always be 1
-		//x2 determines if it accelerates fast but deceleares slow, or vice verca. Should be between 0.8f and 1.
+		//x2 determines if it accelerates fast but deceleares slow, or vice verca. Should be between 0.8 and 1.
 	}
 	// https://www.desmos.com/calculator/pqgliwxzi2
 	float soft_power(const float x, const float k,const float n,const float s,const float o,const float a) {

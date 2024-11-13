@@ -24,7 +24,7 @@
 namespace {
 
 	const float MINIMUM_HUG_DISTANCE = 110.0f;
-	const float GRAB_ANGLE = 70;
+	const float GRAB_ANGLE = 70.0f;
 	const float PI = 3.14159f;
 
 	bool DisallowHugs(Actor* actor) {

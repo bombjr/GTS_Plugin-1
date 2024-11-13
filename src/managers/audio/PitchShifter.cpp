@@ -55,8 +55,8 @@ namespace Gts {
 							float freq_low = 1.5f;
 
 							float freq = std::clamp(frequence, freq_high, freq_low);
-							// < 1  = deep voice, below 0.5f = audio bugs out, not recommended
-							// > 1 = mouse-like voice, not recommended to go above 1.5f	
+							// < 1  = deep voice, below 0.5 = audio bugs out, not recommended
+							// > 1 = mouse-like voice, not recommended to go above 1.5	
 
 							if (Audio_1.soundID != BSSoundHandle::kInvalidID) {
 								Audio_1.SetFrequency(freq);

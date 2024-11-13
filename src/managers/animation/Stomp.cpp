@@ -67,11 +67,11 @@ namespace {
 				actorRadius *= tinyScale;
 				
 				if (scaleRatio > 3.5f) {
-					// 3.5f times bigger
+					// 3.5 times bigger
 					auto tinyLoc = tiny->GetPosition();
 					auto distance = (giantLoc - tinyLoc).Length() - actorRadius;
 					if (distance < giantScale * 15.0f) {
-						// About 1.5f the foot size
+						// About 1.5 the foot size
 						result.push_back(tiny);
 					}
 				}
@@ -247,7 +247,7 @@ namespace {
 			return true;
 		});
 		
-		//KeepInPlace(giant, 1.5f);
+		//KeepInPlace(giant, 1.5);
 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////// Events

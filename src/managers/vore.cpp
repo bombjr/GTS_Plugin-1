@@ -207,7 +207,7 @@ namespace {
 				DamageAV(giantref, ActorValue::kStamina, -health * TimeScale()); 
 				// Restore HP and Stamina for GTS
 
-				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03f (multiplies by race scale)
+				if (get_target_scale(giantref) < get_max_scale(giantref)) { // For some reason likes to surpass size limit by ~0.03 (multiplies by race scale)
 					update_target_scale(giantref, (sizeToApply / reduction) * TimeScale(), SizeEffectType::kGrow);
 					AddStolenAttributes(giantref, sizeToApply * TimeScale());
 				}

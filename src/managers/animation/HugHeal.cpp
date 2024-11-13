@@ -71,7 +71,7 @@ namespace {
 	}
 
     bool Hugs_RestoreHealth(Actor* giantref, Actor* tinyref) {
-		static Timer HeartTimer = Timer(0.5f);
+		static Timer HeartTimer = Timer(0.5);
 		float hp = GetAV(tinyref, ActorValue::kHealth);
 		float maxhp = GetMaxAV(tinyref, ActorValue::kHealth);
 		bool Healing = IsHugHealing(giantref);

@@ -39,7 +39,7 @@ namespace Gts {
 		this->startTime = 0.0f;
 	}
 
-	ActorRumbleData::ActorRumbleData()  : delay(Timer(0.40f)) {
+	ActorRumbleData::ActorRumbleData()  : delay(Timer(0.40)) {
 	}
 
 	Rumbling& Rumbling::GetSingleton() noexcept {

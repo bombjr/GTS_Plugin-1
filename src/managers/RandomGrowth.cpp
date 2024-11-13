@@ -54,7 +54,7 @@ namespace {
 			return false; // Disallow random groth during Tiny Calamity
 		}
 		if (SizeManager::GetSingleton().BalancedMode() == 2.0f) {
-			MultiplySlider = 1.0f; // Disable effect in Balance Mode, so slider is always 1.0f
+			MultiplySlider = 1.0f; // Disable effect in Balance Mode, so slider is always 1.0
 		}
 		float Gigantism = 1.0f + Ench_Aspect_GetPower(actor);
 		int Requirement = static_cast<int>((300 * MultiplySlider * SizeManager::GetSingleton().BalancedMode()) / Gigantism); // Doubles random in Balance Mode
@@ -80,7 +80,7 @@ namespace Gts {
 	}
 
 	void RandomGrowth::Update() {
-		static Timer GrowthTimer = Timer(1.0f);
+		static Timer GrowthTimer = Timer(1.0);
 		if (GrowthTimer.ShouldRunFrame()) {
 			for (auto actor: find_actors()) {
 				if (actor && actor->Is3DLoaded()) {

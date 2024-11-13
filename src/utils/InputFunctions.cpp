@@ -91,7 +91,7 @@ namespace {
 			Grow(player, 0.0010f * stamina, 0.0f);
 			float Volume = std::clamp(get_visual_scale(player)/16.0f, 0.20f, 2.0f);
 			Rumbling::Once("ColossalGrowth", player, 0.15f, 0.05f);
-			static Timer timergrowth = Timer(2.00f);
+			static Timer timergrowth = Timer(2.00);
 			if (timergrowth.ShouldRun()) {
 				Runtime::PlaySoundAtNode("growthSound", player, Volume, 1.0f, "NPC Pelvis [Pelv]");
 			}
@@ -114,7 +114,7 @@ namespace {
 
 			float Volume =std::clamp(get_visual_scale(player)*0.10f, 0.10f, 1.0f);
 			Rumbling::Once("ColossalGrowth", player, 0.15f, 0.05f);
-			static Timer timergrowth = Timer(2.00f);
+			static Timer timergrowth = Timer(2.00);
 			if (timergrowth.ShouldRun()) {
 				Runtime::PlaySound("shrinkSound", player, Volume, 1.0f);
 			}
@@ -137,7 +137,7 @@ namespace {
 					Grow(actor, 0.0010f * magicka, 0.0f);
 					float Volume = std::clamp(0.20f, 2.0f, get_visual_scale(actor)/16.0f);
 					Rumbling::Once("TotalControlOther", actor, 0.15f, 0.05f);
-					static Timer timergrowth = Timer(2.00f);
+					static Timer timergrowth = Timer(2.00);
 					if (timergrowth.ShouldRun()) {
 						Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 					}
@@ -162,7 +162,7 @@ namespace {
 					ShrinkActor(actor, 0.0010f * magicka, 0.0f);
 					float Volume = std::clamp(get_visual_scale(actor) * 0.10f, 0.10f, 1.0f);
 					Rumbling::Once("TotalControlOther", actor, 0.15f, 0.05f);
-					static Timer timergrowth = Timer(2.00f);
+					static Timer timergrowth = Timer(2.00);
 					if (timergrowth.ShouldRun()) {
 						Runtime::PlaySound("shrinkSound", actor, Volume, 1.0f);
 					}
@@ -223,7 +223,7 @@ namespace {
 						float SizeCalculation = duration - 1.2f;
 						float gigantism = 1.0f + Ench_Aspect_GetPower(player);
 						float Volume = std::clamp(get_visual_scale(player) * Cache->SizeReserve/10.0f, 0.10f, 2.0f);
-						static Timer timergrowth = Timer(3.00f);
+						static Timer timergrowth = Timer(3.00);
 						if (timergrowth.ShouldRunFrame()) {
 							Runtime::PlaySoundAtNode("growthSound", player, Cache->SizeReserve/50 * duration, 1.0f, "NPC Pelvis [Pelv]");
 							Task_FacialEmotionTask_Moan(player, 2.0f, "SizeReserve");
@@ -300,7 +300,7 @@ namespace {
 			return; // don't allow us to die from own shrinking
 		}
 
-		static Timer NotifyTimer = Timer(2.0f);
+		static Timer NotifyTimer = Timer(2.0);
 		bool OnCooldown = IsActionOnCooldown(player, CooldownSource::Misc_ShrinkOutburst);
 		if (OnCooldown) {
 			if (NotifyTimer.ShouldRunFrame()) {
@@ -317,7 +317,7 @@ namespace {
 	}
 
 	void ProtectSmallOnesEvent(const InputEventData& data) {
-		static Timer ProtectTimer = Timer(5.0f);
+		static Timer ProtectTimer = Timer(5.0);
 		if (CanPerformAnimation(PlayerCharacter::GetSingleton(), 4) && ProtectTimer.ShouldRunFrame()) {
 			bool balance = IsInBalanceMode();
 			Utils_ProtectTinies(balance);
@@ -335,7 +335,7 @@ namespace {
 	}
 
 	void VoreInputEvent(const InputEventData& data) {
-		static Timer voreTimer = Timer(0.25f);
+		static Timer voreTimer = Timer(0.25);
 		auto pred = PlayerCharacter::GetSingleton();
 		if (IsGtsBusy(pred)) {
 			return;

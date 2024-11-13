@@ -231,7 +231,7 @@ namespace Gts {
 		RipClothManagerActive = (Runtime::GetFloat("AllowClothTearing") > 0.0f);
 		if (!RipClothManagerActive || (!IsTeammate(a_actor) && a_actor->formID != 0x14)) return;
 
-		static Timer timer = Timer(1.2f);
+		static Timer timer = Timer(1.2);
 		if (!timer.ShouldRunFrame()) return;
 
 		auto actordata = Transient::GetSingleton().GetActorData(a_actor);

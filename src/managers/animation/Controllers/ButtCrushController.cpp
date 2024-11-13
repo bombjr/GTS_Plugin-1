@@ -281,11 +281,11 @@ namespace Gts {
 		float prey_distance = (pred->GetPosition() - prey->GetPosition()).Length();
 		if (prey_distance <= MINIMUM_DISTANCE * pred_scale && sizedifference < MINIMUM_BUTTCRUSH_SCALE) {
 			if (pred->formID == 0x14) {
-				std::string_view message = std::format("{} is too big for Butt Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+				std::string_view message = fmt::format("{} is too big for Butt Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				if (!IsCrawling(pred) && pred->IsSneaking()) {
-					message = std::format("{} is too big for Knee Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+					message = fmt::format("{} is too big for Knee Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				} else if (IsCrawling(pred)) {
-					message = std::format("{} is too big for Breast Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
+					message = fmt::format("{} is too big for Breast Crush: x{:.2f}/{:.2f}", prey->GetDisplayFullName(), sizedifference, MINIMUM_BUTTCRUSH_SCALE);
 				} 
 				shake_camera(pred, 0.45f, 0.30f);
 				NotifyWithSound(pred, message);

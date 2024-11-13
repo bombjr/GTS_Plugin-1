@@ -433,7 +433,7 @@ namespace Gts {
 							// Make the transform matrix for our changes
 							NiTransform adjustments = NiTransform();
 							adjustments.scale = scale;
-							// Adjust by scale reports 1.0f / naturalscale (Which includes RaceMenu and GetScale)
+							// Adjust by scale reports 1.0 / naturalscale (Which includes RaceMenu and GetScale)
 
 
 							adjustments.translate = playerLocalOffset;

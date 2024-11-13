@@ -300,7 +300,7 @@ namespace Gts {
 							float distance = (point - actorLocation).Length();
 							if (distance <= maxFootDistance) {
 								if (AllowStagger(giant, otherActor)) {
-									float force = 1.0f - distance / maxFootDistance;//force += 1.0f - distance / maxFootDistance;
+									float force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
 									ApplyLaunchTo(giant, otherActor, force, power);
 								}
 							}
