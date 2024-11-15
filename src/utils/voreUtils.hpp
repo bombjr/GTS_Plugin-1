@@ -8,7 +8,7 @@ using namespace RE;
 using namespace Gts;
 
 namespace Gts {
-	float GetGrowthFormula(float a_giantScale, float a_tinyScale, bool a_devourment);
+	const float GetGrowthFormula(float a_giantScale, float a_tinyScale, bool a_devourment);
 
     void VoreMessage_SwallowedAbsorbing(Actor* pred, Actor* prey);
     void VoreMessage_Absorbed(Actor* pred, std::string_view prey);
