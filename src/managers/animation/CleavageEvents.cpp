@@ -44,7 +44,7 @@ namespace {
 			multiplier *= 1.15f;
 		}
         float grow_value = 0.08f * multiplier * 0.845f;
-        float original = Vore::ReadOriginalScale(tiny) + 0.875f; // Compensate
+        float original = Vore::ReadOriginalScale(tiny) + 0.875f; // Compensate 
         update_target_scale(giant, grow_value * original, SizeEffectType::kGrow);
     }
 

@@ -73,6 +73,7 @@ namespace Gts {
 	class MagicFactoryBase {
 		public:
 			virtual Magic* MakeNew(ActiveEffect* effect) const = 0;
+			virtual ~MagicFactoryBase() = default;
 	};
 
 	template<class MagicCls>

@@ -18,7 +18,7 @@ namespace {
     }
 
     float Perk_LifeAbsorption_GetBonus(Actor* giant) {
-        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.03f;
+        float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.02f;
         return 0.25f + bonus;
     }
 

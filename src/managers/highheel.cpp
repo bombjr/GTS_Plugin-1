@@ -84,70 +84,67 @@ namespace Gts {
 
 	void HighHeelManager::ApplyHH(Actor* actor, bool force) {
 		auto profiler = Profilers::Profile("HH: ApplyHH");
-		if (!actor) {
-			return;
-		}
-		if (!actor->Is3DLoaded()) {
-			return;
-		}
-
-		if (Persistent::GetSingleton().highheel_furniture == false && actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kIsSitting) {
-			return;
-		}
-		this->data.try_emplace(actor);
-		auto& hhData = this->data[actor];
-		float speedup = 1.0f;
-		if (IsCrawling(actor) || IsProning(actor) || BehaviorGraph_DisableHH(actor)) {
-			speedup = 4.0f; // To shift down a lot faster
-		} else if (!IsGtsBusy(actor)) {
-			speedup = 3.0f;
-		}
-		// Should disable HH?
-		bool disableHH = DisableHighHeels(actor);
-
-		if (disableHH) {
-			hhData.multiplier.target = 0.0f;
-			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
-		} else {
-			hhData.multiplier.target = 1.0f;
-			hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
-		}
-
-		NiPoint3 new_hh;
-		if (!Persistent::GetSingleton().highheel_correction) {
-			return;
-		}
-		this->UpdateHHOffset(actor);
-
-		// With model scale do it in unscaled coords
-		new_hh = this->GetBaseHHOffset(actor) * hhData.multiplier.value;
-		
-		float hh_length = new_hh.Length();
-
-		for (bool person: {false, true}) {
-			auto npc_root_node = find_node(actor, "NPC", person);
-
-			if (npc_root_node) {
-				NiPoint3 current_value = npc_root_node->local.translate;
-				NiPoint3 delta = current_value - new_hh;
-
-				if (delta.Length() > 1e-5 || force) {
-					npc_root_node->local.translate = new_hh;
-					update_node(npc_root_node);
+		if (actor) {
+			if (actor->Is3DLoaded()) {
+				if (Persistent::GetSingleton().highheel_furniture == false && actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kIsSitting) {
+					return;
 				}
-				bool wasWearingHh = hhData.wasWearingHh;
-				bool isWearingHH = fabs(new_hh.Length()) > 1e-4;
-				if (isWearingHH != wasWearingHh) {
-					// Just changed hh
-					HighheelEquip hhEvent = HighheelEquip {
-						.actor = actor,
-						.equipping = isWearingHH,
-						.hhLength = new_hh.Length(),
-						.hhOffset = new_hh,
-						.shoe = actor->GetWornArmor(BGSBipedObjectForm::BipedObjectSlot::kFeet),
-					};
-					EventDispatcher::DoHighheelEquip(hhEvent);
-					hhData.wasWearingHh = isWearingHH;
+				this->data.try_emplace(actor);
+				auto& hhData = this->data[actor];
+				float speedup = 1.0f;
+				if (IsCrawling(actor) || IsProning(actor) || BehaviorGraph_DisableHH(actor)) {
+					speedup = 4.0f; // To shift down a lot faster
+				} else if (!IsGtsBusy(actor)) {
+					speedup = 3.0f;
+				}
+				// Should disable HH?
+				bool disableHH = DisableHighHeels(actor);
+
+				if (disableHH) {
+					hhData.multiplier.target = 0.0f;
+					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
+				} else {
+					hhData.multiplier.target = 1.0f;
+					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
+				}
+
+				NiPoint3 new_hh;
+				if (!Persistent::GetSingleton().highheel_correction) {
+					return;
+				}
+				this->UpdateHHOffset(actor);
+
+				// With model scale do it in unscaled coords
+				new_hh = this->GetBaseHHOffset(actor) * hhData.multiplier.value;
+				
+				float hh_length = new_hh.Length();
+
+				for (bool person: {false, true}) {
+					auto npc_root_node = find_node(actor, "NPC", person);
+
+					if (npc_root_node) {
+						NiPoint3 current_value = npc_root_node->local.translate;
+						NiPoint3 delta = current_value - new_hh;
+
+						if (delta.Length() > 1e-5 || force) {
+							npc_root_node->local.translate = new_hh;
+							update_node(npc_root_node);
+						}
+						bool wasWearingHh = hhData.wasWearingHh;
+						bool isWearingHH = fabs(new_hh.Length()) > 1e-4;
+						if (isWearingHH != wasWearingHh) {
+							// Just changed hh
+							HighheelEquip hhEvent = HighheelEquip {
+								.actor = actor,
+								.equipping = isWearingHH,
+								.hhLength = new_hh.Length(),
+								.hhOffset = new_hh,
+								.shoe = actor->GetWornArmor(BGSBipedObjectForm::BipedObjectSlot::kFeet),
+							};
+							EventDispatcher::DoHighheelEquip(hhEvent);
+							hhData.wasWearingHh = isWearingHH;
+						}
+					}
 				}
 			}
 		}

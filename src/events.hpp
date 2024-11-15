@@ -211,8 +211,8 @@ namespace Gts {
 		bool WasLiving;
 		float Scale;
 		float Vore_Power;
-		float Restore_Power;
-		float Natural_Scale;
+		float Health_Regeneration;
+		float Box_Scale;
 		float Duration;
 		std::string_view Tiny_Name;
 	};

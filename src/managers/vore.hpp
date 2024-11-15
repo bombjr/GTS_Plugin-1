@@ -67,14 +67,6 @@ namespace Gts
 			virtual void ResetActor(Actor* actor) override;
 			virtual void Update() override;
 
-
-			// Get's vore target for pred using the crosshair
-			// This will only return actors with appropiate distance/scale
-			// as based on `CanVore`
-			Actor* GeVoreTargetCrossHair(Actor* pred);
-			// The varient get's multiple targets
-			std::vector<Actor*> GeVoreTargetsCrossHair(Actor* pred, std::size_t numberOfPrey);
-
 			// Get's vore target for any actor based on direction they are facing
 			// This will only return actors with appropiate distance/scale
 			// as based on `CanVore`
@@ -84,15 +76,6 @@ namespace Gts
 			// This will only return actors with appropiate distance/scale
 			// as based on `CanVore`  and can return multiple targets
 			std::vector<Actor*> GetVoreTargetsInFront(Actor* pred, std::size_t numberOfPrey);
-
-			// Get's vore target for any actor based on direction they are facing
-			// This will only return actors with appropiate distance/scale
-			Actor* GetVoreTargetAround(Actor* pred);
-
-			// Get's vore target for any actor based on distance from pred
-			// This will only return actors with appropiate distance/scale
-			// as based on `CanVore` and can return multiple targets
-			std::vector<Actor*> GetVoreTargetsAround(Actor* pred, std::size_t numberOfPrey);
 
 			// Check if they can vore based on size difference and reach distance
 			bool CanVore(Actor* pred, Actor* prey);
@@ -106,9 +89,6 @@ namespace Gts
 
 			void ShrinkOverTime(Actor* giant, Actor* tiny, float over_time);
 			
-			// Make Devourment events apply all bonuses
-			void Devourment_Compatibility(Actor* Pred, Actor* Prey, bool Digested);
-
 			// Gets the current vore data of a giant
 			VoreData& GetVoreData(Actor* giant);
 

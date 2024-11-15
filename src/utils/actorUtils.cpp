@@ -2018,7 +2018,7 @@ namespace Gts {
 	}
 
 	void AddStolenAttributes(Actor* giant, float value) {
-		if (giant->formID == 0x14 && Runtime::HasPerk(giant, "SizeAbsorption")) {
+		if (giant->formID == 0x14 && Runtime::HasPerk(giant, "SizeConversion")) {
 			auto attributes = Persistent::GetSingleton().GetData(giant);
 			if (attributes) {
 				attributes->stolen_attributes += value;
@@ -2089,7 +2089,7 @@ namespace Gts {
 	}
 
 	void DistributeStolenAttributes(Actor* giant, float value) {
-		if (value > 0 && giant->formID == 0x14 && Runtime::HasPerk(giant, "SizeAbsorption")) { // Permamently increases random AV after shrinking and stuff
+		if (value > 0 && giant->formID == 0x14 && Runtime::HasPerk(giant, "SizeConversion")) { // Permamently increases random AV after shrinking and stuff
 			float scale = std::clamp(get_visual_scale(giant), 0.01f, 999999.0f);
 			float modifier = Runtime::GetFloatOr("LevelLimitModifier", 1.0f);
 			float Storage = GetStolenAttributes(giant);

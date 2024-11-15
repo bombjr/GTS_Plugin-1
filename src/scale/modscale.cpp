@@ -133,24 +133,12 @@ namespace Gts {
 		if (actor) {
 			std::string name = std::format("UpdateRace_{}", actor->formID);
 			ActorHandle gianthandle = actor->CreateRefHandle();
-
-			float Start = Time::WorldTimeElapsed();
-    
 			TaskManager::RunOnce(name, [=](auto& progressData) { // Reset it one frame later, called by SwitchRaceHook only, inside Hooks/RaceMenu.cpp 
-				try {
-					if (!gianthandle) {
-						return false;
-					}
+				if (gianthandle) {
 					auto giantref = gianthandle.get().get();
-					float Finish = Time::WorldTimeElapsed();
 
 					auto& initScale = GetActorInitialScales(giantref);
 					initScale.model = 1.0f * giantref->GetScale();
-					return false;
-				}
-				catch (exception e) {
-					log::error("RefreshInitialScales Task Failed {}", e.what());
-					return false;
 				}
 			});
 		}

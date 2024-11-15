@@ -1,20 +1,19 @@
-#include "papyrus/plugin.hpp"
-#include "data/persistent.hpp"
-#include "data/transient.hpp"
-#include "utils/actorUtils.hpp"
-#include "managers/Attributes.hpp"
-#include "managers/GtsManager.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/gamemode/GameModeManager.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "utils/ItemDistributor.hpp"
 #include "magic/effects/common.hpp"
+#include "managers/Attributes.hpp"
+#include "managers/GtsManager.hpp"
+#include "utils/actorUtils.hpp"
+#include "utils/voreUtils.hpp"
+#include "data/persistent.hpp"
+#include "papyrus/plugin.hpp"
+#include "data/transient.hpp"
 #include "managers/vore.hpp"
 #include <sstream>
 #include <iomanip>
 #include <math.h>
-
-
 
 using namespace SKSE;
 using namespace Gts;
@@ -452,7 +451,7 @@ namespace {
 	}
 
 	void CallDevourmentCompatibility(StaticFunctionTag*, Actor* Pred, Actor* Prey, bool Digested) {
-		Vore::GetSingleton().Devourment_Compatibility(Pred, Prey, Digested);
+		Devourment_Compatibility(Pred, Prey, Digested);
 	}
 
 	bool GetDevourmentCompatibility(StaticFunctionTag*) {

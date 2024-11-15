@@ -79,7 +79,7 @@ if(MSVC)
 		"${PROJECT_NAME}"
 		PRIVATE
 		/MP
-		/W4
+		/W1
 		/permissive-
 		/Zc:alignedNew
 		/Zc:auto
