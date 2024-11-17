@@ -86,13 +86,25 @@ namespace Gts {
 		return VoreInfo;
 	}
 
-	float GetGrowthFormula(float a_giantScale, float a_tinyScale, bool a_devourment) {
-        //https://www.desmos.com/calculator/tpklrq4pxn
-		//a_devourment param is unused for now
-        float g = a_giantScale;
-        float t = a_tinyScale;
-        float a = 5.0f; //Dampening factor, change to whatever you think looks good
-        return pow(t,2.0f/a) / (sqrt(2 * a * sqrt(g * g)));
+	const float GetGrowthFormula(float a_giantScale, float a_tinyScale, bool a_devourment) {
+		const float g = a_giantScale;
+		const float t = a_tinyScale;
+        const float b = 5.0f; //Dampening factor for GTS formula, change to whatever you think looks good
+		const float u = 0.1f; //Dampening factor for DV formula, change to whatever you think looks good
+		const float a = g / (g * u);
+
+		if (a_devourment) {
+		//https://www.desmos.com/calculator/5abytasrni
+			const float out = (t / sqrt(2 * a * sqrt(g * g))) * 1.1f;
+			//Notify("DV Gained {} Scale", out);
+			return out;
+		}
+
+		//https://www.desmos.com/calculator/tpklrq4pxn
+		const float out = pow(t, 2.0f / b) / (sqrt(2 * b * sqrt(g * g)));
+		//Notify("GTS Gained {} Scale", out);
+		return out;
+        
 	}
 
     void VoreMessage_SwallowedAbsorbing(Actor* pred, Actor* prey) {
