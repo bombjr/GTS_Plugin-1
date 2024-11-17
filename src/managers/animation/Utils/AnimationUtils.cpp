@@ -319,6 +319,8 @@ namespace Gts {
 		AddSMTDuration(giant, 5.0f);
 		ApplyShakeAtNode(tiny, 3, "NPC Root [Root]");
 
+		KillActor(giant, tiny, true);
+
 		if (tiny->formID != 0x14) {
 			Disintegrate(tiny); // Set critical stage 4 on actor
             SendDeathEvent(giant, tiny);
@@ -342,7 +344,6 @@ namespace Gts {
 			auto tinyref = tinyHandle.get().get();
 
 			float scale = get_visual_scale(tinyref) * GetSizeFromBoundingBox(tinyref);
-			KillActor(giantref, tinyref);
 			PerkHandler::UpdatePerkValues(giantref, PerkUpdate::Perk_LifeForceAbsorption);
 			TransferInventory(tinyref, giantref, scale, false, true, DamageSource::Crushed, true);
 		});
@@ -1543,7 +1544,7 @@ namespace Gts {
 		AdjustFacialExpression(giant, 0, 0.40f, "modifier"); // blink L
 		AdjustFacialExpression(giant, 1, 0.40f, "modifier"); // blink R
 
-		float random = (RandomInt(0, 25)) * 0.01f;
+		float random = (RandomInt(5, 25)) * 0.01f;
 		float smile = 0.25f + random; // up to +0.50 to open mouth
 
 		AdjustFacialExpression(giant, 3, random, "phenome"); // Slightly open mouth
@@ -1580,7 +1581,7 @@ namespace Gts {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
 			int rng = RandomInt(0, 3);
-			if (rng <= 1.0f) {
+			if (rng <= 1) {
 				float duration = 1.5f + ((RandomInt(0, 100)) * 0.01f);
 				duration *= multiply;
 
@@ -1598,8 +1599,8 @@ namespace Gts {
 		bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
 		if (!Blocked) {
 			int rng = RandomInt(0, 3);
-			if (rng <= 1.0f) {
-				float duration = 1.5f + ((RandomInt(0, 100)) * 0.01f);
+			if (rng <= 1) {
+				float duration = 1.5f + ((RandomInt(1, 100)) * 0.01f);
 				duration *= multiply;
 
 				PlayLaughSound(giant, 1.0f, 1);

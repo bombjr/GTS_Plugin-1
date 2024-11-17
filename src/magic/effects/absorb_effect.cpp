@@ -26,10 +26,10 @@ namespace Gts {
 		if (!caster) {
 			return;
 		}
-		
-		StaggerActor(caster, target, 0.25f * GetSizeDifference(caster, target, SizeType::VisualScale, true, false));
-		Attacked(target, caster);
-		
+		if (!IsEssential_WithIcons(caster, target)) {
+			StaggerActor(caster, target, 0.25f * GetSizeDifference(caster, target, SizeType::VisualScale, true, false));
+			Attacked(target, caster);
+		}
 	}
 
 	void Absorb::OnUpdate() {

@@ -414,7 +414,7 @@ namespace Gts {
 			if (Runtime::HasPerk(giant, "NoSpeedLoss")) {
 				speed = 1.25f;
                 decay = 1.5f;
-				cap = 1.25f;
+				cap = 1.10f;
 			}
 
 			currentspeed += 0.004400f * speed * Gigantism * 5; // increase MS

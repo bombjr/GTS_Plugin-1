@@ -12,18 +12,23 @@ using namespace Gts;
 
 namespace {
 	struct InitialScales {
-		float model;
-		float npc;
+        float model;
+        float npc;
 
-		InitialScales() {
-			throw std::exception("Cannot init a InitialScales without an actor");
-		}
+        InitialScales() {
+            throw std::exception("Cannot init a InitialScales without an actor");
+        }
 
-		InitialScales(Actor* actor) {
-			model = get_model_scale(actor) / game_getactorscale(actor);
-			npc = get_npcnode_scale(actor);
-		}
-	};
+        InitialScales(Actor* actor) {
+            model = get_model_scale(actor) / game_getactorscale(actor);
+            npc = get_npcnode_scale(actor);
+        }
+
+        InitialScales(float a_model, float a_npc) {
+            model = a_model;
+            npc = a_npc;
+        }
+    };
 
 
 	// Global actor inital scales singleton
@@ -32,16 +37,39 @@ namespace {
 		return initScales;
 	}
 
-	InitialScales& GetActorInitialScales(Actor* actor) {
-		if (!actor) {
-			log::info("GetActorInitialScales: Actor Doesn't Exist");
-			throw std::exception("Actor must exist for GetInitialScale");
-		}
-		auto& initScales = GetInitialScales();
-		auto id = actor->formID;
-		initScales.try_emplace(id, actor);
-		return initScales.at(id);
-	}
+	static std::mutex scalesMutex; // Define a mutex for protecting initScales
+
+    InitialScales& GetActorInitialScales(Actor* actor) {
+        if (!actor) {
+            log::info("GetActorInitialScales: Actor Doesn't Exist");
+            throw std::exception("Actor must exist for GetInitialScale");
+        }
+
+        try {
+            auto& initScales = GetInitialScales(); // Get reference to your map
+            auto id = actor->formID;
+            {
+                // Lock the mutex before accessing the map
+                std::lock_guard<std::mutex> lock(scalesMutex);
+
+                // Ensure the actor's scale data exists in the map
+                initScales.try_emplace(id, actor);
+            }
+
+            return initScales.at(id);
+        }
+        catch (const std::exception& e) {
+            log::error("GetActorInitialScales Failed {}", e.what());
+
+            // Return a static default InitialScales
+            static InitialScales fallbackScales {
+                 1.0f,
+                 1.0f
+            };
+
+            return fallbackScales;
+        }
+    }
 
 	void UpdateInitScale(Actor* actor) {
 		try {

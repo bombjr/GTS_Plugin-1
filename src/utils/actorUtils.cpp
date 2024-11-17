@@ -931,8 +931,8 @@ namespace Gts {
 		// If any of these is true = we disallow animation
 
 		bool Teammate = IsTeammate(tiny);
-		bool essential = IsEssential(giant, tiny); // Teammate check is done here
 		bool hostile = IsHostile(giant, tiny);
+		bool essential = IsEssential_WithIcons(giant, tiny); // Teammate check is also done here, spawns icons
 		bool no_protection = Persistent::GetSingleton().FollowerInteractions;
 		bool Ignore_Protection = (HugCheck && giant->formID == 0x14 && Runtime::HasPerk(giant, "HugCrush_LovingEmbrace"));
 		bool allow_teammate = (giant->formID != 0x14 && no_protection && IsTeammate(tiny) && IsTeammate(giant));
@@ -2106,7 +2106,7 @@ namespace Gts {
 			float& stamin = Persistent->stolen_stamin;
 
 			if (Storage > 0.0f) {
-				int Boost = RandomInt(0, 3);
+				int Boost = RandomInt(0, 2);
 				if (Boost == 0) {
 					health += (value * 4);
 					if (health >= limit) {
@@ -2532,7 +2532,7 @@ namespace Gts {
 	}
 
 	void ShrinkOutburst_Shrink(Actor* giant, Actor* tiny, float shrink, float gigantism) {
-		if (IsEssential(giant, tiny)) { // Protect followers/essentials
+		if (IsEssential_WithIcons(giant, tiny)) { // Protect followers/essentials
 			return;
 		}
 		bool DarkArts1 = Runtime::HasPerk(giant, "DarkArts_Aug");
@@ -2834,11 +2834,11 @@ namespace Gts {
 		}
 		float sizedifference = GetSizeDifference(giant, tiny, SizeType::VisualScale, true, true);
 		if (sizedifference > 1.15f && !tiny->IsDead()) {
-			int rng = RandomInt(0, random);
+			int rng = RandomInt(1, random);
 			if (apply_sd) {
 				rng = static_cast<int>(static_cast<float>(rng) / sizedifference);
 			}
-			if (rng <= 1.0f * sizedifference) {
+			if (rng <= 2.0f * sizedifference) {
 				bool IsScared = IsActionOnCooldown(tiny, CooldownSource::Action_ScareOther);
 				if (!IsScared && GetAV(tiny, ActorValue::kConfidence) > 0) {
 					ApplyActionCooldown(tiny, CooldownSource::Action_ScareOther);

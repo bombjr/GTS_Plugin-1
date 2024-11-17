@@ -149,7 +149,9 @@ namespace {
 
     void PrintBreastAbsorbed(Actor* giant, Actor* tiny) {
         int random = RandomInt(0, 4);
-        if (random <= 1) {
+        if (random == 0) {
+            Cprint("Breasts of {} lovingly ate {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
+        } else if (random == 1) {
             Cprint("{} suddenly disappeared between the breasts of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
         } else if (random == 2) {
             Cprint("Mountains of {} greedily absorbed {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
@@ -341,7 +343,7 @@ namespace {
         auto giant = &data.giant;
 		auto tiny = Grab::GetHeldActor(&data.giant);
 
-        float growth = 0.0625f;
+        float growth = 0.0650f;
 
 		if (tiny) {
             Rumbling::Once("AbsorbPulse_R", giant, 0.45f, 0.0f, "L Breast02", 0.0f);
@@ -368,7 +370,7 @@ namespace {
         Actor* giant = &data.giant;
         Task_FacialEmotionTask_Moan(giant, 1.1f / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
         auto tiny = Grab::GetHeldActor(giant);
-        float growth = 0.95f;
+        float growth = 1.05f;
 
 		if (tiny) {
             SpawnHearts(giant, tiny, 35, 0.75f, false);
@@ -384,9 +386,11 @@ namespace {
             Absorb_GrowInSize(giant, tiny, growth);
             PrintBreastAbsorbed(giant, tiny);
 
-            AdjustSizeReserve(giant, 0.00425f);
+            AdjustSizeReserve(giant, 0.0285f);
 			AdjustSizeLimit(0.0095f, giant);
 			AdjustMassLimit(0.0095f, giant);
+
+            KillActor(giant, tiny, true);
 
             if (tiny->formID != 0x14) {
                 Disintegrate(tiny);
@@ -410,7 +414,6 @@ namespace {
                 auto giantref = giantHandle.get().get();
                 auto tinyref = tinyHandle.get().get();
 
-                KillActor(giantref, tinyref);
                 PerkHandler::UpdatePerkValues(giantref, PerkUpdate::Perk_LifeForceAbsorption);
 
                 TransferInventory(tinyref, giantref, get_visual_scale(tinyref) * GetSizeFromBoundingBox(tinyref), false, true, DamageSource::Vored, true);

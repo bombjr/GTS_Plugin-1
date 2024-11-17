@@ -333,7 +333,6 @@ namespace Gts {
 		if (actor) {
 			auto& attributes = AttributeManager::GetSingleton();
 			bonus = attributes.GetAttributeBonus(actor, ActorValue::kSpeedMult);
-			float volume = 0.0f;
 		}
 		return bonus;
 	}

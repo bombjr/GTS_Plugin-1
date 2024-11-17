@@ -20,6 +20,50 @@
 using namespace RE;
 using namespace Gts;
 
+namespace {
+	void DisableEssentialFlag(Actor* actor) {
+		if (actor->IsEssential()) {
+			actor->GetActorRuntimeData().boolFlags.reset(RE::Actor::BOOL_FLAGS::kEssential); // Else they respawn.
+			actor->AsActorState()->actorState1.lifeState = ACTOR_LIFE_STATE::kDead;
+			auto data = actor->GetActorBase()->As<TESActorBaseData>();
+			if (data) {
+				log::info("ActorData exists");
+				data->actorData.actorBaseFlags.reset(ACTOR_BASE_DATA::Flag::kEssential);
+				data->actorData.actorBaseFlags.reset(ACTOR_BASE_DATA::Flag::kProtected);
+			}
+		}
+	}
+
+	void DisableDeathDialogueTask(Actor* tiny) {
+		std::string name = std::format("MuteDeath_{}", tiny->formID);
+		ActorHandle tinyRef = tiny->CreateRefHandle();
+
+		TaskManager::RunFor(name, 0.25f, [=](auto& progressData) {
+			if (!tinyRef) {
+				return false;
+			}
+			auto actor = tinyRef.get().get();
+
+			if (actor && actor->formID != 0x14) {
+				auto process = actor->GetActorRuntimeData().currentProcess;
+				if (process) {
+					auto high = process->high;
+					if (high) {
+						high->deathDialogue = false;
+						for (auto handles: {0, 1, 2}) {
+							auto handle = high->soundHandles[handles];
+							if (handle.soundID != BSSoundHandle::kInvalidID) {
+								handle.SetVolume(0.0f);
+							}
+						}
+					}
+				}
+			}
+			return true;
+		});
+	}
+}
+
 namespace Gts {
 
 	float GetScareThreshold(Actor* giant) {
@@ -97,19 +141,24 @@ namespace Gts {
 		}
 	}
 
-	void KillActor(Actor* giant, Actor* tiny) {
+	void KillActor(Actor* giant, Actor* tiny, bool silent) {
+		DisableEssentialFlag(tiny); // Prevent Essentials from reappearing
+		if (silent) {
+			DisableDeathDialogueTask(tiny);
+		}
+
 		if (tiny && tiny->Is3DLoaded() && !tiny->IsDead()) {
 			StartCombat(tiny, giant);
 		}
+
 		float hp = GetMaxAV(tiny, ActorValue::kHealth) * 9.0f;	
 
 		InflictSizeDamage(giant, tiny, hp); // just to make sure
-		
+
 		if (tiny->formID == 0x14) {
 			tiny->KillImpl(giant, 1, true, true);
 			tiny->SetAlpha(0.0f);
-		}
-
+		} 
 		SendDeathEvent(giant, tiny);
 		Task_InitHavokTask(tiny);
 	}

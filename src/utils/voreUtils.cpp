@@ -31,7 +31,7 @@ namespace {
 		if (giant) {
 			if (Runtime::HasPerk(giant, "SoulVorePerk")) { // Permamently increases random AV after eating someone
 				float TotalMod = 0.33f;
-				int Boost = RandomInt(0, 3);
+				int Boost = RandomInt(0, 2);
 				if (Boost == 0) {
 					AddStolenAttributesTowards(giant, ActorValue::kHealth, TotalMod);
 				} else if (Boost == 1) {

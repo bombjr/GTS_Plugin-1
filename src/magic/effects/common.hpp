@@ -20,6 +20,14 @@
 
 namespace {
 	const float MASTER_POWER = 2.0f;
+
+	std::string GetAllyEssentialText(bool Teammate) {
+		return Teammate ? "teammate" : "essential";
+	}
+
+	const char* GetIconPath(bool Teammate) {
+		return Teammate ? "GTS/UI/Icon_Teammate.nif" : "GTS/UI/Icon_Essential.nif";
+	}
 }
 
 namespace Gts {
@@ -32,6 +40,41 @@ namespace Gts {
 		bool allow = Runtime::HasPerkTeam(giant, "BendLifeless");
 		return allow;
 	}
+
+	inline bool IsEssential_WithIcons(Actor* giant, Actor* tiny) { // Pretty much the same Essential check but with visualization in terms of icons/messages
+		if (tiny->formID == 0x14) { // always allow with player
+			return false;
+		}
+		bool essential = IsEssential(giant, tiny);
+		if (essential) {
+			bool teammate = !IsHostile(giant, tiny) && IsTeammate(tiny) && Persistent::GetSingleton().FollowerProtection;
+			bool OnCooldown = IsActionOnCooldown(tiny, CooldownSource::Misc_ShrinkParticle_Animation);
+			bool icons_enabled = Persistent::GetSingleton().EnableIcons;
+			if (giant->formID == 0x14 && !OnCooldown) { // player exclusive
+				if (icons_enabled) { 
+					auto node = find_node(tiny, "NPC Root [Root]");
+					if (node) {
+						float size = get_visual_scale(tiny);
+						NiPoint3 pos = node->world.translate;
+						float bounding_z = get_bounding_box_z(tiny);
+
+						pos.z += (bounding_z * size * 2.35f); // 2.35 to be slightly above the head
+						float iconScale = std::clamp(size, 1.0f, 9999.0f) * 2.4f;
+
+						SpawnParticle(tiny, 3.00f, GetIconPath(teammate), NiMatrix3(), pos, iconScale, 7, node);
+					}
+				} else {
+					std::string message_1 = std::format("{} is {}", tiny->GetDisplayFullName(), GetAllyEssentialText(teammate));
+					std::string message_2 = "Immune to size magic and effects";
+					Notify(message_1);
+					Notify(message_2);
+				}
+				ApplyActionCooldown(tiny, CooldownSource::Misc_ShrinkParticle_Animation);
+			}
+			return true;
+		}
+		return false;
+	} 
 
 	inline void AdvanceSkill(Actor* giant, ActorValue Attribute, float points, float multiplier) {
 		// DLL Equivalent of AdvanceSkill from Papyrus, does the same thing

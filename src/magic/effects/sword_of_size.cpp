@@ -40,6 +40,12 @@ namespace Gts {
 		if (caster) {
 			this->power = GetActiveEffect()->magnitude * 0.20f;
 		}
+		auto target = GetTarget();
+		if (caster && target) {
+			if (!IsEssential_WithIcons(caster, target)) {
+				// Just spawn icon
+			}
+		}
 	}
 
 	void SwordOfSize::OnUpdate() {
@@ -51,33 +57,38 @@ namespace Gts {
 		if (!target) {
 			return;
 		}
-		float gain_value = 0.02f;
-		float ench_power = this->power;
+		if (!IsEssential(caster, target)) {
 
-		float calc_power = ench_power * Ench_AbsorbSize_GetPower(ench_power);
-		float base_shrink = std::clamp(calc_power, 1.0f, 10.0f);
-		float shrink_value = base_shrink * 3;
+			float gain_value = 0.02f;
+			float ench_power = this->power;
 
-		// balanced around default value of 3.0f 
+			float calc_power = ench_power * Ench_AbsorbSize_GetPower(ench_power);
+			float base_shrink = std::clamp(calc_power, 1.0f, 10.0f);
+			float shrink_value = base_shrink * 3;
 
-		if (target->IsDead()) {
-			shrink_value *= 3.0f;
-			gain_value *= 0.20f;
+			// balanced around default value of 3.0f 
+
+			if (target->IsDead()) {
+				shrink_value *= 3.0f;
+				gain_value *= 0.20f;
+			}
+
+			TransferSize(caster, target, false, shrink_value, gain_value, false, ShrinkSource::Enchantment);\
 		}
-
-		TransferSize(caster, target, false, shrink_value, gain_value, false, ShrinkSource::Enchantment);
 	}
 
 	void SwordOfSize::OnFinish() {
-		auto Caster = GetCaster();
-		auto Target = GetTarget();
-		if (!Caster) {
+		auto caster = GetCaster();
+		auto target = GetTarget();
+		if (!caster) {
 			return;
 		}
-		if (!Target) {
+		if (!target) {
 			return;
 		}
-		Task_TrackSizeTask(Caster, Target, "Sword", false, 1.0f);
+		if (!IsEssential(caster, target)) {
+			Task_TrackSizeTask(caster, target, "Sword", false, 1.0f);
+		}
 	}
 }
 

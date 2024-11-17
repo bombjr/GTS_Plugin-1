@@ -84,11 +84,14 @@ namespace Gts {
 		if (!target) {
 			return;
 		}
-		float sizediff = GetSizeDifference(caster, target, SizeType::VisualScale, true, false);
-		if (this->power >= 18.00f && sizediff > 4.0f) {
-			StaggerActor(caster, target, 100.0f);
+
+		if (!IsEssential_WithIcons(caster, target)) {
+			float sizediff = GetSizeDifference(caster, target, SizeType::VisualScale, true, false);
+			if (this->power >= 18.00f && sizediff > 4.0f) {
+				StaggerActor(caster, target, 100.0f);
+			}
+			SetMovementSlowdown(caster, target);
 		}
-		SetMovementSlowdown(caster, target);
 	}
 
 	void ShrinkFoe::OnUpdate() {
@@ -160,17 +163,18 @@ namespace Gts {
 	}
 
 	void ShrinkFoe::OnFinish() {
-		auto Caster = GetCaster();
-		auto Target = GetTarget();
+		auto caster = GetCaster();
+		auto target = GetTarget();
 
-		if (!Caster) {
+		if (!caster) {
 			return;
 		}
-		if (!Target) {
+		if (!target) {
 			return;
 		}
-
-		Task_TrackSizeTask(Caster, Target, "Spell", true, this->time_mult);
-		ResetMovementSlowdown(Target);
+		if (!IsEssential(caster, target)) {
+			Task_TrackSizeTask(caster, target, "Spell", true, this->time_mult);
+			ResetMovementSlowdown(target);
+		}
 	}
 }

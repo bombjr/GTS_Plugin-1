@@ -87,15 +87,15 @@ namespace {
     
 
     void AI_Heavy_Kicks(Actor* pred) {
-        int rng = RandomInt(0, 4);
+        int rng = RandomInt(0, 3);
         if (IsCrawling(pred)) {
-            rng = RandomInt(0, 2);
+            rng = RandomInt(0, 1); // Always swipe
         }  
         log::info("Heavy Kicks rng for {} is {}", pred->GetDisplayFullName(), rng);
         AnimationManager::StartAnim(heavy_kicks[rng], pred);
     }
     void AI_Light_Kicks(Actor* pred) {
-        int rng = RandomInt(0, 4);
+        int rng = RandomInt(0, 1);
         int limit = 1;
         //log::info("Light Kicks rng for {} is {}", pred->GetDisplayFullName(), rng);
         AnimationManager::StartAnim(light_kicks[rng], pred);

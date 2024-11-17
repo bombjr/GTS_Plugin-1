@@ -191,6 +191,9 @@ namespace {
 		if (!actor) {
 			return;
 		}
+		if (!actor->Get3D1(false)) {
+			return;
+		}
 		if (!actor->Is3DLoaded()) {
 			return;
 		}

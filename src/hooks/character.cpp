@@ -144,16 +144,18 @@ namespace Hooks
 	}
 
 	void Hook_Character::Move(Character* a_this, float a_arg2, const NiPoint3& a_position) { // Override Movement Speed
-		if (a_this->IsInKillMove()) {
-			return _Move(a_this, a_arg2, a_position); // Do nothing in Kill moves
-		}
-		float bonus = 1.0f;
-		if (a_this->Get3D1(false)) {
-			if (a_this->Is3DLoaded()) {
-				bonus = AttributeManager::AlterMovementSpeed(a_this, a_position);
+		float alter = 1.0f;
+		if (Plugin::InGame()) {
+			if (a_this->IsInKillMove()) {
+				return _Move(a_this, a_arg2, a_position); // Do nothing in Kill moves
+			}
+			if (a_this && a_this->Get3D1(false)) {
+				if (a_this->Is3DLoaded()) {
+					alter = AttributeManager::AlterMovementSpeed(a_this, a_position);
+				}
 			}
 		}
-		return _Move(a_this, a_arg2, a_position * bonus);
+		return _Move(a_this, a_arg2, a_position * alter);
 	}
 
 	void Hook_Character::NPCAnimEvents(BSTEventSink<BSAnimationGraphEvent>* a_this, BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_src) {

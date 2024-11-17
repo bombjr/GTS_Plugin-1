@@ -100,7 +100,7 @@ namespace {
 				if (NodePosition.Length() > 0) {
 					NiPoint3 giantLocation = giant->GetPosition();
 					for (auto otherActor: find_actors()) {
-						if (otherActor != giant && IsHostile(giant, otherActor)) {
+						if (otherActor != giant && IsHostile(giant, otherActor) && !IsEssential(giant, otherActor)) {
 							auto data = Transient::GetSingleton().GetActorData(otherActor);
 							if (data) {
 								NiPoint3 actorLocation = otherActor->GetPosition();

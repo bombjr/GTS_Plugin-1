@@ -153,11 +153,13 @@ namespace {
     void CleavageEnterEvent(const InputEventData& data) {
         Actor* giant = GetPlayerOrControlled();
         if (giant) {
-            Actor* tiny = Grab::GetHeldActor(giant);
-            if (tiny && IsBetweenBreasts(tiny)) {
-                Utils_UpdateHighHeelBlend(giant, false);
-                PassAnimation("Cleavage_EnterState", false);
-                AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
+            if (Runtime::HasPerkTeam(giant, "Breasts_Intro")) {
+                Actor* tiny = Grab::GetHeldActor(giant);
+                if (tiny && IsBetweenBreasts(tiny)) {
+                    Utils_UpdateHighHeelBlend(giant, false);
+                    PassAnimation("Cleavage_EnterState", false);
+                    AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
+                }
             }
         }
     }
