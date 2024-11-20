@@ -287,7 +287,7 @@ namespace Gts {
 	void ResetGrab(Actor* giant);
 	void FixAnimationsAndCamera();
 
-	bool CanPerformAnimation(Actor* giant, float type);
+	bool CanPerformAnimation(Actor* giant, int type);
 	void AdvanceQuestProgression(Actor* giant, Actor* tiny, QuestStage stage, float value, bool vore);
 	float GetQuestProgression(int stage);
 	void ResetQuest();

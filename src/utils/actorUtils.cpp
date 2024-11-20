@@ -3206,7 +3206,7 @@ namespace Gts {
 	}
 
 
-	bool CanPerformAnimation(Actor* giant, float type) { // Needed for smooth animation unlocks during quest progression
+	bool CanPerformAnimation(Actor* giant, int type) { // Needed for smooth animation unlocks during quest progression
 		// 0 = Hugs
 		// 1 = stomps and kicks
 		// 2 = Grab and Sandwich

@@ -8,6 +8,7 @@
 
 #include "events.hpp"
 #include "managers/register.hpp"
+#include "managers/InputManager.hpp"
 #include "UI/DebugAPI.hpp"
 #include "data/runtime.hpp"
 #include "data/persistent.hpp"
@@ -117,6 +118,7 @@ namespace {
 					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Build({}) Git({}) Beta was succesfully initialized. Waiting for New Game/Save Load. ]", buildDate, gitData);
 					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
+					InputManager::GetSingleton().DataReady();
 					break;
 				// Skyrim game events.
 				case MessagingInterface::kPostLoadGame: // Player's selected save game has finished loading.
