@@ -13,6 +13,7 @@ namespace Gts {
 			static bool InGame();
 			static bool Ready();
 			static bool Live();
+			static bool AnyMenuOpen();
 			static void SetInGame(bool value);
 			static bool OnMainThread();
 			static void SetOnMainThread(bool value);

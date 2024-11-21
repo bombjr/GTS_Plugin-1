@@ -20,6 +20,12 @@ namespace Gts
 		Continuous,
 	};
 
+	enum class BlockCondition {
+		Never,
+		Default,
+		Force,
+	};
+
 	class InputEventData {
 		public:
 			// Construct from toml::table (toml11)
@@ -59,6 +65,8 @@ namespace Gts
 			bool SameGroup(const InputEventData& other) const;
 
 			unordered_set<std::uint32_t> GetKeys();
+
+			BlockCondition ShouldBlock();
 		private:
 			std::string name = "";
 			unordered_set<std::uint32_t> keys = {};
@@ -69,6 +77,7 @@ namespace Gts
 			TriggerMode trigger = TriggerMode::Once;
 			InputEventState state = InputEventState::Idle;
 			bool primed = false; // Used for release events. Once primed, when keys are not pressed we fire
+			BlockCondition blockinput = BlockCondition::Default;
 	};
 
 	//enum InputEventConditions {
