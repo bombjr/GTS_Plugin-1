@@ -374,7 +374,7 @@ namespace Gts {
 			//Are all keys pressed for this trigger and are we allowed to selectively block?
 			//if never: behavior defaults to old implementation
 			if (trigger.AllKeysPressed(gameInputKeys) && blockInput != BlockCondition::Never){
-
+				//log::debug("AllkeysPressed for trigger {}", trigger.GetName());
 				//Get the coresponding event data
 				auto& eventData = this->registedInputEvents.at(trigger.GetName());
 

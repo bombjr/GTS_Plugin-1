@@ -54,6 +54,7 @@ namespace Gts {
 		//There's no better way to do this :(
 		//Static const means the list doesnt get recreated Each call. So no perf impact here.
 		static const std::vector<std::string_view> Menus = {
+			RE::CraftingMenu::MENU_NAME,
 			RE::BarterMenu::MENU_NAME,
 			RE::BookMenu::MENU_NAME,
 			RE::Console::MENU_NAME,
