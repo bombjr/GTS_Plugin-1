@@ -339,7 +339,7 @@ namespace {
 		if (grabbedActor) { //If we have actor, don't pick anyone up.
 			return;
 		}
-		if (!CanPerformAnimation(player, 2)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks)) {
 			return;
 		}
 		if (IsGtsBusy(player) || IsEquipBusy(player) || IsTransitioning(player)) {
@@ -384,7 +384,7 @@ namespace {
 	void GrabVoreEvent(const InputEventData& data) { // Eat everyone in hand
 		Actor* player = GetPlayerOrControlled();
 
-		if (!CanPerformAnimation(player, 3)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kVore)) {
 			return;
 		}
 		if (IsGtsBusy(player) && !IsUsingThighAnimations(player)) {

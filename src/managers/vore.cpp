@@ -272,7 +272,7 @@ namespace Gts {
 		if (pred == prey) {
 			return false;
 		}
-		if (!CanPerformAnimation(pred, 3)) {
+		if (!CanPerformAnimation(pred, AnimationCondition::kVore)) {
 			return false;
 		}
 

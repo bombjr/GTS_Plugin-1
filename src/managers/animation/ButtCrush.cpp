@@ -306,7 +306,7 @@ namespace {
 		if (player->formID == 0x14 && IsFirstPerson()) {
 			return;
 		}
-		if (IsGtsBusy(player) || IsChangingSize(player) || !CanPerformAnimation(player, 2)) {
+		if (IsGtsBusy(player) || IsChangingSize(player) || !CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
 			return;
 		}
 
@@ -347,7 +347,7 @@ namespace {
 				return;
 			}
 		}
-		if (!CanPerformAnimation(player, 2) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich) || IsGtsBusy(player)) {
 			return;
 		}
 		auto grabbedActor = Grab::GetHeldActor(player);

@@ -271,7 +271,7 @@ namespace {
 
 	void LightSwipeLeftEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
 			return;
 		}
 		if (player->IsSneaking()) {
@@ -286,7 +286,7 @@ namespace {
 	}
 	void LightSwipeRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
 			return;
 		}
 		if (player->IsSneaking()) {
@@ -302,7 +302,7 @@ namespace {
 
 	void HeavySwipeLeftEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
 			return;
 		}
 		if (player->IsSneaking()) {
@@ -317,7 +317,7 @@ namespace {
 	}
 	void HeavySwipeRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
 			return;
 		}
 		if (player->IsSneaking()) {

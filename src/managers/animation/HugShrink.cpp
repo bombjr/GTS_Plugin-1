@@ -335,7 +335,7 @@ namespace {
 
 	void HugAttemptEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 0)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kHugs)) {
 			return;
 		}
 		if (IsGtsBusy(player)) {

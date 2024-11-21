@@ -351,7 +351,7 @@ namespace {
 
 	void ThighCrushEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 2)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
 			return;
 		}
 		AnimationManager::StartAnim("ThighLoopEnter", player);

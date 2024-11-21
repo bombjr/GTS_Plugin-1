@@ -33,7 +33,7 @@ namespace {
 
 	void PerformKick(std::string_view kick_type, float stamina_drain) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
+		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
 			return;
 		}
 		if (!player->IsSneaking() && !player->AsActorState()->IsSprinting()) {
