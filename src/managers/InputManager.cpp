@@ -373,7 +373,7 @@ namespace Gts {
 
 			//Are all keys pressed for this trigger and are we allowed to selectively block?
 			//if never: behavior defaults to old implementation
-			if (trigger.AllKeysPressed(gameInputKeys) && blockInput != BlockCondition::Never){
+			if (trigger.AllKeysPressed(gameInputKeys)){
 				//log::debug("AllkeysPressed for trigger {}", trigger.GetName());
 				//Get the coresponding event data
 				auto& eventData = this->registedInputEvents.at(trigger.GetName());
@@ -382,6 +382,13 @@ namespace Gts {
 					//If force blocking is set block game input regardless of conditions
 					std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
 					KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
+
+					if (eventData.condition != nullptr) {
+						if (!eventData.condition()) {
+							continue;
+						}
+					}
+
 				}
 				//The condition callback can be null, check before calling it.
 				//In the case it's null input blocking or early continuing won't be done and the system will behave like previously unless its forced.
@@ -391,9 +398,12 @@ namespace Gts {
 					if (eventData.condition()) {
 						//log::debug("condition is true for {}", trigger.GetName());
 						//Need to make a copy here otherwise insert throws an assertion
-						std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
-						//log::debug("ShouldBlock is true for {}", trigger.GetName());
-						KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
+
+						if (blockInput != BlockCondition::Never) {
+							std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
+							//log::debug("ShouldBlock is true for {}", trigger.GetName());
+							KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
+						}
 					}
 					else {
 						//log::debug("Condition Was False For Event: {}", trigger.GetName());
