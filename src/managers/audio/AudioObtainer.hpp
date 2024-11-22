@@ -31,9 +31,9 @@ namespace Gts {
     BSISoundDescriptor* GetNormalSound(float scale);
     BSISoundDescriptor* GetNormalSound_Jump(float scale);
 
-    BSISoundDescriptor* GetHHSound_Normal(float scale);
-    BSISoundDescriptor* GetHHSound_Jump(float scale);
+    BSISoundDescriptor* GetHHSound_Normal(const int scale);
+    BSISoundDescriptor* GetHHSound_Jump(const int scale);
 
-    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, float scale);
+    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale);
     BSISoundDescriptor* get_footstep_normal(const FootEvent& foot_kind, float scale);
 }

@@ -159,59 +159,61 @@ namespace Gts {
         return nullptr;
     }
 
-    BSISoundDescriptor* GetHHSound_Normal(float scale) {
-        if (scale == 2.0f) {
-            return Runtime::GetSound("HighHeel_x2");
-        } else if (scale == 4.0f) {
-            return Runtime::GetSound("HighHeel_x4");
-        } else if (scale == 8.0f) {
-            return Runtime::GetSound("HighHeel_x8");
-        } else if (scale == 12.0f) {
-            return Runtime::GetSound("HighHeel_x12");
-        } else if (scale == 24.0f) {
-            return Runtime::GetSound("HighHeel_x24");
-        } else if (scale == 48.0f) {
-            return Runtime::GetSound("HighHeel_x48");
-        } else if (scale == 96.0f) {
-            return Runtime::GetSound("HighHeel_x96");
-        } else if (scale > 96.0f) {
-            return Runtime::GetSound("HighHeel_Mega");
+    BSISoundDescriptor* GetHHSound_Normal(const int scale) {
+        switch (scale) {
+            case 2: 
+                return Runtime::GetSound("HighHeel_x2");
+            case 4:
+                return Runtime::GetSound("HighHeel_x4");
+            case 8:
+                return Runtime::GetSound("HighHeel_x8");
+            case 12:
+                return Runtime::GetSound("HighHeel_x12");
+            case 24:
+                return Runtime::GetSound("HighHeel_x24");
+            case 48:
+                return Runtime::GetSound("HighHeel_x48");
+            case 96:
+                return Runtime::GetSound("HighHeel_x96");
+            case 128:
+                return Runtime::GetSound("HighHeel_Mega");
+            break;
         }
         return nullptr;
     }
-    BSISoundDescriptor* GetHHSound_Jump(float scale) {
-        if (scale == 2.0f) {
-            return Runtime::GetSound("HighHeelLand_x2");
-        } else if (scale == 4.0f) {
-            return Runtime::GetSound("HighHeelLand_x4");
-        } else if (scale == 8.0f) {
-            return Runtime::GetSound("HighHeelLand_x8");
-        } else if (scale == 12.0f) {
-            return Runtime::GetSound("HighHeelLand_x12");
-        } else if (scale == 24.0f) {
-            return Runtime::GetSound("HighHeelLand_x24");
-        } else if (scale == 48.0f) {
-            return Runtime::GetSound("HighHeelLand_x48");
-        } else if (scale == 96.0f) {
-            return Runtime::GetSound("HighHeelLand_x96");
-        } else if (scale > 96.0f) {
-            return Runtime::GetSound("HighHeelLand_Mega");
+    BSISoundDescriptor* GetHHSound_Jump(const int scale) {
+        switch (scale) {
+            case 2: 
+                return Runtime::GetSound("HighHeelLand_x2");
+            case 4:
+                return Runtime::GetSound("HighHeelLand_x4");
+            case 8:
+                return Runtime::GetSound("HighHeelLand_x8");
+            case 12:
+                return Runtime::GetSound("HighHeelLand_x12");
+            case 24:
+                return Runtime::GetSound("HighHeelLand_x24");
+            case 48:
+                return Runtime::GetSound("HighHeelLand_x48");
+            case 96:
+                return Runtime::GetSound("HighHeelLand_x96");
+            case 128:
+                return Runtime::GetSound("HighHeelLand_Mega");
+            break;
         }
         return nullptr;
     }
-    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, float scale) {
+    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale) {
         switch (foot_kind) {
             case FootEvent::Left:
             case FootEvent::Front:
                 return GetHHSound_Normal(scale);
-                break;
             case FootEvent::Right:
             case FootEvent::Back:
                 return GetHHSound_Normal(scale);
-                break;
             case FootEvent::JumpLand:
                 return GetHHSound_Jump(scale);
-                break;
+            break;
         }
         return nullptr;
     }

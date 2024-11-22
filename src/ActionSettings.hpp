@@ -38,6 +38,9 @@ namespace Gts {
 	const float Damage_Stomp = 11.0f;
 	const float Damage_Stomp_Strong = 22.0f;
 
+    const float Damage_Stomp_Under_Light = 13.2f; // Slightly more powerful damage
+    const float Damage_Stomp_Under_Strong = 20.0f; // Slightly weaker than normal strong stomp
+
     /////////////////Foot Grind
 
     const float Damage_Foot_Grind_Impact = 6.8f;
@@ -148,8 +151,6 @@ namespace Gts {
     const float Push_Object_Forward = 0.0086f;          // Used for objects only
     const float Push_Actor_Upwards = 14.0f;             // Used for Actors only
 
-    
-
 //-----------------------------------------Default effect radius variables
 
     const float Radius_Default_Idle = 6.6f;
@@ -244,9 +245,11 @@ namespace Gts {
 
     ////////////////////////////////////////////////////
 
-    const float Rumble_Stomp_Normal = 2.4f * 1.0f;
+    const float Rumble_Stomp_Normal = 2.25f * 1.0f;
     const float Rumble_Stomp_Strong = 4.0f * 1.0f;
     const float Rumble_Stomp_Land_Normal = 2.75f * 1.0f;
+
+    const float Rumble_Stomp_Under_Light = 2.35f * 1.0f;
 
 
     // Tramples

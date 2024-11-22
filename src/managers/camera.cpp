@@ -214,7 +214,7 @@ namespace Gts {
 
 	// Decide which camera state to use
 	CameraState* CameraManager::GetCameraState() {
-		if (!Runtime::GetBool("EnableCamera") || IsFreeCamera()) {
+		if (!Runtime::GetBool("EnableCamera") || IsFreeCameraEnabled()) {
 			return nullptr;
 		}
 

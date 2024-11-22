@@ -1,26 +1,14 @@
-// Animation: Stomp
-//  - Stages
-//    - "GTSstompimpactR",          // [0] stomp impacts, strongest effect
-//    - "GTSstompimpactL",          // [1]
-//    - "GTSstomplandR",            // [2] when landing after stomping, decreased power
-//    - "GTSstomplandL",            // [3]
-//    - "GTSstompstartR",           // [4] For starting loop of camera shake and air rumble sounds
-//    - "GTSstompstartL",           // [5]
-//    - "GTSStompendR",             // [6] disable loop of camera shake and air rumble sounds
-//    - "GTSStompendL",             // [7]
-//    - "GTS_Next",                 // [8]
-//    - "GTSBEH_Exit",              // [9] Another disable
-
 #include "managers/animation/Utils/AnimationUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
+#include "managers/animation/Stomp_Normal.hpp"
+#include "managers/animation/Stomp_Under.hpp"
 #include "managers/damage/LaunchActor.hpp"
-#include "managers/animation/Stomp.hpp"
+#include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
-#include "managers/audio/footstep.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "managers/tremor.hpp"
@@ -42,7 +30,17 @@ namespace {
 	std::random_device rd;
 	std::mt19937 e2(rd());
 
-	
+	void DoStompOrUnderStomp(Actor* giant, const std::string_view name) {
+		float WasteStamina = 25.0f;
+		if (Runtime::HasPerk(giant, "DestructionBasics")) {
+			WasteStamina *= 0.65f;
+		}
+		if (GetAV(giant, ActorValue::kStamina) > WasteStamina) {
+			AnimationManager::StartAnim(name, giant);
+		} else {
+			NotifyWithSound(giant, "You're too tired to perform stomp");
+		}
+	}
 
 	std::vector<Actor*> FindSquished(Actor* giant) {
 		/*
@@ -311,33 +309,21 @@ namespace {
 
 	void RightStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
-			return;
-		}
-		float WasteStamina = 25.0f;
-		if (Runtime::HasPerk(player, "DestructionBasics")) {
-			WasteStamina *= 0.65f;
-		}
-		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
-			AnimationManager::StartAnim("StompRight", player);
-		} else {
-			NotifyWithSound(player, "You're too tired to perform stomp");
+		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
+			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+			const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StompRight";
+
+			DoStompOrUnderStomp(player, StompType);
 		}
 	}
 
 	void LeftStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
-			return;
-		}
-		float WasteStamina = 25.0f;
-		if (Runtime::HasPerk(player, "DestructionBasics")) {
-			WasteStamina *= 0.65f;
-		}
-		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
-			AnimationManager::StartAnim("StompLeft", player);
-		} else {
-			NotifyWithSound(player, "You're too tired to perform stomp");
+		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
+			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+			const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StompLeft";
+
+			DoStompOrUnderStomp(player, StompType);
 		}
 	}
 }

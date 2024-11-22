@@ -144,16 +144,4 @@ namespace Gts {
 			}
 		}
 	}
-
-	bool IsFreeCamera() {
-		auto playercamera = PlayerCamera::GetSingleton();
-		if (!playercamera) {
-			return false;
-		}
-		if (playercamera->currentState == playercamera->cameraStates[CameraState::kFree]) {
-			return true;
-		}
-		return false;
-	}
-
 }

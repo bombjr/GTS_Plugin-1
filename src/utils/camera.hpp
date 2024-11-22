@@ -25,7 +25,4 @@ namespace Gts {
 	bool IsFirstPerson();
 
 	void ForceThirdPerson(Actor* giant);
-
-	bool IsFreeCamera();
-
 }

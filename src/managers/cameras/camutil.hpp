@@ -26,6 +26,8 @@ namespace Gts {
 	   ShadowSceneNode* GetShadowMap();
 	 #endif*/
 
+	NiMatrix3 GetCameraRotation();
+
 	void UpdateSceneManager(NiPoint3 camLoc);
 
 	void UpdateRenderManager(NiPoint3 camLoc);

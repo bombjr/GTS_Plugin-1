@@ -163,6 +163,7 @@ namespace Gts {
 		VolumeParams Footstep_12_Params = {.a = 12.0f, .k = 0.50f, .n = 0.78f, .s = 1.0f};
 		VolumeParams Footstep_24_Params = {.a = 20.0f, .k = 0.45f, .n = 0.55f, .s = 1.0f};
 		VolumeParams Footstep_48_Params = {.a = 44.0f, .k = 0.46f, .n = 0.55f, .s = 1.0f};
+		VolumeParams Footstep_96_Params = {.a = 88.0f, .k = 0.46f, .n = 0.55f, .s = 1.0f};
 		// Params end
 
 		BSSoundHandle xlFootstep   = get_sound(modifier, foot, scale, limit_x14, get_xlFootstep_sounddesc(foot_kind), xlFootstep_Params, Params_Empty, "XL: Footstep", 1.0f, false);
@@ -173,17 +174,21 @@ namespace Gts {
 		BSSoundHandle xlRumble     = get_sound(modifier, foot, scale, limitless, get_xlRumble_sounddesc(foot_kind), xlRumble_Params, Params_Empty, "XL Rumble", 1.0f, false);
 		//BSSoundHandle xlSprint     = get_sound(modifier, foot, scale, get_xlSprint_sounddesc(foot_kind),    VolumeParams { .a = start_xl,            .k = 0.50, .n = 0.5, .s = 1.0}, "XL Sprint", 1.0);
         //  ^ Same normal sounds but a tiny bit louder: 319060: Sound\fx\GTS\Effects\Footsteps\Original\Movement
-		BSSoundHandle Footstep_2    = get_sound(modifier, foot, scale, limit_x4, get_footstep_highheel(foot_kind, 2), Footstep_2_Params, Footstep_4_Params, "x2 Footstep", 1.0f, true);
+		BSSoundHandle Footstep_2   = get_sound(modifier, foot, scale, limit_x4, get_footstep_highheel(foot_kind, 2), Footstep_2_Params, Footstep_4_Params, "x2 Footstep", 1.0f, true);
 		// Stops at x4
 		BSSoundHandle Footstep_4  = get_sound(modifier, foot, scale, limit_x8, get_footstep_highheel(foot_kind, 4), Footstep_4_Params, Footstep_8_Params, "x4 Footstep", 1.0f, true);
-		// Stops at x12
+		// ^ Stops at ~x12
 		BSSoundHandle Footstep_8  = get_sound(modifier, foot, scale, limit_x14, get_footstep_highheel(foot_kind, 8), Footstep_8_Params, Footstep_12_Params, "x8 Footstep", 1.33f, true);
-		// Stops at x14
+		// ^ Stops at ~x14
 		BSSoundHandle Footstep_12 = get_sound(modifier, foot, scale, limit_x24, get_footstep_highheel(foot_kind, 12), Footstep_12_Params, Footstep_24_Params, "x12 Footstep", 2.0f, true);
-		// Stops at x24
-		BSSoundHandle Footstep_24 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 24), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, false);
-		// Always plays past x22.0
-		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Params_Empty, "x48 Footstep", 8.0f, false);
+		// ^ Stops at ~x24
+		BSSoundHandle Footstep_24 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 24), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, true);
+		// ^ Stops at ~x44
+		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Footstep_96_Params, "x48 Footstep", 8.0f, true);
+		// ^ Stops at ~x88
+		BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 8.0f, false);
+		// ^ Stops at X118 (when Mega will be added)
+		//BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "x96 Footstep", 8.0f, false);
 
 		if (xlFootstep.soundID != BSSoundHandle::kInvalidID) { 
 			// 271EF4: Sound\fx\GTS\Foot\Effects  (Stone sounds)
@@ -221,6 +226,9 @@ namespace Gts {
 		}
 		if (Footstep_48.soundID != BSSoundHandle::kInvalidID) { // x48 Custom audio
 			Footstep_48.Play();
+		}
+		if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
+			Footstep_96.Play();
 		}
 	}
 

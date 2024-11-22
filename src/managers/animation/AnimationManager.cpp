@@ -10,7 +10,9 @@
 #include "managers/animation/ThighSandwich.hpp"
 #include "managers/animation/Sneak_Swipes.hpp"
 #include "managers/animation/RandomGrowth.hpp"
-#include "managers/animation/StrongStomp.hpp"
+#include "managers/animation/Stomp_Normal.hpp"
+#include "managers/animation/Stomp_Strong.hpp"
+#include "managers/animation/Stomp_Under.hpp"
 #include "managers/animation/FootTrample.hpp"
 #include "managers/animation/Grab_Attack.hpp"
 #include "managers/animation/Grab_Throw.hpp"
@@ -30,7 +32,6 @@
 #include "managers/animation/Growth.hpp"
 #include "managers/animation/Shrink.hpp"
 #include "managers/animation/Kicks.hpp"
-#include "managers/animation/Stomp.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/perks/PerkHandler.hpp"
 #include "utils/InputFunctions.hpp"
@@ -78,6 +79,9 @@ namespace Gts {
 
 		AnimationStrongStomp::RegisterEvents();
 		AnimationStrongStomp::RegisterTriggers();
+
+		AnimationUnderStomp::RegisterEvents();
+		AnimationUnderStomp::RegisterTriggers();
 
 		AnimationThighSandwich::RegisterEvents();
 		AnimationThighSandwich::RegisterTriggers();

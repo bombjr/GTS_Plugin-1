@@ -2561,10 +2561,9 @@ namespace Gts {
 			set_target_scale(tiny, MinScale);
 		}
 		if (!IsBetweenBreasts(tiny)) {
-			if (sizedifference <= 4.0f) { // Stagger or Push
-				StaggerActor(giant, tiny, 0.25f);
-			} else {
-				PushActorAway(giant, tiny, 1.0f/Adjustment * GetLaunchPower(giant, sizedifference));
+			if (sizedifference >= 0.9f) { // Stagger or Push
+				float stagger = std::clamp(sizedifference, 1.0f, 4.0f);
+				StaggerActor(giant, tiny, 0.25f * stagger);
 			}
 		}
 	}
