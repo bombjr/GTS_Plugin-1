@@ -39,6 +39,7 @@
 #include "managers/audio/footstep.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "magic/effects/common.hpp"
 #include "managers/explosion.hpp"
 #include "utils/actorUtils.hpp"
@@ -341,9 +342,6 @@ namespace {
 	void ThighSandwichEnterEvent(const InputEventData& data) {
 		auto& Sandwiching = ThighSandwichController::GetSingleton();
 		auto pred = PlayerCharacter::GetSingleton();
-		if (IsCrawling(pred)) {
-			return;
-		}
 
 		std::vector<Actor*> preys = Sandwiching.GetSandwichTargetsInFront(pred, 1);
 		for (auto prey: preys) {
@@ -410,11 +408,12 @@ namespace {
 namespace Gts
 {
 	void AnimationThighSandwich::RegisterEvents() {
-		InputManager::RegisterInputEvent("ThighSandwichEnter", ThighSandwichEnterEvent);
-		InputManager::RegisterInputEvent("PlayerThighSandwichEnter", ThighSandwichEnterEvent_Follower);
-		InputManager::RegisterInputEvent("ThighSandwichAttack", ThighSandwichAttackEvent);
-		InputManager::RegisterInputEvent("ThighSandwichAttackHeavy", ThighSandwichHeavyAttackEvent);
-		InputManager::RegisterInputEvent("ThighSandwichExit", ThighSandwichExitEvent);
+		InputManager::RegisterInputEvent("ThighSandwichEnter", ThighSandwichEnterEvent, ThighSandwitchCondition_Start);
+		InputManager::RegisterInputEvent("PlayerThighSandwichEnter", ThighSandwichEnterEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("ThighSandwichAttack", ThighSandwichAttackEvent, NeverBlock);
+		InputManager::RegisterInputEvent("ThighSandwichAttackHeavy", ThighSandwichHeavyAttackEvent, NeverBlock);
+		InputManager::RegisterInputEvent("ThighSandwichExit", ThighSandwichExitEvent, NeverBlock);
+
 		AnimationManager::RegisterEvent("GTSSandwich_ThighImpact", "ThighSandwich", GTSSandwich_ThighImpact);
 		AnimationManager::RegisterEvent("GTSSandwich_ThighImpact_H", "ThighSandwich", GTSSandwich_ThighImpact_H);
 		AnimationManager::RegisterEvent("GTSSandwich_DropDown", "ThighSandwich", GTSSandwich_DropDown);

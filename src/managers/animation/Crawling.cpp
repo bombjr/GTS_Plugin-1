@@ -10,6 +10,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/InputManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "ActionSettings.hpp"
@@ -271,10 +272,6 @@ namespace {
 
 	void LightSwipeLeftEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (player->IsSneaking()) {
 			float WasteStamina = 25.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
@@ -282,14 +279,9 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
-		}
 	}
 	void LightSwipeRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (player->IsSneaking()) {
 			float WasteStamina = 25.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
@@ -297,15 +289,10 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
-		}
 	}
 
 	void HeavySwipeLeftEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (player->IsSneaking()) {
 			float WasteStamina = 70.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
@@ -313,14 +300,9 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
-		}
 	}
 	void HeavySwipeRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (player->IsSneaking()) {
 			float WasteStamina = 70.0f * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				Utils_UpdateHighHeelBlend(player, false);
@@ -328,7 +310,6 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired for hand swipe");
 			}
-		}
 	}
 }
 
@@ -336,10 +317,10 @@ namespace Gts
 {
 	void AnimationCrawling::RegisterEvents() {
 
-		InputManager::RegisterInputEvent("LightSwipeLeft", LightSwipeLeftEvent);
-		InputManager::RegisterInputEvent("LightSwipeRight", LightSwipeRightEvent);
-		InputManager::RegisterInputEvent("HeavySwipeLeft", HeavySwipeLeftEvent);
-		InputManager::RegisterInputEvent("HeavySwipeRight", HeavySwipeRightEvent);
+		InputManager::RegisterInputEvent("LightSwipeLeft", LightSwipeLeftEvent, SwipeCondition);
+		InputManager::RegisterInputEvent("LightSwipeRight", LightSwipeRightEvent, SwipeCondition);
+		InputManager::RegisterInputEvent("HeavySwipeLeft", HeavySwipeLeftEvent, SwipeCondition);
+		InputManager::RegisterInputEvent("HeavySwipeRight", HeavySwipeRightEvent, SwipeCondition);
 
 		AnimationManager::RegisterEvent("GTS_Crawl_Knee_Trans_Impact", "Crawl", GTS_Crawl_Knee_Trans_Impact);
 		AnimationManager::RegisterEvent("GTS_Crawl_Hand_Trans_Impact", "Crawl", GTS_Crawl_Hand_Trans_Impact);

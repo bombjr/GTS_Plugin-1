@@ -6,6 +6,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
 #include "managers/audio/footstep.hpp"
 #include "managers/highheel.hpp"
@@ -238,12 +239,6 @@ namespace {
 
 	void TrampleLeftEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (IsCrawling(player) || player->IsSneaking() || IsProning(player)) {
-			return;
-		}
 		float WasteStamina = 35.0f * GetWasteMult(player);
 
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
@@ -255,12 +250,6 @@ namespace {
 
 	void TrampleRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
-		if (IsCrawling(player) || player->IsSneaking() || IsProning(player)) {
-			return;
-		}
 		float WasteStamina = 35.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("TrampleR", player);
@@ -273,8 +262,8 @@ namespace {
 namespace Gts
 {
 	void AnimationFootTrample::RegisterEvents() {
-		InputManager::RegisterInputEvent("TrampleLeft", TrampleLeftEvent);
-		InputManager::RegisterInputEvent("TrampleRight", TrampleRightEvent);
+		InputManager::RegisterInputEvent("TrampleLeft", TrampleLeftEvent, TrampleCondition);
+		InputManager::RegisterInputEvent("TrampleRight", TrampleRightEvent, TrampleCondition);
 
 		AnimationManager::RegisterEvent("GTS_Trample_Leg_Raise_L", "Trample", GTS_Trample_Leg_Raise_L);
 		AnimationManager::RegisterEvent("GTS_Trample_Leg_Raise_R", "Trample", GTS_Trample_Leg_Raise_R);

@@ -3518,6 +3518,11 @@ namespace Gts {
 		return func(giant);
 	}
 
+	bool IsPlayerFirstPerson(Actor* a_actor) {
+		if (!a_actor) return false;
+		return a_actor->formID == 0x14 && IsFirstPerson();
+	}
+
 	//void ForEachReferenceInRange_Custom(RE::TESObjectREFR* origin, float radius, std::function<RE::BSContainer::ForEachResult(RE::TESObjectREFR& ref)> callback) {
 	//	if (REL::Module::IsAE()) { // Since commonlib didn't fix this function crashing on AE, we have to create fixed function ourselves
 	//		if (origin && radius > 0.0f) {

@@ -13,6 +13,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
 #include "managers/highheel.hpp"
 #include "utils/actorUtils.hpp"
@@ -303,17 +304,6 @@ namespace {
 	void ButtCrushStartEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 
-		if (player->formID == 0x14 && IsFirstPerson()) {
-			return;
-		}
-		if (IsGtsBusy(player) || IsChangingSize(player) || !CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
-			return;
-		}
-
-		auto grabbedActor = Grab::GetHeldActor(player);
-		if (grabbedActor && !IsCrawling(player)) { // IF we have someone in hands, allow only when we crawl
-			return;
-		}
 		
 		if (Runtime::HasPerk(player, "ButtCrush_NoEscape")) {
 			auto& ButtCrush = ButtCrushController::GetSingleton();
@@ -339,21 +329,6 @@ namespace {
 
 	void QuickButtCrushStartEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (IsFirstPerson()) {
-			return;
-		}
-		if (GetPlayerOrControlled()->formID != 0x14) {
-			if (IsBeingHeld(GetPlayerOrControlled(), player)) {
-				return;
-			}
-		}
-		if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich) || IsGtsBusy(player)) {
-			return;
-		}
-		auto grabbedActor = Grab::GetHeldActor(player);
-		if (grabbedActor && !IsCrawling(player)) { // IF we have someone in hands, allow only when we crawl
-			return;
-		}
 		if (CanDoButtCrush(player, true)) {
 			AnimationManager::StartAnim("ButtCrush_StartFast", player);
 		} else {
@@ -363,10 +338,6 @@ namespace {
 
 	void ButtCrushGrowEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
-		if (player->formID == 0x14 && IsFirstPerson()) {
-			return;
-		}
-		if (IsButtCrushing(player) && !IsChangingSize(player) && Runtime::HasPerkTeam(player, "ButtCrush_GrowingDisaster")) {
 			float GrowthCount = GetGrowthLimit(player);
 			bool CanGrow = ButtCrush_IsAbleToGrow(player, GrowthCount);
 			if (CanGrow) {
@@ -374,14 +345,11 @@ namespace {
 			} else {
 				NotifyWithSound(player, "Your body can't grow any further");
 			}
-		}
 	}
 
 	void ButtCrushAttackEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
-		if (IsButtCrushing(player)) {
 			AnimationManager::StartAnim("ButtCrush_Attack", player);
-		}
 	}
 }
 
@@ -400,11 +368,11 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTSButtCrush_MoveBody_Start", "ButtCrush", GTSButtCrush_MoveBody_Start);
 		AnimationManager::RegisterEvent("GTSButtCrush_MoveBody_Stop", "ButtCrush", GTSButtCrush_MoveBody_Stop);
 		
-		InputManager::RegisterInputEvent("ButtCrushStart", ButtCrushStartEvent);
-		InputManager::RegisterInputEvent("ButtCrushStart_Player", ButtCrushStartEvent_Follower);
-		InputManager::RegisterInputEvent("QuickButtCrushStart", QuickButtCrushStartEvent);
-		InputManager::RegisterInputEvent("ButtCrushGrow", ButtCrushGrowEvent);
-		InputManager::RegisterInputEvent("ButtCrushAttack", ButtCrushAttackEvent);
+		InputManager::RegisterInputEvent("ButtCrushStart", ButtCrushStartEvent, ButtCrushCondition_Start);
+		InputManager::RegisterInputEvent("ButtCrushStart_Player", ButtCrushStartEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("QuickButtCrushStart", QuickButtCrushStartEvent, ButtCrushCondition_Start);
+		InputManager::RegisterInputEvent("ButtCrushGrow", ButtCrushGrowEvent, ButtCrushCondition_Grow);
+		InputManager::RegisterInputEvent("ButtCrushAttack", ButtCrushAttackEvent, ButtCrushCondition_Attack);
 	}
 
 	void AnimationButtCrush::RegisterTriggers() {

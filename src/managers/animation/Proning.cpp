@@ -6,6 +6,7 @@
 #include "managers/animation/Proning.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/InputManager.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
@@ -203,10 +204,10 @@ namespace {
 namespace Gts
 {
 	void AnimationProning::RegisterEvents() {
-		InputManager::RegisterInputEvent("SBO_ToggleProne", SBOProneOnEvent);
-		InputManager::RegisterInputEvent("SBO_DisableProne", SBOProneOffEvent);
-		InputManager::RegisterInputEvent("SBO_ToggleDive_Standing", SBODiveEvent_Standing);
-		InputManager::RegisterInputEvent("SBO_ToggleDive_Sneak", SBODiveEvent_Sneak);
+		InputManager::RegisterInputEvent("SBO_ToggleProne", SBOProneOnEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("SBO_DisableProne", SBOProneOffEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("SBO_ToggleDive_Standing", SBODiveEvent_Standing, AlwaysBlock);
+		InputManager::RegisterInputEvent("SBO_ToggleDive_Sneak", SBODiveEvent_Sneak, AlwaysBlock);
 
 		AnimationManager::RegisterEvent("GTS_DiveSlide_ON", "Proning", GTS_DiveSlide_ON);
 		AnimationManager::RegisterEvent("GTS_DiveSlide_OFF", "Proning", GTS_DiveSlide_OFF);

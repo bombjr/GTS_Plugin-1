@@ -5,6 +5,7 @@
 #include "managers/damage/LaunchActor.hpp"
 #include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
@@ -227,9 +228,6 @@ namespace {
 
 	void RightStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
 		float WasteStamina = 70.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim("StrongStompRight", player);
@@ -240,9 +238,6 @@ namespace {
 
 	void LeftStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
 		float WasteStamina = 70.0f * GetWasteMult(player);
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			//BlockFirstPerson(player, true);
@@ -273,8 +268,8 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTS_Next", "StrongStomp", GTS_Next);
 		AnimationManager::RegisterEvent("GTSBEH_Exit", "StrongStomp", GTSBEH_Exit);
 
-		InputManager::RegisterInputEvent("RightStomp_Strong", RightStrongStompEvent);
-		InputManager::RegisterInputEvent("LeftStomp_Strong", LeftStrongStompEvent);
+		InputManager::RegisterInputEvent("RightStomp_Strong", RightStrongStompEvent, StompCondition);
+		InputManager::RegisterInputEvent("LeftStomp_Strong", LeftStrongStompEvent, StompCondition);
 	}
 
 	void AnimationStrongStomp::RegisterTriggers() {

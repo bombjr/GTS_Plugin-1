@@ -16,11 +16,12 @@
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/damage/LaunchActor.hpp"
 #include "managers/animation/Stomp.hpp"
+#include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
-#include "managers/audio/footstep.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
 #include "managers/tremor.hpp"
@@ -311,9 +312,6 @@ namespace {
 
 	void RightStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
 		float WasteStamina = 25.0f;
 		if (Runtime::HasPerk(player, "DestructionBasics")) {
 			WasteStamina *= 0.65f;
@@ -327,9 +325,6 @@ namespace {
 
 	void LeftStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kStompsAndKicks) || IsGtsBusy(player)) {
-			return;
-		}
 		float WasteStamina = 25.0f;
 		if (Runtime::HasPerk(player, "DestructionBasics")) {
 			WasteStamina *= 0.65f;
@@ -356,8 +351,8 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTS_Next", "Stomp", GTS_Next);
 		AnimationManager::RegisterEvent("GTSBEH_Exit", "Stomp", GTSBEH_Exit);
 
-		InputManager::RegisterInputEvent("RightStomp", RightStompEvent);
-		InputManager::RegisterInputEvent("LeftStomp", LeftStompEvent);
+		InputManager::RegisterInputEvent("RightStomp", RightStompEvent, StompCondition);
+		InputManager::RegisterInputEvent("LeftStomp", LeftStompEvent, StompCondition);
 	}
 
 	void AnimationStomp::RegisterTriggers() {

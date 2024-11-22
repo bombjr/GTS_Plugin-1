@@ -23,6 +23,7 @@
 #include "managers/animation/ThighCrush.hpp"
 #include "managers/audio/footstep.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "magic/effects/common.hpp"
@@ -351,9 +352,6 @@ namespace {
 
 	void ThighCrushEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
-			return;
-		}
 		AnimationManager::StartAnim("ThighLoopEnter", player);
 	}
 
@@ -403,9 +401,9 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTSBEH_Next", "ThighCrush", GTSBEH_Next);
 		AnimationManager::RegisterEvent("GTSBEH_Exit", "ThighCrush", GTSBEH_Exit);
 
-		InputManager::RegisterInputEvent("ThighCrush", ThighCrushEvent);
-		InputManager::RegisterInputEvent("ThighCrushKill", ThighCrushKillEvent);
-		InputManager::RegisterInputEvent("ThighCrushSpare", ThighCrushSpareEvent);
+		InputManager::RegisterInputEvent("ThighCrush", ThighCrushEvent, ThighCrushCondition_Start);
+		InputManager::RegisterInputEvent("ThighCrushKill", ThighCrushKillEvent, NeverBlock);
+		InputManager::RegisterInputEvent("ThighCrushSpare", ThighCrushSpareEvent, NeverBlock);
 	}
 
 	void AnimationThighCrush::RegisterTriggers() {

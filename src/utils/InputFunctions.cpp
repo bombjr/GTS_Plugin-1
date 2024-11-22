@@ -4,6 +4,7 @@
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "Utils/InputConditions.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "magic/effects/common.hpp"
@@ -81,7 +82,6 @@ namespace {
 
 	void TotalControlGrowEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
 			float scale = get_visual_scale(player);
 			float stamina = std::clamp(GetStaminaPercentage(player), 0.05f, 1.0f);
 
@@ -95,11 +95,9 @@ namespace {
 			if (timergrowth.ShouldRun()) {
 				Runtime::PlaySoundAtNode("growthSound", player, Volume, 1.0f, "NPC Pelvis [Pelv]");
 			}
-		}
 	}
 	void TotalControlShrinkEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
 			float scale = get_visual_scale(player);
 			float stamina = std::clamp(GetStaminaPercentage(player), 0.05f, 1.0f);
 
@@ -118,11 +116,9 @@ namespace {
 			if (timergrowth.ShouldRun()) {
 				Runtime::PlaySound("shrinkSound", player, Volume, 1.0f);
 			}
-		}
 	}
 	void TotalControlGrowOtherEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
 			for (auto actor: find_actors()) {
 				if (!actor) {
 					continue;
@@ -143,11 +139,9 @@ namespace {
 					}
 				}
 			}
-		}
 	}
 	void TotalControlShrinkOtherEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
 			for (auto actor: find_actors()) {
 				if (!actor) {
 					continue;
@@ -168,15 +162,10 @@ namespace {
 					}
 				} 
 			}
-		}
 	}
 
 	void RapidGrowthEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
-			return;
-		}
-		if (!IsGtsBusy(player) && !IsChangingSize(player)) {
 			float target = get_target_scale(player);
 			float max_scale = get_max_scale(player);// * get_natural_scale(player);
 			if (target >= max_scale) {
@@ -185,14 +174,9 @@ namespace {
 				return;
 			}
 			AnimationManager::StartAnim("TriggerGrowth", player);
-		}
 	}
 	void RapidShrinkEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!Runtime::HasPerk(player, "GrowthDesirePerkAug")) {
-			return;
-		}
-		if (!IsGtsBusy(player) && !IsChangingSize(player)) {
 			float target = get_target_scale(player);
 			if (target <= Minimum_Actor_Scale) {
 				NotifyWithSound(player, "You can't shrink any further");
@@ -200,7 +184,6 @@ namespace {
 				return;
 			}
 			AnimationManager::StartAnim("TriggerShrink", player);
-		}
 	}
 
 	void SizeReserveEvent(const InputEventData& data) {
@@ -269,10 +252,6 @@ namespace {
 	void ShrinkOutburstEvent(const InputEventData& data) {
 
 		auto player = PlayerCharacter::GetSingleton();
-		bool DarkArts = Runtime::HasPerk(player, "DarkArts");
-		if (!DarkArts) {
-			return; // no perk, do nothing
-		}
 
 		bool DarkArts2 = Runtime::HasPerk(player, "DarkArts_Aug2");
 		bool DarkArts3 = Runtime::HasPerk(player, "DarkArts_Aug3");
@@ -318,7 +297,7 @@ namespace {
 
 	void ProtectSmallOnesEvent(const InputEventData& data) {
 		static Timer ProtectTimer = Timer(5.0);
-		if (CanPerformAnimation(PlayerCharacter::GetSingleton(), AnimationCondition::kOthers) && ProtectTimer.ShouldRunFrame()) {
+		if (ProtectTimer.ShouldRunFrame()) {
 			bool balance = IsInBalanceMode();
 			Utils_ProtectTinies(balance);
 		}
@@ -360,24 +339,24 @@ namespace {
 namespace Gts
 {
 	void InputFunctions::RegisterEvents() {
-		InputManager::RegisterInputEvent("SizeReserve", SizeReserveEvent);
-		InputManager::RegisterInputEvent("DisplaySizeReserve", DisplaySizeReserveEvent);
-		InputManager::RegisterInputEvent("PartyReport", PartyReportEvent);
-		InputManager::RegisterInputEvent("DebugReport", DebugReportEvent);
-		InputManager::RegisterInputEvent("AnimSpeedUp", AnimSpeedUpEvent);
-		InputManager::RegisterInputEvent("AnimSpeedDown", AnimSpeedDownEvent);
-		InputManager::RegisterInputEvent("AnimMaxSpeed", AnimMaxSpeedEvent);
-		InputManager::RegisterInputEvent("RapidGrowth", RapidGrowthEvent);
-		InputManager::RegisterInputEvent("RapidShrink", RapidShrinkEvent);
-		InputManager::RegisterInputEvent("ShrinkOutburst", ShrinkOutburstEvent);
-		InputManager::RegisterInputEvent("ProtectSmallOnes", ProtectSmallOnesEvent);
+		InputManager::RegisterInputEvent("SizeReserve", SizeReserveEvent, SizeReserveCondition);
+		InputManager::RegisterInputEvent("DisplaySizeReserve", DisplaySizeReserveEvent, SizeReserveCondition);
+		InputManager::RegisterInputEvent("PartyReport", PartyReportEvent, NeverBlock);
+		InputManager::RegisterInputEvent("DebugReport", DebugReportEvent, NeverBlock);
+		InputManager::RegisterInputEvent("AnimSpeedUp", AnimSpeedUpEvent, NeverBlock);
+		InputManager::RegisterInputEvent("AnimSpeedDown", AnimSpeedDownEvent, NeverBlock);
+		InputManager::RegisterInputEvent("AnimMaxSpeed", AnimMaxSpeedEvent, NeverBlock);
+		InputManager::RegisterInputEvent("RapidGrowth", RapidGrowthEvent, RappidGrowShrinkCondition);
+		InputManager::RegisterInputEvent("RapidShrink", RapidShrinkEvent, RappidGrowShrinkCondition);
+		InputManager::RegisterInputEvent("ShrinkOutburst", ShrinkOutburstEvent, ShrinkOutburstCondition);
+		InputManager::RegisterInputEvent("ProtectSmallOnes", ProtectSmallOnesEvent, ProtectSmallOnesCondition);
 
-		InputManager::RegisterInputEvent("TotalControlGrow", TotalControlGrowEvent);
-		InputManager::RegisterInputEvent("TotalControlShrink", TotalControlShrinkEvent);
-		InputManager::RegisterInputEvent("TotalControlGrowOther", TotalControlGrowOtherEvent);
-		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent);
+		InputManager::RegisterInputEvent("TotalControlGrow", TotalControlGrowEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlShrink", TotalControlShrinkEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlGrowOther", TotalControlGrowOtherEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent, TotalControlCondition);
 
-		InputManager::RegisterInputEvent("Vore", VoreInputEvent);
-		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower);
+		InputManager::RegisterInputEvent("Vore", VoreInputEvent, VoreCondition);
+		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower, VoreCondition);
 	}
 }
