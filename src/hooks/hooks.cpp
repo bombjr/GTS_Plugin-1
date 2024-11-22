@@ -18,6 +18,7 @@
 #include "hooks/impact.hpp"
 #include "hooks/damage.hpp"
 #include "hooks/actor.hpp"
+#include "hooks/Input.hpp"
 #include "hooks/hooks.hpp"
 #include "hooks/havok.hpp"
 #include "hooks/main.hpp"
@@ -71,6 +72,7 @@ namespace Hooks
 		Hook_Jumping::Hook(trampoline);
 		Hook_Damage::Hook(trampoline);
 		Hook_Pushback::Hook(trampoline);
+		Hook_Input::Hook(trampoline);
 
 		InstallControls();
 		//if (REL::Module::IsSE()) { // Used when something is not RE'd yet for AE

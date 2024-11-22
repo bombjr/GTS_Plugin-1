@@ -1395,7 +1395,7 @@ namespace Gts {
 											SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Essential.nif", NiMatrix3(), Position, iconScale, 7, node); 
 											// Spawn Essential icon
 										} else if (!IsGtsBusy(giant) && difference >= Action_Crush) {
-											if (CanPerformAnimation(giant, 3)) {
+											if (CanPerformAnimation(giant, AnimationCondition::kVore)) {
 												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Crush_All.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'can be crushed and any action can be done'
 											} else {
@@ -1403,14 +1403,14 @@ namespace Gts {
 												// just spawn can be crushed, can happen at any quest stage
 											}
 										} else if (!IsGtsBusy(giant) && difference >= Action_Grab) {
-											if (CanPerformAnimation(giant, 3)) {
+											if (CanPerformAnimation(giant, AnimationCondition::kVore)) {
 												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Vore_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'Can be grabbed/vored'
-											} else if (CanPerformAnimation(giant, 2)) {
+											} else if (CanPerformAnimation(giant, AnimationCondition::kGrabAndSandwich)) {
 												SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Grab.nif", NiMatrix3(), Position, iconScale, 7, node); 
 												// Spawn 'Can be grabbed'
 											}
-										} else if (!IsGtsBusy(giant) && difference >= Action_Sandwich && CanPerformAnimation(giant, 2)) {
+										} else if (!IsGtsBusy(giant) && difference >= Action_Sandwich && CanPerformAnimation(giant, AnimationCondition::kGrabAndSandwich)) {
 											SpawnParticle(otherActor, 3.00f, "GTS/UI/Icon_Sandwich.nif", NiMatrix3(), Position, iconScale, 7, node); // Spawn 'Can be sandwiched'
 										} 
 										// 1 = stomps and kicks
@@ -3205,27 +3205,35 @@ namespace Gts {
 	}
 
 
-	bool CanPerformAnimation(Actor* giant, float type) { // Needed for smooth animation unlocks during quest progression
+	bool CanPerformAnimation(Actor* giant, AnimationCondition type) { // Needed for smooth animation unlocks during quest progression
 		// 0 = Hugs
 		// 1 = stomps and kicks
 		// 2 = Grab and Sandwich
 		// 3 = Vore
-		// 5 = Others
+		// 4 = Others
+
 		if (giant->formID != 0x14) {
 			return true;
 		} else {
 			auto progressionQuest = Runtime::GetQuest("MainQuest");
 			if (progressionQuest) {
 				auto queststage = progressionQuest->GetCurrentStageID();
-				if (queststage >= 10 && type == 0) {
+
+				logger::debug("CanPerformAnimation (Stage: {} / Type: {})", queststage, static_cast<int>(type));
+
+				if (queststage >= 10 && type >= AnimationCondition::kHugs) {
 					return true; // allow hugs
-				} else if (queststage >= 30 && type == 1) {
+				} 
+				else if (queststage >= 30 && type >= AnimationCondition::kStompsAndKicks) {
 					return true; // allow stomps and kicks
-				} else if (queststage >= 50 && type == 2) {
+				} 
+				else if (queststage >= 50 && type >= AnimationCondition::kGrabAndSandwich) {
 					return true; // Allow grabbing and sandwiching
-				} else if (queststage >= 60 && type >= 3) {
+				} 
+				else if (queststage >= 60 && type >= AnimationCondition::kVore) {
 					return true; // Allow Vore
-				} else if (queststage >= 100 && type >= 4) { 
+				} 
+				else if (queststage >= 100 && type >= AnimationCondition::kOthers) {
 					return true; // When quest is completed
 				}
 				else {
@@ -3507,6 +3515,11 @@ namespace Gts {
 		using func_t = decltype(&IsMoving);
 		REL::Relocation<func_t> func{ RELOCATION_ID(36928, 37953) };
 		return func(giant);
+	}
+
+	bool IsPlayerFirstPerson(Actor* a_actor) {
+		if (!a_actor) return false;
+		return a_actor->formID == 0x14 && IsFirstPerson();
 	}
 
 	//void ForEachReferenceInRange_Custom(RE::TESObjectREFR* origin, float radius, std::function<RE::BSContainer::ForEachResult(RE::TESObjectREFR& ref)> callback) {

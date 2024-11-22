@@ -12,6 +12,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
 #include "managers/highheel.hpp"
 #include "utils/actorUtils.hpp"
@@ -152,16 +153,9 @@ namespace {
 
     void CleavageEnterEvent(const InputEventData& data) {
         Actor* giant = GetPlayerOrControlled();
-        if (giant) {
-            if (Runtime::HasPerkTeam(giant, "Breasts_Intro")) {
-                Actor* tiny = Grab::GetHeldActor(giant);
-                if (tiny && IsBetweenBreasts(tiny)) {
                     Utils_UpdateHighHeelBlend(giant, false);
                     PassAnimation("Cleavage_EnterState", false);
                     AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
-                }
-            }
-        }
     }
     void CleavageExitEvent(const InputEventData& data) {
         PassAnimation("Cleavage_ExitState", true);
@@ -215,13 +209,13 @@ namespace Gts
     }
 
 	void Animation_Cleavage::RegisterEvents() {
-        InputManager::RegisterInputEvent("CleavageEnter", CleavageEnterEvent);
-        InputManager::RegisterInputEvent("CleavageExit", CleavageExitEvent);
-        InputManager::RegisterInputEvent("CleavageLightAttack", CleavageLightAttackEvent);
-        InputManager::RegisterInputEvent("CleavageHeavyAttack", CleavageHeavyAttackEvent);
-        InputManager::RegisterInputEvent("CleavageSuffocate", CleavageSuffocateEvent);
-        InputManager::RegisterInputEvent("CleavageAbsorb", CleavageAbsorbEvent);
-        InputManager::RegisterInputEvent("CleavageVore", CleavageVoreEvent);
+        InputManager::RegisterInputEvent("CleavageEnter", CleavageEnterEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageExit", CleavageExitEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageLightAttack", CleavageLightAttackEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageHeavyAttack", CleavageHeavyAttackEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageSuffocate", CleavageSuffocateEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageAbsorb", CleavageAbsorbEvent, CleavageCondition);
+        InputManager::RegisterInputEvent("CleavageVore", CleavageVoreEvent, CleavageCondition);
 	}
 
 	void Animation_Cleavage::RegisterTriggers() {
