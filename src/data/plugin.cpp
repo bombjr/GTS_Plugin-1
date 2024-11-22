@@ -49,6 +49,47 @@ namespace Gts {
 		return false;
 	}
 
+	bool Plugin::AnyMenuOpen() {
+
+		//There's no better way to do this :(
+		//Static const means the list doesnt get recreated Each call. So no perf impact here.
+		static const std::vector<std::string_view> Menus = {
+			RE::CraftingMenu::MENU_NAME,
+			RE::BarterMenu::MENU_NAME,
+			RE::BookMenu::MENU_NAME,
+			RE::Console::MENU_NAME,
+			RE::ContainerMenu::MENU_NAME,
+			RE::FavoritesMenu::MENU_NAME,
+			RE::GiftMenu::MENU_NAME,
+			RE::InventoryMenu::MENU_NAME,
+			RE::JournalMenu::MENU_NAME,
+			RE::LevelUpMenu::MENU_NAME,
+			RE::LockpickingMenu::MENU_NAME,
+			RE::MagicMenu::MENU_NAME,
+			RE::MapMenu::MENU_NAME,
+			RE::MessageBoxMenu::MENU_NAME,
+			RE::RaceSexMenu::MENU_NAME,
+			RE::SleepWaitMenu::MENU_NAME,
+			RE::StatsMenu::MENU_NAME,
+			RE::TrainingMenu::MENU_NAME,
+			RE::TutorialMenu::MENU_NAME,
+			RE::TweenMenu::MENU_NAME
+		};
+
+		if (Plugin::Ready()) {
+			//Looping Through the list Is O(n) (almost) no perf impact here.
+			auto ui = RE::UI::GetSingleton();
+			for (const auto& Menu : Menus) {
+				if (ui->IsMenuOpen(Menu)) {
+					//log::debug("Menu is open: {}", Menu);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
 	bool Plugin::OnMainThread() {
 		return Plugin::GetSingleton().onmainthread.load();
 	}

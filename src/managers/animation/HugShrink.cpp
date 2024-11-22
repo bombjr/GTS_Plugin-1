@@ -13,6 +13,7 @@
 #include "managers/ai/aifunctions.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/InputManager.hpp"
+#include "Utils/InputConditions.hpp"
 #include "magic/effects/common.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
@@ -334,21 +335,13 @@ namespace {
 
 
 	void HugAttemptEvent(const InputEventData& data) {
-		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 0)) {
-			return;
-		}
-		if (IsGtsBusy(player)) {
-			return;
-		}
-		if (CanDoPaired(player) && !IsSynced(player) && !IsTransferingTiny(player)) {
+		auto player = GetPlayerOrControlled();
 			auto& Hugging = HugAnimationController::GetSingleton();
 
 			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1);
 			for (auto prey: preys) {
 				Hugging.StartHug(player, prey);
 			}
-		}
 	}
 
 	void HugAttemptEvent_Follower(const InputEventData& data) {
@@ -360,7 +353,6 @@ namespace {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
 
-		if (huggedActor) {
 			if (!IsActionOnCooldown(player, CooldownSource::Action_AbsorbOther)) {
 				float health = GetHealthPercentage(huggedActor);
 				float HpThreshold = GetHugCrushThreshold(player, huggedActor, true);
@@ -389,15 +381,11 @@ namespace {
                 std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
 				NotifyWithSound(player, message);
 			}
-		}
 	}
 
 	void HugShrinkEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
-		if (!huggedActor) {
-			return;
-		}
 		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
 				NotifyWithSound(player, "All available size was drained");
@@ -413,9 +401,6 @@ namespace {
 	void HugHealEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
-		if (!huggedActor) {
-			return;
-		}
 
 		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
 			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
@@ -700,12 +685,12 @@ namespace Gts {
 	}
 
 	void HugShrink::RegisterEvents() {
-		InputManager::RegisterInputEvent("HugPlayer", HugAttemptEvent_Follower);
-		InputManager::RegisterInputEvent("HugAttempt", HugAttemptEvent);
-		InputManager::RegisterInputEvent("HugRelease", HugReleaseEvent);
-		InputManager::RegisterInputEvent("HugShrink", HugShrinkEvent);
-		InputManager::RegisterInputEvent("HugHeal", HugHealEvent);
-		InputManager::RegisterInputEvent("HugCrush", HugCrushEvent);
+		InputManager::RegisterInputEvent("HugPlayer", HugAttemptEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("HugAttempt", HugAttemptEvent, HugCondition_Start);
+		InputManager::RegisterInputEvent("HugRelease", HugReleaseEvent, HugCondition_Release);
+		InputManager::RegisterInputEvent("HugShrink", HugShrinkEvent, HugCondition_Action);
+		InputManager::RegisterInputEvent("HugHeal", HugHealEvent, HugCondition_Action);
+		InputManager::RegisterInputEvent("HugCrush", HugCrushEvent, HugCondition_Action);
 
 		AnimationManager::RegisterEvent("GTS_Hug_Catch", "Hugs", GTS_Hug_Catch);
 		AnimationManager::RegisterEvent("GTS_Hug_Grab", "Hugs", GTS_Hug_Grab);

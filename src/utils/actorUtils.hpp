@@ -8,6 +8,16 @@ using namespace RE;
 using namespace Gts;
 
 namespace Gts {
+
+	enum class AnimationCondition {
+		kHugs = 0,
+		kStompsAndKicks = 1,
+		kGrabAndSandwich = 2,
+		kVore = 3,
+		kOthers = 4,
+	};
+
+
 	[[nodiscard]] RE::NiPoint3 RotateAngleAxis(const RE::NiPoint3& vec, const float angle, const RE::NiPoint3& axis);
 
 	Actor* GetActorPtr(Actor* actor);
@@ -287,7 +297,7 @@ namespace Gts {
 	void ResetGrab(Actor* giant);
 	void FixAnimationsAndCamera();
 
-	bool CanPerformAnimation(Actor* giant, float type);
+	bool CanPerformAnimation(Actor* giant, AnimationCondition type);
 	void AdvanceQuestProgression(Actor* giant, Actor* tiny, QuestStage stage, float value, bool vore);
 	float GetQuestProgression(int stage);
 	void ResetQuest();
@@ -312,4 +322,7 @@ namespace Gts {
 	std::int16_t GetItemCount(InventoryChanges* changes, RE::TESBoundObject* a_obj);
 	int GetCombatState(Actor* actor);
 	bool IsMoving(Actor* giant);
+
+	bool IsPlayerFirstPerson(Actor* a_actor);
+
 }

@@ -20,6 +20,12 @@ namespace Gts
 		Continuous,
 	};
 
+	enum class BlockCondition {
+		Never,
+		Default,
+		Force,
+	};
+
 	class InputEventData {
 		public:
 			// Construct from toml::table (toml11)
@@ -58,6 +64,9 @@ namespace Gts
 			// of mutaally exclusive triggers
 			bool SameGroup(const InputEventData& other) const;
 
+			unordered_set<std::uint32_t> GetKeys();
+
+			BlockCondition ShouldBlock();
 		private:
 			std::string name = "";
 			unordered_set<std::uint32_t> keys = {};
@@ -68,28 +77,37 @@ namespace Gts
 			TriggerMode trigger = TriggerMode::Once;
 			InputEventState state = InputEventState::Idle;
 			bool primed = false; // Used for release events. Once primed, when keys are not pressed we fire
+			BlockCondition blockinput = BlockCondition::Default;
 	};
 
-	struct RegisteredInputEvent {
-		std::function<void(const InputEventData&)> callback;
+	//enum InputEventConditions {
+	//	kValid = 1,
+	//	kInvalid = 2
+	//};
 
-		RegisteredInputEvent(std::function<void(const InputEventData&)> callback);
+	struct RegisteredInputEvent {
+		std::function<void(const InputEventData&)> callback = nullptr;
+		std::function<bool(void)> condition = nullptr;
+
+		RegisteredInputEvent(std::function<void(const InputEventData&)> callback, std::function<bool(void)> condition) : callback(callback) , condition(condition){
+
+		}
 	};
 
 	using EventResult = RE::BSEventNotifyControl;
 
-	class InputManager : public EventListener, public BSTEventSink<InputEvent*>
+	class InputManager
 	{
 		public:
 			[[nodiscard]] static InputManager& GetSingleton() noexcept;
 
-			BSEventNotifyControl ProcessEvent(InputEvent* const* a_event, BSTEventSource<InputEvent*>* a_eventSource) override;
+			void ProcessEvents(InputEvent** a_event);
+			bool Ready = false;
 
-			virtual std::string DebugName() override;
-			virtual void DataReady() override;
-			void Start() override;
+			std::string DebugName();
+			void DataReady();
 
-			static void RegisterInputEvent(std::string_view name, std::function<void(const InputEventData&)> callback);
+			static void RegisterInputEvent(std::string_view name, std::function<void(const InputEventData&)> callback, std::function<bool(void)> condition = nullptr);
 
 			std::unordered_map<std::string, RegisteredInputEvent> registedInputEvents;
 			std::vector<InputEventData> keyTriggers;

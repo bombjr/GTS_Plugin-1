@@ -1,5 +1,6 @@
 #include "managers/cameras/camutil.hpp"
 #include "managers/InputManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/highheel.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
@@ -59,13 +60,13 @@ namespace Gts {
 	}
 
 	void CameraManager::DataReady() {
-		InputManager::RegisterInputEvent("HorizontalCameraReset", HorizontalResetEvent);
-		InputManager::RegisterInputEvent("VerticalCameraReset", VerticalResetEvent);
+		InputManager::RegisterInputEvent("HorizontalCameraReset", HorizontalResetEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("VerticalCameraReset", VerticalResetEvent, AlwaysBlock);
 
-		InputManager::RegisterInputEvent("CameraUp", CamUpEvent);
-		InputManager::RegisterInputEvent("CameraDown", CamDownEvent);
-		InputManager::RegisterInputEvent("CameraLeft", CamLeftEvent);
-		InputManager::RegisterInputEvent("CameraRight", CamRightEvent);
+		InputManager::RegisterInputEvent("CameraUp", CamUpEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("CameraDown", CamDownEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("CameraLeft", CamLeftEvent, AlwaysBlock);
+		InputManager::RegisterInputEvent("CameraRight", CamRightEvent, AlwaysBlock);
 	}
 
 	void CameraManager::Start() {

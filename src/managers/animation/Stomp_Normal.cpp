@@ -8,6 +8,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "Utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -309,22 +310,16 @@ namespace {
 
 	void RightStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
-			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-			const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StompRight";
-
-			DoStompOrUnderStomp(player, StompType);
-		}
+		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+		const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StompRight";
+		DoStompOrUnderStomp(player, StompType);
 	}
 
 	void LeftStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
 			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
 			const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StompLeft";
-
 			DoStompOrUnderStomp(player, StompType);
-		}
 	}
 }
 
@@ -342,8 +337,8 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTS_Next", "Stomp", GTS_Next);
 		AnimationManager::RegisterEvent("GTSBEH_Exit", "Stomp", GTSBEH_Exit);
 
-		InputManager::RegisterInputEvent("RightStomp", RightStompEvent);
-		InputManager::RegisterInputEvent("LeftStomp", LeftStompEvent);
+		InputManager::RegisterInputEvent("RightStomp", RightStompEvent, StompCondition);
+		InputManager::RegisterInputEvent("LeftStomp", LeftStompEvent, StompCondition);
 	}
 
 	void AnimationStomp::RegisterTriggers() {

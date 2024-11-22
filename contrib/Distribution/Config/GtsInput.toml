@@ -16,6 +16,7 @@
 # exclusive = false
 # duration = 0.0
 # trigger = "once"
+# blockinput = default
 # ```
 # - Small Guide:
 #
@@ -35,6 +36,11 @@
 #            - "once" - the keys must be released before the event will fire again.
 #            - "continuous" - the event will fire every frame until the keys are released
 #            - "release" - event will be sent once you release the keys
+#
+# - blockinput: Either
+#             - "default": Block the game from processing the keybind key(s) only when the input is valid (eg. When you have the relevant perk/the action is possible to do).
+#             - "never": Never prevent the game from processing the keybind key(s) even if the action is valid.
+#             - "force": Will always block game input regardless of action validity.
 #
 # If you will forget to put , between "key" "key" - controls will break and input won't work.
 # If for some reason input doesn't work - the mod will send in-game error that will let you know that you messed up in the config somewhere.

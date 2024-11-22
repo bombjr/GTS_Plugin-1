@@ -8,6 +8,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "Utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -234,20 +235,16 @@ namespace {
 
 	void RightStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
-			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-			const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StrongStompRight";
-			DoStompOrUnderStomp(player, StompType);
-		}
+		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+		const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StrongStompRight";
+		DoStompOrUnderStomp(player, StompType);
 	}
 
 	void LeftStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (CanPerformAnimation(player, 1) && !IsGtsBusy(player)) {
-			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-			const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StrongStompLeft";
-			DoStompOrUnderStomp(player, StompType);
-		}
+		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+		const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StrongStompLeft";
+		DoStompOrUnderStomp(player, StompType);
 	}
 }
 
@@ -271,8 +268,8 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTS_Next", "StrongStomp", GTS_Next);
 		AnimationManager::RegisterEvent("GTSBEH_Exit", "StrongStomp", GTSBEH_Exit);
 
-		InputManager::RegisterInputEvent("RightStomp_Strong", RightStrongStompEvent);
-		InputManager::RegisterInputEvent("LeftStomp_Strong", LeftStrongStompEvent);
+		InputManager::RegisterInputEvent("RightStomp_Strong", RightStrongStompEvent, StompCondition);
+		InputManager::RegisterInputEvent("LeftStomp_Strong", LeftStrongStompEvent, StompCondition);
 	}
 
 	void AnimationStrongStomp::RegisterTriggers() {

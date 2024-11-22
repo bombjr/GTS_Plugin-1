@@ -11,6 +11,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/CrushManager.hpp"
+#include "utils/InputConditions.hpp"
 #include "managers/InputManager.hpp"
 #include "magic/effects/common.hpp"
 #include "managers/Attributes.hpp"
@@ -335,16 +336,6 @@ namespace {
 
 	void GrabOtherEvent(const InputEventData& data) { // Grab other actor
 		auto player = PlayerCharacter::GetSingleton();
-		auto grabbedActor = Grab::GetHeldActor(player);
-		if (grabbedActor) { //If we have actor, don't pick anyone up.
-			return;
-		}
-		if (!CanPerformAnimation(player, 2)) {
-			return;
-		}
-		if (IsGtsBusy(player) || IsEquipBusy(player) || IsTransitioning(player)) {
-			return; // Disallow Grabbing if Behavior is busy doing other stuff.
-		}
 		auto& Grabbing = GrabAnimationController::GetSingleton();
 
 		std::vector<Actor*> preys = Grabbing.GetGrabTargetsInFront(player, 1);
@@ -360,15 +351,6 @@ namespace {
 
 	void GrabAttackEvent(const InputEventData& data) { // Attack everyone in your hand
 		Actor* player = GetPlayerOrControlled();
-
-		if (IsGtsBusy(player) && !IsUsingThighAnimations(player)) {
-			return;
-		}
-		if (!IsStomping(player) && !IsTransitioning(player)) {
-			auto grabbedActor = Grab::GetHeldActor(player);
-			if (!grabbedActor) {
-				return;
-			}
 			float WasteStamina = 20.0f;
 			if (Runtime::HasPerk(player, "DestructionBasics")) {
 				WasteStamina *= 0.65f;
@@ -378,41 +360,16 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired to perform hand attack");
 			}
-		}
 	}
 
 	void GrabVoreEvent(const InputEventData& data) { // Eat everyone in hand
 		Actor* player = GetPlayerOrControlled();
-
-		if (!CanPerformAnimation(player, 3)) {
-			return;
-		}
-		if (IsGtsBusy(player) && !IsUsingThighAnimations(player)) {
-			return;
-		}
-		if (!IsTransitioning(player)) {
 			auto grabbedActor = Grab::GetHeldActor(player);
-			if (!grabbedActor) {
-				return;
-			}
-			if (IsInsect(grabbedActor, true) || IsBlacklisted(grabbedActor) || IsUndead(grabbedActor, true)) {
-				return; // Same rules as with Vore
-			}
 			AnimationManager::StartAnim("GrabEatSomeone", player);
-		}
 	}
 
 	void GrabThrowEvent(const InputEventData& data) { // Throw everyone away
 		Actor* player = GetPlayerOrControlled();
-
-		if (IsGtsBusy(player) && !IsUsingThighAnimations(player)) {
-			return;
-		}
-		if (!IsTransitioning(player)) { // Only allow outside of GtsBusy and when not transitioning
-			auto grabbedActor = Grab::GetHeldActor(player);
-			if (!grabbedActor) {
-				return;
-			}
 			float WasteStamina = 40.0f;
 			if (Runtime::HasPerk(player, "DestructionBasics")) {
 				WasteStamina *= 0.65f;
@@ -422,7 +379,6 @@ namespace {
 			} else {
 				NotifyWithSound(player, "You're too tired to throw that actor");
 			}
-		}
 	}
 
 	void GrabReleaseEvent(const InputEventData& data) {
@@ -443,20 +399,10 @@ namespace {
 
 	void BreastsPutEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
-
-		auto grabbedActor = Grab::GetHeldActor(player);
-		if (!grabbedActor || IsTransitioning(player)) {
-			return;
-		}
 		AnimationManager::StartAnim("Breasts_Put", player);
 	}
 	void BreastsRemoveEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
-
-		auto grabbedActor = Grab::GetHeldActor(player);
-		if (!grabbedActor || IsTransitioning(player)) {
-			return;
-		}
 		AnimationManager::StartAnim("Breasts_Pull", player);
 	}
 }
@@ -889,14 +835,14 @@ namespace Gts {
 	}
 
 	void Grab::RegisterEvents() {
-		InputManager::RegisterInputEvent("GrabPlayer", GrabOtherEvent_Follower);
-		InputManager::RegisterInputEvent("GrabOther", GrabOtherEvent);
-		InputManager::RegisterInputEvent("GrabAttack", GrabAttackEvent);
-		InputManager::RegisterInputEvent("GrabVore", GrabVoreEvent);
-		InputManager::RegisterInputEvent("GrabThrow", GrabThrowEvent);
-		InputManager::RegisterInputEvent("GrabRelease", GrabReleaseEvent);
-		InputManager::RegisterInputEvent("BreastsPut", BreastsPutEvent);
-		InputManager::RegisterInputEvent("BreastsRemove", BreastsRemoveEvent);
+		InputManager::RegisterInputEvent("GrabPlayer", GrabOtherEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("GrabOther", GrabOtherEvent, GrabCondition_Start);
+		InputManager::RegisterInputEvent("GrabAttack", GrabAttackEvent, GrabCondition_Attack);
+		InputManager::RegisterInputEvent("GrabVore", GrabVoreEvent, GrabCondition_Vore);
+		InputManager::RegisterInputEvent("GrabThrow", GrabThrowEvent, GrabCondition_Throw);
+		InputManager::RegisterInputEvent("GrabRelease", GrabReleaseEvent, GrabCondition_Release);
+		InputManager::RegisterInputEvent("BreastsPut", BreastsPutEvent, GrabCondition_Breasts);
+		InputManager::RegisterInputEvent("BreastsRemove", BreastsRemoveEvent, GrabCondition_Breasts);
 
 		AnimationManager::RegisterEvent("GTSGrab_Catch_Start", "Grabbing", GTSGrab_Catch_Start);
 		AnimationManager::RegisterEvent("GTSGrab_Catch_Actor", "Grabbing", GTSGrab_Catch_Actor);

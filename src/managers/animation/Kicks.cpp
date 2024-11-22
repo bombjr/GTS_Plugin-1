@@ -8,6 +8,7 @@
 #include "managers/GtsSizeManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
+#include "Utils/InputConditions.hpp"
 #include "magic/effects/common.hpp"
 #include "managers/explosion.hpp"
 #include "managers/audio/footstep.hpp"
@@ -33,17 +34,12 @@ namespace {
 
 	void PerformKick(std::string_view kick_type, float stamina_drain) {
 		auto player = PlayerCharacter::GetSingleton();
-		if (!CanPerformAnimation(player, 1) || IsGtsBusy(player)) {
-			return;
-		}
-		if (!player->IsSneaking() && !player->AsActorState()->IsSprinting()) {
 			float WasteStamina = stamina_drain * GetWasteMult(player);
 			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 				AnimationManager::StartAnim(kick_type, player);
 			} else {
 				NotifyWithSound(player, "You're too tired for a kick");
 			}
-		}
 	}
 
 	void StartDamageAt(Actor* actor, float power, float crush, float pushpower, bool Right, std::string_view node, DamageSource Source) {
@@ -152,12 +148,12 @@ namespace {
 namespace Gts
 {
 	void AnimationKicks::RegisterEvents() {
-		InputManager::RegisterInputEvent("LightKickLeft", LightKickLeftEvent);
-		InputManager::RegisterInputEvent("LightKickRight", LightKickRightEvent);
-		InputManager::RegisterInputEvent("HeavyKickLeft", HeavyKickLeftEvent);
-		InputManager::RegisterInputEvent("HeavyKickRight", HeavyKickRightEvent);
-		InputManager::RegisterInputEvent("HeavyKickRight_Low", HeavyKickRightLowEvent);
-		InputManager::RegisterInputEvent("HeavyKickLeft_Low", HeavyKickLeftLowEvent);
+		InputManager::RegisterInputEvent("LightKickLeft", LightKickLeftEvent, KickCondition);
+		InputManager::RegisterInputEvent("LightKickRight", LightKickRightEvent, KickCondition);
+		InputManager::RegisterInputEvent("HeavyKickLeft", HeavyKickLeftEvent, KickCondition);
+		InputManager::RegisterInputEvent("HeavyKickRight", HeavyKickRightEvent, KickCondition);
+		InputManager::RegisterInputEvent("HeavyKickRight_Low", HeavyKickRightLowEvent, KickCondition);
+		InputManager::RegisterInputEvent("HeavyKickLeft_Low", HeavyKickLeftLowEvent, KickCondition);
 		
 
 		AnimationManager::RegisterEvent("GTS_Kick_Camera_On_R", "Kicks", GTS_Kick_Camera_On_R);
