@@ -357,6 +357,6 @@ namespace Gts
 		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent, TotalControlCondition);
 
 		InputManager::RegisterInputEvent("Vore", VoreInputEvent, VoreCondition);
-		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower, VoreCondition_Follower);
 	}
 }

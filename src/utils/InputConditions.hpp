@@ -395,6 +395,57 @@ static bool VoreCondition() {
 	return true;
 }
 
+
+//------------------------------
+// Follower Specific Ones
+//------------------------------
+
+static bool ButtCrushCondition_Follower() {
+	auto player = PlayerCharacter::GetSingleton();
+
+	if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
+		return false;
+	}
+	return true;
+}
+
+static bool GrabCondition_Follower() {
+	auto player = PlayerCharacter::GetSingleton();
+
+	if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
+		return false;
+	}
+	return true;
+}
+
+static bool HugCondition_Follower() {
+	auto player = PlayerCharacter::GetSingleton();
+
+	if (!CanPerformAnimation(player, AnimationCondition::kHugs)) {
+		return false;
+	}
+	return true;
+}
+
+static bool ThighSandwitchCondition_Follower() {
+	auto player = PlayerCharacter::GetSingleton();
+
+	if (!CanPerformAnimation(player, AnimationCondition::kGrabAndSandwich)) {
+		return false;
+	}
+	return true;
+}
+
+static bool VoreCondition_Follower() {
+	auto player = PlayerCharacter::GetSingleton();
+
+	if (!CanPerformAnimation(player, AnimationCondition::kVore)) {
+		return false;
+	}
+
+	return true;
+}
+
 static inline bool AlwaysBlock() {
 	return true;
 }
