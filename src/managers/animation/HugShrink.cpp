@@ -685,7 +685,7 @@ namespace Gts {
 	}
 
 	void HugShrink::RegisterEvents() {
-		InputManager::RegisterInputEvent("HugPlayer", HugAttemptEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("HugPlayer", HugAttemptEvent_Follower, HugCondition_Follower);
 		InputManager::RegisterInputEvent("HugAttempt", HugAttemptEvent, HugCondition_Start);
 		InputManager::RegisterInputEvent("HugRelease", HugReleaseEvent, HugCondition_Release);
 		InputManager::RegisterInputEvent("HugShrink", HugShrinkEvent, HugCondition_Action);
