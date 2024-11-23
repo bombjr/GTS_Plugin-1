@@ -289,6 +289,13 @@ namespace Gts {
 		}
 
 		if (IsCrawling(pred)) {
+			if (!CanPerformAnimation(PlayerCharacter::GetSingleton(), AnimationCondition::kOthers)) {
+				// Can Crawl Hug only after quest is done
+				if (pred->formID == 0x14) {
+					NotifyWithSound(pred, "You're not experienced enough for Crawl Hugs");
+				}
+				return;
+			}
 			DamageAV(pred, ActorValue::kMagicka, 225 * Perk_GetCostReduction(pred));
 		}
 

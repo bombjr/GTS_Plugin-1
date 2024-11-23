@@ -236,14 +236,14 @@ namespace {
 	void RightStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-		const std::string_view StompType = UnderStomp ? "UnderStompRight" : "StrongStompRight";
+		const std::string_view StompType = UnderStomp ? "UnderStompStrongRight" : "StrongStompRight";
 		DoStompOrUnderStomp(player, StompType);
 	}
 
 	void LeftStrongStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-		const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StrongStompLeft";
+		const std::string_view StompType = UnderStomp ? "UnderStompStrongLeft" : "StrongStompLeft";
 		DoStompOrUnderStomp(player, StompType);
 	}
 }

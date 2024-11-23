@@ -65,7 +65,7 @@ name = "PlayerVore"
 keys = [ "LSHIFT", "V"]
 trigger = "continuous"
 duration = 1.0
-
+blockinput = "never"
 # Forces the followers to eat player if possible
 
 
@@ -170,7 +170,7 @@ keys = ["LSHIFT", "C"]
 exclusive = true
 trigger = "continuous"
 duration = 1.0
-
+blockinput = "never"
 # Forces the follower to perform Thigh Sandiwch on player. 
 # In that case you can control the Follower actions through default key-binds below
 
@@ -386,7 +386,7 @@ keys = ["LSHIFT", "H"]
 exclusive = false
 trigger = "continuous"
 duration = 1.0
-
+blockinput = "never"
 # Force follower to hug the player if possible
 # In that case you can control the Follower actions through default key-binds below
 
@@ -450,6 +450,7 @@ name = "ButtCrushStart_Player"
 keys = ["LSHIFT", "B"]
 trigger = "continuous"
 duration = 1.0 
+blockinput = "never"
 # Start Butt/Knee/Breast Crush on the player if possible.
 # In that case you can control the Follower actions through default key-binds below
 
@@ -487,6 +488,7 @@ name = "SBO_ToggleProne"
 keys = ["X"]
 exclusive = false
 trigger = "continuous"
+blockinput = "never"
 duration = 0.66
 
 # When Sneaking or Crawling: enter prone state 
@@ -497,6 +499,7 @@ name = "SBO_ToggleDive_Standing"
 keys = ["W", "S"]
 exclusive = false
 trigger = "continuous"
+blockinput = "never"
 duration = 0.50
 
 # When Standing: perform a Dive that leads to prone state
@@ -506,6 +509,7 @@ name = "SBO_ToggleDive_Sneak"
 keys = ["W", "S"]
 exclusive = false
 trigger = "continuous"
+blockinput = "never"
 duration = 0.5
 
 # When Sneaking or Crawling: perform a Dive that leads to prone state
@@ -518,7 +522,8 @@ duration = 0.5
 [[InputEvent]]
 name = "GrabOther"
 keys = ["F"]
-duration = 0.25 
+duration = 0.25
+blockinput = "never"
 # Grabs closest actor.
 
 [[InputEvent]]
@@ -526,6 +531,8 @@ name = "GrabPlayer"
 keys = ["F"]
 trigger = "continuous"
 duration = 1.0
+blockinput = "never"
+
 # Force the follower to grab player if possibe.
 # In that case you can control the Follower actions through default key-binds below
 
@@ -553,6 +560,7 @@ name = "GrabThrow"
 keys = ["X"]
 exclusive = false
 trigger = "continuous"
+blockinput = "never"
 
 # Throw Everyone in your hands
 
@@ -665,6 +673,7 @@ name = "SizeReserve"
 keys = ["E"]
 duration = 1.2
 trigger = "continuous"
+blockinput = "never"
 
 # Use size reserve and grow yourself. Requires Perk.
 
@@ -672,6 +681,7 @@ trigger = "continuous"
 name = "DisplaySizeReserve"
 keys = ["F"]
 duration = 1.2
+blockinput = "never"
 
 # Hold to print size reserve value. Requires Perk.
 
@@ -730,6 +740,7 @@ trigger = "continuous"
 name = "PartyReport"
 keys = ["LCONTROL"]
 duration = 1.2
+blockinput = "never"
 
 # Reports Follower's size info into the console 
 
@@ -737,6 +748,7 @@ duration = 1.2
 name = "DebugReport"
 keys = ["RCONTROL"]
 duration = 1.2
+blockinput = "never"
 
 # Reports Non Follower size info into the console 
 
@@ -745,6 +757,7 @@ duration = 1.2
 name = "ProtectSmallOnes"
 keys = ["C"]
 duration = 1.0
+blockinput = "never"
 
 # Protect tinies against size-related damage for 180 seconds. 
 # Wastes stamina in balance mode an runs out if out of stamina

@@ -1,5 +1,6 @@
 #include "managers/animation/Sneak_Slam_FingerGrind.hpp"
 #include "managers/animation/TinyCalamity_Shrink.hpp"
+#include "managers/animation/Stomp_Under_Strong.hpp"
 #include "managers/animation/Sneak_Slam_Strong.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/animation/Grab_Sneak_Vore.hpp"
@@ -82,6 +83,9 @@ namespace Gts {
 
 		AnimationUnderStomp::RegisterEvents();
 		AnimationUnderStomp::RegisterTriggers();
+
+		AnimationUnderStompStrong::RegisterEvents();
+		AnimationUnderStompStrong::RegisterTriggers();
 
 		AnimationThighSandwich::RegisterEvents();
 		AnimationThighSandwich::RegisterTriggers();

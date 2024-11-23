@@ -184,9 +184,9 @@ namespace Gts {
 		// ^ Stops at ~x24
 		BSSoundHandle Footstep_24 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 24), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, true);
 		// ^ Stops at ~x44
-		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Footstep_96_Params, "x48 Footstep", 8.0f, true);
+		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Params_Empty, "x48 Footstep", 8.0f, false);
 		// ^ Stops at ~x88
-		BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 8.0f, false);
+		//BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 8.0f, false);
 		// ^ Stops at X118 (when Mega will be added)
 		//BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "x96 Footstep", 8.0f, false);
 
@@ -227,9 +227,9 @@ namespace Gts {
 		if (Footstep_48.soundID != BSSoundHandle::kInvalidID) { // x48 Custom audio
 			Footstep_48.Play();
 		}
-		if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
+		/*if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
 			Footstep_96.Play();
-		}
+		}*/
 	}
 
 	void FootStepManager::PlayHighHeelSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale) {

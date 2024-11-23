@@ -3221,19 +3221,19 @@ namespace Gts {
 
 				logger::debug("CanPerformAnimation (Stage: {} / Type: {})", queststage, static_cast<int>(type));
 
-				if (queststage >= 10 && type >= AnimationCondition::kHugs) {
+				if (queststage >= 10 && type == AnimationCondition::kHugs) {
 					return true; // allow hugs
 				} 
-				else if (queststage >= 30 && type >= AnimationCondition::kStompsAndKicks) {
+				else if (queststage >= 30 && type == AnimationCondition::kStompsAndKicks) {
 					return true; // allow stomps and kicks
 				} 
-				else if (queststage >= 50 && type >= AnimationCondition::kGrabAndSandwich) {
+				else if (queststage >= 50 && type == AnimationCondition::kGrabAndSandwich) {
 					return true; // Allow grabbing and sandwiching
 				} 
-				else if (queststage >= 60 && type >= AnimationCondition::kVore) {
+				else if (queststage >= 60 && type == AnimationCondition::kVore) {
 					return true; // Allow Vore
 				} 
-				else if (queststage >= 100 && type >= AnimationCondition::kOthers) {
+				else if (queststage >= 100 && type == AnimationCondition::kOthers) {
 					return true; // When quest is completed
 				}
 				else {

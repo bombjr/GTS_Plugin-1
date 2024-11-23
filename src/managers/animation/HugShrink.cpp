@@ -336,12 +336,12 @@ namespace {
 
 	void HugAttemptEvent(const InputEventData& data) {
 		auto player = GetPlayerOrControlled();
-			auto& Hugging = HugAnimationController::GetSingleton();
+		auto& Hugging = HugAnimationController::GetSingleton();
 
-			std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1);
-			for (auto prey: preys) {
-				Hugging.StartHug(player, prey);
-			}
+		std::vector<Actor*> preys = Hugging.GetHugTargetsInFront(player, 1);
+		for (auto prey: preys) {
+			Hugging.StartHug(player, prey);
+		}
 	}
 
 	void HugAttemptEvent_Follower(const InputEventData& data) {

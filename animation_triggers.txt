@@ -10,6 +10,11 @@ player.sae GTSBEH_HeavyKickLow_R
 GtsModStompAnimRight -> GTSBEH_StartFootGrindR
 GtsModStompAnimLeft -> GTSBEH_StartFootGrindL
 
+GTSBeh_UnderStomp_StartR   (UnderStomp range depends on Behavior float 'GTS_StompBlend', 0.0 = under self, 1.0 = far)
+GTSBeh_UnderStomp_StartL   (UnderStomp range depends on Behavior float 'GTS_StompBlend', 0.0 = under self, 1.0 = far)
+GTSBeh_UnderStomp_Start_StrongR   - Same logic as UnderStomp_StartL/R
+GTSBeh_UnderStomp_Start_StrongL   - Same logic as UnderStomp_StartL/R
+
 GTSBeh_StrongStomp_StartRight
 GTSBeh_StrongStomp_StartLeft
 

@@ -46,7 +46,7 @@ namespace {
         DoImpactRumble(giant, Node, rumble);
         DoDustExplosion(giant, 1.0f * (SMT), Event, Node);
 
-        DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 3.4f);
+        DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 0.5f);
 
         DoFootstepSound(giant, SMT, Event, Node);
 
@@ -57,12 +57,12 @@ namespace {
 	}
 
     void GTS_UnderStomp_CamOnR(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8f);
+        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 0.5f);
         ManageCamera(&data.giant, true, CameraTracking::R_Foot);
     }
 
     void GTS_UnderStomp_CamOnL(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.8f);
+        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 0.5f);
         ManageCamera(&data.giant, true, CameraTracking::L_Foot);
     }
 
@@ -93,19 +93,23 @@ namespace Gts {
         //abs makes it become 1 -> 0 -> 1 for down -> middle -> up
         const float absPitch = abs(GetCameraRotation().GetVectorY().z);
         //Remap our starting range
-        const float InvLookDownStartAngle = 0.925f; //Starting value of remap. Defines start angle for how down we are looking
+        const float InvLookDownStartAngle = 0.9f; //Starting value of remap. Defines start angle for how down we are looking
         const float InvLookdownIntensity = std::clamp(Remap(absPitch, 1.0f, InvLookDownStartAngle, 0.0f, 1.0f), 0.0f, 1.0f);
         log::info("LookDownIntensity: {}", InvLookdownIntensity);
 
-        bool allow = absPitch > InvLookDownStartAngle;
-        // Allow to stomp when looking from above or below
-        log::info("ShouldStompUnder: {}, Pitch: {}", allow, absPitch);
-        if (allow) {
-            float beh = std::clamp(InvLookdownIntensity * 1.35f, 0.0f, 1.0f);
-            giant->SetGraphVariableFloat("GTS_StompBlend", beh);
-            // Blend between "close" and "far" under-stomps
+        bool Sneaking = giant->IsSneaking(); // We don't want it to work when sneaking
+        if (!Sneaking) {
+            bool allow = absPitch > InvLookDownStartAngle;
+            // Allow to stomp when looking from above or below
+            log::info("ShouldStompUnder: {}, Pitch: {}", allow, absPitch);
+            if (allow) {
+                float blend = std::clamp(InvLookdownIntensity * 1.3f, 0.0f, 1.0f);
+                giant->SetGraphVariableFloat("GTS_StompBlend", blend);
+                // Blend between "close" and "far" under-stomps
+            }
+            return allow;
         }
-        return allow;
+        return false;
     }
 
     void AnimationUnderStomp::RegisterEvents() {

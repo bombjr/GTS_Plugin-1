@@ -39,7 +39,7 @@ namespace Gts {
 	const float Damage_Stomp_Strong = 22.0f;
 
     const float Damage_Stomp_Under_Light = 13.2f; // Slightly more powerful damage
-    const float Damage_Stomp_Under_Strong = 20.0f; // Slightly weaker than normal strong stomp
+    const float Damage_Stomp_Under_Strong = 20.6f; // Slightly weaker than normal strong stomp
 
     /////////////////Foot Grind
 
@@ -250,6 +250,7 @@ namespace Gts {
     const float Rumble_Stomp_Land_Normal = 2.75f * 1.0f;
 
     const float Rumble_Stomp_Under_Light = 2.35f * 1.0f;
+    const float Rumble_Stomp_Under_Strong = 3.85f * 1.0f;
 
 
     // Tramples
