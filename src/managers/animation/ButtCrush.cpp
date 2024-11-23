@@ -369,7 +369,7 @@ namespace Gts
 		AnimationManager::RegisterEvent("GTSButtCrush_MoveBody_Stop", "ButtCrush", GTSButtCrush_MoveBody_Stop);
 		
 		InputManager::RegisterInputEvent("ButtCrushStart", ButtCrushStartEvent, ButtCrushCondition_Start);
-		InputManager::RegisterInputEvent("ButtCrushStart_Player", ButtCrushStartEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("ButtCrushStart_Player", ButtCrushStartEvent_Follower, ButtCrushCondition_Follower);
 		InputManager::RegisterInputEvent("QuickButtCrushStart", QuickButtCrushStartEvent, ButtCrushCondition_Start);
 		InputManager::RegisterInputEvent("ButtCrushGrow", ButtCrushGrowEvent, ButtCrushCondition_Grow);
 		InputManager::RegisterInputEvent("ButtCrushAttack", ButtCrushAttackEvent, ButtCrushCondition_Attack);

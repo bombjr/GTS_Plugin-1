@@ -835,7 +835,7 @@ namespace Gts {
 	}
 
 	void Grab::RegisterEvents() {
-		InputManager::RegisterInputEvent("GrabPlayer", GrabOtherEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("GrabPlayer", GrabOtherEvent_Follower, GrabCondition_Follower);
 		InputManager::RegisterInputEvent("GrabOther", GrabOtherEvent, GrabCondition_Start);
 		InputManager::RegisterInputEvent("GrabAttack", GrabAttackEvent, GrabCondition_Attack);
 		InputManager::RegisterInputEvent("GrabVore", GrabVoreEvent, GrabCondition_Vore);

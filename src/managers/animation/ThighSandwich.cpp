@@ -409,7 +409,7 @@ namespace Gts
 {
 	void AnimationThighSandwich::RegisterEvents() {
 		InputManager::RegisterInputEvent("ThighSandwichEnter", ThighSandwichEnterEvent, ThighSandwitchCondition_Start);
-		InputManager::RegisterInputEvent("PlayerThighSandwichEnter", ThighSandwichEnterEvent_Follower, AlwaysBlock);
+		InputManager::RegisterInputEvent("PlayerThighSandwichEnter", ThighSandwichEnterEvent_Follower, ThighSandwitchCondition_Follower);
 		InputManager::RegisterInputEvent("ThighSandwichAttack", ThighSandwichAttackEvent);
 		InputManager::RegisterInputEvent("ThighSandwichAttackHeavy", ThighSandwichHeavyAttackEvent);
 		InputManager::RegisterInputEvent("ThighSandwichExit", ThighSandwichExitEvent);
