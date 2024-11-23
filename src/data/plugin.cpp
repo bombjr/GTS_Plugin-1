@@ -57,7 +57,6 @@ namespace Gts {
 			RE::CraftingMenu::MENU_NAME,
 			RE::BarterMenu::MENU_NAME,
 			RE::BookMenu::MENU_NAME,
-			RE::Console::MENU_NAME,
 			RE::ContainerMenu::MENU_NAME,
 			RE::FavoritesMenu::MENU_NAME,
 			RE::GiftMenu::MENU_NAME,
