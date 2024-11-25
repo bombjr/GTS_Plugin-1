@@ -9,9 +9,6 @@ Very complex parts (98% of DLL code) done by Andy.
 
 Still WIP
 
-## Extern Requirements
-- [CommonlibSSE-NG](https://github.com/alandtse/CommonLibVR/tree/ng)
-
 ## Building Requirements
 - [git](https://gitforwindows.org/) and add git to `PATH`
 - [cmake](https://cmake.org/download/) and add cmake to `PATH`
@@ -24,8 +21,7 @@ Launch `x64 Native Tools Command Promt For VS 2022` from the start menu first
 ```
 git clone https://github.com/sermitse/GTS_Plugin/
 cd GTS_Plugin
-git submodule update --init --recursive
-cmake --preset AE_SE_Release
+cmake --preset build-release-withdebuginfo-msvc
 cmake --build build --config RelWithDebInfo
 ```
 
