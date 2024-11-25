@@ -32,4 +32,8 @@ namespace RE {
 	std::unique_ptr<hkpAllRayHitCollector> hkpAllRayHitCollector::CreatePtr() {
 		return std::unique_ptr<hkpAllRayHitCollector>(hkpAllRayHitCollector::Create());
 	}
+
+	hkpRayHitCollector::~hkpRayHitCollector() {
+		// Dummy
+	}
 }

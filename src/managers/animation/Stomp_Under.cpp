@@ -91,7 +91,7 @@ namespace Gts {
         }
         //Range is between -1 (looking down) and 1 (looking up)
         //abs makes it become 1 -> 0 -> 1 for down -> middle -> up
-        const float absPitch = abs(GetCameraRotation().GetVectorY().z);
+        const float absPitch = abs(GetCameraRotation().entry[2][1]);
         //Remap our starting range
         const float InvLookDownStartAngle = 0.9f; //Starting value of remap. Defines start angle for how down we are looking
         const float InvLookdownIntensity = std::clamp(Remap(absPitch, 1.0f, InvLookDownStartAngle, 0.0f, 1.0f), 0.0f, 1.0f);

@@ -325,4 +325,6 @@ namespace Gts {
 
 	bool IsPlayerFirstPerson(Actor* a_actor);
 
+	void ForEachReferenceInRange_Custom(RE::TESObjectREFR* origin, float radius, std::function<RE::BSContainer::ForEachResult(RE::TESObjectREFR& ref)> callback);
+
 }

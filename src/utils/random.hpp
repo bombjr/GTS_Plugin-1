@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <random>
-#include <ClibUtil/rng.hpp>
+#include "xoshiro.hpp"
 
 namespace Gts {
 
 	inline static std::random_device rdevice;
-	inline static XoshiroCpp::Xoshiro256StarStar generator(rdevice());
+	//inline static XoshiroCpp::Xoshiro256StarStar generator(rdevice());
+	inline static xso::rng generator(rdevice());
 
 	// ------------------
 	// Random Float

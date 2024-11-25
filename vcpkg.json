@@ -6,21 +6,15 @@
     "plugin": {
       "description": "Build the SKSE plugin.",
       "dependencies": [
-	    "xbyak",
-		"catch2",
-		"fmt",
-		"directxtk",
-		"rapidcsv",
-		"spdlog",
-		{
+	    {
 			"name": "imgui",
 			"features": ["dx11-binding", "win32-binding", "docking-experimental"]
 		},
+        "commonlibsse-ng",
         "glm",
         "toml11",
         "nlohmann-json",
-		"gluino",
-		"clib-util"
+		"gluino"
       ]
     }
   },
