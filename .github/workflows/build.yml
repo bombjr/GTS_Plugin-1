@@ -44,7 +44,7 @@ jobs:
       - name: Compile
         run: |
            cmake --preset build-release-withdebuginfo-msvc
-           cmake --build build --config RelWithDebInfo
+           cmake --build build/release-msvc --config ${{env.CMAKE_BUILD_TYPE}}
             
       - name: Copy Plugin
         shell: bash
