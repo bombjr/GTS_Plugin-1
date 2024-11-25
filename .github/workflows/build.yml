@@ -32,19 +32,19 @@ jobs:
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "~3.26.2"
-          ninjaVersion: "~1.11.0"
+          ninjaVersion: "~1.12.0"
 
       - name: Set Env
         uses: TheMrMilchmann/setup-msvc-dev@v3.0.1
         with:
             arch: x64
-            toolset: 14.40
+            toolset: 14.42
 
 
       - name: Compile
         run: |
-           cmake --preset AE_SE_Release
-           cmake --build build --config RelWithDebInfo
+           cmake --preset build-release-withdebuginfo-msvc
+           cmake --build build/release-msvc --config RelWithDebInfo
             
       - name: Copy Plugin
         shell: bash

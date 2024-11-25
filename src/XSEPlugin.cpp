@@ -60,7 +60,10 @@ namespace {
 				"Global", std::make_shared <spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
 
+
+
 		try {
+			spdlog::set_default_logger(std::move(log));
 			spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
 			spdlog::set_level(spdlog::level::level_enum::trace);
 			spdlog::flush_on(spdlog::level::level_enum::trace);
@@ -70,12 +73,10 @@ namespace {
 			spdlog::set_level(debugConfig.GetLogLevel());
 			spdlog::flush_on(debugConfig.GetFlushLevel());
 		} catch (const std::exception& ex) {
+			spdlog::set_default_logger(std::move(log));
 			log::critical("Could not load config: {}", ex.what());
 			report_and_fail(std::format("Could not load config: {}", ex.what()));
 		}
-
-		//spdlog::set_default_logger(std::move(log));
-		//spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
 	}
 
 
@@ -195,18 +196,19 @@ void InitializeEventSystem() {
  * tasks.
  * </p>
  */
-SKSEPluginLoad(const LoadInterface * a_skse)
-{
-	
+SKSEPluginLoad(const LoadInterface * a_skse){
+
 
 	auto *plugin  = PluginDeclaration::GetSingleton();
 	auto version = plugin->GetVersion();
+
+	InitializeLogging();
 
 	auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
 	log::info("{} {} {} is loading...", plugin->GetName(), version, gitData);
 
 	Init(a_skse);
-	InitializeLogging();
+
 	InitializeMessaging();
 	Hooks::Install();
 	InitializePapyrus();
@@ -218,12 +220,13 @@ SKSEPluginLoad(const LoadInterface * a_skse)
 	return(true);
 }
 
-SKSEPluginInfo(
-	.Version = REL::Version{ 2, 0, 0, 0 },
-	.Name = "GtsPlugin",
-	.Author = "Sermit and Andy",
-	.StructCompatibility = SKSE::StructCompatibility::Independent,
-	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
-);
+//SKSEPluginInfo(
+//	.Version = REL::Version{ 2, 0, 0, 0 },
+//	.Name = "GtsPlugin",
+//	.Author = "Sermit and Andy",
+//	.StructCompatibility = SKSE::StructCompatibility::Independent,
+//	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
+//);
+
 
 

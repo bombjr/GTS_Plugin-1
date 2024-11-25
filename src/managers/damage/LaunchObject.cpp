@@ -329,14 +329,14 @@ namespace Gts {
 		} else if (PreciseScan) { // Else scan Entire world
 			TESObjectREFR* GiantRef = skyrim_cast<TESObjectREFR*>(giant);
 			if (GiantRef) {
-				//Will this ctd on AE? lets find out
-				TES::GetSingleton()->ForEachReferenceInRange(GiantRef, maxDistance, [&](RE::TESObjectREFR* a_ref) {
-					bool IsActor = a_ref->Is(FormType::ActorCharacter);
+				//Revert to hack....
+				ForEachReferenceInRange_Custom(GiantRef, maxDistance, [&](RE::TESObjectREFR& a_ref) {
+					bool IsActor = a_ref.Is(FormType::ActorCharacter);
 					if (!IsActor) { // we don't want to apply it to actors
-						NiPoint3 objectlocation = a_ref->GetPosition();
+						NiPoint3 objectlocation = a_ref.GetPosition();
 						float distance = (point - objectlocation).Length();
 						if (distance <= maxDistance) {
-							ObjectRefHandle handle = a_ref->CreateRefHandle();
+							ObjectRefHandle handle = a_ref.CreateRefHandle();
 							if (handle) {
 								Objects.push_back(handle);
 							}
