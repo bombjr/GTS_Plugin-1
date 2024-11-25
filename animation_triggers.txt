@@ -73,5 +73,7 @@ GTSBEH_TC_Shrink
 GTSBEH_StartVore
 
 ---GROWTH/SHRINK:
-GTSBeh_Shrink_Trigger
-GTSBeh_Grow_Trigger
+GTSBEH_Grow_Random     // Random Growth anims by Lajest.
+
+GTSBeh_Shrink_Trigger // Manual Growth
+GTSBeh_Grow_Trigger   // Manual Shrink

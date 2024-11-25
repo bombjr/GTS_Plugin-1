@@ -318,6 +318,7 @@ exclusive = false
 name = "CleavageExit"
 keys = ["RMB"]
 exclusive = true
+blockinput = "never"
 
 # Leave breast attack state
 # WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
@@ -328,6 +329,7 @@ keys = ["LMB"]
 trigger = "release"
 duration = 0.0
 exclusive = true
+blockinput = "never"
 
 # Do Light Attack with breasts
 # WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
@@ -347,6 +349,7 @@ name = "CleavageSuffocate"
 keys = ["W"]
 exclusive = false
 duration = 0
+blockinput = "never"
 # Suffocate the tiny with breasts
 # WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
 
@@ -355,6 +358,7 @@ name = "CleavageAbsorb"
 keys = ["S"]
 exclusive = false
 duration = 0
+blockinput = "never"
 # Absorb the tiny between the breasts
 # WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
 

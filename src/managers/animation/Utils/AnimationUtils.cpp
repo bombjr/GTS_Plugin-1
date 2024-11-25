@@ -930,7 +930,7 @@ namespace Gts {
 
 									if (Finish - Start > 0.02) {
 										if (CanDoDamage(giant, tiny, false)) {
-											if (aveForce >= 0.00f && !tiny->IsDead()) {
+											if (aveForce >= 0.00f && !tiny->IsDead() && GetAV(tiny, ActorValue::kHealth) > 0.0f) {
 												SetBeingGrinded(tiny, true);
 												if (!strong) {
 													DoFootGrind(giant, tiny, Right);

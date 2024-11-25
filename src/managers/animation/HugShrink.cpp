@@ -148,30 +148,26 @@ namespace {
 	void GTS_Hug_Grab(AnimationEventData& data) {
 		auto giant = &data.giant;
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
-		if (!huggedActor) {
-			return;
-		}
+		if (huggedActor) {
+			SetBeingHeld(huggedActor, true);
+			HugShrink::AttachActorTask(giant, huggedActor);
 
-		SetBeingHeld(huggedActor, true);
-		HugShrink::AttachActorTask(giant, huggedActor);
-
-		if (!giant->IsSneaking()) {
-			Hugs_ShakeCamera(giant);
+			if (!giant->IsSneaking()) {
+				Hugs_ShakeCamera(giant);
+			}
 		}
 	}
 
 	void GTS_Hug_Grow(AnimationEventData& data) {
 		auto giant = &data.giant;
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
-		if (!huggedActor) {
-			return;
-		}
+		if (huggedActor) {
+			if (!IsTeammate(huggedActor)) {
+				Attacked(huggedActor, giant);
+			}
 
-		if (!IsTeammate(huggedActor)) {
-			Attacked(huggedActor, giant);
+			HugShrink::ShrinkOtherTask(giant, huggedActor);
 		}
-
-		HugShrink::ShrinkOtherTask(giant, huggedActor);
 	}
 
 	void GTS_Hug_Moan(AnimationEventData& data) {
@@ -225,29 +221,28 @@ namespace {
 	void GTS_Hug_CrushTiny(AnimationEventData& data) {
 		auto giant = &data.giant;
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
-		if (!huggedActor) {
-			return;
+		if (huggedActor) {
+			HugCrushOther(giant, huggedActor);
+			PrintDeathSource(giant, huggedActor, DamageSource::Hugs);
+			Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f);
+			HugShrink::DetachActorTask(giant);
+
+			AdjustFacialExpression(giant, 0, 0.0f, "phenome");
+			AdjustFacialExpression(giant, 0, 0.0f, "modifier");
+			AdjustFacialExpression(giant, 1, 0.0f, "modifier");
+
+			Task_ApplyAbsorbCooldown(giant); // Start Cooldown right after crush
+			ShrinkPulse_GainSize(giant, huggedActor, true);
+
+			if (giant->formID == 0x14) {
+				auto caster = giant;
+				float target_scale = get_visual_scale(huggedActor);
+				AdjustSizeReserve(caster, 0.0225f);
+				AdjustSizeLimit(0.0060f, caster);
+				AdjustMassLimit(0.0060f, caster);
+			}
+			HugShrink::Release(giant);
 		}
-		HugCrushOther(giant, huggedActor);
-		PrintDeathSource(giant, huggedActor, DamageSource::Hugs);
-		Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f);
-		HugShrink::DetachActorTask(giant);
-
-		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
-		AdjustFacialExpression(giant, 0, 0.0f, "modifier");
-		AdjustFacialExpression(giant, 1, 0.0f, "modifier");
-
-		Task_ApplyAbsorbCooldown(giant); // Start Cooldown right after crush
-		ShrinkPulse_GainSize(giant, huggedActor, true);
-
-		if (giant->formID == 0x14) {
-			auto caster = giant;
-			float target_scale = get_visual_scale(huggedActor);
-			AdjustSizeReserve(caster, 0.0225f);
-			AdjustSizeLimit(0.0060f, caster);
-			AdjustMassLimit(0.0060f, caster);
-		}
-		HugShrink::Release(giant);
 	}
 
 	void GTSBeh_HugCrushEnd(AnimationEventData& data) {
@@ -352,7 +347,7 @@ namespace {
 	void HugCrushEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
-
+		if (huggedActor) {
 			if (!IsActionOnCooldown(player, CooldownSource::Action_AbsorbOther)) {
 				float health = GetHealthPercentage(huggedActor);
 				float HpThreshold = GetHugCrushThreshold(player, huggedActor, true);
@@ -378,50 +373,55 @@ namespace {
 				}
 			} else {
 				double cooldown = GetRemainingCooldown(player, CooldownSource::Action_AbsorbOther);
-                std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
+				std::string message = std::format("Hug Crush is on a cooldown: {:.1f} sec", cooldown);
 				NotifyWithSound(player, message);
 			}
+		}
 	}
 
 	void HugShrinkEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
-		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
-			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
-				NotifyWithSound(player, "All available size was drained");
-				shake_camera(player, 0.45f, 0.30f);
+		if (huggedActor) {
+			if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
+				if (!IsHugCrushing(player) && !IsHugHealing(player)) {
+					NotifyWithSound(player, "All available size was drained");
+					shake_camera(player, 0.45f, 0.30f);
+				}
+				return;
 			}
-			return;
-		}
 
-		AnimationManager::StartAnim("Huggies_Shrink", player);
-		AnimationManager::StartAnim("Huggies_Shrink_Victim", huggedActor);
+			AnimationManager::StartAnim("Huggies_Shrink", player);
+			AnimationManager::StartAnim("Huggies_Shrink_Victim", huggedActor);
+		}
 	}
 
 	void HugHealEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
 		auto huggedActor = HugShrink::GetHuggiesActor(player);
 
-		if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
-			if (!IsHugCrushing(player) && !IsHugHealing(player)) {
-				NotifyWithSound(player, "All available size was drained");
-				shake_camera(player, 0.45f, 0.30f);
-			}
-			return;
-		}
-
-		if (Runtime::HasPerkTeam(player, "HugCrush_LovingEmbrace")) {
-			if (!IsHostile(huggedActor, player) && (IsTeammate(huggedActor) || huggedActor->formID == 0x14)) {
-				StartHealingAnimation(player, huggedActor);
+		if (huggedActor) {
+			if (GetSizeDifference(player, huggedActor, SizeType::VisualScale, false, true) >= GetHugShrinkThreshold(player)) {
+				if (!IsHugCrushing(player) && !IsHugHealing(player)) {
+					NotifyWithSound(player, "All available size was drained");
+					shake_camera(player, 0.45f, 0.30f);
+				}
 				return;
+			}
+
+			if (Runtime::HasPerkTeam(player, "HugCrush_LovingEmbrace")) {
+				if (!IsHostile(huggedActor, player) && (IsTeammate(huggedActor) || huggedActor->formID == 0x14)) {
+					StartHealingAnimation(player, huggedActor);
+					return;
+				} else {
+					AnimationManager::StartAnim("Huggies_Shrink", player);
+					AnimationManager::StartAnim("Huggies_Shrink_Victim", huggedActor);
+				}
 			} else {
 				AnimationManager::StartAnim("Huggies_Shrink", player);
 				AnimationManager::StartAnim("Huggies_Shrink_Victim", huggedActor);
+				UpdateFriendlyHugs(player, huggedActor, true);
 			}
-		} else {
-			AnimationManager::StartAnim("Huggies_Shrink", player);
-			AnimationManager::StartAnim("Huggies_Shrink_Victim", huggedActor);
-			UpdateFriendlyHugs(player, huggedActor, true);
 		}
 	}
 	void HugReleaseEvent(const InputEventData& data) {
@@ -651,18 +651,17 @@ namespace Gts {
 
 	void HugShrink::CallRelease(Actor* giant) {
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
-		if (!huggedActor) {
-			return;
+		if (huggedActor) {
+			std::string_view message = fmt::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
+			float sizedifference = get_visual_scale(giant)/get_visual_scale(huggedActor);
+			if (giant->formID == 0x14) {
+				shake_camera(giant, 0.25f * sizedifference, 0.35f);
+			} else {
+				Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10f);
+			}
+			Notify(message);
+			AbortHugAnimation(giant, huggedActor);
 		}
-		std::string_view message = fmt::format("{} was saved from hugs of {}", huggedActor->GetDisplayFullName(), giant->GetDisplayFullName());
-		float sizedifference = get_visual_scale(giant)/get_visual_scale(huggedActor);
-		if (giant->formID == 0x14) {
-			shake_camera(giant, 0.25f * sizedifference, 0.35f);
-		} else {
-			Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10f);
-		}
-		Notify(message);
-		AbortHugAnimation(giant, huggedActor);
 	}
 
 	TESObjectREFR* HugShrink::GetHuggiesObj(Actor* giant) {

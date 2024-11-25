@@ -327,7 +327,6 @@ namespace {
 
 	void GTSGrab_Throw_ThrowActor(AnimationEventData& data) { // Throw frame 1
 		auto giant = &data.giant;
-		auto otherActor = Grab::GetHeldActor(&data.giant);
 
 		giant->SetGraphVariableInt("GTS_GrabbedTiny", 0);
 		giant->SetGraphVariableInt("GTS_Grab_State", 0);
