@@ -141,6 +141,6 @@
             "displayName": "Debug (MSVC)",
             "configurePreset": "build-debug-msvc",
             "description": "Debug build for testing."
-        },
+        }
     ]
 }
