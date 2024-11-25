@@ -21,31 +21,26 @@ jobs:
     name: build
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
-      - name: Setup CMake
+        uses: actions/checkout@v3
+      - name: Get cmake
         uses: lukka/get-cmake@latest
+      - name: Add msbuild to PATH
+        # This works with 2017+
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Restore artifacts, or setup vcpkg (do not install any package)
+        uses: lukka/run-vcpkg@v11
         with:
-          cmakeVersion: "~3.26.2"
-          ninjaVersion: "~1.11.0"
-
-      - name: Set Env
-        uses: TheMrMilchmann/setup-msvc-dev@v3.0.1
+          vcpkgGitCommitId: f6a5d4e8eb7476b8d7fc12a56dff300c1c986131
+      - name: Run CMake consuming CMakePreset.json and vcpkg.json by mean of vcpkg.
+        uses: lukka/run-cmake@v10
         with:
-            arch: x64
-            toolset: 14.40
-
-
-      - name: Compile
-        run: |
-           cmake --preset AE_SE_Release
-           cmake --build build --config RelWithDebInfo
-            
+          # configurePreset: build-release-msvc
+          # buildPreset: release-msvc
+          configurePreset: build-release-withdebuginfo-msvc
+          buildPreset: release-withdebuginfo-msvc
       - name: Copy Plugin
         shell: bash
         run: |
@@ -59,7 +54,6 @@ jobs:
           fi
           if [ -n "${root_folder}" ]; then
             cp "${root_folder}"/*.dll contrib/Distribution/Plugin/
-            cp "${root_folder}"/*.pdb contrib/Distribution/Plugin/
             ls -la "${root_folder}"/
             ls -la "${root_folder}"/*.pdb
             pdbs=( "${root_folder}"/*.pdb )
