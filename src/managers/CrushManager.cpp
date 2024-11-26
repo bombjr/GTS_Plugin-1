@@ -243,13 +243,16 @@ namespace Gts {
 
 	bool CrushManager::CanCrush(Actor* giant, Actor* tiny) {
 		if (CrushManager::AlreadyCrushed(tiny)) {
+			log::info("{} Is already crushed", tiny->GetDisplayFullName());
 			return false;
 		}
 		if (IsEssential(giant, tiny)) {
+			log::info("{} Is essential", tiny->GetDisplayFullName());
 			return false;
 		}
 
 		if (IsFlying(tiny)) {
+			log::info("{} Is flying", tiny->GetDisplayFullName());
 			return false; // Disallow to crush flying dragons
 		}
 

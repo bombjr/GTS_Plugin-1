@@ -42,27 +42,26 @@ namespace {
 			SMT = 1.75f; // Larger Dust
 			damage = 1.25f;
 		}
-        DoDamageEffect(giant, Damage_Stomp_Under_Light * damage * perk, Radius_Stomp_Strong, 8, 0.30f, Event, 1.0f, Source);
+        DoDamageEffect(giant, Damage_Stomp_Under_Light * damage * perk, Radius_Stomp_Strong, 8, 0.30f, Event, 1.0f, Source, false);
         DoImpactRumble(giant, Node, rumble);
         DoDustExplosion(giant, 1.0f * (SMT), Event, Node);
 
-        DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 0.5f);
+        DrainStamina(giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.4f);
 
         DoFootstepSound(giant, SMT, Event, Node);
 
         LaunchTask(giant, 0.825f * perk, 2.10f, Event);
 
         FootStepManager::PlayVanillaFootstepSounds(giant, right);
-
 	}
 
     void GTS_UnderStomp_CamOnR(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 0.5f);
+        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.4f);
         ManageCamera(&data.giant, true, CameraTracking::R_Foot);
     }
 
     void GTS_UnderStomp_CamOnL(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 0.5f);
+        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.4f);
         ManageCamera(&data.giant, true, CameraTracking::L_Foot);
     }
 
@@ -95,13 +94,11 @@ namespace Gts {
         //Remap our starting range
         const float InvLookDownStartAngle = 0.9f; //Starting value of remap. Defines start angle for how down we are looking
         const float InvLookdownIntensity = std::clamp(Remap(absPitch, 1.0f, InvLookDownStartAngle, 0.0f, 1.0f), 0.0f, 1.0f);
-        log::info("LookDownIntensity: {}", InvLookdownIntensity);
 
         bool Sneaking = giant->IsSneaking(); // We don't want it to work when sneaking
         if (!Sneaking) {
             bool allow = absPitch > InvLookDownStartAngle;
             // Allow to stomp when looking from above or below
-            log::info("ShouldStompUnder: {}, Pitch: {}", allow, absPitch);
             if (allow) {
                 float blend = std::clamp(InvLookdownIntensity * 1.3f, 0.0f, 1.0f);
                 giant->SetGraphVariableFloat("GTS_StompBlend", blend);

@@ -66,6 +66,16 @@ namespace {
 		"QUIVER",
 		"WeaponBow",
 		"WeaponBack",
+		"AnimObjectL",
+		"AnimObjectR",
+		"NPC L MagicNode [LMag]",
+		"NPC R MagicNode [RMag]",
+		/*"NPC R Item01",
+		"NPC R Item02",
+		"NPC R Item03",
+		"NPC L Item01",
+		"NPC L Item02",
+		"NPC L Item03",*/
 	};
 
 	float GetGrowthReduction(float size) {
@@ -1037,6 +1047,9 @@ namespace Gts {
 		bool NPC = Persistent::GetSingleton().NPCEffectImmunity;
 		bool PC = Persistent::GetSingleton().PCEffectImmunity;
 
+		if (hostile) {
+			return true;
+		}
 		if (NPC && giant->formID == 0x14 && (IsTeammate(tiny)) && !hostile) {
 			return false; // Protect NPC's against player size-related effects
 		}
@@ -2733,54 +2746,52 @@ namespace Gts {
 	}
 
 	void DisarmActor(Actor* tiny, bool drop) {
-		if (tiny->formID != 0x14) {
-			if (!drop) {
-				for (auto &object_find : disarm_nodes) {
-					auto object = find_node(tiny, object_find);
-					if (object) {
-						//log::info("Found Object: {}", object->name.c_str());
-						//object->local.scale = 0.01f;
-						object->SetAppCulled(true);
+		if (!drop) {
+			for (auto &object_find : disarm_nodes) {
+				auto object = find_node(tiny, object_find);
+				if (object) {
+					//log::info("Found Object: {}", object->name.c_str());
+					object->local.scale = 0.01f;
+					//object->SetAppCulled(true);
 
-						update_node(object);
-						
-						std::string objectname = object->name.c_str();
-						std::string name = std::format("ScaleWeapons_{}_{}", tiny->formID, objectname);
-						ActorHandle tinyHandle = tiny->CreateRefHandle();
+					update_node(object);
+					
+					std::string objectname = object->name.c_str();
+					std::string name = std::format("ScaleWeapons_{}_{}", tiny->formID, objectname);
+					ActorHandle tinyHandle = tiny->CreateRefHandle();
 
-						double Start = Time::WorldTimeElapsed();
+					double Start = Time::WorldTimeElapsed();
 
-						TaskManager::Run(name,[=](auto& progressData) {
-							if (!tinyHandle) {
-								return false;
-							}
-							Actor* Tiny = tinyHandle.get().get();
-							double Finish = Time::WorldTimeElapsed();
-							if (Finish - Start > 0.25 && !IsGtsBusy(Tiny)) {
-								//object->local.scale = 1.0f;
-								object->SetAppCulled(false);
-								update_node(object);
-								return false;
-							}
-
-							return true;
-						});
-					}
-				}
-			} else {
-				NiPoint3 dropPos = tiny->GetPosition();
-				for (auto object: {tiny->GetEquippedObject(true), tiny->GetEquippedObject(false)}) {
-					dropPos.x += 25 * get_visual_scale(tiny);
-					dropPos.y += 25 * get_visual_scale(tiny);
-					if (object) {
-						log::info("Object found");
-						
-						TESBoundObject* as_object = skyrim_cast<TESBoundObject*>(object);
-						if (as_object) {
-							log::info("As object exists, {}", as_object->GetName());
-							dropPos.z += 40 * get_visual_scale(tiny);
-							tiny->RemoveItem(as_object, 1, ITEM_REMOVE_REASON::kDropping, nullptr, nullptr, &dropPos, nullptr);
+					TaskManager::Run(name,[=](auto& progressData) {
+						if (!tinyHandle) {
+							return false;
 						}
+						Actor* Tiny = tinyHandle.get().get();
+						double Finish = Time::WorldTimeElapsed();
+						if (Finish - Start > 0.25 && !IsGtsBusy(Tiny)) {
+							object->local.scale = 1.0f;
+							//object->SetAppCulled(false);
+							update_node(object);
+							return false;
+						}
+
+						return true;
+					});
+				}
+			}
+		} else {
+			NiPoint3 dropPos = tiny->GetPosition();
+			for (auto object: {tiny->GetEquippedObject(true), tiny->GetEquippedObject(false)}) {
+				dropPos.x += 25 * get_visual_scale(tiny);
+				dropPos.y += 25 * get_visual_scale(tiny);
+				if (object) {
+					log::info("Object found");
+					
+					TESBoundObject* as_object = skyrim_cast<TESBoundObject*>(object);
+					if (as_object) {
+						log::info("As object exists, {}", as_object->GetName());
+						dropPos.z += 40 * get_visual_scale(tiny);
+						tiny->RemoveItem(as_object, 1, ITEM_REMOVE_REASON::kDropping, nullptr, nullptr, &dropPos, nullptr);
 					}
 				}
 			}

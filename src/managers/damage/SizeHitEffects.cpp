@@ -171,40 +171,34 @@ namespace {
 	}
 
 	void ApplyHitGrowth(Actor* attacker, Actor* receiver, float damage) {
-		auto grabbedActor = Grab::GetHeldActor(receiver);
-		if (grabbedActor) {
-			if (grabbedActor == attacker) {
-				return;
-			}
-			if (attacker == receiver) {
-				return;
-			}
-			
-			float scale = get_visual_scale(receiver);
-			float naturalscale = get_natural_scale(receiver, true);
-			
-			auto& sizemanager = SizeManager::GetSingleton();
-			float BalanceMode = sizemanager.BalancedMode();
-			float SizeHunger = 1.0f + Ench_Hunger_GetPower(receiver);
-			float Gigantism = 1.0f + Ench_Aspect_GetPower(receiver);
-			float SizeDifference = get_visual_scale(receiver)/get_visual_scale(attacker);
-			float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
-
-			float resistance = Potion_GetShrinkResistance(receiver);
+		if (attacker == receiver) {
+			return;
+		}
 		
-			damage *= DamageReduction;
+		float scale = get_visual_scale(receiver);
+		float naturalscale = get_natural_scale(receiver, true);
+		
+		auto& sizemanager = SizeManager::GetSingleton();
+		float BalanceMode = sizemanager.BalancedMode();
+		float SizeHunger = 1.0f + Ench_Hunger_GetPower(receiver);
+		float Gigantism = 1.0f + Ench_Aspect_GetPower(receiver);
+		float SizeDifference = get_visual_scale(receiver)/get_visual_scale(attacker);
+		float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
 
-			if ((receiver->formID == 0x14 || (IsTeammate(receiver) && IsFemale(receiver))) && Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk") && sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f) { // if has perk
-				//log::info("Applying hitgrowth for {}", damage);
-				float GrowthValue = std::clamp((-damage/2000) * SizeHunger * Gigantism, 0.0f, 0.25f * Gigantism);
-				HitGrowth(receiver, attacker, GrowthValue, SizeDifference, BalanceMode);
-				return;
-			} else if (BalanceMode >= 2.0f && receiver->formID == 0x14 && !Runtime::HasPerk(receiver, "GrowthOnHitPerk")) { // Shrink us
-				if (scale > naturalscale) {
-					float sizebonus = std::clamp(get_visual_scale(attacker), 0.10f, 1.0f);
-					float ShrinkValue = std::clamp(((-damage/850)/SizeHunger/Gigantism * sizebonus) * resistance, 0.0f, 0.25f / Gigantism); // affect limit by decreasing it
-					HitShrink(receiver, ShrinkValue);
-				}
+		float resistance = Potion_GetShrinkResistance(receiver);
+	
+		damage *= DamageReduction;
+
+		if ((receiver->formID == 0x14 || (IsTeammate(receiver) && IsFemale(receiver))) && Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk") && sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f) { // if has perk
+			//log::info("Applying hitgrowth for {}", damage);
+			float GrowthValue = std::clamp((-damage/2000) * SizeHunger * Gigantism, 0.0f, 0.25f * Gigantism);
+			HitGrowth(receiver, attacker, GrowthValue, SizeDifference, BalanceMode);
+			return;
+		} else if (BalanceMode >= 2.0f && receiver->formID == 0x14 && !Runtime::HasPerk(receiver, "GrowthOnHitPerk")) { // Shrink us
+			if (scale > naturalscale) {
+				float sizebonus = std::clamp(get_visual_scale(attacker), 0.10f, 1.0f);
+				float ShrinkValue = std::clamp(((-damage/850)/SizeHunger/Gigantism * sizebonus) * resistance, 0.0f, 0.25f / Gigantism); // affect limit by decreasing it
+				HitShrink(receiver, ShrinkValue);
 			}
 		}
 	}

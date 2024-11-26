@@ -53,21 +53,21 @@ namespace {
 			}
 
 			double Finish = Time::WorldTimeElapsed();
-			auto giant = giantHandle.get().get();
+			auto giantref = giantHandle.get().get();
 
 			if (Finish - Start > 0.05) { 
-				DoDamageEffect(giant, Damage_Stomp_Under_Strong * damage * perk, Radius_Stomp_Strong, 8, 0.30f, Event, 1.0f, Source);
-				DoImpactRumble(giant, Node, rumble);
-				DoDustExplosion(giant, 1.0f * (SMT), Event, Node);
+				DoDamageEffect(giantref, Damage_Stomp_Under_Strong * damage * perk, Radius_Stomp_Strong, 8, 0.30f, Event, 1.0f, Source, false);
+				DoImpactRumble(giantref, Node, rumble);
+				DoDustExplosion(giantref, 1.0f * (SMT), Event, Node);
 
-				DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 1.85f);
+				DrainStamina(giantref,"StaminaDrain_StrongStomp", "DestructionBasics", false, 5.1f); // 13.5 * 5.1
 
-				DoFootstepSound(giant, SMT, Event, Node);
+				DoFootstepSound(giantref, SMT, Event, Node);
 
-				LaunchTask(giant, 1.05f * perk, 3.60f, Event);
+				LaunchTask(giantref, 1.05f * perk, 3.60f, Event);
 
-				FootStepManager::DoStrongSounds(giant, 1.10f + animSpeed/20, Node);
-				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+				FootStepManager::DoStrongSounds(giantref, 1.10f + animSpeed/20, Node);
+				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
 				return false;
 			}
 			return true;
@@ -75,12 +75,12 @@ namespace {
 	}
 
     void GTS_UnderStomp_CamOn_StrongR(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.85f);
+        DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 5.1f);
         ManageCamera(&data.giant, true, CameraTracking::R_Foot);
     }
 
     void GTS_UnderStomp_CamOn_StrongL(AnimationEventData& data) {
-        DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.85f);
+        DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 5.1f);
         ManageCamera(&data.giant, true, CameraTracking::L_Foot);
     }
 
@@ -95,7 +95,6 @@ namespace {
 		float SavedSpeed = data.animSpeed;
 		UnderStomp_DoEverything(&data.giant, SavedSpeed, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "HeavyStompL");
 	}
-
 }
 namespace Gts {
     void AnimationUnderStompStrong::RegisterEvents() {

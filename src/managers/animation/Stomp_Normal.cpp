@@ -230,7 +230,7 @@ namespace {
 
 			double Finish = Time::WorldTimeElapsed();
 
-			if (Finish - Start > 0.025) { 
+			if (Finish - Start > 0.075) { 
 				auto giant = giantHandle.get().get();
 
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);

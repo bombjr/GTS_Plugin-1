@@ -198,7 +198,9 @@ namespace Gts {
 		} else {
 			AnimationManager::StartAnim("Huggies_Try_Victim", prey); //   GTSBEH_HugAbsorbStart_V
 		}
+		
 		AI_StartHugsTask(pred, prey);
+		DisarmActor(prey, false);
 	}
 
 	void AI_StartHugsTask(Actor* giant, Actor* tiny) {
