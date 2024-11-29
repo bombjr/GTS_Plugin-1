@@ -188,7 +188,7 @@ namespace Gts {
                 AdjustMassLimit(0.0106f * multiplier, giant);
             }
             if (Vore::GetSingleton().GetVoreData(giant).GetTimer() == true) {
-				Task_FacialEmotionTask_Moan(giant, 2.0f, "Vore");
+				Task_FacialEmotionTask_Moan(giant, 1.0f, "Vore", RandomFloat(0.0f, 0.35f));
                 PlayMoanSound(giant, 1.0f); // play timed sound.
             }
 

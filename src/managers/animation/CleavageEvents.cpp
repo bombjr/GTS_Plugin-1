@@ -435,14 +435,18 @@ namespace {
     ///=================================================================== Suffocate
 
     void GTS_BS_SufoStart(const AnimationEventData& data) { 
-        Actor* giant = &data.giant;
-        auto tiny = Grab::GetHeldActor(giant);
+        auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
             SuffocateTinyFor(&data.giant, tiny, 0.10f, 0.85f, 25.0f);
-            Task_RunSuffocateTask(giant, tiny);
-            SpawnHearts(giant, tiny, 35, 0.35f, false);
+            Task_RunSuffocateTask(&data.giant, tiny);
+            SpawnHearts(&data.giant, tiny, 35, 0.35f, false);
         }
-        Task_FacialEmotionTask_Smile(&data.giant, 1.8f, "SufoStart");
+        Task_FacialEmotionTask_Smile(&data.giant, 1.8f, "SufoStart", RandomFloat(0.0f, 0.75f));
+
+        int rng = RandomInt(0, 3);
+        if (rng >= 2) {
+            PlayLaughSound(&data.giant, 1.0f, 1);
+        }
     }
     void GTS_BS_SufoStop(const AnimationEventData& data) {}
 
@@ -472,6 +476,8 @@ namespace {
 
             ManageCamera(&data.giant, true, CameraTracking::ObjectB);
             SpawnHearts(&data.giant, tiny, 35, 0.50f, false);
+
+            PlayLaughSound(&data.giant, 1.0f, 2);
         }
     }
 
@@ -506,6 +512,7 @@ namespace {
     void GTS_BS_Poke(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
+            Task_FacialEmotionTask_Smile(&data.giant, 0.7f, "SufoPoke", RandomFloat(0.0f, 0.90f));
             SpawnHearts(&data.giant, tiny, 35, 0.4f, false);
         }
     }

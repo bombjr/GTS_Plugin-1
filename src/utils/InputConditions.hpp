@@ -6,7 +6,7 @@
 #include "data/runtime.hpp"
 #include "data/persistent.hpp"
 
-/*
+/*  Arial:
 	Input Conditions.
 	If a condition returns true it assumed a bound action can play or some other form of feedback will be displayed.
 	eg. A cooldown message.
@@ -15,6 +15,13 @@
 	
 	If true is returned inputmanager assumes the bound trigger will lead to an action and thus will block the relevant key inputs from being passed on to the game.
 
+*/
+
+/* Sermit:
+   (Monke Logic on)
+	False = do not block.
+	True = block.
+	*equips smart glasses and rolls far away on the chair*
 */
 
 //---------------------
@@ -152,8 +159,10 @@ static bool HugCondition_Release() {
 //------------------
 
 static bool SizeReserveCondition() {
-	auto target = PlayerCharacter::GetSingleton();
+	/*auto target = PlayerCharacter::GetSingleton();
 	return Runtime::HasPerk(target, "SizeReserve") && Persistent::GetSingleton().GetData(target);
+	*/
+	return false;
 }
 
 //---------------------
@@ -302,12 +311,12 @@ static bool GrabCondition_Attack() {
 	auto target = GetPlayerOrControlled();
 
 	if (IsGtsBusy(target) && !IsUsingThighAnimations(target)) {
-		return false;
+		return true;
 	}
 	if (IsStomping(target) && IsTransitioning(target)) {
-		return false;
+		return true;
 	}
-	return true;
+	return false;
 }
 
 static bool GrabCondition_Vore() {

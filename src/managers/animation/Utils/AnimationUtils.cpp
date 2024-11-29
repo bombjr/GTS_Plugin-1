@@ -1373,22 +1373,12 @@ namespace Gts {
 			}
 			TargetA += (bone->world.translate) * (1.0f/bone_count);
 		}
-		/*for (auto bone_name_B: bone_names) {
-			auto bone = find_node(tiny, bone_name_B);
-			if (!bone) {
-				Notify("Error: Breast Nodes could not be found.");
-				Notify("Actor without nodes: {}", tiny->GetDisplayFullName());
-				Notify("Suggestion: install XP32 skeleton.");
-				return NiPoint3();
-			}
-			TargetB += (bone->world.translate) * (1.0f/bone_count);
-		}*/
 
 		TargetB += tiny->GetPosition();
 
 		auto targetPoint = TargetA;
 		float adjustment = 45.0f * get_visual_scale(giant);
-		//bool hugs = IsHugging(giant);
+
 		if (hugs) {
 			if (IsCrawling(giant)) { // if doing healing crawl hugs
 				targetPoint = TargetA; // just target the breasts

@@ -70,16 +70,16 @@ namespace {
 		}
 	}
 
-	void GrowAfterTheKill(Actor* caster, Actor* target) {
-		if (!Runtime::GetBool("GtsDecideGrowth") || HasSMT(caster)) {
-			return;
-		} else if (Runtime::HasPerkTeam(caster, "GrowthDesirePerk") && Runtime::GetInt("GtsDecideGrowth") >= 1) {
-			float Rate = (0.00016f * get_visual_scale(target)) * 120;
-			if (Runtime::HasPerkTeam(caster, "AdditionalGrowth")) {
-				Rate *= 2.0f;
+	void GrowAfterTheKill(Actor* caster, Actor* target, float power) { // called twice
+		if (Runtime::GetBool("GtsDecideGrowth") && !HasSMT(caster)) {
+			if (Runtime::HasPerkTeam(caster, "GrowthDesirePerk") && Runtime::GetInt("GtsDecideGrowth") >= 1) {
+				float Rate = (0.00016f * get_visual_scale(target)) * 120 * power;
+				if (Runtime::HasPerkTeam(caster, "AdditionalGrowth")) {
+					Rate *= 2.0f;
+				}
+				CrushGrow(caster, 0, Rate * SizeSteal_GetPower(caster, target));
+				GrowthText(caster);
 			}
-			CrushGrow(caster, 0, Rate * SizeSteal_GetPower(caster, target));
-			GrowthText(caster);
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
@@ -88,13 +88,14 @@ namespace {
 		auto select = RandomInt(0, 2);
 		if (randomInt <= 3) {
 			if (voicetimer.ShouldRun()) {
-				if (select >= 2) {
+				if (select >= 1) {
+					Task_FacialEmotionTask_Moan(giant, 1.6f, "CrushMoan", RandomFloat(0.0f, 0.40f));
+					GrowAfterTheKill(giant, target, 2.0f);
 					PlayMoanSound(giant, 1.0f);
-					GrowAfterTheKill(giant, target);
-					Task_FacialEmotionTask_Moan(giant, 2.0f, "Crush");
 				} else {
-					Task_FacialEmotionTask_Smile(giant, 1.1f, "Crush");
-					PlayLaughSound(giant, 1.0f, 2);
+					Task_FacialEmotionTask_Smile(giant, 1.25f, "CrushSmile", RandomFloat(0.0f, 0.7f));
+					PlayLaughSound(giant, 1.0f, RandomInt(1, 2));
+					GrowAfterTheKill(giant, target, 2.0f);
 				}
 			}
 		}
@@ -149,9 +150,9 @@ namespace Gts {
 				
 				std::string taskname = std::format("CrushTiny {}", tiny->formID);
 
+				GrowAfterTheKill(giant, tiny, 1.0f);
 				MoanOrLaugh(giant, tiny);
-				GrowAfterTheKill(giant, tiny);
-
+			
 				if (giant->formID == 0x14) {
 					if (IsLiving(tiny)) {
 						TriggerScreenBlood(50);
