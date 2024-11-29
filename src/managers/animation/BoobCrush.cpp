@@ -288,20 +288,20 @@ namespace {
 
 	void GTS_BoobCrush_Smile_On(AnimationEventData& data) {
 		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 1.0f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 1.0f, "modifier"); // blink R
-		AdjustFacialExpression(giant, 2, 1.0f, "expression");
+		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 1.0f, CharEmotionType::Modifier); // blink R
+		AdjustFacialExpression(giant, 2, 1.0f, CharEmotionType::Expression);
 
 		ApplyButtCrushCooldownTask(giant);
-		//AdjustFacialExpression(giant, 0, 0.75f, "phenome");
+		//AdjustFacialExpression(giant, 0, 0.75f, CharEmotionType::Phenome);
 	}
 
 	void GTS_BoobCrush_Smile_Off(AnimationEventData& data) {
 		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
-		AdjustFacialExpression(giant, 2, 0.0f, "expression");
-		//AdjustFacialExpression(giant, 0, 0.0f, "phenome");
+		AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 0.0f, CharEmotionType::Modifier); // blink R
+		AdjustFacialExpression(giant, 2, 0.0f, CharEmotionType::Expression);
+		//AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Phenome);
 	}
 
 	void GTS_BoobCrush_DOT_Start_Loop(AnimationEventData& data) {
@@ -342,7 +342,7 @@ namespace {
 		DamageAV(giant, ActorValue::kStamina, WasteStamina);
 		
 		Runtime::PlaySoundAtNode("growthSound", giant, 1.0f, 1.0f, "NPC Pelvis [Pelv]");
-		Task_FacialEmotionTask_Moan(giant, 2.2f / GetAnimationSlowdown(giant), "BoobCrush_Growth");
+		Task_FacialEmotionTask_Moan(giant, 2.2f, "BoobCrush_Growth");
 		
 		StartRumble("CleavageRumble", data.giant, 0.06f, 0.60f);
 	}

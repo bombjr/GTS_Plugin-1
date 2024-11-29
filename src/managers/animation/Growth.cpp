@@ -88,16 +88,9 @@ namespace {
 		PlayMoanSound(&data.giant, 1.0f);
 	}
 	void GtsGrowth_Mouth_Open(AnimationEventData& data) {
-		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 1.0f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 1.0f, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 0.75f, "phenome");
+		Task_FacialEmotionTask_Moan(&data.giant, 1.25f, "GrowthMoan", 0.15f);
 	}
 	void GtsGrowth_Mouth_Close(AnimationEventData& data) {
-		auto giant = &data.giant;
-		AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
 	}
 	void GTSGrowth_Enter(AnimationEventData& data) {
 	}

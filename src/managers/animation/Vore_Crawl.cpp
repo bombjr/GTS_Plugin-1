@@ -75,8 +75,8 @@ namespace {
 	}
 
 	void GTSCrawlVore_SmileOn(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 2, 1.0f, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.8f, "phenome");
+		AdjustFacialExpression(&data.giant, 2, 1.0f, CharEmotionType::Expression);
+		AdjustFacialExpression(&data.giant, 3, 0.8f, CharEmotionType::Phenome);
 	}
 
 	void GTSCrawlVore_Grab(AnimationEventData& data) {
@@ -136,7 +136,7 @@ namespace {
 
 	void GTSCrawlVore_OpenMouth(AnimationEventData& data) {
 		auto giant = &data.giant;
-		Task_FacialEmotionTask_OpenMouth(giant, 0.5f / AnimationManager::GetAnimSpeed(giant), "CrawlVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.5f, "CrawlVoreOpenMouth");
 
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 
@@ -186,8 +186,8 @@ namespace {
 	}
 
 	void GTSCrawlVore_SmileOff(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 2, 0.0f, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.0f, "phenome");
+		AdjustFacialExpression(&data.giant, 2, 0.0f, CharEmotionType::Expression);
+		AdjustFacialExpression(&data.giant, 3, 0.0f, CharEmotionType::Phenome);
 	}
 
 	void GTSBEH_CrawlVoreExit(AnimationEventData& data) {} // unused

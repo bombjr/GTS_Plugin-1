@@ -1,6 +1,7 @@
 #include "managers/animation/Utils/CooldownManager.hpp"
 #include "managers/animation/Utils/AnimationUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
+#include "managers/emotions/EmotionManager.hpp"
 #include "managers/ShrinkToNothingManager.hpp"
 #include "managers/damage/SizeHitEffects.hpp"
 #include "managers/animation/HugShrink.hpp"
@@ -129,7 +130,7 @@ namespace {
 			Runtime::PlaySoundAtNode("growthSound", receiver, GrowthValue * 2, 1.0f, "NPC Pelvis [Pelv]");
 		}
 		if (ShrinkChance >= 2) {
-			if (SizeDifference >= 4.0f && LaughChance >= 11 && !LaughBlocked) {
+			if (SizeDifference >= 2.5f && LaughChance >= 5 && !LaughBlocked) {
 				Task_FacialEmotionTask_Smile(receiver, 1.4f, "HitGrowthSmile");
 				ApplyActionCooldown(receiver, CooldownSource::Emotion_Laugh);
 				PlayLaughSound(receiver, 1.0f, 1);
@@ -147,9 +148,7 @@ namespace {
 			if (get_target_scale(attacker) <= 0.12f/Adjustment) {
 				set_target_scale(attacker, 0.12f/Adjustment);
 			}
-			
 		}
-		
 	}
 
 	void HitShrink(Actor* receiver, float ShrinkValue) {

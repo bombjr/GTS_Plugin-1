@@ -14,8 +14,12 @@ namespace Gts {
 			
 
 			virtual std::string DebugName() override;
-			
-			void OverridePhenome(Actor* giant, int number, float power, float halflife, float target);
-			void OverrideModifier(Actor* giant, int number, float power, float halflife, float target);
+
+			static void SetEmotionBusy(Actor* giant, CharEmotionType Type, bool lock);
+			static bool IsEmotionBusy(Actor* giant, CharEmotionType Type);
+
+			static float GetEmotionValue(Actor* giant, CharEmotionType Type, std::uint32_t emotion_value);
+			void OverridePhenome(Actor* giant, int number, float halflife, float target);
+			void OverrideModifier(Actor* giant, int number, float halflife, float target);
 	};
 }

@@ -93,6 +93,7 @@ namespace {
 					GrowAfterTheKill(giant, target);
 					Task_FacialEmotionTask_Moan(giant, 2.0f, "Crush");
 				} else {
+					Task_FacialEmotionTask_Smile(giant, 1.1f, "Crush");
 					PlayLaughSound(giant, 1.0f, 2);
 				}
 			}

@@ -179,9 +179,11 @@ static bool RappidGrowShrinkCondition() {
 
 static bool ShrinkOutburstCondition() {
 	auto target = PlayerCharacter::GetSingleton();
-	bool DarkArts = Runtime::HasPerk(target, "DarkArts");
-	if (!DarkArts) {
-		return false; // no perk, do nothing
+	if (target) {
+		bool DarkArts = Runtime::HasPerk(target, "DarkArts");
+		if (!DarkArts) {
+			return false; // no perk, do nothing
+		}
 	}
 	return true;
 }
@@ -193,7 +195,7 @@ static bool ShrinkOutburstCondition() {
 static bool ProtectSmallOnesCondition() {
 	auto target = PlayerCharacter::GetSingleton();
 
-	if (CanPerformAnimation(target, AnimationCondition::kOthers)) {
+	if (target && CanPerformAnimation(target, AnimationCondition::kOthers)) {
 		return true;
 	}
 	return false;
@@ -302,14 +304,10 @@ static bool GrabCondition_Attack() {
 	if (IsGtsBusy(target) && !IsUsingThighAnimations(target)) {
 		return false;
 	}
-	if (!IsStomping(target) && !IsTransitioning(target)) {
-		auto grabbedActor = Grab::GetHeldActor(target);
-		if (!grabbedActor) {
-			return false;
-		}
-		return true;
+	if (IsStomping(target) && IsTransitioning(target)) {
+		return false;
 	}
-	return false;
+	return true;
 }
 
 static bool GrabCondition_Vore() {

@@ -181,7 +181,7 @@ namespace {
 		if (!Blocked) {
 			PlayMoanSound(giant, 1.0f);
 			ApplyActionCooldown(giant, CooldownSource::Emotion_Moan);
-			Task_FacialEmotionTask_Moan(giant, 1.8f, "ButtCrush_Growth");
+			Task_FacialEmotionTask_Moan(giant, 1.2f, "ButtCrush_Growth");
 		}
 
 		StopRumble("BCRumble", data.giant);

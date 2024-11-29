@@ -52,8 +52,7 @@ namespace Gts {
 
 	void SpawnHurtParticles(Actor* giant, Actor* grabbedActor, float mult, float dustmult);
 
-	void AdjustFacialExpression(Actor* giant, int ph, float target, std::string_view type);
-	void AdjustFacialExpression(Actor* giant, int ph, float target, float speed_phenome, float speed_modifier, std::string_view type);
+	void AdjustFacialExpression(Actor* giant, int ph, float target, CharEmotionType Type, float phenome_halflife = 0.08f, float modifier_speed = 0.25f);
 
 	float GetWasteMult(Actor* giant);
 	float GetPerkBonus_Basics(Actor* Giant);
@@ -74,9 +73,9 @@ namespace Gts {
 
 	void AbsorbShout_BuffCaster(Actor* giantref, Actor* tinyref);
 	void Task_TrackSizeTask(Actor* giant, Actor* tiny, std::string_view naming, bool check_ticks, float time_mult);
-	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming);
-	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming);
-	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming);
+	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming, float duration_add = 0.0f);
+	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming, float duration_add = 0.0f);
+	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming, float duration_add = 0.0f);
 
 	void Laugh_Chance(Actor* giant, Actor* otherActor, float multiply, std::string_view name);
 	void Laugh_Chance(Actor* giant, float multiply, std::string_view name);

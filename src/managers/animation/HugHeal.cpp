@@ -47,9 +47,9 @@ namespace {
 		} if (rng <= 1) {
 			PlayMoanSound(actor, 1.0f);
 		}
-		AdjustFacialExpression(actor, 0, p_1, "modifier"); // blink L
-		AdjustFacialExpression(actor, 1, p_1, "modifier"); // blink R
-		AdjustFacialExpression(actor, 0, p_2, "phenome");
+		AdjustFacialExpression(actor, 0, p_1, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(actor, 1, p_1, CharEmotionType::Modifier); // blink R
+		AdjustFacialExpression(actor, 0, p_2, CharEmotionType::Phenome);
 	}
 
 	void AbortHugAnimation_Friendly(Actor* giant) {

@@ -169,7 +169,7 @@ namespace {
 
 	void GTSvore_sit_end(AnimationEventData& data) {
 		Rumbling::Stop("BodyRumble", &data.giant);
-		AdjustFacialExpression(&data.giant, 2, 1.0f, "expression"); // smile (expression)
+		AdjustFacialExpression(&data.giant, 2, 1.0f, CharEmotionType::Expression); // smile (expression)
 	}
 
 	void GTSvore_hand_extend(AnimationEventData& data) {
@@ -200,14 +200,14 @@ namespace {
 	}
 
 	void GTSvore_bringactor_start(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 3, 0.8f, "phenome"); // Smile a bit (Mouth)
+		AdjustFacialExpression(&data.giant, 3, 0.8f, CharEmotionType::Phenome); // Smile a bit (Mouth)
 		StartRHandRumble("HandR", data.giant, 0.2f, 0.175f);
 	}
 
 	void GTSvore_open_mouth(AnimationEventData& data) {
 		auto giant = &data.giant;
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
-		Task_FacialEmotionTask_OpenMouth(giant, 0.75f / AnimationManager::GetAnimSpeed(giant), "StandingVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.75f, "StandingVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
 			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
@@ -240,7 +240,7 @@ namespace {
 	}
 
 	void GTSvore_swallow_sound(AnimationEventData& data) {
-		AdjustFacialExpression(&data.giant, 3, 0.0f, "phenome"); // Remove smile (Mouth)
+		AdjustFacialExpression(&data.giant, 3, 0.0f, CharEmotionType::Phenome); // Remove smile (Mouth)
 	}
 
 	void GTSvore_close_mouth(AnimationEventData& data) {
@@ -268,8 +268,8 @@ namespace {
 		/*if (!AllowDevourment()) {
 			
 		}*/
-		AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 0.0f, CharEmotionType::Modifier); // blink R
 		StartRHandRumble("HandR", data.giant, 0.20f, 0.15f);
 	}
 
@@ -287,7 +287,7 @@ namespace {
 
 	void GTSvore_eat_actor(AnimationEventData& data) {
 		auto& VoreData = Vore::GetSingleton().GetVoreData(&data.giant);
-		AdjustFacialExpression(&data.giant, 2, 0.0f, "expression"); // Remove smile
+		AdjustFacialExpression(&data.giant, 2, 0.0f, CharEmotionType::Expression); // Remove smile
 		VoreData.KillAll();
 	}
 

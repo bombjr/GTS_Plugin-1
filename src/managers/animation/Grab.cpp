@@ -545,8 +545,9 @@ namespace Gts {
 			NiPoint3 GiantDist = HandNode->world.translate;
 			NiPoint3 TinyDist = tiny->GetPosition();
 			float distance = (GiantDist - TinyDist).Length();
+			float reattach_dist = std::clamp(512.0f * get_visual_scale(giant), 512.0f, 4096.0f);
 
-			if (distance > 2048) {
+			if (distance > reattach_dist) {
 
 				log::info("Moving tiny to giant");
 				tiny->MoveTo(giant);

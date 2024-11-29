@@ -59,7 +59,7 @@ namespace {
 		auto giant = &data.giant;
 		auto& VoreData = Vore::GetSingleton().GetVoreData(giant);
 
-		Task_FacialEmotionTask_OpenMouth(giant, 0.6f / AnimationManager::GetAnimSpeed(giant), "SneakVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.6f, "SneakVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
 			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
@@ -107,12 +107,12 @@ namespace {
     }
 
     void GTS_Sneak_Vore_SmileOn(AnimationEventData& data) {
-        AdjustFacialExpression(&data.giant, 2, 1.0f, 0.32f, 0.72f, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.8f, 0.32f, 0.72f, "phenome");
+        AdjustFacialExpression(&data.giant, 2, 1.0f, CharEmotionType::Expression, 0.32f, 0.72f);
+		AdjustFacialExpression(&data.giant, 3, 0.8f, CharEmotionType::Phenome, 0.32f, 0.72f);
     }
     void GTS_Sneak_Vore_SmileOff(AnimationEventData& data) {
-        AdjustFacialExpression(&data.giant, 2, 0.0f, 0.32f, 0.72f, "expression");
-		AdjustFacialExpression(&data.giant, 3, 0.0f, 0.32f, 0.72f, "phenome");
+        AdjustFacialExpression(&data.giant, 2, 0.0f, CharEmotionType::Expression, 0.32f, 0.72f);
+		AdjustFacialExpression(&data.giant, 3, 0.0f, CharEmotionType::Phenome, 0.32f, 0.72f);
     }
 }
 

@@ -357,9 +357,9 @@ namespace Gts {
 
 		SetSneaking(giant, false, 0);
 
-		AdjustFacialExpression(giant, 0, 0.0f, "phenome");
-		AdjustFacialExpression(giant, 0, 0.0f, "modifier");
-		AdjustFacialExpression(giant, 1, 0.0f, "modifier");
+		AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Phenome);
+		AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Modifier);
+		AdjustFacialExpression(giant, 1, 0.0f, CharEmotionType::Modifier);
 
 		AnimationManager::StartAnim("Huggies_Spare", giant); // Start "Release" animation on Giant
 
@@ -583,43 +583,25 @@ namespace Gts {
 		}
 	}
 
-	void AdjustFacialExpression(Actor* giant, int ph, float target, std::string_view type) {
+	void AdjustFacialExpression(Actor* giant, int ph, float target, CharEmotionType Type, float phenome_halflife, float modifier_speed) {
 		auto& Emotions = EmotionManager::GetSingleton();
-
-		if (type == "phenome") {
-			Emotions.OverridePhenome(giant, ph, 0.0f, 0.08f, target);
-		}
-		if (type == "expression") {
-			auto fgen = giant->GetFaceGenAnimationData();
-			if (fgen) {
-				//fgen->exprOverride = false;
-				fgen->SetExpressionOverride(ph, target);
-				fgen->expressionKeyFrame.SetValue(ph, target); // Expression doesn't need Spring since it is already smooth by default
-				//fgen->exprOverride = true;
-			}
-		}
-		if (type == "modifier") {
-			Emotions.OverrideModifier(giant, ph, 0.0f, 0.25f, target);
-		}
-	} 
-
-	void AdjustFacialExpression(Actor* giant, int ph, float target, float speed_phenome, float speed_modifier, std::string_view type) {
-		auto& Emotions = EmotionManager::GetSingleton();
-
-		if (type == "phenome") {
-			Emotions.OverridePhenome(giant, ph, 0.0f, speed_phenome, target);
-		}
-		if (type == "expression") {
-			auto fgen = giant->GetFaceGenAnimationData();
-			if (fgen) {
-				fgen->exprOverride = false;
-				fgen->SetExpressionOverride(ph, target);
-				fgen->expressionKeyFrame.SetValue(ph, target); // Expression doesn't need Spring since it is already smooth by default
-				fgen->exprOverride = true;
-			}
-		}
-		if (type == "modifier") {
-			Emotions.OverrideModifier(giant, ph, 0.0f, speed_modifier, target);
+		auto fgen = giant->GetFaceGenAnimationData();
+		switch (Type) {
+			case CharEmotionType::Phenome:
+				Emotions.OverridePhenome(giant, ph, phenome_halflife, target);
+			break;
+			case CharEmotionType::Expression:
+				
+				if (fgen) {
+					//fgen->exprOverride = false;
+					fgen->SetExpressionOverride(ph, target);
+					fgen->expressionKeyFrame.SetValue(ph, target); // Expression doesn't need Spring since it is already smooth by default
+					//fgen->exprOverride = true;
+				}
+			break;
+			case CharEmotionType::Modifier:
+				Emotions.OverrideModifier(giant, ph, modifier_speed, target);
+			break;
 		}
 	}
 
@@ -1469,19 +1451,22 @@ namespace Gts {
 		});
 	}
 
-	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming) {
+	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming, float duration_add) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
 		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		float open_speed = duration/2;
+		float open_speed = duration/6.0f;
 
-		AdjustFacialExpression(giant, 0, 1.0f, open_speed, open_speed, "phenome"); // Start opening mouth
-		AdjustFacialExpression(giant, 1, 0.5f, open_speed, open_speed, "phenome"); // Open it wider
+		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Phenome, open_speed, open_speed); // Start opening mouth
+		AdjustFacialExpression(giant, 1, 0.5f, CharEmotionType::Phenome, open_speed, open_speed); // Open it wider
 
-		AdjustFacialExpression(giant, 0, 0.80f, open_speed, open_speed, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.80f, open_speed, open_speed, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.80f, CharEmotionType::Modifier, open_speed, open_speed); // blink L
+		AdjustFacialExpression(giant, 1, 0.80f, CharEmotionType::Modifier, open_speed, open_speed); // blink R
+
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Phenome, true);
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Modifier, true);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
@@ -1489,31 +1474,43 @@ namespace Gts {
 			}
 			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = static_cast<float>(finish - start);
 
-			if (timepassed >= duration) {
-				float close_speed = duration / 1.75f;
+			float timepassed = static_cast<float>(finish - start) * AnimationManager::GetAnimSpeed(giantref);
+			bool FullEmotion = EmotionManager::GetEmotionValue(giantref, CharEmotionType::Phenome, 0) >= 1.0f;
 
-				AdjustFacialExpression(giant, 0, 0.0f, close_speed, close_speed, "phenome"); // Start opening mouth
-				AdjustFacialExpression(giant, 1, 0.0f, close_speed, close_speed, "phenome"); // Open it wider
+			bool ShouldRevert = FullEmotion && timepassed >= duration + duration_add;
+			
+			if (ShouldRevert) {
+				float close_speed = duration / 6.0f;
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, false);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, false);
 
-				AdjustFacialExpression(giant, 0, 0.0f, close_speed, close_speed, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0f, close_speed, close_speed, "modifier"); // blink R
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Phenome, close_speed, close_speed); // Start opening mouth
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Phenome, close_speed, close_speed); // Open it wider
+
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Modifier, close_speed, close_speed); // blink L
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Modifier, close_speed, close_speed); // blink R
+
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, true);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, true);
 				return false;
 			}
 			return true;
 		});
 	}
 
-	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming) {
+	void Task_FacialEmotionTask_Moan(Actor* giant, float duration, std::string_view naming, float duration_add) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
 		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		AdjustFacialExpression(giant, 0, 1.0f, 0.0f, duration/2, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 1.0f, 0.0f, duration/2, "modifier"); // blink R
-		AdjustFacialExpression(giant, 0, 1.0f, "phenome"); // open mouth
+		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 1.0f, CharEmotionType::Modifier); // blink R
+		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Phenome); // open mouth
+
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Phenome, true);
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Modifier, true);
 
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!giantHandle) {
@@ -1521,35 +1518,46 @@ namespace Gts {
 			}
 			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			float timepassed = static_cast<float>(finish - start);
+			float timepassed = static_cast<float>(finish - start) * AnimationManager::GetAnimSpeed(giantref);
 
-			if (timepassed >= duration) {
-				AdjustFacialExpression(giant, 0, 0.0f, 0.0f, 0.0f, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0f, 0.0f, 0.0f, "modifier"); // blink R
-				AdjustFacialExpression(giantref, 0, 0.0f, "phenome"); // close mouth
+			bool ShouldRevert = timepassed >= duration + duration_add;
+
+			if (ShouldRevert) {
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, false);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, false);
+
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Modifier); // blink L
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Modifier); // blink R
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Phenome); // close mouth
+
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, true);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, true);
 				return false;
 			}
 			return true;
 		});
 	}
 
-	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming) {
+	void Task_FacialEmotionTask_Smile(Actor* giant, float duration, std::string_view naming, float duration_add) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
 		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		AdjustFacialExpression(giant, 0, 0.1f, "phenome"); // Start opening mouth
+		AdjustFacialExpression(giant, 0, 0.1f, CharEmotionType::Phenome); // Start opening mouth
 
-		AdjustFacialExpression(giant, 0, 0.40f, "modifier"); // blink L
-		AdjustFacialExpression(giant, 1, 0.40f, "modifier"); // blink R
+		AdjustFacialExpression(giant, 0, 0.40f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 0.40f, CharEmotionType::Modifier); // blink R
 
 		float random = (RandomInt(5, 25)) * 0.01f;
 		float smile = 0.25f + random; // up to +0.50 to open mouth
 
-		AdjustFacialExpression(giant, 3, random, "phenome"); // Slightly open mouth
-		AdjustFacialExpression(giant, 5, 0.5f, "phenome"); // Actual smile but leads to opening mouth 
-		AdjustFacialExpression(giant, 7, 1.0f, "phenome"); // Close mouth stronger to counter opened mouth from smiling
+		AdjustFacialExpression(giant, 3, random, CharEmotionType::Phenome); // Slightly open mouth
+		AdjustFacialExpression(giant, 5, 0.5f, CharEmotionType::Phenome); // Actual smile but leads to opening mouth 
+		AdjustFacialExpression(giant, 7, 1.0f, CharEmotionType::Phenome); // Close mouth stronger to counter opened mouth from smiling
+
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Phenome, true);
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Modifier, true);
 		
 
 		// Emotion guide:
@@ -1561,16 +1569,25 @@ namespace Gts {
 			}
 			double finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
-			double timepassed = finish - start;
-			if (timepassed >= static_cast<double>(duration)) {
-				AdjustFacialExpression(giant, 0, 0.0f, "phenome"); // Start closing mouth
 
-				AdjustFacialExpression(giant, 0, 0.0f, "modifier"); // blink L
-				AdjustFacialExpression(giant, 1, 0.0f, "modifier"); // blink R
+			float timepassed = static_cast<float>(finish - start) * AnimationManager::GetAnimSpeed(giantref);
+			bool ShouldRevert = timepassed >= duration + duration_add;
+			
+			if (ShouldRevert) {
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, false);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, false);
 
-				AdjustFacialExpression(giant, 3, 0.0f, "phenome"); // Smile a bit (Mouth)
-				AdjustFacialExpression(giant, 5, 0.0f, "phenome"); // Smile a bit (Mouth)
-				AdjustFacialExpression(giant, 7, 0.0f, "phenome"); // Smile a bit (Mouth)
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Phenome); // Start closing mouth
+
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Modifier); // blink L
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Modifier); // blink R
+
+				AdjustFacialExpression(giantref, 3, 0.0f, CharEmotionType::Phenome); // Smile a bit (Mouth)
+				AdjustFacialExpression(giantref, 5, 0.0f, CharEmotionType::Phenome); // Smile a bit (Mouth)
+				AdjustFacialExpression(giantref, 7, 0.0f, CharEmotionType::Phenome); // Smile a bit (Mouth)
+
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, true);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, true);
 				return false;
 			}
 			return true;
@@ -1649,7 +1666,7 @@ namespace Gts {
 		}
 
 		float difference = GetSizeDifference(giant, tiny, SizeType::GiantessScale, false, false);
-		float clamped_diff = std::clamp(difference, 1.0f, 10.0f);
+		float clamped_diff = std::clamp(difference, 1.0f, 14.0f);
 
 		return hp * clamped_diff;
 	}

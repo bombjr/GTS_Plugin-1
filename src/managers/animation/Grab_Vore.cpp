@@ -53,7 +53,7 @@ namespace {
 			SetBeingEaten(otherActor, true);
 			Vore::GetSingleton().ShrinkOverTime(giant, otherActor, 0.1f);
 		}
-		Task_FacialEmotionTask_OpenMouth(giant, 1.1f / AnimationManager::GetAnimSpeed(giant), "GrabVoreOpenMouth");
+		Task_FacialEmotionTask_OpenMouth(giant, 1.1f, "GrabVoreOpenMouth", 0.3f);
 		StopLHandRumble("GrabVoreL", data.giant);
 	}
 

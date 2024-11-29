@@ -4,6 +4,7 @@
 #include "managers/animation/Utils/CrawlUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/animation/CleavageEvents.hpp"
+#include "managers/emotions/EmotionManager.hpp"
 #include "managers/animation/CleavageState.hpp"
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/damage/SizeHitEffects.hpp"
@@ -255,7 +256,7 @@ namespace {
         Rumbling::Once("BreastShake_R", &data.giant, 0.3f, 0.0f, "R Breast02", 0.0f);
 
         if (!IsActionOnCooldown(&data.giant, CooldownSource::Emotion_Laugh)) {
-            Task_FacialEmotionTask_Smile(&data.giant, 6.0f / AnimationManager::GetAnimSpeed(&data.giant), "ShakeSmile");
+            Task_FacialEmotionTask_Smile(&data.giant, 6.0f, "ShakeSmile");
             ApplyActionCooldown(&data.giant, CooldownSource::Emotion_Laugh);
         }
     }
@@ -274,7 +275,7 @@ namespace {
 			SetBeingEaten(tiny, true);
 			Vore::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
 		}
-		Task_FacialEmotionTask_OpenMouth(giant, 0.66f / AnimationManager::GetAnimSpeed(giant), "PrepareVore");
+		Task_FacialEmotionTask_OpenMouth(giant, 0.66f, "PrepareVore");
     }
     void GTS_BS_CloseMouth(const AnimationEventData& data) {
     }
@@ -330,7 +331,7 @@ namespace {
     ///=================================================================== Absorb
 
     void GTS_BS_AbsorbStart(const AnimationEventData& data) {
-        Task_FacialEmotionTask_Smile(&data.giant, 3.2f / AnimationManager::GetAnimSpeed(&data.giant), "AbsorbStart");
+        Task_FacialEmotionTask_Smile(&data.giant, 3.2f, "AbsorbStart");
         Task_ApplyAbsorbCooldown(&data.giant);
 
         auto tiny = Grab::GetHeldActor(&data.giant);
@@ -356,6 +357,7 @@ namespace {
             bool Blocked = IsActionOnCooldown(giant, CooldownSource::Emotion_Laugh);
             if (!Blocked) {
                 ApplyActionCooldown(giant, CooldownSource::Emotion_Laugh);
+                Task_FacialEmotionTask_Smile(giant, 0.9f, "AbsorbSmile", 0.12f);
                 PlayLaughSound(giant, 0.6f, 1);
             }
 
@@ -368,7 +370,7 @@ namespace {
 
     void GTS_BS_FinishAbsorb(const AnimationEventData& data) {
         Actor* giant = &data.giant;
-        Task_FacialEmotionTask_Moan(giant, 1.1f / AnimationManager::GetAnimSpeed(giant), "AbsorbMoan");
+        Task_FacialEmotionTask_Moan(giant, 1.1f, "AbsorbMoan");
         auto tiny = Grab::GetHeldActor(giant);
         float growth = 1.05f;
 
@@ -440,7 +442,7 @@ namespace {
             Task_RunSuffocateTask(giant, tiny);
             SpawnHearts(giant, tiny, 35, 0.35f, false);
         }
-        Task_FacialEmotionTask_Smile(&data.giant, 1.8f / AnimationManager::GetAnimSpeed(&data.giant), "SufoStart");
+        Task_FacialEmotionTask_Smile(&data.giant, 1.8f, "SufoStart");
     }
     void GTS_BS_SufoStop(const AnimationEventData& data) {}
 
@@ -456,13 +458,13 @@ namespace {
             SuffocateTinyFor(&data.giant, tiny, 0.35f, 0.85f, 25.0f);
             SpawnHearts(&data.giant, tiny, 35, 0.50f, false);
         }
-        Task_FacialEmotionTask_Smile(&data.giant, 1.2f / AnimationManager::GetAnimSpeed(&data.giant), "SufoPress");
+        Task_FacialEmotionTask_Smile(&data.giant, 1.2f, "SufoPress");
     }
     
     void GTS_BS_PullTiny(const AnimationEventData& data) {
         auto tiny = Grab::GetHeldActor(&data.giant);
         if (tiny) {
-            Task_FacialEmotionTask_Smile(&data.giant, 1.6f / AnimationManager::GetAnimSpeed(&data.giant), "SufoPullOut");
+            Task_FacialEmotionTask_Smile(&data.giant, 1.6f, "SufoPullOut");
             Rumbling::Once("PullOut_R", &data.giant, 0.75f, 0.0f, "L Breast02", 0.0f);
             Rumbling::Once("PullOut_L", &data.giant, 0.75f, 0.0f, "R Breast02", 0.0f);
 

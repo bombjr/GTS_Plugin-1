@@ -189,6 +189,12 @@ namespace Gts {
 		Perk_None,
 	};
 
+	enum class CharEmotionType {
+		Phenome,
+		Modifier,
+		Expression,
+	};
+
 	struct Impact {
 		Actor* actor;
 		FootEvent kind;

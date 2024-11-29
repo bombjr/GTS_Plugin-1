@@ -171,20 +171,19 @@ namespace {
 	}
 
 	void GTS_Hug_Moan(AnimationEventData& data) {
-		auto giant = &data.giant;
-		PlayMoanSound(giant, 1.0f);
-		Task_FacialEmotionTask_Moan(giant, 2.75f, "HugMoan");
+		PlayMoanSound(&data.giant, 1.0f);
+		Task_FacialEmotionTask_Moan(&data.giant, 2.75f, "HugMoan");
 	}
 
 	void GTS_Hug_Moan_End(AnimationEventData& data) {
 	}
 
 	void GTS_Hug_FacialOn(AnimationEventData& data) { // Smug or something
-		AdjustFacialExpression(&data.giant, 2, 1.0f, "expression");
+		AdjustFacialExpression(&data.giant, 2, 1.0f, CharEmotionType::Expression);
 	}
 
 	void GTS_Hug_FacialOff(AnimationEventData& data) { // Disable smug
-		AdjustFacialExpression(&data.giant, 2, 0.0f, "expression");
+		AdjustFacialExpression(&data.giant, 2, 0.0f, CharEmotionType::Expression);
 	}
 
 	void GTS_Hug_PullBack(AnimationEventData& data) { // When we pull actor back to chest, used to play laugh
@@ -227,9 +226,9 @@ namespace {
 			Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f);
 			HugShrink::DetachActorTask(giant);
 
-			AdjustFacialExpression(giant, 0, 0.0f, "phenome");
-			AdjustFacialExpression(giant, 0, 0.0f, "modifier");
-			AdjustFacialExpression(giant, 1, 0.0f, "modifier");
+			AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Phenome);
+			AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Modifier);
+			AdjustFacialExpression(giant, 1, 0.0f, CharEmotionType::Modifier);
 
 			Task_ApplyAbsorbCooldown(giant); // Start Cooldown right after crush
 			ShrinkPulse_GainSize(giant, huggedActor, true);

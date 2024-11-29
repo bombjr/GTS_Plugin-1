@@ -72,6 +72,9 @@ namespace Gts {
 		bool disable_collision;
 		bool was_sneaking;
 
+		bool emotion_modifier_busy;
+		bool emotion_phenome_busy;
+
 		float IsNotImmune;
 
 		NiPoint3 POS_Last_Leg_L;

@@ -146,7 +146,7 @@ namespace {
 		Actor* giant = &data.giant;
 
 		PlayMoanSound(giant, 1.0f);
-		Task_FacialEmotionTask_Moan(giant, 2.0f, "RandomGrow");
+		Task_FacialEmotionTask_Moan(giant, 1.75f, "RandomGrow");
 
 		if (Runtime::HasPerkTeam(giant, "RandomGrowthTerror")) {
 			for (auto tiny: find_actors()) {
