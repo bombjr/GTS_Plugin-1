@@ -189,39 +189,40 @@ namespace {
 	void SizeReserveEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		auto Cache = Persistent::GetSingleton().GetData(player);
-		if (!Cache) {
-			return;
-		}
-		if (Cache->SizeReserve > 0.0f) {
-			bool Attacking = false;
-			player->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
+		if (Cache) {
+			if (Cache->SizeReserve > 0.0f) {
+				bool Attacking = false;
+				player->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
 
-			if (!Attacking) {
-				float duration = data.Duration();
-				
+				if (!Attacking) {
+					float duration = data.Duration();
+					
+					if (duration >= 1.2f && Runtime::HasPerk(player, "SizeReserve")) {
+						bool ShouldPrevent = get_target_scale(player) >= 1.49f && HasSMT(player); // So we don't waste it on Calamity that shrinks player back
+						if (!ShouldPrevent) {
+							bool HandsBusy = Grab::GetHeldActor(player);
+							if (!HandsBusy) {
+								float SizeCalculation = duration - 1.2f;
+								float gigantism = 1.0f + Ench_Aspect_GetPower(player);
+								float Volume = std::clamp(get_visual_scale(player) * Cache->SizeReserve/10.0f, 0.10f, 2.0f);
+								static Timer timergrowth = Timer(3.00);
+								if (timergrowth.ShouldRunFrame()) {
+									Runtime::PlaySoundAtNode("growthSound", player, Cache->SizeReserve/50 * duration, 1.0f, "NPC Pelvis [Pelv]");
+									Task_FacialEmotionTask_Moan(player, 2.0f, "SizeReserve");
+									PlayMoanSound(player, Volume);
+								}
 
-				if (duration >= 1.2f && Runtime::HasPerk(player, "SizeReserve") && Cache->SizeReserve > 0) {
-					bool HandsBusy = Grab::GetHeldActor(player);
-					if (!HandsBusy) {
-						float SizeCalculation = duration - 1.2f;
-						float gigantism = 1.0f + Ench_Aspect_GetPower(player);
-						float Volume = std::clamp(get_visual_scale(player) * Cache->SizeReserve/10.0f, 0.10f, 2.0f);
-						static Timer timergrowth = Timer(3.00);
-						if (timergrowth.ShouldRunFrame()) {
-							Runtime::PlaySoundAtNode("growthSound", player, Cache->SizeReserve/50 * duration, 1.0f, "NPC Pelvis [Pelv]");
-							Task_FacialEmotionTask_Moan(player, 2.0f, "SizeReserve");
-							PlayMoanSound(player, Volume);
-						}
+								float shake_power = std::clamp(Cache->SizeReserve/15 * duration, 0.0f, 2.0f);
+								Rumbling::Once("SizeReserve", player, shake_power, 0.05f);
 
-						float shake_power = std::clamp(Cache->SizeReserve/15 * duration, 0.0f, 2.0f);
-						Rumbling::Once("SizeReserve", player, shake_power, 0.05f);
+								update_target_scale(player, (SizeCalculation/80) * gigantism, SizeEffectType::kNeutral);
+								regenerate_health(player, (SizeCalculation/80) * gigantism);
 
-						update_target_scale(player, (SizeCalculation/80) * gigantism, SizeEffectType::kNeutral);
-						regenerate_health(player, (SizeCalculation/80) * gigantism);
-
-						Cache->SizeReserve -= SizeCalculation/80;
-						if (Cache->SizeReserve <= 0) {
-							Cache->SizeReserve = 0.0f; // Protect against negative values.
+								Cache->SizeReserve -= SizeCalculation/80;
+								if (Cache->SizeReserve <= 0) {
+									Cache->SizeReserve = 0.0f; // Protect against negative values.
+								}
+							}
 						}
 					}
 				}

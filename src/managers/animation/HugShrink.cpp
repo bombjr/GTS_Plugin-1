@@ -171,8 +171,8 @@ namespace {
 	}
 
 	void GTS_Hug_Moan(AnimationEventData& data) {
+		Task_FacialEmotionTask_Moan(&data.giant, 1.15f, "HugMoan", RandomFloat(0.0f, 0.45f));
 		PlayMoanSound(&data.giant, 1.0f);
-		Task_FacialEmotionTask_Moan(&data.giant, 2.75f, "HugMoan");
 	}
 
 	void GTS_Hug_Moan_End(AnimationEventData& data) {

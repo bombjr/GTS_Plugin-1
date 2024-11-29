@@ -2304,15 +2304,13 @@ namespace Gts {
 		float sizedifference_tinypov = tinySize/giantSize;
 
 		int ragdollchance = RandomInt(0, 30);
-		if ((giantSize > 1.25f || IsBeingGrinded(tiny)) && !IsRagdolled(tiny) && sizedifference > 2.8f && ragdollchance < 4.0f * sizedifference) { // Chance for ragdoll. Becomes 100% at high scales
+		if ((giantSize >= 2.0f || IsBeingGrinded(tiny)) && !IsRagdolled(tiny) && sizedifference > 2.8f && ragdollchance < 4.0f * sizedifference) { // Chance for ragdoll. Becomes 100% at high scales
 			PushActorAway(giant, tiny, 1.0f); // Ragdoll
-			return;
 		} else if (sizedifference > 1.25f) { // Always Stagger
 			tiny->SetGraphVariableFloat("GiantessScale", sizedifference_tinypov); // enable stagger just in case
 
 		    float push = std::clamp(0.25f * (sizedifference - 0.25f), 0.25f, 1.0f);
 			StaggerActor(giant, tiny, push);
-			return;
 		}
 	}
 

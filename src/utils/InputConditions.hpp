@@ -17,12 +17,6 @@
 
 */
 
-/* Sermit:
-   (Monke Logic on)
-	False = do not block.
-	True = block.
-	*equips smart glasses and rolls far away on the chair*
-*/
 
 //---------------------
 // ButtCrush
@@ -162,7 +156,7 @@ static bool SizeReserveCondition() {
 	/*auto target = PlayerCharacter::GetSingleton();
 	return Runtime::HasPerk(target, "SizeReserve") && Persistent::GetSingleton().GetData(target);
 	*/
-	return false;
+	return true;
 }
 
 //---------------------
@@ -311,12 +305,12 @@ static bool GrabCondition_Attack() {
 	auto target = GetPlayerOrControlled();
 
 	if (IsGtsBusy(target) && !IsUsingThighAnimations(target)) {
-		return true;
+		return false;
 	}
 	if (IsStomping(target) && IsTransitioning(target)) {
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 static bool GrabCondition_Vore() {

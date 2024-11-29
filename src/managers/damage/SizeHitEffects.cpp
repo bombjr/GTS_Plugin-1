@@ -36,6 +36,49 @@ namespace {
 		// Prevent stagger anims from playing on GTS, Behaviors read GiantessScale value and disallow stagger if value is > 1.5
 	}
 
+	float Hit_CalculateGrowth(float damage, float SizeHunger, float Gigantism) {
+		return std::clamp((-damage/2000) * SizeHunger * Gigantism, 0.0f, 0.25f * Gigantism);
+	}
+
+	float Hit_CalculateShrink(Actor* attacker, float damage, float SizeHunger, float Gigantism, float resistance) {
+		float sizebonus = std::clamp(get_visual_scale(attacker), 0.10f, 1.0f);
+		float ShrinkValue = std::clamp(((-damage/600)/SizeHunger/Gigantism * sizebonus) * resistance, 0.0f, 0.25f / Gigantism); // affect limit by decreasing it
+
+		return ShrinkValue;
+	}
+
+	bool Hit_ShouldGrow(Actor* receiver) {
+		auto& sizemanager = SizeManager::GetSingleton();
+		float BalanceMode = sizemanager.BalancedMode();
+
+		bool GrowthEnabled = sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f;
+		bool HasPerk = Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk");
+		bool Teammate = IsTeammate(receiver) && IsFemale(receiver);
+		bool IsPlayer = receiver->formID == 0x14;
+		
+		if (IsPlayer || Teammate) {
+			if (GrowthEnabled && HasPerk){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool Hit_ShouldShrink(Actor* receiver) {
+		auto& sizemanager = SizeManager::GetSingleton();
+		
+		bool HasPerk = Runtime::HasPerk(receiver, "GrowthOnHitPerk");
+		bool BalanceMode = sizemanager.BalancedMode() >= 2.0f;
+		bool IsPlayer = receiver->formID == 0x14;
+
+		if (BalanceMode && receiver->formID == 0x14 && !HasPerk) {
+			if (get_target_scale(receiver) > get_natural_scale(receiver, true)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	void TinyAsShield(Actor* receiver, float a_damage) {
 		auto grabbedActor = Grab::GetHeldActor(receiver);
 		if (grabbedActor) {
@@ -162,11 +205,11 @@ namespace {
 
 		log::info("Shrink Value: {}", -ShrinkValue);
 
-		if (scale < naturalscale) {
-			set_target_scale(receiver, naturalscale); // reset to normal scale
-			return;
+		if (scale - ShrinkValue < naturalscale) {
+			set_target_scale(receiver, naturalscale);
+		} else {
+			update_target_scale(receiver, -ShrinkValue, SizeEffectType::kShrink);
 		}
-		update_target_scale(receiver, -ShrinkValue, SizeEffectType::kShrink);
 	}
 
 	void ApplyHitGrowth(Actor* attacker, Actor* receiver, float damage) {
@@ -174,31 +217,19 @@ namespace {
 			return;
 		}
 		
-		float scale = get_visual_scale(receiver);
-		float naturalscale = get_natural_scale(receiver, true);
-		
 		auto& sizemanager = SizeManager::GetSingleton();
 		float BalanceMode = sizemanager.BalancedMode();
+
 		float SizeHunger = 1.0f + Ench_Hunger_GetPower(receiver);
 		float Gigantism = 1.0f + Ench_Aspect_GetPower(receiver);
-		float SizeDifference = get_visual_scale(receiver)/get_visual_scale(attacker);
-		float DamageReduction = 1.0f; //std::clamp(GetDamageResistance(receiver), 0.50f, 1.0f); // disallow going > than 1 and < than 0.5
-
+		
+		float SizeDifference = GetSizeDifference(receiver, attacker, SizeType::VisualScale, true, true);
 		float resistance = Potion_GetShrinkResistance(receiver);
 	
-		damage *= DamageReduction;
-
-		if ((receiver->formID == 0x14 || (IsTeammate(receiver) && IsFemale(receiver))) && Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk") && sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f) { // if has perk
-			//log::info("Applying hitgrowth for {}", damage);
-			float GrowthValue = std::clamp((-damage/2000) * SizeHunger * Gigantism, 0.0f, 0.25f * Gigantism);
-			HitGrowth(receiver, attacker, GrowthValue, SizeDifference, BalanceMode);
-			return;
-		} else if (BalanceMode >= 2.0f && receiver->formID == 0x14 && !Runtime::HasPerk(receiver, "GrowthOnHitPerk")) { // Shrink us
-			if (scale > naturalscale) {
-				float sizebonus = std::clamp(get_visual_scale(attacker), 0.10f, 1.0f);
-				float ShrinkValue = std::clamp(((-damage/850)/SizeHunger/Gigantism * sizebonus) * resistance, 0.0f, 0.25f / Gigantism); // affect limit by decreasing it
-				HitShrink(receiver, ShrinkValue);
-			}
+		if (Hit_ShouldGrow(receiver)) { // if has perk. Wins over balance mode if true
+			HitGrowth(receiver, attacker, Hit_CalculateGrowth(damage, SizeHunger, Gigantism), SizeDifference, BalanceMode);
+		} else if (Hit_ShouldShrink(receiver)) { // else, if balance mode is on, Shrink us
+			HitShrink(receiver, Hit_CalculateShrink(attacker, damage, SizeHunger, Gigantism, resistance));
 		}
 	}
 

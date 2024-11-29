@@ -51,18 +51,13 @@ namespace Gts {
 			return; // Disallow shrinking Essentials
 		}
 
-		float size_difference = GetSizeDifference(caster, target, SizeType::VisualScale, true, false);
+		float size_difference = std::clamp(GetSizeDifference(caster, target, SizeType::VisualScale, true, false), 1.0f, 3.0f);
 
 		if (HasSMT(caster)) {
 			size_difference += SMT_BONUS;
 		} // More shrink with SMT
 
-		
-		if (size_difference >= 3.0f) {
-			size_difference = 3.0f;
-		} // Cap Size Difference
-
-		float shrink_power = 2.5f * size_difference;
+		float shrink_power = 4.5f * size_difference;
 		float gain_size = 0.0025f;
 
 		if (target->IsDead()) {

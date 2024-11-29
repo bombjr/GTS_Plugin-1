@@ -96,32 +96,35 @@ namespace Gts {
 
 								if (Runtime::HasPerkTeam(actor, "RandomGrowthAug") && TotalPower >= Get_Breach_Threshold(actor) && !IsGtsBusy(actor)) {
 									AnimationManager::StartAnim("StartRandomGrowth", actor);
-									return;
 								} else {
-									ActorHandle gianthandle = actor->CreateRefHandle();
-									std::string name = std::format("RandomGrowth_{}", actor->formID);
-									// Sounds
-									float Volume = std::clamp(scale/4, 0.20f, 1.0f);
+									if (!IsGrowing(actor)) {
+										ActorHandle gianthandle = actor->CreateRefHandle();
+										std::string name = std::format("RandomGrowth_{}", actor->formID);
+										// Sounds
+										float Volume = std::clamp(scale/4, 0.20f, 1.0f);
 
-									PlayMoanSound(actor, 1.0f);
-									Task_FacialEmotionTask_Moan(actor, 2.0f, "RandomGrow");
-									Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0f, "NPC COM [COM ]");
-									Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
-
-									TaskManager::RunFor(name, 0.40f * TotalPower, [=](auto& progressData) {
-										if (!gianthandle) {
-											return false;
+										if (TotalPower >= 1.45f) {
+											PlayMoanSound(actor, 1.0f);
+											Task_FacialEmotionTask_Moan(actor, 0.8f, "RandomGrow");
 										}
-										auto giantref = gianthandle.get().get();
-										// Grow
-										float delta_time = Time::WorldTimeDelta();
-										update_target_scale(giantref, base_power * delta_time * Gigantism, SizeEffectType::kGrow);
+										Runtime::PlaySoundAtNode("xlRumble", actor, base_power, 1.0f, "NPC COM [COM ]");
+										Runtime::PlaySoundAtNode("growthSound", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 
-										// Play sound
-										Rumbling::Once("RandomGrowth", giantref, base_power, 0.10f);
-										RandomGrowth::RestoreStats(giantref, 0.8f); // Regens Attributes if PC has perk
-										return true;
-									});
+										TaskManager::RunFor(name, 0.40f * TotalPower, [=](auto& progressData) {
+											if (!gianthandle) {
+												return false;
+											}
+											auto giantref = gianthandle.get().get();
+											// Grow
+											float delta_time = Time::WorldTimeDelta();
+											update_target_scale(giantref, base_power * delta_time * Gigantism, SizeEffectType::kGrow);
+
+											// Play sound
+											Rumbling::Once("RandomGrowth", giantref, base_power, 0.10f);
+											RandomGrowth::RestoreStats(giantref, 0.8f); // Regens Attributes if PC has perk
+											return true;
+										});
+									}
 								}
 							}
 						}

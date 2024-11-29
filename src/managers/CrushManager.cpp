@@ -83,20 +83,21 @@ namespace {
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
-		static Timer voicetimer = Timer(2.4);
+		bool OnCooldown = IsActionOnCooldown(giant, CooldownSource::Emotion_Moan);
 		auto randomInt = RandomInt(0, 16);
 		auto select = RandomInt(0, 2);
 		if (randomInt <= 3) {
-			if (voicetimer.ShouldRun()) {
+			if (!OnCooldown) {
 				if (select >= 1) {
 					Task_FacialEmotionTask_Moan(giant, 1.6f, "CrushMoan", RandomFloat(0.0f, 0.40f));
-					GrowAfterTheKill(giant, target, 2.0f);
+					GrowAfterTheKill(giant, target, 1.75f);
 					PlayMoanSound(giant, 1.0f);
 				} else {
 					Task_FacialEmotionTask_Smile(giant, 1.25f, "CrushSmile", RandomFloat(0.0f, 0.7f));
 					PlayLaughSound(giant, 1.0f, RandomInt(1, 2));
-					GrowAfterTheKill(giant, target, 2.0f);
+					GrowAfterTheKill(giant, target, 1.75f);
 				}
+				ApplyActionCooldown(giant, CooldownSource::Emotion_Moan);
 			}
 		}
 	}
