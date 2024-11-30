@@ -83,11 +83,12 @@ namespace {
 		}
 	}
 	void MoanOrLaugh(Actor* giant, Actor* target) {
-		bool OnCooldown = IsActionOnCooldown(giant, CooldownSource::Emotion_Moan);
+		bool OnCooldown = IsActionOnCooldown(giant, CooldownSource::Emotion_Moan_Crush);
 		auto randomInt = RandomInt(0, 16);
 		auto select = RandomInt(0, 2);
 		if (randomInt <= 3) {
 			if (!OnCooldown) {
+				ApplyActionCooldown(giant, CooldownSource::Emotion_Moan_Crush);
 				if (select >= 1) {
 					Task_FacialEmotionTask_Moan(giant, 1.6f, "CrushMoan", RandomFloat(0.0f, 0.40f));
 					GrowAfterTheKill(giant, target, 1.75f);
@@ -97,7 +98,6 @@ namespace {
 					PlayLaughSound(giant, 1.0f, RandomInt(1, 2));
 					GrowAfterTheKill(giant, target, 1.75f);
 				}
-				ApplyActionCooldown(giant, CooldownSource::Emotion_Moan);
 			}
 		}
 	}
@@ -246,16 +246,16 @@ namespace Gts {
 
 	bool CrushManager::CanCrush(Actor* giant, Actor* tiny) {
 		if (CrushManager::AlreadyCrushed(tiny)) {
-			log::info("{} Is already crushed", tiny->GetDisplayFullName());
+			//log::info("{} Is already crushed", tiny->GetDisplayFullName());
 			return false;
 		}
 		if (IsEssential(giant, tiny)) {
-			log::info("{} Is essential", tiny->GetDisplayFullName());
+			//log::info("{} Is essential", tiny->GetDisplayFullName());
 			return false;
 		}
 
 		if (IsFlying(tiny)) {
-			log::info("{} Is flying", tiny->GetDisplayFullName());
+			//log::info("{} Is flying", tiny->GetDisplayFullName());
 			return false; // Disallow to crush flying dragons
 		}
 

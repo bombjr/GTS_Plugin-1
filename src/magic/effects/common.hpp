@@ -463,7 +463,7 @@ namespace Gts {
 		float target_scale = get_visual_scale(target) * GetSizeFromBoundingBox(target);
 
 		int Random = RandomInt(1, 8);
-		if (Random >= 8 && Runtime::HasPerk(caster, "GrowthDesirePerk")) {
+		if (Random >= 8 && !IsActionOnCooldown(caster, CooldownSource::Emotion_Moan_Crush) && Runtime::HasPerk(caster, "GrowthDesirePerk")) {
 			PlayMoanSound(caster, 1.0f);
 		}
 

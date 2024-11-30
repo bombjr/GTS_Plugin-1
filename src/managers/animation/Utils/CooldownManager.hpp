@@ -23,6 +23,7 @@ namespace Gts {
         Action_Hugs,
         Emotion_Laugh,
         Emotion_Moan,
+        Emotion_Moan_Crush,
         Misc_RevertSound,
         Misc_GrowthSound,
         Misc_BeingHit,
@@ -55,6 +56,7 @@ namespace Gts {
         
         double lastLaughTime = -1.0e8f;
         double lastMoanTime = -1.0e8f;
+        double lastMoanCrushTime = -1.0e8f;
 
         double lastRevertTime = -1.0e8f;
         double lastSoundGrowthTime = -1.0e8f;

@@ -40,6 +40,7 @@ namespace {
 
     const float LAUGH_COOLDOWN = 5.0f;
 	const float MOAN_COOLDOWN = 5.0f;
+    const float MOAN_CRUSH_COOLDOWN = 3.0f;
 
     const float SOUND_COOLDOWN = 2.0f;
     const float GROW_SOUND_COOLDOWN = 1.0f;
@@ -188,6 +189,9 @@ namespace Gts {
             case CooldownSource::Emotion_Moan: 
                 data.lastMoanTime = Time::WorldTimeElapsed();
                 break;  
+            case CooldownSource::Emotion_Moan_Crush: 
+                data.lastMoanCrushTime = Time::WorldTimeElapsed();
+                break;  
             case CooldownSource::Misc_RevertSound: 
                 data.lastRevertTime = Time::WorldTimeElapsed();
                 break; 
@@ -260,6 +264,8 @@ namespace Gts {
                 return (data.lastLaughTime + LAUGH_COOLDOWN) - time;
             case CooldownSource::Emotion_Moan: 
                 return (data.lastMoanTime + MOAN_COOLDOWN) - time;
+            case CooldownSource::Emotion_Moan_Crush:
+                return (data.lastMoanCrushTime + MOAN_CRUSH_COOLDOWN) - time;
             case CooldownSource::Misc_RevertSound: 
                 return (data.lastRevertTime + SOUND_COOLDOWN) - time;
             case CooldownSource::Misc_GrowthSound:
@@ -321,6 +327,8 @@ namespace Gts {
                 return time <= (data.lastLaughTime + LAUGH_COOLDOWN);
             case CooldownSource::Emotion_Moan: 
                 return time <= (data.lastMoanTime + MOAN_COOLDOWN);
+            case CooldownSource::Emotion_Moan_Crush:
+                return time <= (data.lastMoanCrushTime + MOAN_CRUSH_COOLDOWN);
             case CooldownSource::Misc_RevertSound: 
                 return time <= (data.lastRevertTime + SOUND_COOLDOWN);
             case CooldownSource::Misc_GrowthSound:
