@@ -222,6 +222,7 @@ namespace Gts {
 		RegisterMagic<MaxSizePotion>("EffectSizePotionNormal");
 		RegisterMagic<MaxSizePotion>("EffectSizePotionStrong");
 		RegisterMagic<MaxSizePotion>("EffectSizePotionExtreme");
+		RegisterMagic<MaxSizePotion>("AlchEffectSize");
 
 		RegisterMagic<MightPotion>("EffectMightPotionWeak");
 		RegisterMagic<MightPotion>("EffectMightPotionNormal");
