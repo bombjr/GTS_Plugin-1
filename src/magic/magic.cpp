@@ -244,6 +244,7 @@ namespace Gts {
 		RegisterMagic<GrowthPotion>("EffectGrowthPotionNormal");
 		RegisterMagic<GrowthPotion>("EffectGrowthPotionStrong");
 		RegisterMagic<GrowthPotion>("EffectGrowthPotionExtreme");
+		RegisterMagic<GrowthPotion>("AlchEffectGrowth");
 
 		RegisterMagic<ShrinkPotion>("SizeDrainPotion");
 		RegisterMagic<Shrink_Poison>("ShrinkPoison");
