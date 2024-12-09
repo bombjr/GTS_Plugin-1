@@ -235,6 +235,7 @@ namespace Gts {
 		RegisterMagic<EssencePotion>("EffectEssencePotionNormal");
 		RegisterMagic<EssencePotion>("EffectEssencePotionStrong");
 		RegisterMagic<EssencePotion>("EffectEssencePotionExtreme");
+		RegisterMagic<EssencePotion>("AlchEffectEssence");
 
 		RegisterMagic<ShrinkResistPotion>("ResistShrinkPotionWeak");
 		RegisterMagic<ShrinkResistPotion>("ResistShrinkPotionNormal");
