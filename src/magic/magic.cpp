@@ -242,6 +242,7 @@ namespace Gts {
 		RegisterMagic<ShrinkResistPotion>("ResistShrinkPotionNormal");
 		RegisterMagic<ShrinkResistPotion>("ResistShrinkPotionStrong");
 		RegisterMagic<ShrinkResistPotion>("ResistShrinkPotionExtreme");
+		RegisterMagic<ShrinkResistPotion>("AlchResistShrink");
 
 		RegisterMagic<GrowthPotion>("EffectGrowthPotionWeak");
 		RegisterMagic<GrowthPotion>("EffectGrowthPotionNormal");
