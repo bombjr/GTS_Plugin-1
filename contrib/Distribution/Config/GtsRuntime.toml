@@ -172,6 +172,7 @@ gtsProtectTiniesMGEF = "GTS.esp|763AD1"
 AlchEffectGrowth = "GTS.esp|8A2A46"
 AlchEffectSize = "GTS.esp|8A2A48"
 AlchEffectEssence = "GTS.esp|8ACC4E"
+AlchEffectMight = "GTS.esp|8ACC51"
 
 
 # Crushing

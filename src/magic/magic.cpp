@@ -228,6 +228,7 @@ namespace Gts {
 		RegisterMagic<MightPotion>("EffectMightPotionNormal");
 		RegisterMagic<MightPotion>("EffectMightPotionStrong");
 		RegisterMagic<MightPotion>("EffectMightPotionExtreme");
+		RegisterMagic<MightPotion>("AlchEffectMight");
 
 		RegisterMagic<ExperiencePotion>("SizeMasteryPotionBasic");
 
