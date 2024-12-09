@@ -44,7 +44,7 @@ namespace Gts {
 			this->power = 0.08f; 
 		} else if (base_spell == Runtime::GetMagicEffect("AlchEffectEssence")) {
 			auto active_effect = GetActiveEffect();
-			this->power = active_effect->magnitude > 0 ? active_effect->magnitude / 100.0f : 1.0f;
+			this->power = active_effect->magnitude > 0 ? active_effect->magnitude / 100.0f : 0.08f;
 		}
 	}
 
