@@ -5,7 +5,7 @@
 #include "rays/raycast.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
-
+#include "UI/DebugAPI.hpp"
 #include "node.hpp"
 
 
@@ -20,57 +20,6 @@ namespace {
 
 	const CameraDataMode currentMode = CameraDataMode::State;
 
-	void PerformRaycastOnCamera(NiPoint3& LocalCoords, PlayerCamera* playerCamera) {
-		// Get our computed local-space xyz offset.
-		const auto cameraLocal = LocalCoords;
-		// Get the base world position for the camera which we will offset with the local-space values.
-
-		bool success = false;
-		NiPoint3 endpos = NiPoint3();
-		NiPoint3 ray_start = playerCamera->cameraRoot->world.translate;
-		const std::vector<NiPoint3> directions = {
-			{0,0, -1},
-			{0,0, 1},
-			{0,-1,0},
-			{0,1,0},
-			{-1,0,0},
-			{1,0,0},
-		};
-
-		float ray_length = 30 * get_visual_scale(PlayerCharacter::GetSingleton());
-		for (auto Directions: directions) {
-			NiPoint3 endpos = CastRayStatics(PlayerCharacter::GetSingleton(), ray_start, Directions, ray_length, success);
-		}
-		if (success) {
-			log::info("Raycast is true");
-			LocalCoords = endpos;
-			// I can't get the logic for it right, behaves incorrectly.
-		}
-	}
-
-	void CameraTest(NiPoint3 coords) {
-		auto player = PlayerCharacter::GetSingleton();
-		auto playerCamera = RE::PlayerCamera::GetSingleton();
-		auto thirdPersonState = reinterpret_cast<RE::ThirdPersonState*>(playerCamera->cameraStates[RE::CameraState::kThirdPerson].get());
-		auto isInThirdPerson = playerCamera->currentState->id == RE::CameraState::kThirdPerson;
-		//log::info("Current Zoom Offset: {}", thirdPersonState->currentZoomOffset);
-		if (isInThirdPerson) {
-
-			float shift = 100 * (get_visual_scale(player) - get_natural_scale(player));
-
-			if (coords.Length() <= 0) {
-				coords = {0, -shift, shift}; // If no Bone Tracking mode is selected, just scale the camera up and backwards
-			}
-			
-			// Else apply bone tracking offsets
- 			//NiPoint3& expected_pos = thirdPersonState->posOffsetExpected;
-			//expected_pos = coords;
-			// Problems:
-			    // 
-				// -1: When looking above the character, camera moves forward despite offsetting it backwards based on size
-				// -2: rotating the camera around the player results in weird distance shifts
-		}
-	}
 }
 
 namespace Gts {
@@ -139,7 +88,7 @@ namespace Gts {
 		auto camera = PlayerCamera::GetSingleton();
 		auto cameraRoot = camera->cameraRoot.get();
 		NiCamera* niCamera = nullptr;
-		for (auto child: cameraRoot->GetChildren()) {
+		for (auto& child : cameraRoot->GetChildren()) {
 			NiAVObject* node = child.get();
 			if (node) {
 				NiCamera* casted = netimmerse_cast<NiCamera*>(node);
@@ -151,6 +100,7 @@ namespace Gts {
 		}
 		return niCamera;
 	}
+
 	void UpdateWorld2ScreetMat(NiCamera* niCamera) {
 		auto camNi = niCamera ? niCamera : GetNiCamera();
 		typedef void (*UpdateWorldToScreenMtx)(RE::NiCamera*);
@@ -162,7 +112,6 @@ namespace Gts {
 		auto camera = PlayerCamera::GetSingleton();
 		return camera->cameraTarget.get().get();
 	}
-
 
 	void UpdateSceneManager(NiPoint3 camLoc) {
 		auto sceneManager = UI3DSceneManager::GetSingleton();
@@ -223,10 +172,10 @@ namespace Gts {
 		 #endif*/
 	}
 
-	NiTransform GetCameraWorldTransform() {
+	static NiTransform GetCameraWorldTransform() {
 		auto camera = PlayerCamera::GetSingleton();
 		if (camera) {
-			auto cameraRoot = camera->cameraRoot;
+			auto& cameraRoot = camera->cameraRoot;
 			if (cameraRoot) {
 				return cameraRoot->world;
 			}
@@ -247,7 +196,7 @@ namespace Gts {
 		}
 	}
 
-	NiPoint3 GetCameraPosition() {
+	static NiPoint3 GetCameraPosition() {
 		NiPoint3 cameraLocation;
 		switch (currentMode) {
 			case CameraDataMode::State: {
@@ -279,7 +228,7 @@ namespace Gts {
 				//log::info("Camera State: State");
 				auto camera = PlayerCamera::GetSingleton();
 				if (camera) {
-					auto currentState = camera->currentState;
+					auto& currentState = camera->currentState;
 					if (currentState) {
 						NiQuaternion cameraQuat;
 						currentState->GetRotation(cameraQuat);
@@ -291,7 +240,7 @@ namespace Gts {
 				//log::info("Camera State: Transform");
 				auto camera = PlayerCamera::GetSingleton();
 				if (camera) {
-					auto cameraRoot = camera->cameraRoot;
+					auto& cameraRoot = camera->cameraRoot;
 					if (cameraRoot) {
 						cameraRot = cameraRoot->world.rotate;
 					}
@@ -311,13 +260,13 @@ namespace Gts {
 		return cameraRot;
 	}
 
-	// Get's camera position relative to the player
+	// Get's camera position relative to the cameraActor
 	NiPoint3 GetCameraPosLocal() {
 		auto camera = PlayerCamera::GetSingleton();
 		if (camera) {
 			NiPointer<TESObjectREFR> Target = camera->cameraTarget.get();
 
-			auto currentState = camera->currentState;
+			auto& currentState = camera->currentState;
 			if (currentState) {
 				auto player = GetCameraActor();
 				if (player) {
@@ -376,6 +325,7 @@ namespace Gts {
 		camState->GetTranslation(cameraTrans);
 		return cameraTrans;
 	}
+
 	NiPoint3 ThirdPersonPoint() {
 		auto camera = PlayerCamera::GetSingleton();
 		auto camState = camera->cameraStates[CameraState::kThirdPerson].get();
@@ -395,6 +345,7 @@ namespace Gts {
 		}
 		return 0.0f;
 	}
+
 	float MaxZoom() {
 		return GetINIFloat("fVanityModeMaxDist:Camera");
 	}
@@ -411,20 +362,18 @@ namespace Gts {
 
 	void UpdateCamera(float scale, NiPoint3 cameraLocalOffset, NiPoint3 playerLocalOffset) {
 		auto camera = PlayerCamera::GetSingleton();
-		auto cameraRoot = camera->cameraRoot;
-		auto player = GetCameraActor();
-		auto currentState = camera->currentState;
-
-		float value = Runtime::GetFloatOr("cameraAlternateX", 1.0f);
+		auto& cameraRoot = camera->cameraRoot;
+		auto cameraActor = GetCameraActor();
+		auto& currentState = camera->currentState;
 
 		if (cameraRoot) {
 			if (currentState) {
 				auto cameraWorldTranform = GetCameraWorldTransform();
 				NiPoint3 cameraLocation;
 				currentState->GetTranslation(cameraLocation);
-				if (player) {
+				if (cameraActor) {
 					if (scale > 1e-4) {
-						auto model = player->Get3D(false);
+						auto model = cameraActor->Get3D(false);
 						if (model) {
 							auto playerTrans = model->world;
 							playerTrans.scale = model->parent ? model->parent->world.scale : 1.0f;  // Only do translation/rotation
@@ -433,9 +382,8 @@ namespace Gts {
 							// Make the transform matrix for our changes
 							NiTransform adjustments = NiTransform();
 							adjustments.scale = scale;
+
 							// Adjust by scale reports 1.0 / naturalscale (Which includes RaceMenu and GetScale)
-
-
 							adjustments.translate = playerLocalOffset;
 
 							// Get Scaled Camera Location
@@ -445,22 +393,42 @@ namespace Gts {
 							cameraWorldTranform.translate = targetLocationWorld; // Update with latest position
 							NiTransform adjustments2 = NiTransform();
 							adjustments2.translate = cameraLocalOffset * scale;
-							auto worldShifted =  cameraWorldTranform * adjustments2 * NiPoint3();
+							auto worldShifted = cameraWorldTranform * adjustments2 * NiPoint3();
 
 							// Convert to local space
 							auto parent = cameraRoot->parent;
 							NiTransform transform = parent->world.Invert();
 							auto localShifted = transform * worldShifted;
-							auto targetLocationLocalShifted = localShifted;
 
-							//PerformRaycastOnCamera(targetLocationLocalShifted, camera); // Doesn't work as intended
-							//CameraTest(targetLocationLocalShifted);
+							//Fix Camera Collision
+							//Anchor to Pelvis bone. Works Fine.
+							//This method relies on the camera having a target as we cast from the target to the camera
+							//upside this only needs 1 raycast, downside you need to have a target
 
-							UpdatePlayerCamera(targetLocationLocalShifted);
-							UpdateNiCamera(targetLocationLocalShifted);
+							if (auto node = find_node_any(cameraActor, "NPC Pelvis [Pelv]")) {
 
-							//UpdateSceneManager(targetLocationLocalShifted);
-							//UpdateRenderManager(targetLocationLocalShifted);
+									auto rayStart = node->world.translate;
+									auto hullMult = min(get_visual_scale(cameraActor), 1.0f);
+
+									//offset Height by camera hull size. Fixes cases where the bone is closer to the ground than the hull size.
+									rayStart.z += max(camhullSize * hullMult, 3.0f);
+
+									//TODO The distances at small scales become so small that we run against the camera clip
+									//TODO Scale FnearDistance... This will be fun considering mods like IC also mess with it constantly... 
+
+									if (IsDebugEnabled()) {
+										DebugAPI::DrawSphere(glm::vec3(rayStart.x, rayStart.y, rayStart.z), 1.0f, 10, { 0.5f, 1.0f, 0.0f, 1.0f }, 10.0f);
+									}
+
+									//Cast a ray from the bone to the new camera pos in worldspace as the camera. If the ray hits move the camera to the pos of the hit
+									localShifted = ComputeRaycast(rayStart, localShifted, hullMult);
+
+							}
+
+							UpdatePlayerCamera(localShifted);
+							UpdateNiCamera(localShifted);
+							UpdateSceneManager(localShifted);
+							UpdateRenderManager(localShifted);
 						}
 					}
 				}

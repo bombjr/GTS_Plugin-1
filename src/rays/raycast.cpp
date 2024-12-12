@@ -50,6 +50,53 @@ namespace {
 
 namespace Gts {
 
+	RayResult CastCamRay(glm::vec4 start, glm::vec4 end, float traceHullSize)
+		noexcept {
+		RayResult res;
+
+		const auto ply = RE::PlayerCharacter::GetSingleton();
+		const auto cam = RE::PlayerCamera::GetSingleton();
+		if (!ply->parentCell || !cam->unk120) return res;
+
+		auto physicsWorld = ply->parentCell->GetbhkWorld();
+		if (physicsWorld) {
+			typedef bool(__fastcall* RayCastFunType)(
+				decltype(RE::PlayerCamera::unk120) physics, RE::bhkWorld* world, glm::vec4& rayStart,
+				glm::vec4& rayEnd, uint32_t* rayResultInfo, RE::Character** hitCharacter, float traceHullSize
+				);
+			static auto cameraCaster = REL::Relocation<RayCastFunType>(RELOCATION_ID(32270, 33007));
+			res.hit = cameraCaster(
+				cam->unk120, physicsWorld,
+				start, end, static_cast<uint32_t*>(res.data), &res.hitCharacter,
+				traceHullSize
+			);
+		}
+
+		if (res.hit) {
+			res.hitPos = end;
+			res.rayLength = glm::length(static_cast<glm::vec3>(res.hitPos) - static_cast<glm::vec3>(start));
+		}
+
+		return res;
+	}
+
+	// Performs a ray cast and returns a new position based on the result
+	NiPoint3 ComputeRaycast(const NiPoint3& rayStart, const NiPoint3& rayEnd, const float hullMult) {
+		const auto rayStart4 = glm::vec4(rayStart.x, rayStart.y, rayStart.z, 0.0f);
+		const auto rayEnd4 = glm::vec4(rayEnd.x, rayEnd.y, rayEnd.z, 0.0f);
+		const auto result = CastCamRay(rayStart4, rayEnd4, camhullSize * hullMult);
+
+
+		if (result.hit) {
+			NiPoint3 ResHit = { result.hitPos.x, result.hitPos.y, result.hitPos.z };
+			NiPoint3 ResNorm = { result.rayNormal.x, result.rayNormal.y, result.rayNormal.z };
+			return ResHit + (ResNorm * glm::min(result.rayLength, camhullSize * hullMult));
+		}
+		else {
+			return rayEnd;
+		}
+	}
+
 	NiPoint3 CastRay(TESObjectREFR* ref, const NiPoint3& origin, const NiPoint3& direction, const float& length, bool& success) {
 		auto collector = AllRayCollector::Create();
 		collector->Reset();
