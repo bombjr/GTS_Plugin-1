@@ -122,10 +122,6 @@ GrowAllySizeButton = "GTS.esp|123BE3"
 ShrinkAllySizeButton = "GTS.esp|123BE4"
 CrushGrowthMGEF = "GTS.esp|2028B6"
 
-# Damage
-SizeRelatedDamage0 = "GTS.esp|00A441"
-SizeRelatedDamage1 = "GTS.esp|00A9A8"
-SizeRelatedDamage2 = "GTS.esp|00B474"
 # Absorb
 AbsorbMGEF = "GTS.esp|00B470"
 TrueAbsorb = "GTS.esp|22B0D5"
@@ -304,7 +300,6 @@ BloodExplosion = "GTS.esp|01CE9D"
 BloodFX = "Dawnguard.esm|00E7B4"
 footstepExplosion = "GTS.esp|035C81"
 draugrexplosion = "GTS.esp|035C80"
-ShrinkOutburstExplosion = "GTS.esp|638F99"
 
 [globals]
 PlayerSizeOverride = "GTS.esp|2028B5"

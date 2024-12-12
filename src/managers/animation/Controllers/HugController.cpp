@@ -234,12 +234,12 @@ namespace Gts {
 
 		if (pred->IsSneaking()) {
 			if (IsCrawling(pred)) {
-				MINIMUM_DISTANCE *= 2.25f;
+				MINIMUM_DISTANCE *= 2.35f;
 			} else {
 				MINIMUM_DISTANCE *= 1.6f;
 			}
 		}
-
+	
 		if (HasSMT(pred)) {
 			MINIMUM_HUG_SCALE *= 0.80f;
 		}

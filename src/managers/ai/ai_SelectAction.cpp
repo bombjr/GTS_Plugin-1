@@ -158,17 +158,16 @@ namespace Gts {
 	}
 
 	void AI_DoHugs(Actor* pred) {
-		if (!Persistent::GetSingleton().Hugs_Ai || IsCrawling(pred)) {
-			return;
-		}
-		int rng = RandomInt(0, 7);
-		if (rng >= 2) {
-			if (CanDoPaired(pred) && !IsSynced(pred) && !IsTransferingTiny(pred)) {
-				auto& hugs = HugAnimationController::GetSingleton();
-				std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, 1);
-				for (auto prey: preys) {
-					// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
-					AI_StartHugs(pred, prey);
+		if (Persistent::GetSingleton().Hugs_Ai) {
+			int rng = RandomInt(0, 7);
+			if (rng >= 2) {
+				if (CanDoPaired(pred) && !IsSynced(pred) && !IsTransferingTiny(pred)) {
+					auto& hugs = HugAnimationController::GetSingleton();
+					std::vector<Actor*> preys = hugs.GetHugTargetsInFront(pred, 1);
+					for (auto prey: preys) {
+						// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
+						AI_StartHugs(pred, prey);
+					}
 				}
 			}
 		}

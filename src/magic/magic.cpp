@@ -9,6 +9,8 @@
 #include "magic/effects/shrink.hpp"
 #include "magic/effects/restore_size.hpp"
 #include "magic/effects/restore_size_other.hpp"
+#include "magic/effects/shrink_rune.hpp"
+#include "magic/effects/shrink_cloak.hpp"
 #include "magic/effects/shrink_foe.hpp"
 #include "magic/effects/shrink_other.hpp"
 #include "magic/effects/slow_grow.hpp"
@@ -274,6 +276,8 @@ namespace Gts {
 		RegisterMagic<ShrinkOther>("ShrinkAllyExpert");
 		RegisterMagic<RestoreSize>("RestoreSize");
 		RegisterMagic<RestoreSizeOther>("RestoreSizeNPC");
+		//RegisterMagic<ShrinkRune>("ShrinkRuneEffect");
+		//RegisterMagic<ShrinkCloak>("ShrinkCloakEffect");
 		RegisterMagic<Absorb>("AbsorbMGEF");
 		RegisterMagic<Absorb>("TrueAbsorb");
 		RegisterMagic<GrowthSpurt>("GrowthSpurt1");

@@ -104,17 +104,6 @@ namespace {
 		}
 	}
 
-	float GetBoobCrushDamage(Actor* actor) {
-		float damage = 1.0f;
-		if (Runtime::HasPerkTeam(actor, "ButtCrush_KillerBooty")) {
-			damage += 0.30f;
-		}
-		if (Runtime::HasPerkTeam(actor, "ButtCrush_UnstableGrowth")) {
-			damage += 0.70f;
-		}
-		return damage;
-	}
-
 	void ModGrowthCount(Actor* giant, float value, bool reset) {
 		auto transient = Transient::GetSingleton().GetData(giant);
 		if (transient) {
@@ -137,7 +126,7 @@ namespace {
 		auto gianthandle = giant->CreateRefHandle();
 		std::string name = std::format("BreastDOT_{}", giant->formID);
 		
-		float damage = GetBoobCrushDamage(giant) * TimeScale();
+		float damage = AnimationBoobCrush::GetBoobCrushDamage(giant) * TimeScale();
 		TaskManager::Run(name, [=](auto& progressData) {
 			if (!gianthandle) {
 				return false;
@@ -211,7 +200,7 @@ namespace {
 	}
 
 	void InflictBodyDamage(Actor* giant) {
-		float damage = GetBoobCrushDamage(giant);
+		float damage = AnimationBoobCrush::GetBoobCrushDamage(giant);
 		float perk = GetPerkBonus_Basics(giant);
 		for (auto Nodes: BODY_NODES) {
 			auto Node = find_node(giant, Nodes);
@@ -225,7 +214,7 @@ namespace {
 	}
 
 	void InflictBreastDamage(Actor* giant) {
-		float damage = GetBoobCrushDamage(giant);
+		float damage = AnimationBoobCrush::GetBoobCrushDamage(giant);
 		Actor* victim = AnimationBoobCrush::GetSingleton().GetBoobCrushVictim(giant);
 		if (victim) {
 			SetBeingEaten(victim, false); // Allow to be staggered
@@ -260,7 +249,6 @@ namespace {
 			Rumbling::Once("Breast_L", giant, shake_power * smt, 0.075f, "L Breast03", 0.0f);
 			Rumbling::Once("Breast_R", giant, shake_power * smt, 0.075f, "R Breast03", 0.0f);
 			ModGrowthCount(giant, 0, true); // Reset limit
-			return;
 		} else if (BreastL && BreastR) {
 			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastL, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
 			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastR, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
@@ -272,7 +260,6 @@ namespace {
 			Rumbling::Once("Breast_L", giant, shake_power * smt, 0.075f, "NPC L Breast", 0.0f);
 			Rumbling::Once("Breast_R", giant, shake_power * smt, 0.075f, "NPC R Breast", 0.0f);
 			ModGrowthCount(giant, 0, true); // Reset limit
-			return;
 		} else {
 			if (!BreastR) {
 				Notify("Error: Missing Breast Nodes"); // Will help people to troubleshoot it. Not everyone has 3BB/XPMS32 body.
@@ -386,6 +373,17 @@ namespace Gts
 		} catch (std::out_of_range e) {
 			return nullptr;
 		}
+	}
+
+	float AnimationBoobCrush::GetBoobCrushDamage(Actor* actor) {
+		float damage = 1.0f;
+		if (Runtime::HasPerkTeam(actor, "ButtCrush_KillerBooty")) {
+			damage += 0.30f;
+		}
+		if (Runtime::HasPerkTeam(actor, "ButtCrush_UnstableGrowth")) {
+			damage += 0.70f;
+		}
+		return damage;
 	}
 
 	void AnimationBoobCrush::RegisterEvents() {

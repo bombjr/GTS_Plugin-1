@@ -26,6 +26,8 @@ namespace Gts
 			static void AttachActor(Actor* giant, Actor* tiny);
 			static Actor* GetBoobCrushVictim(Actor* giant);
 
+			static float GetBoobCrushDamage(Actor* actor);
+
 			std::unordered_map<Actor*, BoobCrushData> data;
 	};
 }

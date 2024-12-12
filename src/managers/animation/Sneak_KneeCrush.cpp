@@ -182,7 +182,10 @@ namespace {
     void GTS_SneakCrush_FootStep_SilentL(AnimationEventData& data) {DoFootsteps(&data.giant, 1.0f, false); TrackKnee(&data.giant, true); SetButtCrushSize(&data.giant, 0.0f, false);}
     void GTS_SneakCrush_FootStep_SilentR(AnimationEventData& data) {DoFootsteps(&data.giant, 1.0f, true);}
 
-	void GTS_DisableHH(AnimationEventData& data) {data.stage = 2; data.HHspeed = 2.25f; data.disableHH = true;}
+	void GTS_DisableHH(AnimationEventData& data) {
+		data.stage = 2; data.HHspeed = 2.25f; data.disableHH = true;
+	
+	}
 	void GTS_EnableHH(AnimationEventData& data) {data.stage = 2; data.HHspeed = 1.0f; data.disableHH = false;}
 }
 

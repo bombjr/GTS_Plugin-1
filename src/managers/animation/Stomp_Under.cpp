@@ -95,18 +95,14 @@ namespace Gts {
         const float InvLookDownStartAngle = 0.9f; //Starting value of remap. Defines start angle for how down we are looking
         const float InvLookdownIntensity = std::clamp(Remap(absPitch, 1.0f, InvLookDownStartAngle, 0.0f, 1.0f), 0.0f, 1.0f);
 
-        bool Sneaking = giant->IsSneaking(); // We don't want it to work when sneaking
-        if (!Sneaking) {
-            bool allow = absPitch > InvLookDownStartAngle;
-            // Allow to stomp when looking from above or below
-            if (allow) {
-                float blend = std::clamp(InvLookdownIntensity * 1.3f, 0.0f, 1.0f);
-                giant->SetGraphVariableFloat("GTS_StompBlend", blend);
-                // Blend between "close" and "far" under-stomps
-            }
-            return allow;
+        bool allow = absPitch > InvLookDownStartAngle;
+        // Allow to stomp when looking from above or below
+        if (allow) {
+            float blend = std::clamp(InvLookdownIntensity * 1.3f, 0.0f, 1.0f);
+            giant->SetGraphVariableFloat("GTS_StompBlend", blend);
+            // Blend between "close" and "far" under-stomps
         }
-        return false;
+        return allow;
     }
 
     void AnimationUnderStomp::RegisterEvents() {

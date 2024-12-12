@@ -1046,95 +1046,94 @@ namespace Gts {
 	void ApplyThighDamage(Actor* actor, bool right, bool CooldownCheck, float radius, float damage, float bbmult, float crush_threshold, int random, DamageSource Cause) {
 		auto profiler = Profilers::Profile("CollisionDamageLeft: DoFootCollision_Left");
 		auto& CollisionDamage = CollisionDamage::GetSingleton();
-		if (!actor) {
-			return;
-		}
 		
-		auto& sizemanager = SizeManager::GetSingleton();
-		float giantScale = get_visual_scale(actor);
-		float perk = GetPerkBonus_Thighs(actor);
-		const float BASE_CHECK_DISTANCE = 90.0f;
-		float SCALE_RATIO = 1.75f;
+		if (actor) {
+			auto& sizemanager = SizeManager::GetSingleton();
+			float giantScale = get_visual_scale(actor);
+			float perk = GetPerkBonus_Thighs(actor);
+			const float BASE_CHECK_DISTANCE = 90.0f;
+			float SCALE_RATIO = 1.75f;
 
-		if (HasSMT(actor)) {
-			giantScale += 0.20f;
-			SCALE_RATIO = 0.90f;
-		}
-
-		std::string_view leg = "NPC R Foot [Rft ]";
-		std::string_view knee = "NPC R Calf [RClf]";
-		std::string_view thigh = "NPC R Thigh [RThg]";
-
-		if (!right) {
-			leg = "NPC L Foot [Lft ]";
-			knee = "NPC L Calf [LClf]";
-			thigh = "NPC L Thigh [LThg]";
-		}
-
-
-		std::vector<NiPoint3> ThighPoints = GetThighCoordinates(actor, knee, leg, thigh);
-
-		float speed = AnimationManager::GetBonusAnimationSpeed(actor);
-		crush_threshold *= (1.10f - speed*0.10f);
-
-		float feet_damage = (Damage_ThighCrush_CrossLegs_FeetImpact * perk * speed);
-		
-		if (CooldownCheck) {
-			CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, true, true, false, false);
-			CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, false, true, false, false);
-		}
-
-		float maxFootDistance = radius * giantScale;
-
-		if (!ThighPoints.empty()) {
-			if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor) || EffectsForEveryone(actor))) {
-				for (auto &point : ThighPoints) {
-					DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxFootDistance);
-				}
+			if (HasSMT(actor)) {
+				giantScale += 0.20f;
+				SCALE_RATIO = 0.90f;
 			}
-		
-			NiPoint3 giantLocation = actor->GetPosition();
-			for (auto otherActor: find_actors()) {
-				if (otherActor != actor) {
-					float tinyScale = get_visual_scale(otherActor);
-					if (giantScale / tinyScale > SCALE_RATIO) {
-						NiPoint3 actorLocation = otherActor->GetPosition();
 
-						if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
-							int nodeCollisions = 0;
-							float force = 0.0f;
+			std::string_view leg = "NPC R Foot [Rft ]";
+			std::string_view knee = "NPC R Calf [RClf]";
+			std::string_view thigh = "NPC R Thigh [RThg]";
 
-							auto model = otherActor->GetCurrent3D();
-							
-							if (model) {
-								for (auto &point : ThighPoints) {
-									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
-										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
-										if (distance <= maxFootDistance) {
-											nodeCollisions += 1;
-											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
-											return false;
-										}
-										return true;
-									});
-								}
-							}
-							if (nodeCollisions > 0) {
-								//damage /= nodeCollisions;
-								if (CooldownCheck) {
-									float pushForce = std::clamp(force, 0.04f, 0.10f);
-									bool OnCooldown = IsActionOnCooldown(otherActor, CooldownSource::Damage_Thigh);
-									if (!OnCooldown) {
-										float pushCalc = 0.06f * pushForce * speed;
-										Laugh_Chance(actor, otherActor, 1.35f, "ThighCrush");
-										float difference = giantScale / (tinyScale * GetSizeFromBoundingBox(otherActor));
-										PushTowards(actor, otherActor, leg, pushCalc * difference, true);
-										CollisionDamage.DoSizeDamage(actor, otherActor, damage * speed * perk, bbmult, crush_threshold, random, Cause, true);
-										ApplyActionCooldown(otherActor, CooldownSource::Damage_Thigh);
+			if (!right) {
+				leg = "NPC L Foot [Lft ]";
+				knee = "NPC L Calf [LClf]";
+				thigh = "NPC L Thigh [LThg]";
+			}
+
+
+			std::vector<NiPoint3> ThighPoints = GetThighCoordinates(actor, knee, leg, thigh);
+
+			float speed = AnimationManager::GetBonusAnimationSpeed(actor);
+			crush_threshold *= (1.10f - speed*0.10f);
+
+			float feet_damage = (Damage_ThighCrush_CrossLegs_FeetImpact * perk * speed);
+			
+			if (CooldownCheck) {
+				CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, true, true, false, false);
+				CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, false, true, false, false);
+			}
+
+			float maxFootDistance = radius * giantScale;
+
+			if (!ThighPoints.empty()) {
+				if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor) || EffectsForEveryone(actor))) {
+					for (auto &point : ThighPoints) {
+						DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), maxFootDistance);
+					}
+				}
+			
+				NiPoint3 giantLocation = actor->GetPosition();
+				for (auto otherActor: find_actors()) {
+					if (otherActor != actor) {
+						float tinyScale = get_visual_scale(otherActor);
+						if (giantScale / tinyScale > SCALE_RATIO) {
+							NiPoint3 actorLocation = otherActor->GetPosition();
+
+							if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
+								int nodeCollisions = 0;
+								float force = 0.0f;
+
+								auto model = otherActor->GetCurrent3D();
+								
+								if (model) {
+									for (auto &point : ThighPoints) {
+										VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
+											float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
+											if (distance <= maxFootDistance) {
+												nodeCollisions += 1;
+												force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+												return false;
+											}
+											return true;
+										});
 									}
-								} else {
-									Utils_PushCheck(actor, otherActor, Get_Bone_Movement_Speed(actor, Cause)); // pass original un-altered force
-									CollisionDamage.DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, true);
+								}
+								if (nodeCollisions > 0) {
+									//damage /= nodeCollisions;
+									if (CooldownCheck) {
+										float pushForce = std::clamp(force, 0.04f, 0.10f);
+										bool OnCooldown = IsActionOnCooldown(otherActor, CooldownSource::Damage_Thigh);
+										if (!OnCooldown) {
+											float pushCalc = 0.06f * pushForce * speed;
+											Laugh_Chance(actor, otherActor, 1.35f, "ThighCrush");
+											float difference = giantScale / (tinyScale * GetSizeFromBoundingBox(otherActor));
+											PushTowards(actor, otherActor, leg, pushCalc * difference, true);
+											CollisionDamage.DoSizeDamage(actor, otherActor, damage * speed * perk, bbmult, crush_threshold, random, Cause, true);
+											ApplyActionCooldown(otherActor, CooldownSource::Damage_Thigh);
+										}
+									} else {
+										Utils_PushCheck(actor, otherActor, Get_Bone_Movement_Speed(actor, Cause)); // pass original un-altered force
+										CollisionDamage.DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, true);
+									}
 								}
 							}
 						}

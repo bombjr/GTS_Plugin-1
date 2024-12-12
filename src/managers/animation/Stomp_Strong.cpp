@@ -46,10 +46,25 @@ namespace {
 
 	void DoStompOrUnderStomp(Actor* player, const std::string_view name) {
 		float WasteStamina = 70.0f * GetWasteMult(player);
+
+		std::string_view message = "You're too tired to perform heavy stomp";
+
+		if (player->IsSneaking()) {
+			if (AnimationUnderStomp::ShouldStompUnder(player)) {
+				if (!IsCrawling(player)) {
+					message = "You're too tired to perform sneak butt crush";
+					WasteStamina *= 1.8f;
+				} else {
+					message = "You're too tired to perform sneak breast crush";
+					WasteStamina *= 2.5f;
+				}	
+			}
+		}
+
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
 			AnimationManager::StartAnim(name, player);
 		} else {
-			NotifyWithSound(player, "You're too tired to perform heavy stomp");
+			NotifyWithSound(player, message);
 		}
 	}
 

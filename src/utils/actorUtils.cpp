@@ -464,7 +464,7 @@ namespace Gts {
 	}
 
 	bool IsVoring(Actor* giant) {
-		bool Voring;
+		bool Voring = false;
 		giant->GetGraphVariableBool("GTS_IsVoring", Voring);
 		return Voring;
 	}
@@ -617,25 +617,25 @@ namespace Gts {
 	}
 
 	bool CanDoCombo(Actor* actor) {
-		bool Combo;
+		bool Combo = false;
 		actor->GetGraphVariableBool("GTS_CanCombo", Combo);
 		return Combo;
 	}
 
 	bool IsCameraEnabled(Actor* actor) {
-		bool Camera;
+		bool Camera = false;
 		actor->GetGraphVariableBool("GTS_VoreCamera", Camera);
 		return Camera;
 	}
 
 	bool IsCrawlVoring(Actor* actor) {
-		bool Voring;
+		bool Voring = false;
 		actor->GetGraphVariableBool("GTS_IsCrawlVoring", Voring);
 		return Voring;//Voring;
 	}
 
 	bool IsButtCrushing(Actor* actor) {
-		bool ButtCrushing;
+		bool ButtCrushing = false;
 		actor->GetGraphVariableBool("GTS_IsButtCrushing", ButtCrushing);
 		return ButtCrushing;
 	}

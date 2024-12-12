@@ -40,6 +40,11 @@ namespace Gts {
 
     const float Damage_Stomp_Under_Light = 13.2f; // Slightly more powerful damage
     const float Damage_Stomp_Under_Strong = 20.6f; // Slightly weaker than normal strong stomp
+    const float Damage_Stomp_Under_LegLand = 16.2f; // When legs land after butt crush during strong sneak under-stomp 
+
+    const float Damage_Stomp_Under_Breast_Legs = 14.2f; // When legs land after breast impact
+    const float Damage_Stomp_Under_Breast_Body = 20.0f; // When body hits the target
+    const float Damage_Stomp_Under_Breast_Breasts = 30.0f; // When breasts hit the target 
 
     /////////////////Foot Grind
 
@@ -54,6 +59,8 @@ namespace Gts {
 	const float Damage_Trample_Finisher = 22.0f;
 
     ////////////////Butt Crush
+
+    const float Damage_ButtCrush_Under_ButtImpact = 24.4f;
 
 	const float Damage_ButtCrush_ButtImpact = 32.0f;
     const float Damage_ButtCrush_HandImpact = 6.0f;
@@ -114,7 +121,8 @@ namespace Gts {
 	const float Damage_Sneak_HandSwipe = 4.5f;
 	const float Damage_Sneak_HandSwipe_Strong = 10.0f;
 
-    const float Damage_Sneak_HandSlam = 4.0f;
+    const float Damage_Sneak_HandSlam = 5.2f;
+    const float Damage_Sneak_HandSlam_Sneak = 7.2f;
     const float Damage_Sneak_HandSlam_Strong = 20.0f;
     const float Damage_Sneak_HandSlam_Strong_Secondary = 2.6f;
 
@@ -160,6 +168,8 @@ namespace Gts {
 
     const float Radius_Stomp = 7.0f;
     const float Radius_Stomp_Strong = 7.6f;
+
+    const float Radius_UnderStomp_Butt_Impact = 18.2f;
 
     /////////Foot Grind
     const float Radius_Foot_Grind_Impact = 7.4f;
@@ -292,6 +302,8 @@ namespace Gts {
     // Butt crush
     const float Rumble_ButtCrush_FeetImpact = 2.5f * 1.0f;
     const float Rumble_ButtCrush_ButtImpact = 5.8f;  // Butt Crush
+
+    const float Rumble_ButtCrush_UnderStomp_ButtImpact = 3.4f;  // Butt Crush
 
     // Knee Crush
     const float Rumble_KneeCrush_FootImpact = 1.75f * 1.0f;
