@@ -24,5 +24,7 @@ namespace Gts {
 
 	bool IsFirstPerson();
 
+	bool IsFakeFirstPerson();
+
 	void ForceThirdPerson(Actor* giant);
 }

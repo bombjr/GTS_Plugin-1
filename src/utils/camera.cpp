@@ -97,6 +97,24 @@ namespace Gts {
 		return false;
 	}
 
+	bool IsFakeFirstPerson() {
+		constexpr float fakeFpMinCurrentZoom = -0.275f;
+		auto fMinCurrentZoom = reinterpret_cast<float*>(REL::RelocationID(509882, 382633).address());
+		if (!fMinCurrentZoom) return false;
+
+		auto playercamera = PlayerCamera::GetSingleton();
+
+		if (!playercamera) {
+			return false;
+		}
+
+		if (playercamera->currentState == playercamera->cameraStates[CameraState::kThirdPerson] && fakeFpMinCurrentZoom == *fMinCurrentZoom) {
+			return true;
+		}
+
+		return false;
+	}
+
 	void ForceThirdPerson(Actor* giant) {
 		if (giant->formID == 0x14) {
 			auto camera = RE::PlayerCamera::GetSingleton();
