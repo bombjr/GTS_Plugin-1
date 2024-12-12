@@ -414,7 +414,18 @@ namespace Gts {
 									rayStart.z += max(camhullSize * hullMult, 3.0f);
 
 									//TODO The distances at small scales become so small that we run against the camera clip
-									//TODO Scale FnearDistance... This will be fun considering mods like IC also mess with it constantly... 
+                                    //TODO Scale FnearDistance... This will be fun considering mods like IC also mess with it constantly... 
+									//TODO Wait For IC to fix this on their end.
+									/*
+									if (!IsFirstPerson()) {
+										auto niCamera = GetNiCamera();
+										if (niCamera) {
+											niCamera->GetRuntimeData2().viewFrustum.fNear = camhullSize * hullMult;
+											UpdateWorld2ScreetMat(niCamera);
+											update_node(niCamera);
+										}
+									}*/
+
 
 									if (IsDebugEnabled()) {
 										DebugAPI::DrawSphere(glm::vec3(rayStart.x, rayStart.y, rayStart.z), 1.0f, 10, { 0.5f, 1.0f, 0.0f, 1.0f }, 10.0f);
