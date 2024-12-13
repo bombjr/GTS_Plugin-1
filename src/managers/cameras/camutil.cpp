@@ -1,6 +1,7 @@
 #include "managers/cameras/camutil.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/highheel.hpp"
+#include "api/APIManager.hpp"
 #include "scale/modscale.hpp"
 #include "rays/raycast.hpp"
 #include "data/runtime.hpp"

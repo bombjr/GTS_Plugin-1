@@ -4,7 +4,7 @@
 
 This is the source for the [Gianttess Mod - Size matters NG](https://www.nexusmods.com/skyrimspecialedition/mods/37823?tab=description) SKSE plugin.
 
-Monke coding with new features/expansions by Sermit.
+Monke coding with new features/expansions by Sermit and Arial.
 Very complex parts (98% of DLL code) done by Andy.
 
 Still WIP
@@ -21,14 +21,14 @@ Launch `x64 Native Tools Command Promt For VS 2022` from the start menu first
 ```
 git clone https://github.com/sermitse/GTS_Plugin/
 cd GTS_Plugin
-cmake --preset build-release-withdebuginfo-msvc
-cmake --build build --config RelWithDebInfo
+cmake --preset build-release
+cmake --build --preset preset-release
 ```
 
 ## Feature Wish List
 
 - [X] [1] Auto scale height to room
-- [ ] [2] Correct bumper for height
+- [X] [2] Correct bumper for height (Done through Side-Mod)
 - [X] [3] Talk to actor when crouching
 - [X] [4] Accurate Body Collision that inflicts size effects on contact instead of using cloak magiceffects
 - [X] [5] Fixed Player and NPC headtracking

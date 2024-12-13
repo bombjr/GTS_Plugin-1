@@ -5,6 +5,7 @@
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
 #include "managers/camera.hpp"
+#include "api/APIManager.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "data/time.hpp"
@@ -74,10 +75,33 @@ namespace Gts {
 	}
 
 	void CameraManager::CameraUpdate() {
+
 		auto profiler = Profilers::Profile("Camera: Update");
 		CameraState* currentState = this->GetCameraState();
 
-		// Handles Transitioning
+		if (SmoothCamLoaded()) {
+			if (auto thirdPersonCameraState = dynamic_cast<ThirdPersonCameraState*>(currentState)) {
+
+				auto TPState = GetCameraStateTP();
+
+				if (TPState == &this->footLState ||
+					TPState == &this->footRState ||
+					TPState == &this->footState ||
+					thirdPersonCameraState->GetBoneTarget().boneNames.size() > 0) {
+					ReqControlFromSC();
+				}
+				else {
+					//Else Let Smoothcam Handle it
+					RetControlToSC();
+					return;
+				}
+			}
+			else if (!currentState) {
+				RetControlToSC();
+				return;
+			}
+		}
+
 		if (currentState != this->currentState) {
 			if (this->currentState) {
 				this->currentState->ExitState();
@@ -215,6 +239,7 @@ namespace Gts {
 
 	// Decide which camera state to use
 	CameraState* CameraManager::GetCameraState() {
+
 		if (!Runtime::GetBool("EnableCamera") || IsFreeCameraEnabled()) {
 			return nullptr;
 		}
@@ -237,6 +262,7 @@ namespace Gts {
 			return nullptr;
 		}
 		RE::CameraState playerCameraMode = playerCameraState->id;
+
 		switch (playerCameraMode) {
 			// Fp state
 			case RE::CameraState::kFirstPerson: {

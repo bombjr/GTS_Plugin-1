@@ -20,6 +20,7 @@
 #include "git.h"
 
 #include "skselog.hpp"
+#include "api/APIManager.hpp"
 
 using namespace RE::BSScript;
 using namespace Gts;
@@ -29,18 +30,15 @@ using namespace SKSE::stl;
 
 namespace {
 
-
-	/**
-	 * Setup logging.
-	 *
-	 * <p>
-	 * Logging is important to track issues. CommonLibSSE bundles functionality for spdlog, a common C++ logging
-	 * framework. Here we initialize it, using values from the configuration file. This includes support for a debug
-	 * logger that shows output in your IDE when it has a debugger attached to Skyrim, as well as a file logger which
-	 * writes data to the standard SKSE logging directory at <code>Documents/My Games/Skyrim Special Edition/SKSE</code>
-	 * (or <code>Skyrim VR</code> if you are using VR).
-	 * </p>
-	 */
+	void PrintStartupBanner() {
+		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Beta was succesfully initialized. Waiting for New Game/Save Load. ]");
+		Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
+		Cprint("[GTSPlugin.dll]: Git Info:");
+		Cprint("\t -- Commit: {}", git_CommitSubject());
+		Cprint("\t -- SHA1: {}", git_CommitSHA1());
+		Cprint("\t -- Date: {}", git_CommitDate());
+		Cprint("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
+	}
 
 	void InitializeLogging() {
 		auto path = Gts::log_directory();
@@ -68,77 +66,80 @@ namespace {
 
 	}
 
-
-	/**
-	 * Register to listen for messages.
-	 *
-	 * <p>
-	 * SKSE has a messaging system to allow for loosely coupled messaging. This means you don't need to know about or
-	 * link with a message sender to receive their messages. SKSE itself will send messages for common Skyrim lifecycle
-	 * events, such as when SKSE plugins are done loading, or when all ESP plugins are loaded.
-	 * </p>
-	 *
-	 * <p>
-	 * Here we register a listener for SKSE itself (because we have not specified a message source). Plugins can send
-	 * their own messages that other plugins can listen for as well, although that is not demonstrated in this example
-	 * and is not common.
-	 * </p>
-	 *
-	 * <p>
-	 * The data included in the message is provided as only a void pointer. It's type depends entirely on the type of
-	 * message, and some messages have no data (<code>dataLen</code> will be zero).
-	 * </p>
-	 */
 	void InitializeMessaging() {
 
 		if (!GetMessagingInterface()->RegisterListener([](MessagingInterface::Message *message) {
 			switch (message->type) {
-				// Skyrim lifecycle events.
-				case MessagingInterface::kPostLoad: // Called after all plugins have finished running SKSEPlugin_Load.
-				// It is now safe to do multithreaded operations, or operations against other plugins.
-				case MessagingInterface::kPostPostLoad: // Called after all kPostLoad message handlers have run.
+
+				// Called after all plugins have finished running SKSEPlugin_Load.
+				case MessagingInterface::kPostLoad:     
+				{ 
+					//RegisterAPIs();
 					break;
-				case MessagingInterface::kInputLoaded: // Called when all game data has been found.
+				}
+
+				// Called after all kPostLoad message handlers have run.
+				case MessagingInterface::kPostPostLoad: 
+				{ 
 					break;
-				case MessagingInterface::kDataLoaded: // All ESM/ESL/ESP plugins have loaded, main menu is now active.
-					// It is now safe to access form data.
-					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Beta was succesfully initialized. Waiting for New Game/Save Load. ]");
-					Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
-					Cprint("[GTSPlugin.dll]: Git Info:");
-					Cprint("\t -- Commit: {}", git_CommitSubject());
-					Cprint("\t -- SHA1: {}", git_CommitSHA1());
-					Cprint("\t -- Date: {}", git_CommitDate());
-					Cprint("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
+				}
+
+				// Called when all game data has been found.
+				case MessagingInterface::kInputLoaded:   
+				{
+					break;
+				}
+
+				// All ESM/ESL/ESP plugins have loaded, main menu is now active.
+				case MessagingInterface::kDataLoaded:  
+				{    
 					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
 					InputManager::GetSingleton().DataReady();
+					RegisterAPIs();
 					break;
+				}
+
 				// Skyrim game events.
-				case MessagingInterface::kPostLoadGame: // Player's selected save game has finished loading.
-					// Data will be a boolean indicating whether the load was successful.
+				// Player's selected save game has finished loading.
+				case MessagingInterface::kPostLoadGame:  
 				{
 					Plugin::SetInGame(true);
 					Cprint(" [GTSPlugin.dll]: [ Giantess Mod was succesfully initialized and loaded. ]");
+					break;
 				}
-				break;
-				case MessagingInterface::kNewGame: // Player starts a new game from main menu.
+
+				// Player starts a new game from main menu.
+				case MessagingInterface::kNewGame:
 				{
 					Plugin::SetInGame(true);
 					EventDispatcher::DoReset();
 					Cprint(" [GTSPlugin.dll]: [ Giantess Mod was succesfully initialized and loaded. ]");
+					break;
 				}
-				break;
-				case MessagingInterface::kPreLoadGame: // Player selected a game to load, but it hasn't loaded yet.
-					// Data will be the name of the loaded save.
+
+				// Player selected a game to load, but it hasn't loaded yet.
+				// Data will be the name of the loaded save.
+				case MessagingInterface::kPreLoadGame: 
 				{
 					Plugin::SetInGame(false);
 					EventDispatcher::DoReset();
-				}
-				break;
-				case MessagingInterface::kSaveGame: // The player has saved a game.
-				// Data will be the save name.
-				case MessagingInterface::kDeleteGame: // The player deleted a saved game from within the load menu.
 					break;
+				}
+
+				// The player has saved a game.
+				case MessagingInterface::kSaveGame:
+				{
+					break;
+				}
+
+				// The player deleted a saved game from within the load menu.
+				// Data will be the save name.
+				case MessagingInterface::kDeleteGame:
+				{
+					break;
+				} 
+
 			}
 		})) {
 			stl::report_and_fail("Unable to register message listener.");
@@ -207,16 +208,6 @@ static void SetLogLevel() {
 	}
 }
 
-/**
- * This if the main callback for initializing your SKSE plugin, called just before Skyrim runs its main function.
- *
- * <p>
- * This is your main entry point to your plugin, where you should initialize everything you need. Many things can't be
- * done yet here, since Skyrim has not initialized and the Windows loader lock is not released (so don't do any
- * multithreading). But you can register to listen for messages for later stages of Skyrim startup to perform such
- * tasks.
- * </p>
- */
 SKSEPluginLoad(const LoadInterface * a_skse){
 
 
