@@ -413,20 +413,18 @@ namespace Gts {
 									//offset Height by camera hull size. Fixes cases where the bone is closer to the ground than the hull size.
 									rayStart.z += max(camhullSize * hullMult, 3.0f);
 
-									//TODO The distances at small scales become so small that we run against the camera fnear clip
-                                    //TODO Scale FnearDistance... This will be fun considering mods like IC also mess with it constantly... 
-									//TODO Wait For IC to fix this on their end.
+									//TODO Wait For IC 2.0
 									
-									if (!IsFirstPerson() && !IsFakeFirstPerson()) {
-										auto niCamera = GetNiCamera();
-										if (niCamera) {
+									//if (!IsFirstPerson() && !IsFakeFirstPerson()) {
+									//	auto niCamera = GetNiCamera();
+									//	if (niCamera) {
 											//CamHull Should be the same as FNearDistance
 											//TODO Find the Offset For that value and assign CamHull to it.
 											//TODO Also Connect this to the camera rotation matrix Z coord. it should be somethin like: camhullSize * (LookUpDownAngle Remaped to something like 0.8-1.0 * min(visual scale, 1.0)).
 											//TODO Also Move this to its own func.
-											niCamera->GetRuntimeData2().viewFrustum.fNear = camhullSize * hullMult;
-										}
-									}
+									//		niCamera->GetRuntimeData2().viewFrustum.fNear = camhullSize * hullMult;
+									//	}
+									//}
 
 
 									if (IsDebugEnabled()) {

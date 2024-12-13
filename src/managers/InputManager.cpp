@@ -376,40 +376,47 @@ namespace Gts {
 			if (trigger.AllKeysPressed(gameInputKeys)){
 				//log::debug("AllkeysPressed for trigger {}", trigger.GetName());
 				//Get the coresponding event data
-				auto& eventData = this->registedInputEvents.at(trigger.GetName());
+				try {
+					auto& eventData = this->registedInputEvents.at(trigger.GetName());
 
-				if (blockInput == BlockCondition::Force) {
-					//If force blocking is set block game input regardless of conditions
-					std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
-					KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
+					if (blockInput == BlockCondition::Force) {
+						//If force blocking is set block game input regardless of conditions
+						std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
+						KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
 
-					if (eventData.condition != nullptr) {
-						if (!eventData.condition()) {
+						if (eventData.condition != nullptr) {
+							if (!eventData.condition()) {
+								continue;
+							}
+						}
+
+					}
+					//The condition callback can be null, check before calling it.
+					//In the case it's null input blocking or early continuing won't be done and the system will behave like previously unless its forced.
+					else if (eventData.condition != nullptr) {
+						//log::debug("condition exists {}", fmt::ptr(&eventData.condition));
+						//Used to verify wether this trigger will actually end up doing anthing
+						if (eventData.condition()) {
+							//log::debug("condition is true for {}", trigger.GetName());
+							//Need to make a copy here otherwise insert throws an assertion
+
+							if (blockInput != BlockCondition::Never) {
+								std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
+								//log::debug("ShouldBlock is true for {}", trigger.GetName());
+								KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
+							}
+						}
+						else {
+							//log::debug("Condition Was False For Event: {}", trigger.GetName());
+							//If False Skip calling ShouldFire as there is no point in processing an event that won't do anything
 							continue;
 						}
 					}
-
 				}
-				//The condition callback can be null, check before calling it.
-				//In the case it's null input blocking or early continuing won't be done and the system will behave like previously unless its forced.
-				else if (eventData.condition != nullptr) {
-					//log::debug("condition exists {}", fmt::ptr(&eventData.condition));
-					//Used to verify wether this trigger will actually end up doing anthing
-					if (eventData.condition()) {
-						//log::debug("condition is true for {}", trigger.GetName());
-						//Need to make a copy here otherwise insert throws an assertion
 
-						if (blockInput != BlockCondition::Never) {
-							std::unordered_set<uint32_t> KeysToAdd = std::unordered_set<uint32_t>(trigger.GetKeys());
-							//log::debug("ShouldBlock is true for {}", trigger.GetName());
-							KeysToBlock.insert(KeysToAdd.begin(), KeysToAdd.end());
-						}
-					}
-					else {
-						//log::debug("Condition Was False For Event: {}", trigger.GetName());
-						//If False Skip calling ShouldFire as there is no point in processing an event that won't do anything
-						continue;
-					}
+				catch (std::out_of_range e) {
+					log::warn("Event {} was triggered but there is no event of that name", trigger.GetName());
+					continue;
 				}
 			}
 

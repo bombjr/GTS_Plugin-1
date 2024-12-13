@@ -43,8 +43,8 @@ jobs:
 
       - name: Compile
         run: |
-           cmake --preset build-release-withdebuginfo-msvc
-           cmake --build build/release-msvc --config RelWithDebInfo
+           cmake --preset build-release
+           cmake --build --preset preset-release
             
       - name: Copy Plugin
         shell: bash

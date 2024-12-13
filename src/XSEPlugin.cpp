@@ -19,6 +19,8 @@
 #include <thread>
 #include "git.h"
 
+#include "skselog.hpp"
+
 using namespace RE::BSScript;
 using namespace Gts;
 using namespace SKSE;
@@ -40,9 +42,8 @@ namespace {
 	 * </p>
 	 */
 
-	void InitializeLogging()
-	{
-		auto path = log_directory();
+	void InitializeLogging() {
+		auto path = Gts::log_directory();
 
 		if (!path) {
 			report_and_fail("Unable to lookup SKSE logs directory.");
@@ -60,23 +61,11 @@ namespace {
 				"Global", std::make_shared <spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
 
+		spdlog::set_default_logger(std::move(log));
+		spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
+		spdlog::set_level(spdlog::level::level_enum::trace);
+		spdlog::flush_on(spdlog::level::level_enum::trace);
 
-
-		try {
-			spdlog::set_default_logger(std::move(log));
-			spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
-			spdlog::set_level(spdlog::level::level_enum::trace);
-			spdlog::flush_on(spdlog::level::level_enum::trace);
-			log::info("Loading Config...");
-			const auto& debugConfig = Gts::Config::GetSingleton().GetDebug();
-			log::info("Plugin Config Loaded");
-			spdlog::set_level(debugConfig.GetLogLevel());
-			spdlog::flush_on(debugConfig.GetFlushLevel());
-		} catch (const std::exception& ex) {
-			spdlog::set_default_logger(std::move(log));
-			log::critical("Could not load config: {}", ex.what());
-			report_and_fail(std::format("Could not load config: {}", ex.what()));
-		}
 	}
 
 
@@ -100,13 +89,10 @@ namespace {
 	 * message, and some messages have no data (<code>dataLen</code> will be zero).
 	 * </p>
 	 */
-	void InitializeMessaging()
-	{
+	void InitializeMessaging() {
+
 		if (!GetMessagingInterface()->RegisterListener([](MessagingInterface::Message *message) {
-			auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
-			auto buildDate = std::format("{} {}",__DATE__,__TIME__);
-			switch (message->type)
-			{
+			switch (message->type) {
 				// Skyrim lifecycle events.
 				case MessagingInterface::kPostLoad: // Called after all plugins have finished running SKSEPlugin_Load.
 				// It is now safe to do multithreaded operations, or operations against other plugins.
@@ -116,7 +102,13 @@ namespace {
 					break;
 				case MessagingInterface::kDataLoaded: // All ESM/ESL/ESP plugins have loaded, main menu is now active.
 					// It is now safe to access form data.
-					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Build({}) Git({}) Beta was succesfully initialized. Waiting for New Game/Save Load. ]", buildDate, gitData);
+					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Beta was succesfully initialized. Waiting for New Game/Save Load. ]");
+					Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
+					Cprint("[GTSPlugin.dll]: Git Info:");
+					Cprint("\t -- Commit: {}", git_CommitSubject());
+					Cprint("\t -- SHA1: {}", git_CommitSHA1());
+					Cprint("\t -- Date: {}", git_CommitDate());
+					Cprint("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
 					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
 					InputManager::GetSingleton().DataReady();
@@ -154,7 +146,7 @@ namespace {
 	}
 }
 
-void InitializeSerialization() {
+static void InitializeSerialization() {
 	log::trace("Initializing cosave serialization...");
 	auto* serde = GetSerializationInterface();
 	serde->SetUniqueID(_byteswap_ulong('GTSP'));
@@ -164,7 +156,7 @@ void InitializeSerialization() {
 	log::info("Cosave serialization initialized.");
 }
 
-void InitializePapyrus() {
+static void InitializePapyrus() {
 	log::trace("Initializing Papyrus binding...");
 	if (GetPapyrusInterface()->Register(Gts::register_papyrus)) {
 		log::info("Papyrus functions bound.");
@@ -173,7 +165,7 @@ void InitializePapyrus() {
 	}
 }
 
-void InitializeEventSystem() {
+static void InitializeEventSystem() {
 	EventDispatcher::AddListener(&DebugOverlayMenu::GetSingleton());
 	EventDispatcher::AddListener(&Runtime::GetSingleton()); // Stores spells, globals and other important data
 	EventDispatcher::AddListener(&Persistent::GetSingleton());
@@ -184,6 +176,35 @@ void InitializeEventSystem() {
 	EventDispatcher::AddListener(&SpringManager::GetSingleton());
 	log::info("Adding Default Listeners");
 	RegisterManagers();
+}
+
+static void PrintPluginInfo() {
+
+	logger::info("SKSEPluginLoad... ");
+	logger::info("Dll Build Date: {} {}", __DATE__, __TIME__);
+
+	std::string git_commit = fmt::format("\t -- Commit: {}", git_CommitSubject());
+	std::string git_sha1 = fmt::format("\t -- SHA1: {}", git_CommitSHA1());
+	std::string git_date = fmt::format("\t -- Date: {}", git_CommitDate());
+	std::string git_ditry = fmt::format("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
+
+	logger::info("Git Info:\n{}\n{}\n{}\n{}", git_commit, git_sha1, git_date, git_ditry);
+
+}
+
+static void SetLogLevel() {
+	try {
+		log::info("Getting Logger Config...");
+		const auto& debugConfig = Gts::Config::GetSingleton().GetDebug();
+		log::info("Config Loaded");
+
+		spdlog::set_level(debugConfig.GetLogLevel());
+		spdlog::flush_on(debugConfig.GetFlushLevel());
+	}
+	catch (exception e){
+		log::critical("Could not load config file", e.what());
+		stl::report_and_fail("Could not load config file");
+	}
 }
 
 /**
@@ -199,13 +220,13 @@ void InitializeEventSystem() {
 SKSEPluginLoad(const LoadInterface * a_skse){
 
 
-	auto *plugin  = PluginDeclaration::GetSingleton();
-	auto version = plugin->GetVersion();
+	const auto *plugin  = PluginDeclaration::GetSingleton();
+	const auto version = plugin->GetVersion().string();
+	const auto name = plugin->GetName();
 
 	InitializeLogging();
-
-	auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
-	log::info("{} {} {} is loading...", plugin->GetName(), version, gitData);
+	PrintPluginInfo();
+	SetLogLevel();
 
 	Init(a_skse);
 
@@ -215,18 +236,10 @@ SKSEPluginLoad(const LoadInterface * a_skse){
 	InitializeSerialization();
 	InitializeEventSystem();
 
-	log::info("{} has finished loading.", plugin->GetName());
+	logger::info("SKSEPluginLoad OK");
 
 	return(true);
 }
-
-//SKSEPluginInfo(
-//	.Version = REL::Version{ 2, 0, 0, 0 },
-//	.Name = "GtsPlugin",
-//	.Author = "Sermit and Andy",
-//	.StructCompatibility = SKSE::StructCompatibility::Independent,
-//	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
-//);
 
 
 
