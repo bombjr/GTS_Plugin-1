@@ -32,7 +32,7 @@ namespace Gts {
 				SKSE::GetMessagingInterface(),
 				SmoothCamAPI::InterfaceVersion::V3)) {
 				//Set back to null incase it got set but requesting the interface failed.
-				SmoothCam == nullptr;
+				SmoothCam = nullptr;
 				logger::warn("SmoothCamAPI::RequestInterface reported an error");
 			}
 		}

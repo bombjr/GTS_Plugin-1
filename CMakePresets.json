@@ -109,7 +109,7 @@
           "type": "STRING",
           "value": "Debug"
         },
-        "CMAKE_CXX_FLAGS_DEBUG": "/Ob0 /Od /RTC1 /EHa"
+        "CMAKE_CXX_FLAGS_DEBUG": "/Zi /Ob0 /Od /RTC1 /EHa"
       }
     },
     {
@@ -128,8 +128,7 @@
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
           "value": "RelWithDebInfo"
-        },
-        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "/O2 /Ob1 /DNDEBUG"
+        }
       }
     },
     {
