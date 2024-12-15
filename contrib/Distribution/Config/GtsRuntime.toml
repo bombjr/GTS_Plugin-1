@@ -165,11 +165,11 @@ ShrinkPoison = "GTS.esp|5B5552"
 gtsProtectTiniesMGEF = "GTS.esp|763AD1"
 
 # Alchemy (scalable potions)
-AlchEffectGrowth = "GTS.esp|8A2A46"
-AlchEffectSize = "GTS.esp|8A2A48"
-AlchEffectEssence = "GTS.esp|8ACC4E"
-AlchEffectMight = "GTS.esp|8ACC51"
-AlchResistShrink = "GTS.esp|8ACC53"
+AlchEffectGrowth = "GTS.esp|89D948"
+AlchEffectSize = "GTS.esp|89D94A"
+AlchEffectEssence = "GTS.esp|89D947"
+AlchEffectMight = "GTS.esp|89D946"
+AlchResistShrink = "GTS.esp|89D949"
 
 
 # Crushing

@@ -41,6 +41,12 @@ namespace Gts {
 		return allow;
 	}
 
+	inline void RecordPotionMagnitude(ActiveEffect* effect, float& power, float IfFalse) {
+		if (effect) {
+			power = effect->magnitude > 0 ? effect->magnitude / 100.0f : IfFalse;
+		}
+	}
+
 	inline bool IsEssential_WithIcons(Actor* giant, Actor* tiny) { // Pretty much the same Essential check but with visualization in terms of icons/messages
 		if (tiny->formID == 0x14) { // always allow with player
 			return false;

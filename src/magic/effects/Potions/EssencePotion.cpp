@@ -43,8 +43,7 @@ namespace Gts {
 		} else if (base_spell == Runtime::GetMagicEffect("EffectEssencePotionExtreme")) {
 			this->power = 0.08f; 
 		} else if (base_spell == Runtime::GetMagicEffect("AlchEffectEssence")) {
-			auto active_effect = GetActiveEffect();
-			this->power = active_effect->magnitude > 0 ? active_effect->magnitude / 100.0f : 0.08f;
+			RecordPotionMagnitude(GetActiveEffect(), this->power, 0.08f);
 		}
 	}
 

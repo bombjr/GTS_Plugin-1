@@ -22,6 +22,7 @@ namespace {
 			Runtime::PlaySoundAtNode_FallOff("growthSound", giant, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
 		}
 	}
+
 }
 
 namespace Gts {
@@ -42,8 +43,7 @@ namespace Gts {
 		} else if (base_spell == Runtime::GetMagicEffect("EffectGrowthPotionExtreme")) {
 			this->power = 2.5f;
 		} else if (base_spell == Runtime::GetMagicEffect("AlchEffectGrowth")) {
-			auto active_effect = GetActiveEffect();
-			this->power = active_effect->magnitude > 0 ? active_effect->magnitude / 100.0f : 1.0f;
+			RecordPotionMagnitude(GetActiveEffect(), this->power, 1.0f);
 		}
 	}
 

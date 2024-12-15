@@ -35,8 +35,7 @@ namespace Gts {
 		} else if (base_spell == Runtime::GetMagicEffect("ResistShrinkPotionExtreme")) {
 			this->Resistance = 0.8f;
 		} else if (base_spell == Runtime::GetMagicEffect("AlchResistShrink")) {
-			auto active_effect = GetActiveEffect();
-			this->Resistance = active_effect->magnitude > 0 ? active_effect->magnitude / 100.0f : 0.8f;
+			RecordPotionMagnitude(GetActiveEffect(), this->Resistance, 0.8f);
 		}
 	}
 
