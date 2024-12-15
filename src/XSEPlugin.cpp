@@ -19,6 +19,9 @@
 #include <thread>
 #include "git.h"
 
+#include "skselog.hpp"
+#include "api/APIManager.hpp"
+
 using namespace RE::BSScript;
 using namespace Gts;
 using namespace SKSE;
@@ -27,22 +30,18 @@ using namespace SKSE::stl;
 
 namespace {
 
+	void PrintStartupBanner() {
+		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Beta was succesfully initialized. Waiting for New Game/Save Load. ]");
+		Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
+		Cprint("[GTSPlugin.dll]: Git Info:");
+		Cprint("\t -- Commit: {}", git_CommitSubject());
+		Cprint("\t -- SHA1: {}", git_CommitSHA1());
+		Cprint("\t -- Date: {}", git_CommitDate());
+		Cprint("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
+	}
 
-	/**
-	 * Setup logging.
-	 *
-	 * <p>
-	 * Logging is important to track issues. CommonLibSSE bundles functionality for spdlog, a common C++ logging
-	 * framework. Here we initialize it, using values from the configuration file. This includes support for a debug
-	 * logger that shows output in your IDE when it has a debugger attached to Skyrim, as well as a file logger which
-	 * writes data to the standard SKSE logging directory at <code>Documents/My Games/Skyrim Special Edition/SKSE</code>
-	 * (or <code>Skyrim VR</code> if you are using VR).
-	 * </p>
-	 */
-
-	void InitializeLogging()
-	{
-		auto path = log_directory();
+	void InitializeLogging() {
+		auto path = Gts::log_directory();
 
 		if (!path) {
 			report_and_fail("Unable to lookup SKSE logs directory.");
@@ -60,93 +59,87 @@ namespace {
 				"Global", std::make_shared <spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
 
+		spdlog::set_default_logger(std::move(log));
+		spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
+		spdlog::set_level(spdlog::level::level_enum::trace);
+		spdlog::flush_on(spdlog::level::level_enum::trace);
 
-
-		try {
-			spdlog::set_default_logger(std::move(log));
-			spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%t][%l] [%s:%#] %v");
-			spdlog::set_level(spdlog::level::level_enum::trace);
-			spdlog::flush_on(spdlog::level::level_enum::trace);
-			log::info("Loading Config...");
-			const auto& debugConfig = Gts::Config::GetSingleton().GetDebug();
-			log::info("Plugin Config Loaded");
-			spdlog::set_level(debugConfig.GetLogLevel());
-			spdlog::flush_on(debugConfig.GetFlushLevel());
-		} catch (const std::exception& ex) {
-			spdlog::set_default_logger(std::move(log));
-			log::critical("Could not load config: {}", ex.what());
-			report_and_fail(std::format("Could not load config: {}", ex.what()));
-		}
 	}
 
+	void InitializeMessaging() {
 
-	/**
-	 * Register to listen for messages.
-	 *
-	 * <p>
-	 * SKSE has a messaging system to allow for loosely coupled messaging. This means you don't need to know about or
-	 * link with a message sender to receive their messages. SKSE itself will send messages for common Skyrim lifecycle
-	 * events, such as when SKSE plugins are done loading, or when all ESP plugins are loaded.
-	 * </p>
-	 *
-	 * <p>
-	 * Here we register a listener for SKSE itself (because we have not specified a message source). Plugins can send
-	 * their own messages that other plugins can listen for as well, although that is not demonstrated in this example
-	 * and is not common.
-	 * </p>
-	 *
-	 * <p>
-	 * The data included in the message is provided as only a void pointer. It's type depends entirely on the type of
-	 * message, and some messages have no data (<code>dataLen</code> will be zero).
-	 * </p>
-	 */
-	void InitializeMessaging()
-	{
 		if (!GetMessagingInterface()->RegisterListener([](MessagingInterface::Message *message) {
-			auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
-			auto buildDate = std::format("{} {}",__DATE__,__TIME__);
-			switch (message->type)
-			{
-				// Skyrim lifecycle events.
-				case MessagingInterface::kPostLoad: // Called after all plugins have finished running SKSEPlugin_Load.
-				// It is now safe to do multithreaded operations, or operations against other plugins.
-				case MessagingInterface::kPostPostLoad: // Called after all kPostLoad message handlers have run.
+			switch (message->type) {
+
+				// Called after all plugins have finished running SKSEPlugin_Load.
+				case MessagingInterface::kPostLoad:     
+				{ 
+					//RegisterAPIs();
 					break;
-				case MessagingInterface::kInputLoaded: // Called when all game data has been found.
+				}
+
+				// Called after all kPostLoad message handlers have run.
+				case MessagingInterface::kPostPostLoad: 
+				{ 
 					break;
-				case MessagingInterface::kDataLoaded: // All ESM/ESL/ESP plugins have loaded, main menu is now active.
-					// It is now safe to access form data.
-					Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 Build({}) Git({}) Beta was succesfully initialized. Waiting for New Game/Save Load. ]", buildDate, gitData);
+				}
+
+				// Called when all game data has been found.
+				case MessagingInterface::kInputLoaded:   
+				{
+					break;
+				}
+
+				// All ESM/ESL/ESP plugins have loaded, main menu is now active.
+				case MessagingInterface::kDataLoaded:  
+				{    
 					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
 					InputManager::GetSingleton().DataReady();
+					RegisterAPIs();
 					break;
+				}
+
 				// Skyrim game events.
-				case MessagingInterface::kPostLoadGame: // Player's selected save game has finished loading.
-					// Data will be a boolean indicating whether the load was successful.
+				// Player's selected save game has finished loading.
+				case MessagingInterface::kPostLoadGame:  
 				{
 					Plugin::SetInGame(true);
 					Cprint(" [GTSPlugin.dll]: [ Giantess Mod was succesfully initialized and loaded. ]");
+					break;
 				}
-				break;
-				case MessagingInterface::kNewGame: // Player starts a new game from main menu.
+
+				// Player starts a new game from main menu.
+				case MessagingInterface::kNewGame:
 				{
 					Plugin::SetInGame(true);
 					EventDispatcher::DoReset();
 					Cprint(" [GTSPlugin.dll]: [ Giantess Mod was succesfully initialized and loaded. ]");
+					break;
 				}
-				break;
-				case MessagingInterface::kPreLoadGame: // Player selected a game to load, but it hasn't loaded yet.
-					// Data will be the name of the loaded save.
+
+				// Player selected a game to load, but it hasn't loaded yet.
+				// Data will be the name of the loaded save.
+				case MessagingInterface::kPreLoadGame: 
 				{
 					Plugin::SetInGame(false);
 					EventDispatcher::DoReset();
-				}
-				break;
-				case MessagingInterface::kSaveGame: // The player has saved a game.
-				// Data will be the save name.
-				case MessagingInterface::kDeleteGame: // The player deleted a saved game from within the load menu.
 					break;
+				}
+
+				// The player has saved a game.
+				case MessagingInterface::kSaveGame:
+				{
+					break;
+				}
+
+				// The player deleted a saved game from within the load menu.
+				// Data will be the save name.
+				case MessagingInterface::kDeleteGame:
+				{
+					break;
+				} 
+
 			}
 		})) {
 			stl::report_and_fail("Unable to register message listener.");
@@ -154,7 +147,7 @@ namespace {
 	}
 }
 
-void InitializeSerialization() {
+static void InitializeSerialization() {
 	log::trace("Initializing cosave serialization...");
 	auto* serde = GetSerializationInterface();
 	serde->SetUniqueID(_byteswap_ulong('GTSP'));
@@ -164,7 +157,7 @@ void InitializeSerialization() {
 	log::info("Cosave serialization initialized.");
 }
 
-void InitializePapyrus() {
+static void InitializePapyrus() {
 	log::trace("Initializing Papyrus binding...");
 	if (GetPapyrusInterface()->Register(Gts::register_papyrus)) {
 		log::info("Papyrus functions bound.");
@@ -173,7 +166,7 @@ void InitializePapyrus() {
 	}
 }
 
-void InitializeEventSystem() {
+static void InitializeEventSystem() {
 	EventDispatcher::AddListener(&DebugOverlayMenu::GetSingleton());
 	EventDispatcher::AddListener(&Runtime::GetSingleton()); // Stores spells, globals and other important data
 	EventDispatcher::AddListener(&Persistent::GetSingleton());
@@ -186,26 +179,45 @@ void InitializeEventSystem() {
 	RegisterManagers();
 }
 
-/**
- * This if the main callback for initializing your SKSE plugin, called just before Skyrim runs its main function.
- *
- * <p>
- * This is your main entry point to your plugin, where you should initialize everything you need. Many things can't be
- * done yet here, since Skyrim has not initialized and the Windows loader lock is not released (so don't do any
- * multithreading). But you can register to listen for messages for later stages of Skyrim startup to perform such
- * tasks.
- * </p>
- */
+static void PrintPluginInfo() {
+
+	logger::info("SKSEPluginLoad... ");
+	logger::info("Dll Build Date: {} {}", __DATE__, __TIME__);
+
+	std::string git_commit = fmt::format("\t -- Commit: {}", git_CommitSubject());
+	std::string git_sha1 = fmt::format("\t -- SHA1: {}", git_CommitSHA1());
+	std::string git_date = fmt::format("\t -- Date: {}", git_CommitDate());
+	std::string git_ditry = fmt::format("\t -- LocalChanges: {}", git_AnyUncommittedChanges() ? "Yes" : "No");
+
+	logger::info("Git Info:\n{}\n{}\n{}\n{}", git_commit, git_sha1, git_date, git_ditry);
+
+}
+
+static void SetLogLevel() {
+	try {
+		log::info("Getting Logger Config...");
+		const auto& debugConfig = Gts::Config::GetSingleton().GetDebug();
+		log::info("Config Loaded");
+
+		spdlog::set_level(debugConfig.GetLogLevel());
+		spdlog::flush_on(debugConfig.GetFlushLevel());
+	}
+	catch (exception e){
+		log::critical("Could not load config file", e.what());
+		stl::report_and_fail("Could not load config file");
+	}
+}
+
 SKSEPluginLoad(const LoadInterface * a_skse){
 
 
-	auto *plugin  = PluginDeclaration::GetSingleton();
-	auto version = plugin->GetVersion();
+	const auto *plugin  = PluginDeclaration::GetSingleton();
+	const auto version = plugin->GetVersion().string();
+	const auto name = plugin->GetName();
 
 	InitializeLogging();
-
-	auto gitData = std::format("{} ({}) on {}", git_CommitSubject(), git_CommitSHA1(), git_CommitDate());
-	log::info("{} {} {} is loading...", plugin->GetName(), version, gitData);
+	PrintPluginInfo();
+	SetLogLevel();
 
 	Init(a_skse);
 
@@ -215,18 +227,10 @@ SKSEPluginLoad(const LoadInterface * a_skse){
 	InitializeSerialization();
 	InitializeEventSystem();
 
-	log::info("{} has finished loading.", plugin->GetName());
+	logger::info("SKSEPluginLoad OK");
 
 	return(true);
 }
-
-//SKSEPluginInfo(
-//	.Version = REL::Version{ 2, 0, 0, 0 },
-//	.Name = "GtsPlugin",
-//	.Author = "Sermit and Andy",
-//	.StructCompatibility = SKSE::StructCompatibility::Independent,
-//	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary
-//);
 
 
 
