@@ -95,8 +95,9 @@ namespace {
 				{    
 					EventDispatcher::DoDataReady();
 					InputManager::GetSingleton().DataReady();
+					APIManager::GetSingleton().Register();
+
 					PrintStartupBanner();
-					RegisterAPIs();
 					break;
 				}
 
@@ -172,10 +173,11 @@ static void InitializeEventSystem() {
 	EventDispatcher::AddListener(&Persistent::GetSingleton());
 	EventDispatcher::AddListener(&Transient::GetSingleton());
 	EventDispatcher::AddListener(&CooldownManager::GetSingleton());
-
 	EventDispatcher::AddListener(&TaskManager::GetSingleton());
 	EventDispatcher::AddListener(&SpringManager::GetSingleton());
+
 	log::info("Adding Default Listeners");
+
 	RegisterManagers();
 }
 
@@ -209,12 +211,6 @@ static void SetLogLevel() {
 }
 
 SKSEPluginLoad(const LoadInterface * a_skse){
-
-
-	const auto *plugin  = PluginDeclaration::GetSingleton();
-	const auto version = plugin->GetVersion().string();
-	const auto name = plugin->GetName();
-
 	InitializeLogging();
 	PrintPluginInfo();
 	SetLogLevel();
@@ -229,7 +225,7 @@ SKSEPluginLoad(const LoadInterface * a_skse){
 
 	logger::info("SKSEPluginLoad OK");
 
-	return(true);
+	return true;
 }
 
 

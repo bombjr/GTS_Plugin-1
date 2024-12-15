@@ -78,27 +78,22 @@ namespace Gts {
 
 		auto profiler = Profilers::Profile("Camera: Update");
 		CameraState* currentState = this->GetCameraState();
+		auto& APIMngr = APIManager::GetSingleton();
 
-		if (SmoothCamLoaded()) {
-			if (auto thirdPersonCameraState = dynamic_cast<ThirdPersonCameraState*>(currentState)) {
-
-				auto TPState = GetCameraStateTP();
-
-				if (TPState == &this->footLState ||
-					TPState == &this->footRState ||
-					TPState == &this->footState ||
-					thirdPersonCameraState->GetBoneTarget().boneNames.size() > 0) {
-					ReqControlFromSC();
+		if (APIMngr.SmoothCamEnabled()) {
+			if (auto TPState = reinterpret_cast<ThirdPersonCameraState*>(GetCameraStateTP())) {
+				if ((TPState == &this->footLState ||
+					TPState == &this->footRState  ||
+					TPState == &this->footState   ||
+					TPState->GetBoneTarget().boneNames.size() > 0)) { //Checks for Valid states when using Normal or Alt Cam
+					//Take control from SC so we can do our own thing if one of these conditions match
+					APIMngr.ReqControlFromSC();
 				}
 				else {
-					//Else Let Smoothcam Handle it
-					RetControlToSC();
+					//If not in one of the above states. Return camera control to SC.
+					APIMngr.RetControlToSC();
 					return;
 				}
-			}
-			else if (!currentState) {
-				RetControlToSC();
-				return;
 			}
 		}
 
