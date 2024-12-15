@@ -93,9 +93,9 @@ namespace {
 				// All ESM/ESL/ESP plugins have loaded, main menu is now active.
 				case MessagingInterface::kDataLoaded:  
 				{    
-					//Hooks::Hook_Experiments::PatchShaking();
 					EventDispatcher::DoDataReady();
 					InputManager::GetSingleton().DataReady();
+					PrintStartupBanner();
 					RegisterAPIs();
 					break;
 				}

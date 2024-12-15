@@ -439,8 +439,8 @@ namespace Gts {
 
 							UpdatePlayerCamera(localShifted);
 							UpdateNiCamera(localShifted);
-							UpdateSceneManager(localShifted);
-							UpdateRenderManager(localShifted);
+							//UpdateSceneManager(localShifted); // These 2 mess up UI, so keep them off
+							//UpdateRenderManager(localShifted);
 						}
 					}
 				}
