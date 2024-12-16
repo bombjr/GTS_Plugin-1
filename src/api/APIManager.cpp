@@ -3,20 +3,18 @@
 
 using namespace RE;
 using namespace SKSE;
-namespace {
-	static inline SmoothCamAPI::IVSmoothCam3* SmoothCam = nullptr;
-	static bool Smoothcam_HaveCamera = false;
-	static bool Smoothcam_Enable = true;
-}
+
 namespace Gts {
-	bool SmoothCamLoaded() {
-		return SmoothCam != nullptr && Smoothcam_Enable;
+
+	APIManager& APIManager::GetSingleton() noexcept {
+		static APIManager instance;
+		return instance;
 	}
 
-	void RegisterAPIs() {
-
+	void APIManager::Register() {
 		logger::info("Registering Smoothcam API");
-		if (!SmoothCam) {
+
+		if (!SmoothCamLoaded()) {
 			if (!SmoothCamAPI::RegisterInterfaceLoaderCallback(SKSE::GetMessagingInterface(), [](void* interfaceInstance, SmoothCamAPI::InterfaceVersion interfaceVersion) {
 				if (interfaceVersion >= SmoothCamAPI::InterfaceVersion::V3) {
 					SmoothCam = reinterpret_cast<SmoothCamAPI::IVSmoothCam3*>(interfaceInstance);
@@ -38,13 +36,16 @@ namespace Gts {
 		}
 	}
 
-	bool ReqControlFromSC() {
+	//------------------
+	// Smoothcam
+	//------------------
 
-		if (SmoothCam && Smoothcam_Enable) {
+	void APIManager::ReqControlFromSC() {
+
+		if (SmoothCamLoaded()) {
 			if (!SmoothCam->IsCameraEnabled()) {
 				//Camera is disabled, We don't need to do anything
 				Smoothcam_HaveCamera = false;
-				return false;
 			}
 
 			if (!Smoothcam_HaveCamera) {
@@ -54,21 +55,13 @@ namespace Gts {
 				}
 			}
 		}
-
-		return Smoothcam_HaveCamera;
 	}
 
-	void RetControlToSC() {
-		if (SmoothCam && Smoothcam_Enable) {
-
-			if (!SmoothCam->IsCameraEnabled()) {
-				//Camera is disabled, We don't need to do anything
-				Smoothcam_HaveCamera = false;
-				return;
-			}
-
+	void APIManager::RetControlToSC() {
+		
+		if (SmoothCamLoaded()) {
 			if (Smoothcam_HaveCamera) {
-				auto res = SmoothCam->ReleaseCameraControl(SKSE::GetPluginHandle());
+				SmoothCam->ReleaseCameraControl(SKSE::GetPluginHandle());
 				Smoothcam_HaveCamera = false;
 			}
 		}
