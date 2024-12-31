@@ -191,14 +191,12 @@ namespace {
 		// do footsteps
 		//Rumbling::Stop("FS_L", &data.giant);
 		ButtCrush_DoFootImpact(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "FS_L");
-		data.HHspeed = 1.0f;
 	}
 
 	void GTSButtCrush_FootstepL(AnimationEventData& data) {
 		// do footsteps
 		//Rumbling::Stop("FS_R", &data.giant);
 		ButtCrush_DoFootImpact(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "FS_L");
-		data.HHspeed = 1.0f;
 	}
 
 	void GTSButtCrush_HandImpactR(AnimationEventData& data) {
@@ -206,13 +204,13 @@ namespace {
 		float scale = get_visual_scale(giant);
 		DoCrawlingFunctions(giant, scale, 1.0f, Damage_ButtCrush_HandImpact, CrawlEvent::RightHand, "RightHand", 0.8f, Radius_ButtCrush_HandImpact, 1.0f, DamageSource::HandCrawlRight);
 		data.disableHH = false;
-		data.HHspeed = 4.0f;
+		data.HHspeed = 1.5f;
 	}
 
 	void GTSButtCrush_FallDownStart(AnimationEventData& data) {
 		data.stage = 1;
 		data.disableHH = true;
-		data.HHspeed = 1.0f;
+		data.HHspeed = 0.5f;
 	}
 
 	void GTSButtCrush_FallDownImpact(AnimationEventData& data) {

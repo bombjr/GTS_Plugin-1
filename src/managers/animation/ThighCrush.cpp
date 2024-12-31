@@ -321,13 +321,17 @@ namespace {
 
 	void GTSstandR(AnimationEventData& data) {
 		// do stand up damage
-		ThighCrush_GetUpFootstepDamage(&data.giant, true, data.animSpeed, 1.0f, FootEvent::Right, DamageSource::CrushedRight, RNode, "ThighCrushStompR");
-		data.stage = 9;
+		data.stage += 1;
+		if (data.stage <= 10) { // fix for double footsteps
+			ThighCrush_GetUpFootstepDamage(&data.giant, true, data.animSpeed, 1.0f, FootEvent::Right, DamageSource::CrushedRight, RNode, "ThighCrushStompR");
+			FootStepManager::PlayVanillaFootstepSounds(&data.giant, true);
+		}
 	}
 
 	void GTSstandL(AnimationEventData& data) {
 		// do stand up damage
 		ThighCrush_GetUpFootstepDamage(&data.giant, false, data.animSpeed, 1.0f, FootEvent::Left, DamageSource::CrushedLeft, LNode, "ThighCrushStompL");
+		FootStepManager::PlayVanillaFootstepSounds(&data.giant, false);
 		data.stage = 9;
 	}
 

@@ -1,6 +1,7 @@
 #include "managers/cameras/tp/foot.hpp"
 #include "managers/cameras/camutil.hpp"
 #include "managers/highheel.hpp"
+#include "ActionSettings.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "node.hpp"
@@ -28,7 +29,7 @@ namespace Gts {
 		auto player = GetCameraActor();
 		float playerScale = get_visual_scale(player);
 
-		NiPoint3 lookAt = CompuleLookAt(0.45f); // float is zoom scale
+		NiPoint3 lookAt = CompuleLookAt(ZoomIn_LookAt_BothFoot); // float is zoom scale
 
 		NiPoint3 footPos = this->GetFootPos();
 
@@ -63,17 +64,12 @@ namespace Gts {
 				auto transform = playerTrans.Invert();
 				auto leftFoot = find_node(player, leftFootLookup);
 				auto rightFoot = find_node(player, rightFootLookup);
-				if (leftFoot != nullptr && rightFoot != nullptr) {
+				if (leftFoot && rightFoot) {
 					auto leftPosLocal = transform * (leftFoot->world * NiPoint3());
 					auto rightPosLocal = transform * (rightFoot->world * NiPoint3());
 					this->smoothFootPos.target = (leftPosLocal + rightPosLocal) / 2.0f;
 
-					NiPoint3 highheelOffset = HighHeelManager::GetHHOffset(player) * HighHeelManager::GetHHMultiplier(player);
 					this->smoothFootPos.target.z += OFFSET*playerScale;
-					if (highheelOffset.Length() > 1e-4) {
-						this->smoothFootPos.target -= highheelOffset * 1.6f;
-					}
-					
 				}
 			}
 		}

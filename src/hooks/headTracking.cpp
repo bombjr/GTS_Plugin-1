@@ -81,29 +81,28 @@ namespace {
 	}
 
 	void SetHeadtrackTargetImpl(Actor* actor, NiPoint3& target) {
-		if (!actor) {
-			return;
-		}
-		if (actor->Is3DLoaded()) {
-			if (!HasHeadTrackingTarget(actor)) {// || actor->formID != 0x14) { // Alter it ONLY when target is nullptr or if Actor is not a player
-				//                                    ^ Needs to be enabled if experimenting with ForceLookAtCleavage() so dll will allow pos override
-				if (!IsinRagdollState(actor)) { // ^ Needed to fix TDM bugs with deforming Meshes of Actors when we lock onto someone
-				
-					// log::info("Actor: {}", actor->GetDisplayFullName());
-					auto headPos = actor->GetLookingAtLocation();
-					// log::info("headPos: {}", Vector2Str(headPos));
-					auto model = actor->Get3D();
-					if (model) {
-						auto trans = model->world;
-						auto transInv = trans.Invert();
-						auto scale = get_visual_scale(actor) / game_getactorscale(actor);
+		if (actor) {
+			if (actor->Is3DLoaded()) {
+				if (!HasHeadTrackingTarget(actor)) {// || actor->formID != 0x14) { // Alter it ONLY when target is nullptr or if Actor is not a player
+					//                                    ^ Needs to be enabled if experimenting with ForceLookAtCleavage() so dll will allow pos override
+					if (!IsinRagdollState(actor)) { // ^ Needed to fix TDM bugs with deforming Meshes of Actors when we lock onto someone
+					
+						// log::info("Actor: {}", actor->GetDisplayFullName());
+						auto headPos = actor->GetLookingAtLocation();
+						// log::info("headPos: {}", Vector2Str(headPos));
+						auto model = actor->Get3D();
+						if (model) {
+							auto trans = model->world;
+							auto transInv = trans.Invert();
+							auto scale = get_visual_scale(actor) / game_getactorscale(actor);
 
-						auto unscaledHeadPos = trans * (transInv*headPos * (1.0f/scale));
+							auto unscaledHeadPos = trans * (transInv*headPos * (1.0f/scale));
 
-						//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
+							//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
 
-						auto direction = target - headPos;
-						target = unscaledHeadPos + direction;
+							auto direction = target - headPos;
+							target = unscaledHeadPos + direction;
+						}
 					}
 				}
 			}

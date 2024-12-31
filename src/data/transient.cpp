@@ -113,7 +113,8 @@ namespace Gts {
 			TESObjectREFR* Throw_Offender = nullptr;
 
 			AttachToNode AttachmentNode = AttachToNode::None;
-
+			BusyFoot FootInUse = BusyFoot::None;
+			
 			float otherScales = 1.0f;
 			float vore_recorded_scale = 1.0f;
 			float WorldFov_Default = 0;
@@ -178,6 +179,7 @@ namespace Gts {
 			result.disable_collision_with = disable_collision_with;
 			result.Throw_Offender = Throw_Offender;
 			result.AttachmentNode = AttachmentNode;
+			result.FootInUse = FootInUse;
 			result.otherScales = otherScales;
 			result.vore_recorded_scale = vore_recorded_scale;
 			result.WorldFov_Default = WorldFov_Default;

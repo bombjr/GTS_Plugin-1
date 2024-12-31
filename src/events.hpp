@@ -8,6 +8,17 @@ using namespace SKSE;
 
 namespace Gts {
 	
+	struct BoneTarget {
+		std::vector<std::string> boneNames = {};
+		float zoomScale = 1.0f;
+	};
+
+	enum class BusyFoot {
+		None,
+		RightFoot,
+		LeftFoot,
+	};
+
 	enum class FootEvent {
 		Left,
 		Right,

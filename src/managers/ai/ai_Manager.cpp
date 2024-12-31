@@ -96,7 +96,6 @@ namespace {
 			}
 		}
 	}
-
 }
 
 
@@ -249,8 +248,7 @@ namespace Gts {
 			return false;
 		}
 		if (prey_distance <= (MINIMUM_STOMP_DISTANCE * pred_scale * bonus)
-		    && sizedifference > MINIMUM_STOMP_SCALE_RATIO
-		    && prey_distance > 25.0f) { // We don't want the Stomp to be too close
+		    && sizedifference > MINIMUM_STOMP_SCALE_RATIO) { // We don't want the Stomp to be too close
 			return true;
 		} else {
 			return false;

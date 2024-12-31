@@ -17,6 +17,25 @@ using namespace Gts;
 
 namespace {
 
+	// Params
+	const VolumeParams Params_Empty = {.a = 0.0f, .k = 0.0f, .n = 0.0f, .s = 0.0f};
+
+	const VolumeParams xlFootstep_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
+	const VolumeParams xxlFootstep_Params = {.a = 20.0f, .k = 0.50f,  .n = 0.5f, .s = 1.0f};
+	const VolumeParams lJumpLand_Params = {.a = 1.2f, .k = 0.65f,  .n = 0.7f, .s = 1.0f};
+
+	const VolumeParams xlRumble_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
+
+	const VolumeParams Footstep_2_Params = {.a = 1.35f, .k = 1.0f, .n = 0.75f, .s = 1.0f};    // https://www.desmos.com/calculator/6yzmmrg3oi
+	const VolumeParams Footstep_4_Params = {.a = 3.0f, .k = 1.0f, .n = 1.15f, .s = 1.0f};     // https://www.desmos.com/calculator/ighurmlanl
+	const VolumeParams Footstep_8_Params = {.a = 6.0f, .k = 0.26f, .n = 1.94f, .s = 1.0f};    // https://www.desmos.com/calculator/d3gsgj6ocs
+	const VolumeParams Footstep_12_Params = {.a = 12.0f, .k = 0.27f, .n = 1.9f, .s = 1.0f};   // https://www.desmos.com/calculator/akoyl4cxch
+	const VolumeParams Footstep_24_Params = {.a = 16.0f, .k = 0.36f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/bh4fhfrji6
+	const VolumeParams Footstep_48_Params = {.a = 36.0f, .k = 0.20f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/3q4qgkrker
+	const VolumeParams Footstep_96_Params = {.a = 80.0f, .k = 0.66f, .n = 0.90f, .s = 0.1f};  // https://www.desmos.com/calculator/ufdbieymdi
+	const VolumeParams Footstep_128_Params = {.a = 118.0f, .k = 0.19f, .n = 1.5f, .s = 0.1f}; // https://www.desmos.com/calculator/pvrge5dejz
+	// Params end
+
 	const float limitless = 0.0f;
 	const float limit_x2 = 2.0f;
 	const float limit_x4 = 4.0f;
@@ -31,17 +50,9 @@ namespace {
 	std::string GetFootstepName(Actor* giant, bool right) {
 		std::string tag;
 		if (!giant->AsActorState()->IsSneaking()) {
-			if (right) { // Non Sneaking = use scuffs
-				tag = "FootScuffRight";
-			} else {
-				tag = "FootScuffLeft";
-			}
+			right ? tag = "FootScuffRight" : tag = "FootScuffLeft";
 		} else {
-			if (right) { // Scuffs are silent during sneaking for some reason, so we have to send these instead
-				tag = "FootRight";
-			} else {
-				tag = "FootLeft";
-			}
+			right ? tag = "FootRight" : tag = "FootLeft";
 		}
 		return tag;
 	}
@@ -148,23 +159,6 @@ namespace Gts {
 	void FootStepManager::PlayLegacySounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale) {
 		//https://www.desmos.com/calculator/wh0vwgljfl
 		auto profiler = Profilers::Profile("Impact: PlayLegacySounds");
-		// Params
-		VolumeParams Params_Empty = {.a = 0.0f, .k = 0.0f, .n = 0.0f, .s = 0.0f};
-
-		VolumeParams xlFootstep_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
-		VolumeParams xxlFootstep_Params = {.a = 20.0f, .k = 0.50f,  .n = 0.5f, .s = 1.0f};
-		VolumeParams lJumpLand_Params = {.a = 1.2f, .k = 0.65f,  .n = 0.7f, .s = 1.0f};
-
-		VolumeParams xlRumble_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
-
-		VolumeParams Footstep_2_Params = {.a = 1.35f, .k = 1.0f, .n = 0.75f, .s = 1.0f};
-		VolumeParams Footstep_4_Params = {.a = 3.0f, .k = 1.0f, .n = 0.55f, .s = 1.0f};
-		VolumeParams Footstep_8_Params = {.a = 6.0f, .k = 0.50f, .n = 0.90f, .s = 1.0f};
-		VolumeParams Footstep_12_Params = {.a = 12.0f, .k = 0.50f, .n = 0.78f, .s = 1.0f};
-		VolumeParams Footstep_24_Params = {.a = 20.0f, .k = 0.45f, .n = 0.55f, .s = 1.0f};
-		VolumeParams Footstep_48_Params = {.a = 44.0f, .k = 0.46f, .n = 0.55f, .s = 1.0f};
-		VolumeParams Footstep_96_Params = {.a = 88.0f, .k = 0.46f, .n = 0.55f, .s = 1.0f};
-		// Params end
 
 		BSSoundHandle xlFootstep   = get_sound(modifier, foot, scale, limit_x14, get_xlFootstep_sounddesc(foot_kind), xlFootstep_Params, Params_Empty, "XL: Footstep", 1.0f, false);
 		BSSoundHandle xxlFootstep = get_sound(modifier, foot, scale, limit_x14, get_xxlFootstep_sounddesc(foot_kind), xxlFootstep_Params, Params_Empty, "XXL Footstep", 1.0f, false);
@@ -182,13 +176,13 @@ namespace Gts {
 		// ^ Stops at ~x14
 		BSSoundHandle Footstep_12 = get_sound(modifier, foot, scale, limit_x24, get_footstep_highheel(foot_kind, 12), Footstep_12_Params, Footstep_24_Params, "x12 Footstep", 2.0f, true);
 		// ^ Stops at ~x24
-		BSSoundHandle Footstep_24 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 24), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, true);
+		BSSoundHandle Footstep_24 = get_sound(modifier, foot, scale, limit_x48, get_footstep_highheel(foot_kind, 24), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, true);
 		// ^ Stops at ~x44
-		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Params_Empty, "x48 Footstep", 8.0f, false);
+		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limit_x96, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Footstep_96_Params, "x48 Footstep", 8.0f, true);
 		// ^ Stops at ~x88
-		//BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 8.0f, false);
-		// ^ Stops at X118 (when Mega will be added)
-		//BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "x96 Footstep", 8.0f, false);
+		BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 12.0f, false);
+		// ^ Stops at X126 (when Mega will be added)
+		//BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "Mega Footstep", 18.0f, false);
 
 		if (xlFootstep.soundID != BSSoundHandle::kInvalidID) { 
 			// 271EF4: Sound\fx\GTS\Foot\Effects  (Stone sounds)
@@ -227,9 +221,9 @@ namespace Gts {
 		if (Footstep_48.soundID != BSSoundHandle::kInvalidID) { // x48 Custom audio
 			Footstep_48.Play();
 		}
-		/*if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
+		if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
 			Footstep_96.Play();
-		}*/
+		}
 	}
 
 	void FootStepManager::PlayHighHeelSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale) {

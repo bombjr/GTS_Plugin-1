@@ -467,12 +467,6 @@ namespace Gts {
 
 	inline void CrushBonuses(Actor* caster, Actor* target) {
 		float target_scale = get_visual_scale(target) * GetSizeFromBoundingBox(target);
-
-		int Random = RandomInt(1, 8);
-		if (Random >= 8 && !IsActionOnCooldown(caster, CooldownSource::Emotion_Moan_Crush) && Runtime::HasPerk(caster, "GrowthDesirePerk")) {
-			PlayMoanSound(caster, 1.0f);
-		}
-
 		if (caster->formID == 0x14) {
 			AdjustSizeReserve(caster, target_scale/25);
 			AdjustSizeLimit(0.0066f * target_scale, caster);

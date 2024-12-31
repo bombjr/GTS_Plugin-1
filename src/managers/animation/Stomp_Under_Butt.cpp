@@ -87,7 +87,7 @@ namespace {
 
 				LaunchTask(giantref, 0.85f * perk, 1.40f, Event);
 
-				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
+				//FootStepManager::PlayVanillaFootstepSounds(giantref, right);
 				return false;
 			}
 			return true;
@@ -126,7 +126,7 @@ namespace {
 			double Finish = Time::WorldTimeElapsed();
 			auto giantref = giantHandle.get().get();
 
-			if (Finish - Start > 0.04) { 
+			if (Finish - Start > 0.07) { 
 				auto ThighL = find_node(giantref, "NPC L Thigh [LThg]");
 				auto ThighR = find_node(giantref, "NPC R Thigh [RThg]");
 				auto ButtR = find_node(giantref, "NPC R Butt");
@@ -142,8 +142,9 @@ namespace {
 						DoDamageAtPoint(giantref, Radius_UnderStomp_Butt_Impact, Damage_ButtCrush_Under_ButtImpact * damage, ThighR, 8, 0.35f, 0.925f, DamageSource::Booty);
 						DoDustExplosion(giantref, 1.45f * dust * damage, FootEvent::Butt, "NPC R Butt");
 						DoDustExplosion(giantref, 1.45f * dust * damage, FootEvent::Butt, "NPC L Butt");
-						DoLaunch(giantref, 1.65f * perk, 5.0f, FootEvent::Butt);
 						DoFootstepSound(giantref, 1.05f, FootEvent::Right, RNode);
+						DoLaunch(giantref, 1.65f * perk, 5.0f, FootEvent::Butt);
+						
 						
 						Rumbling::Once("Butt_L", giantref, shake_power * smt, 0.075f, "NPC R Butt", 0.0f);
 						Rumbling::Once("Butt_R", giantref, shake_power * smt, 0.075f, "NPC L Butt", 0.0f);
@@ -168,12 +169,13 @@ namespace {
 
 	void GTS_UnderStomp_Butt_DisableHH(AnimationEventData& data) {
 		data.stage = 2;
-		data.HHspeed = 3.25f;
 		data.disableHH = true;
+		data.HHspeed = 6.0f;
 		
 	}
 	void GTS_UnderStomp_Butt_EnableHH(AnimationEventData& data) {
 		data.disableHH = false;
+		data.HHspeed = 3.25f;
 	}
 
 	void GTS_UnderStomp_Butt_RecFootstepL(AnimationEventData& data) {

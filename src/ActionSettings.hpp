@@ -9,6 +9,7 @@ using namespace SKSE;
 namespace Gts {
 //-----------------------------------------Misc
     const float Collision_Distance_Override = 5.75f;
+    const float Characters_AssumedCharSize = 1.82f; // We assume that default humanoid height is 1.82m, used in some calculations
 //-----------------------------------------Size Limits
     const float Minimum_Actor_Scale = 0.04f;
     const float Minimum_Actor_Crush_Scale_Idle = 16.0f; // x16.0 crush threshold for just standing still
@@ -161,24 +162,24 @@ namespace Gts {
 
 //-----------------------------------------Default effect radius variables
 
-    const float Radius_Default_Idle = 6.6f;
+    const float Radius_Default_Idle = 5.6f;
 
-    const float Radius_Walk_Default = 7.0f;
+    const float Radius_Walk_Default = 6.2f;
     const float Radius_Jump_Default = 20.0f; 
 
-    const float Radius_Stomp = 7.0f;
-    const float Radius_Stomp_Strong = 7.6f;
+    const float Radius_Stomp = 6.0f;
+    const float Radius_Stomp_Strong = 6.25f;
 
-    const float Radius_UnderStomp_Butt_Impact = 18.2f;
+    const float Radius_UnderStomp_Butt_Impact = 19.0f;
 
     /////////Foot Grind
-    const float Radius_Foot_Grind_Impact = 7.4f;
-    const float Radius_Foot_Grind_DOT = 9.0f;
+    const float Radius_Foot_Grind_Impact = 6.6f;
+    const float Radius_Foot_Grind_DOT = 8.0f;
 
     /////////Foot Trample
-    const float Radius_Trample = 7.0f;
-    const float Radius_Trample_Repeat = 7.2f;
-    const float Radius_Trample_Finisher = 7.6f;
+    const float Radius_Trample = 6.2f;
+    const float Radius_Trample_Repeat = 6.4f;
+    const float Radius_Trample_Finisher = 6.6f;
 
     /////////Butt Crush
 
@@ -341,4 +342,41 @@ namespace Gts {
 
     const float Rumble_Kill_CrushOther = 7.6f;
     const float Rumble_Kill_ShrinkToNothing = 8.6f;
+
+    //=========================================================================================
+    //Zoom-in parameters
+    const float ZoomIn_butt = 0.75f;
+    const float ZoomIn_knees = 1.25f;
+
+    const float ZoomIn_Breast02 = 0.75f;
+    const float ZoomIn_ThighCrush = 1.0f;
+    const float ZoomIn_ThighSandwich = 1.0f;
+    const float ZoomIn_RightHand = 0.75f;
+    const float ZoomIn_LeftHand = 0.75f;
+
+    const float ZoomIn_GrabLeft = 0.65f;
+
+    const float ZoomIn_RightFoot = 0.825f;
+    const float ZoomIn_LeftFoot = 0.825f;
+
+    const float ZoomIn_ButtLegs = 1.25f;
+    const float ZoomIn_VoreRight = 1.25f;
+
+    const float ZoomIn_FingerRight = 0.65f;
+    const float ZoomIn_FingerLeft = 0.65f;
+
+    const float ZoomIn_ObjectA = 1.0f;
+    const float ZoomIn_ObjectB = 1.0f;
+
+    //////////////////
+    const float ZoomIn_Cam_Spine = 1.0f;
+    const float ZoomIn_Cam_Clavicle = 1.0f;
+    const float ZoomIn_Cam_Breasts_01 = 0.8f;
+    const float ZoomIn_Cam_Breasts_02 = 0.8f;
+    const float ZoomIn_Cam_Breasts_03 = 0.8f;
+    const float ZoomIn_Cam_Neck = 1.0f;
+    const float ZoomIn_Cam_Butt = 0.8f;
+
+    //////////////////
+    const float ZoomIn_LookAt_BothFoot = 0.5f;
 }

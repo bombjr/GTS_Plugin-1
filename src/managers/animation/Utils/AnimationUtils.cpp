@@ -634,7 +634,7 @@ namespace Gts {
 		auto gianthandle = giant->CreateRefHandle();
 		auto tinyhandle = tiny->CreateRefHandle();
 
-		ShrinkUntil(giant, tiny, 4.2f, 0.22f, false);
+		ShrinkUntil(giant, tiny, 8.0f, 0.22f, false);
 
 		std::string name = std::format("FootTrample_{}", tiny->formID);
 		auto FrameA = Time::FramesElapsed();
@@ -678,7 +678,7 @@ namespace Gts {
 		auto gianthandle = giant->CreateRefHandle();
 		auto tinyhandle = tiny->CreateRefHandle();
 
-		ShrinkUntil(giant, tiny, 4.2f, 0.16f, false);
+		ShrinkUntil(giant, tiny, 8.0f, 0.16f, false);
 		
 		std::string name = std::format("FootGrind_{}", tiny->formID);
 		auto FrameA = Time::FramesElapsed();
@@ -839,102 +839,99 @@ namespace Gts {
 	}
 
 	void FootGrindCheck(Actor* actor, float radius, bool strong, bool Right) {  // Check if we hit someone with stomp. Yes = Start foot grind. Left Foot.
-		if (!actor) {
-			return;
-		}
+		if (actor) {
+			float giantScale = get_visual_scale(actor);
+			const float BASE_CHECK_DISTANCE = 180.0f;
+			float SCALE_RATIO = 3.0f;
 
-		float giantScale = get_visual_scale(actor);
-		const float BASE_CHECK_DISTANCE = 180.0f;
-		float SCALE_RATIO = 3.0f;
+			float maxFootDistance = radius * giantScale;
 
-		float maxFootDistance = radius * giantScale;
-
-
-		if (HasSMT(actor)) {
-			SCALE_RATIO = 0.8f;
-		}
-		std::vector<NiPoint3> CoordsToCheck = GetFootCoordinates(actor, Right, false);
-		if (!CoordsToCheck.empty()) {
-			if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor))) {
-				for (const auto& footPoints: CoordsToCheck) {
-					DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 800, {0.0f, 1.0f, 0.0f, 1.0f});
-				}
+			if (HasSMT(actor)) {
+				SCALE_RATIO = 0.8f;
 			}
+			std::vector<NiPoint3> CoordsToCheck = GetFootCoordinates(actor, Right, false);
+			if (!CoordsToCheck.empty()) {
+				if (IsDebugEnabled() && (actor->formID == 0x14 || IsTeammate(actor))) {
+					for (const auto& footPoints: CoordsToCheck) {
+						DebugAPI::DrawSphere(glm::vec3(footPoints.x, footPoints.y, footPoints.z), maxFootDistance, 800, {0.0f, 1.0f, 0.0f, 1.0f});
+					}
+				}
 
-			NiPoint3 giantLocation = actor->GetPosition();
-			for (auto otherActor: find_actors()) {
-				if (otherActor != actor) {
-					float tinyScale = get_visual_scale(otherActor);
-					if (giantScale / tinyScale > SCALE_RATIO) {
-						NiPoint3 actorLocation = otherActor->GetPosition();
+				NiPoint3 giantLocation = actor->GetPosition();
+				for (auto otherActor: find_actors()) {
+					if (otherActor != actor) {
+						float tinyScale = get_visual_scale(otherActor);
+						if (giantScale / tinyScale > SCALE_RATIO) {
+							NiPoint3 actorLocation = otherActor->GetPosition();
 
-						if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
-							// Check the tiny's nodes against the giant's foot points
-							int nodeCollisions = 0;
-							float force = 0.0f;
+							if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale) {
+								// Check the tiny's nodes against the giant's foot points
+								int nodeCollisions = 0;
+								float force = 0.0f;
 
-							auto model = otherActor->GetCurrent3D();
+								auto model = otherActor->GetCurrent3D();
 
-							if (model) {
-								for (auto &point : CoordsToCheck) {
-									VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
-										float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
+								if (model) {
+									for (auto &point : CoordsToCheck) {
+										VisitNodes(model, [&nodeCollisions, &force, point, maxFootDistance](NiAVObject& a_obj) {
+											float distance = (point - a_obj.world.translate).Length() - Collision_Distance_Override;
 
-										if (distance <= maxFootDistance) {
-											nodeCollisions += 1;
-											force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+											if (distance <= maxFootDistance) {
+												nodeCollisions += 1;
+												force = 1.0f - distance / maxFootDistance;//force += 1.0 - distance / maxFootDistance;
+												return false;
+											}
+											return true;
+										});
+									}
+								}
+								if (nodeCollisions > 0) {
+									float aveForce = std::clamp(force, 0.00f, 0.70f);
+									ActorHandle giantHandle = actor->CreateRefHandle();
+									ActorHandle tinyHandle = otherActor->CreateRefHandle();
+
+									double Start = Time::WorldTimeElapsed();
+
+									std::string taskname = std::format("GrindCheck_{}_{}", actor->formID, otherActor->formID);
+									TaskManager::RunFor(taskname, 1.0f, [=](auto& update){
+										if (!tinyHandle) {
+											return false;
+										}
+										if (!giantHandle) {
+											return false;
+										}
+										
+										double Finish = Time::WorldTimeElapsed();
+
+										auto giant = giantHandle.get().get();
+										auto tiny = tinyHandle.get().get();
+
+										if (Finish - Start > 0.02) {
+											if (CanDoDamage(giant, tiny, false)) {
+												if (aveForce >= 0.00f && !tiny->IsDead() && GetAV(tiny, ActorValue::kHealth) > 0.0f) {
+													SetBeingGrinded(tiny, true);
+													if (!strong) {
+														DoFootGrind(giant, tiny, Right);
+														if (!Right) {
+															AnimationManager::StartAnim("GrindLeft", giant);
+														} else {
+															AnimationManager::StartAnim("GrindRight", giant);
+														}
+													} else {
+														if (!Right) {
+															AnimationManager::StartAnim("TrampleStartL", giant);
+														} else {
+															AnimationManager::StartAnim("TrampleStartR", giant);
+														}
+														DoFootTrample(giant, tiny, Right);
+													}
+												}
+											}
 											return false;
 										}
 										return true;
 									});
 								}
-							}
-							if (nodeCollisions > 0) {
-								float aveForce = std::clamp(force, 0.00f, 0.70f);
-								ActorHandle giantHandle = actor->CreateRefHandle();
-								ActorHandle tinyHandle = otherActor->CreateRefHandle();
-
-								double Start = Time::WorldTimeElapsed();
-
-								std::string taskname = std::format("GrindCheck_{}_{}", actor->formID, otherActor->formID);
-								TaskManager::RunFor(taskname, 1.0f, [=](auto& update){
-									if (!tinyHandle) {
-										return false;
-									}
-									if (!giantHandle) {
-										return false;
-									}
-									
-									double Finish = Time::WorldTimeElapsed();
-
-									auto giant = giantHandle.get().get();
-									auto tiny = tinyHandle.get().get();
-
-									if (Finish - Start > 0.02) {
-										if (CanDoDamage(giant, tiny, false)) {
-											if (aveForce >= 0.00f && !tiny->IsDead() && GetAV(tiny, ActorValue::kHealth) > 0.0f) {
-												SetBeingGrinded(tiny, true);
-												if (!strong) {
-													DoFootGrind(giant, tiny, Right);
-													if (!Right) {
-														AnimationManager::StartAnim("GrindLeft", giant);
-													} else {
-														AnimationManager::StartAnim("GrindRight", giant);
-													}
-												} else {
-													if (!Right) {
-														AnimationManager::StartAnim("TrampleStartL", giant);
-													} else {
-														AnimationManager::StartAnim("TrampleStartR", giant);
-													}
-													DoFootTrample(giant, tiny, Right);
-												}
-											}
-										}
-										return false;
-									}
-									return true;
-								});
 							}
 						}
 					}

@@ -563,7 +563,7 @@ namespace Gts {
 				return false;
 			}
 			
-			GrabStaminaDrain(giantref, tinyref, sizedifference * DrainReduction);
+			GrabStaminaDrain(giantref, tinyref, sizedifference * 2 * DrainReduction);
 			DamageAV(tinyref, ActorValue::kStamina, 0.125f * TimeScale()); // Drain Tiny Stamina
 			ModSizeExperience(giantref, 0.00005f);
 			

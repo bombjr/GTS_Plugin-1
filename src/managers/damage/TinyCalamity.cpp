@@ -270,6 +270,11 @@ namespace Gts {
         giant->GetGraphVariableFloat("GiantessScale", OldScale); // save old scale
         giant->SetGraphVariableFloat("GiantessScale", 1.0f); // Needed to allow Stagger to play, else it won't work
 
+        int Random = RandomInt(1, 4);
+		if (Random >= 4 && !IsActionOnCooldown(giant, CooldownSource::Emotion_Moan_Crush) && Runtime::HasPerk(giant, "GrowthDesirePerk")) {
+			PlayMoanSound(giant, 1.0f);
+		}
+
         shake_camera(giant, 1.7f, 0.8f);
         StaggerActor(giant, 0.5f);
         RefreshDuration(giant);

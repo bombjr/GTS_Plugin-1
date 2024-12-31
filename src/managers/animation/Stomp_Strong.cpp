@@ -125,22 +125,24 @@ namespace {
 			}
 
 			double Finish = Time::WorldTimeElapsed();
-			auto giant = giantHandle.get().get();
+			auto giantref = giantHandle.get().get();
 
 			if (Finish - Start > 0.07) { 
 
-				DoDamageEffect(giant, Damage_Stomp_Strong * damage * perk, Radius_Stomp_Strong, 5, 0.35f, Event, 1.0f, Source);
-				DoImpactRumble(giant, Node, rumble);
-				DoDustExplosion(giant, 1.33f * (SMT + (animSpeed * 0.05f)), Event, Node);
+				DoDamageEffect(giantref, Damage_Stomp_Strong * damage * perk, Radius_Stomp_Strong, 5, 0.35f, Event, 1.0f, Source);
+				DoImpactRumble(giantref, Node, rumble);
+				DoDustExplosion(giantref, 1.33f * (SMT + (animSpeed * 0.05f)), Event, Node);
 
-				DrainStamina(giant, "StaminaDrain_StrongStomp", "DestructionBasics", false, 3.4f);
+				DrainStamina(giantref, "StaminaDrain_StrongStomp", "DestructionBasics", false, 3.4f);
 
-				DoFootstepSound(giant, SMT + (animSpeed/10), Event, Node);
+				DoFootstepSound(giantref, SMT + (animSpeed/10), Event, Node);
 
-				LaunchTask(giant, 1.05f * perk, 3.6f + animSpeed/2, Event);
+				LaunchTask(giantref, 1.05f * perk, 3.6f + animSpeed/2, Event);
 
-				FootStepManager::DoStrongSounds(giant, 1.15f + animSpeed/20, Node);
-				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+				FootStepManager::DoStrongSounds(giantref, 1.15f + animSpeed/20, Node);
+				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
+
+				SetBusyFoot(giantref, BusyFoot::None);
 
 				return false;
 			}
@@ -167,6 +169,8 @@ namespace {
 		}
 		ManageCamera(giant, true, CameraTracking::R_Foot);
 		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4f);
+
+		SetBusyFoot(&data.giant, BusyFoot::RightFoot);
 	}
 
 	void GTS_StrongStomp_LL_Start(AnimationEventData& data) {
@@ -178,6 +182,8 @@ namespace {
 		}
 		ManageCamera(giant, true, CameraTracking::L_Foot);
 		DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 3.4f);
+
+		SetBusyFoot(&data.giant, BusyFoot::LeftFoot);
 	}
 
 	void GTS_StrongStomp_LR_Middle(AnimationEventData& data) {

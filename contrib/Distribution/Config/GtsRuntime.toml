@@ -471,6 +471,7 @@ CountAsFollower = "GTS.esp|88E644"
 
 DarkSouls = "Skyrim.esm|0C1E8F"
 SummonUndead = "Skyrim.esm|02482B"
+ActorTypeNPC = "Skyrim.esm|013794"
 
 
 [containers]

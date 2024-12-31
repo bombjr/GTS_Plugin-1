@@ -5,15 +5,16 @@
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/animation/ThighSandwich.hpp"
 #include "managers/ThighSandwichController.hpp"
+#include "managers/animation/Stomp_Under.hpp"
 #include "managers/animation/HugShrink.hpp"
 #include "managers/ai/ai_PerformAction.hpp"
+#include "managers/audio/footstep.hpp"
 #include "managers/ai/aifunctions.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
-#include "managers/audio/footstep.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
 #include "managers/tremor.hpp"
@@ -38,6 +39,16 @@ namespace {
         "StrongKick_Low_Left",              // 3
         "StrongKick_Low_Left",              // 4, a fail-safe one in case random does funny stuff 
     };
+
+    float GetDistanceBetween(Actor* giant, Actor* tiny) {
+        float prey_distance = 0.0f;
+        if (giant && tiny) {
+            prey_distance = (giant->GetPosition() - tiny->GetPosition()).Length();
+            prey_distance /= get_visual_scale(giant);
+        }
+
+        return prey_distance;
+    }
 
     void Task_ButtCrushLogicTask(Actor* giant) {
 
@@ -104,25 +115,34 @@ namespace {
 
 namespace Gts {
     
-    void AI_StrongStomp(Actor* pred, int rng) {
+    void AI_StrongStomp(Actor* pred, Actor* prey, int rng) {
         if (!Persistent::GetSingleton().Stomp_Ai) {
             return; // don't check any further if it is disabled
         }
+
+        bool UnderStomp = AnimationUnderStomp::ShouldStompUnder_NPC(pred, GetDistanceBetween(pred, prey));
+		const std::string_view StompType_R = UnderStomp ? "UnderStompStrongRight" : "StrongStompRight";
+        const std::string_view StompType_L = UnderStomp ? "UnderStompStrongLeft" : "StrongStompLeft";
+
         if (rng <= 5) {
-            AnimationManager::StartAnim("StrongStompRight", pred);
+            AnimationManager::StartAnim(StompType_R, pred);
         } else {
-            AnimationManager::StartAnim("StrongStompLeft", pred);
+            AnimationManager::StartAnim(StompType_L, pred);
         }
     }
-    void AI_LightStomp(Actor* pred, int rng) {
+    void AI_LightStomp(Actor* pred, Actor* prey, int rng) {
         if (!Persistent::GetSingleton().Stomp_Ai) {
             return; // don't check any further if it is disabled
         }
         Utils_UpdateHighHeelBlend(pred, false);
+        bool UnderStomp = AnimationUnderStomp::ShouldStompUnder_NPC(pred, GetDistanceBetween(pred, prey));
+		const std::string_view StompType_R = UnderStomp ? "UnderStompRight" : "StompRight";
+        const std::string_view StompType_L = UnderStomp ? "UnderStompLeft" : "StompLeft";
+
         if (rng <= 5) {
-            AnimationManager::StartAnim("StompRight", pred);
+            AnimationManager::StartAnim(StompType_R, pred);
         } else {
-            AnimationManager::StartAnim("StompLeft", pred);
+            AnimationManager::StartAnim(StompType_L, pred);
         }
     }
 

@@ -9,8 +9,10 @@
 #include "magic/magic.hpp"
 #include "scale/scale.hpp"
 
+// A potion that TEMPORARILY increases max possible size
+
 namespace {
-	void BonusMaxSize_Modify(Actor* giant, float value) {
+	void TempBonusMaxSize_Modify(Actor* giant, float value) {
 		auto saved_data = Transient::GetSingleton().GetData(giant);
 		if (saved_data) {
 			saved_data->potion_max_size += value;
@@ -46,7 +48,7 @@ namespace Gts {
 	void MaxSizePotion::OnStart() {
 		auto caster = GetCaster();
 		if (caster) {
-			BonusMaxSize_Modify(caster, this->Power);
+			TempBonusMaxSize_Modify(caster, this->Power);
 			Potion_Penalty(caster);
 		}
 	}
@@ -54,7 +56,7 @@ namespace Gts {
 	void MaxSizePotion::OnFinish() {
 		auto caster = GetCaster();
 		if (caster) {
-			BonusMaxSize_Modify(caster, -this->Power);
+			TempBonusMaxSize_Modify(caster, -this->Power);
 		}
 	}
 }

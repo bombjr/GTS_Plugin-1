@@ -68,6 +68,8 @@ namespace {
 
 				FootStepManager::DoStrongSounds(giantref, 1.10f + animSpeed/20, Node);
 				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
+
+				SetBusyFoot(giantref, BusyFoot::None);
 				return false;
 			}
 			return true;
@@ -77,11 +79,13 @@ namespace {
     void GTS_UnderStomp_CamOn_StrongR(AnimationEventData& data) {
         DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 5.1f);
         ManageCamera(&data.giant, true, CameraTracking::R_Foot);
+		SetBusyFoot(&data.giant, BusyFoot::RightFoot);
     }
 
     void GTS_UnderStomp_CamOn_StrongL(AnimationEventData& data) {
         DrainStamina(&data.giant, "StaminaDrain_StrongStomp", "DestructionBasics", true, 5.1f);
         ManageCamera(&data.giant, true, CameraTracking::L_Foot);
+		SetBusyFoot(&data.giant, BusyFoot::LeftFoot);
     }
 
     void GTS_UnderStomp_CamOff_StrongR(AnimationEventData& data) {ManageCamera(&data.giant, false, CameraTracking::R_Foot);}

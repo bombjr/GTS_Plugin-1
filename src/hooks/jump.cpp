@@ -87,7 +87,7 @@ namespace Hooks {
 						auto actor = skyrim_cast<Actor*>(graph);
 						if (actor) {
 							const float CRITICALHEIGHT = 9.70f;
-							const float ACTORHEIGHT = 1.82f*70.0f;
+							const float ACTORHEIGHT = Characters_AssumedCharSize*70.0f;
 							const float FACTOR = 0.20f;
 							float scale = get_giantess_scale(actor);
 							float newCriticalHeight = ACTORHEIGHT*scale*FACTOR;

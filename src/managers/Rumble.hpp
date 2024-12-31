@@ -72,4 +72,8 @@ namespace Gts {
 		private:
 			std::unordered_map<Actor*, ActorRumbleData> data;
 	};
+
+	void ApplyShake(Actor* caster, float modifier, float radius);
+	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv);
+	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override);
 }

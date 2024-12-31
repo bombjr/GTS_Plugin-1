@@ -9,6 +9,27 @@
 #include "scale/scale.hpp"
 #include "timer.hpp"
 
+namespace {
+	bool PerformMoanAndParticle(Actor* caster) {
+		if (caster && IsFemale(caster) && !IsActionOnCooldown(caster, CooldownSource::Emotion_Moan)) {
+			for (auto Foot: {"NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
+				auto FootNode = find_node(caster, Foot);
+				if (FootNode) {
+					SpawnCustomParticle(caster, ParticleType::Green, FootNode->world.translate, Foot, 0.75f);
+				}
+			}
+
+			if (Runtime::GetFloat("AllowMoanSounds") == 1.0f) {
+				Task_FacialEmotionTask_Moan(caster, 1.0f + RandomFloat(0.0f, 0.25f), "SlowGrow");
+				float MoanVolume = std::clamp(get_visual_scale(caster)/8.0f, 0.25f, 1.0f);
+				PlayMoanSound(caster, MoanVolume);
+			}
+			ApplyActionCooldown(caster, CooldownSource::Emotion_Moan);
+			return true;
+		}
+		return false;
+	}
+}
 
 namespace Gts {
 	std::string SlowGrow::GetName() {
@@ -33,9 +54,9 @@ namespace Gts {
 			float mult = 0.40f;
 			if (this->IsDual) {
 				Rumbling::For("SlowGrow", caster, Rumble_Growth_SlowGrowth_Start, 0.10f, "NPC COM [COM ]", 0.35f, 0.0f);
-				mult = 0.85f;
+				mult *= 1.5f;
 			}
-			SpawnCustomParticle(caster, ParticleType::Green, NiPoint3(), "NPC Root [Root]", scale * mult);
+			SpawnCustomParticle(caster, ParticleType::Green, NiPoint3(), "NPC COM [COM ]", scale * mult * 1.75f);
 		}
 	}
 
@@ -43,36 +64,35 @@ namespace Gts {
 		const float BASE_POWER = 0.000025f; // Default growth over time.
 		const float DUAL_CAST_BONUS = 2.25f;
 		auto caster = GetCaster();
-		if (!caster) {
-			return;
-		}
-		auto GtsSkillLevel = GetGtsSkillLevel(caster);
 
-		float SkillBonus = 1.0f + (GtsSkillLevel * 0.01f); // Calculate bonus power. At the Alteration/Siz Mastery of 100 it becomes 200%.
-		float power = BASE_POWER * SkillBonus;
+		if (caster) {
+			auto GtsSkillLevel = GetGtsSkillLevel(caster);
 
-		if (this->timer.ShouldRun()) {
-			float Volume = std::clamp(get_visual_scale(caster)/8.0f, 0.20f, 1.0f);
-			Runtime::PlaySoundAtNode("growthSound", caster, Volume, 1.0f,  "NPC Pelvis [Pelv]");
-		}
-		if (Runtime::GetFloat("AllowMoanSounds") == 1.0f && this->MoanTimer.ShouldRun() && IsFemale(caster)) {
-			float MoanVolume = std::clamp(get_visual_scale(caster)/8.0f, 0.25f, 1.0f);
-			Task_FacialEmotionTask_Moan(caster, 1.4f, "SlowGrow");
-			PlayMoanSound(caster, MoanVolume);
-			//log::info("Attempting to play Moan Sound for: {}", caster->GetDisplayFullName());
-		}
-		float bonus = 1.0f;
-		if (Runtime::HasMagicEffect(caster, "EffectSizeAmplifyPotion")) {
-			bonus = get_visual_scale(caster) * 0.25f + 0.75f;
-		}
+			float SkillBonus = 1.0f + (GtsSkillLevel * 0.01f); // Calculate bonus power. At the Alteration/Size Mastery of 100 it becomes 200%.
+			float power = BASE_POWER * SkillBonus;
+			float bonus = 1.0f;
 
-		if (this->IsDual) {
-			power *= DUAL_CAST_BONUS;
-		}
+			if (this->timer.ShouldRun()) {
+				float Volume = std::clamp(get_visual_scale(caster)/8.0f, 0.20f, 1.0f);
+				Runtime::PlaySoundAtNode("growthSound", caster, Volume, 1.0f,  "NPC Pelvis [Pelv]");
+			}
+			
+			if (Runtime::HasMagicEffect(caster, "EffectSizeAmplifyPotion")) {
+				bonus = get_visual_scale(caster) * 0.25f + 0.75f;
+			}
 
-		Grow(caster, 0.0f, power * bonus);
-		Rumbling::Once("SlowGrow", caster, Rumble_Growth_SlowGrowth_Loop, 0.05f);
-		//log::info("Slowly Growing, actor: {}", caster->GetDisplayFullName());
+			if (this->IsDual) {
+				power *= DUAL_CAST_BONUS;
+			}
+
+			PerformMoanAndParticle(caster) ? power *= 320.0f : power *= 0.625f;
+			// Mini growth spurts, else weaker growth over time
+
+			Rumbling::Once("SlowGrow", caster, Rumble_Growth_SlowGrowth_Loop, 0.05f);
+			Grow(caster, 0.0f, power * bonus);
+			
+			//log::info("Slowly Growing, actor: {}", caster->GetDisplayFullName());
+		}
 	}
 
 	void SlowGrow::OnFinish() {

@@ -10,6 +10,7 @@
 #include "managers/ai/ai_SelectAction.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/ai/ai_Manager.hpp"
+#include "managers/AttackManager.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "managers/explosion.hpp"
@@ -76,27 +77,38 @@ namespace {
 	}
 
 	void AI_SelectActionToPlay(Actor* pred, Actor* prey, int rng, int butt_rng, int action_rng) {
-		if (IsGtsBusy(pred)) {
-			return;
-		}
-
-		if (rng <= 2 && butt_rng <= 2) {
-			AI_ButtCrush(pred, prey);
-			return;
-		} else if (rng <= 3) {
-			AI_StrongStomp(pred, action_rng);
-			return;
-		} else if (rng <= 6) {
-			AI_LightStomp(pred, action_rng);
-			return;
-		} else if (rng <= 8) {
-			AI_Kicks(pred, action_rng);
-			return;
-		} else if (rng <= 9) {
-			AI_Tramples(pred, action_rng);
-			return;
+		if (!IsGtsBusy(pred)) {
+			if (rng <= 2 && butt_rng <= 2) {
+				AI_ButtCrush(pred, prey);
+			} else if (rng <= 3) {
+				AI_StrongStomp(pred, prey, action_rng);
+			} else if (rng <= 6) {
+				AI_LightStomp(pred, prey, action_rng);
+			} else if (rng <= 8) {
+				AI_Kicks(pred, action_rng);
+			} else if (rng <= 9) {
+				AI_Tramples(pred, action_rng);
+			}
 		}
 	}
+
+	bool AnyActionEnabled() {
+        bool Vore_Ai = Persistent::GetSingleton().Vore_Ai;
+        bool Stomp_Ai = Persistent::GetSingleton().Stomp_Ai;
+        bool Sandwich_Ai = Persistent::GetSingleton().Sandwich_Ai;
+        bool Kick_Ai = Persistent::GetSingleton().Kick_Ai;
+        bool Hugs_Ai = Persistent::GetSingleton().Hugs_Ai;
+        bool Butt_Ai = Persistent::GetSingleton().Butt_Ai;
+        bool Thigh_Ai = Persistent::GetSingleton().Thigh_Ai;
+
+        for (auto Toggled: {Vore_Ai, Stomp_Ai, Sandwich_Ai, Kick_Ai, Hugs_Ai, Butt_Ai, Thigh_Ai}) {
+            if (Toggled) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 namespace Gts {
@@ -107,14 +119,17 @@ namespace Gts {
 			log::info("Action: {} Health is < 0", actor->GetDisplayFullName());
 			return;
 		}
+
+		if (!AnyActionEnabled()) {
+			AttackManager::PreventAttacks(actor, nullptr); // Toggle ON vanilla attacks
+		}
+
 		if (!IsGtsBusy(actor)) {
 			int rng = RandomInt(0, 100);
 			if (rng > 7 && rng < 33 * scale) {
 				AI_DoStomp_Kick_ButtCrush(actor);
-				return;
 			} else if (rng > 3 && rng < 7) {
 				AI_DoSandwich(actor);
-				return;
 			} else if (rng <= 3) {
 				int HugsOrThigh = RandomInt(0, 10);
 				if (HugsOrThigh > 5) {
@@ -135,7 +150,12 @@ namespace Gts {
         std::vector<Actor*> preys = AiManager::GetSingleton().RandomStomp(pred, amount);
         for (auto prey: preys) {
             AI_SelectActionToPlay(pred, prey, rng, butt_rng, action_rng);
+			AttackManager::PreventAttacks(pred, prey);
         }
+
+		if (preys.empty()) {
+			AttackManager::PreventAttacks(pred, nullptr); // Toggle Vanilla Attacks back
+		}
     }
 
 	void AI_DoSandwich(Actor* pred) {
@@ -153,7 +173,13 @@ namespace Gts {
 					node->local.scale = 0.01f;
 					update_node(node);
 				}
+
+				AttackManager::PreventAttacks(pred, prey);
 			}
+		}
+
+		if (preys.empty()) {
+			AttackManager::PreventAttacks(pred, nullptr); // Toggle Vanilla Attacks back
 		}
 	}
 
@@ -167,6 +193,12 @@ namespace Gts {
 					for (auto prey: preys) {
 						// ^ If Size > 0.92 (minimum) && Size < 2.5 + perk bonus (maximum) threshold basically
 						AI_StartHugs(pred, prey);
+
+						AttackManager::PreventAttacks(pred, prey);
+					}
+
+					if (preys.empty()) {
+						AttackManager::PreventAttacks(pred, nullptr); // Toggle Vanilla Attacks back
 					}
 				}
 			}
@@ -259,7 +291,10 @@ namespace Gts {
 			Actor* tiny = tinies[0];
 			if (tiny) {
 				ThighCrushController::GetSingleton().StartThighCrush(giant, tiny);
-			}
+				AttackManager::PreventAttacks(giant, tiny);
+			} 
+		} else {
+			AttackManager::PreventAttacks(giant, nullptr);
 		}
 	}
 

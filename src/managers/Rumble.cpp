@@ -1,5 +1,6 @@
 // Module that handles rumbling
 #include "managers/animation/AnimationManager.hpp"
+#include "data/persistent.hpp"
 #include "managers/Rumble.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
@@ -176,6 +177,92 @@ namespace Gts {
 			// There is a way to patch camera not shaking more than once so we won't need totalWeight hacks, but it requires ASM hacks
 			// Done by this mod: https://github.com/jarari/ImmersiveImpactSE/blob/b1e0be03f4308718e49072b28010c38c455c394f/HitStopManager.cpp#L67
 			// Edit: seems to be unstable to do it
+		}
+	}
+
+	void ApplyShake(Actor* caster, float modifier, float radius) {
+		if (caster) {
+			auto position = caster->GetPosition();
+			ApplyShakeAtPoint(caster, modifier, position, 0.0f);
+		}
+	}
+
+	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv) {
+		auto node = find_node(caster, nodesv);
+		if (node) {
+			ApplyShakeAtPoint(caster, modifier, node->world.translate, 0.0f);
+		}
+	}
+
+	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override) {
+		if (caster) {
+			// Reciever is always PC, if it is not PC - we do nothing anyways
+			Actor* receiver = PlayerCharacter::GetSingleton();
+			if (receiver) {
+				auto& persist = Persistent::GetSingleton();
+				
+				float tremor_scale = persist.npc_tremor_scale;
+				float might = 1.0f + Potion_GetMightBonus(caster); // Stronger, more impactful shake with Might potion
+				
+				float distance = (coords - receiver->GetPosition()).Length(); // In that case we apply shake based on actor distance
+
+				float AnimSpeed = AnimationManager::GetAnimSpeed(caster);
+
+				float sourcesize = get_visual_scale(caster);
+				float receiversize = get_visual_scale(receiver);
+
+				float sizedifference = sourcesize/receiversize;
+				float scale_bonus = 0.0f;
+
+				if (caster->formID == 0x14) {
+					distance = get_distance_to_camera(coords); // use player camera distance (for player only)
+					tremor_scale = persist.tremor_scale;
+					sizedifference = sourcesize;
+
+					if (HasSMT(caster)) {
+						sourcesize += 0.2f; // Fix SMT having no shake at x1.0 scale
+					}
+					if (IsFirstPerson()) {
+						tremor_scale *= 0.25f; // Less annoying FP screen shake
+					}
+
+					scale_bonus = 0.1f;
+				} 
+
+				if (sourcesize < 2.0f) {  // slowly gain power of shakes
+					float reduction = (sourcesize - 1.0f);
+					if (reduction < 0.0f) {
+						reduction = 0.0f;
+					}
+					modifier *= reduction;
+				}
+
+				SoftPotential params {.k = 0.0065f, .n = 3.0f, .s = 1.0f, .o = 0.0f, .a = 0.0f, };
+				//https://www.desmos.com/calculator/jeeugm72gn
+
+				sizedifference *= modifier * tremor_scale * might;
+
+				float intensity = soft_core(distance * 2.5f / sizedifference, params);
+				float duration = 0.45f * (1 + intensity);
+
+				intensity *= 1 + ((sourcesize * scale_bonus) - scale_bonus);
+
+				if (duration_override > 0) { // Custom extra duration when needed
+					duration *= duration_override;
+				}
+
+				intensity = std::clamp(intensity, 0.0f, 8.8f);
+				duration = std::clamp(duration, 0.0f, 2.6f);
+
+				if (intensity > 0.005f) {
+					shake_controller(intensity, intensity, duration);
+
+					auto camera = PlayerCamera::GetSingleton(); // Shake at the camera pos, else it won't always shake properly
+					if (camera) {
+						shake_camera_at_node(camera->pos, intensity, duration);
+					}
+				}
+			}
 		}
 	}
 }

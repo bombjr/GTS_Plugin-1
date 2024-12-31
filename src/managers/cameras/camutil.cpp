@@ -1,14 +1,16 @@
 #include "managers/cameras/camutil.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "managers/cameras/state.hpp"
 #include "managers/highheel.hpp"
+#include "ActionSettings.hpp"
 #include "api/APIManager.hpp"
 #include "scale/modscale.hpp"
 #include "rays/raycast.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
 #include "UI/DebugAPI.hpp"
+#include "events.hpp"
 #include "node.hpp"
-
 
 using namespace RE;
 using namespace Gts;
@@ -21,9 +23,172 @@ namespace {
 
 	const CameraDataMode currentMode = CameraDataMode::State;
 
+	const BoneTarget GetBoneTarget_Anim(CameraTracking Camera_Anim) {
+		switch (Camera_Anim) {
+			case CameraTracking::None: {
+				return BoneTarget();
+			}
+			case CameraTracking::Butt: {
+				return BoneTarget {
+					.boneNames = {"NPC L Butt","NPC R Butt",},
+					.zoomScale = ZoomIn_butt,
+				};
+			}
+			case CameraTracking::Knees: {
+				return BoneTarget {
+					.boneNames = {"NPC L Calf [LClf]","NPC R Calf [RClf]",},
+					.zoomScale = ZoomIn_knees,
+				};
+			}
+			case CameraTracking::Breasts_02: {
+				return BoneTarget {
+					.boneNames = {"L Breast02","R Breast02",},
+					.zoomScale = ZoomIn_Breast02,
+				};
+			}
+			case CameraTracking::Thigh_Crush: {
+				return BoneTarget {
+					.boneNames = {"NPC R PreRearCalf","NPC R Foot [Rft ]","NPC L PreRearCalf","NPC L Foot [Lft ]",},
+					.zoomScale = ZoomIn_ThighCrush,
+				};
+			}
+			case CameraTracking::Thigh_Sandwich: {
+				return BoneTarget {
+					.boneNames = {"AnimObjectA",},
+					.zoomScale = ZoomIn_ThighSandwich,
+				};
+			}
+			case CameraTracking::Hand_Right: {
+				return BoneTarget {
+					.boneNames = {"NPC R Hand [RHnd]",},
+					.zoomScale = ZoomIn_RightHand,
+				};
+			}
+			case CameraTracking::Hand_Left: {
+				return BoneTarget {
+					.boneNames = {"NPC L Hand [LHnd]",},
+					.zoomScale = ZoomIn_LeftHand,
+				};
+			}
+			case CameraTracking::Grab_Left: {
+				return BoneTarget {
+					.boneNames = {"NPC L Finger02 [LF02]",},
+					.zoomScale = ZoomIn_GrabLeft,
+				};
+			}
+			case CameraTracking::L_Foot: {
+				return BoneTarget {
+					.boneNames = {"NPC L Foot [Lft ]",},
+					.zoomScale = ZoomIn_LeftFoot,
+				};
+			}
+			case CameraTracking::R_Foot: {
+				return BoneTarget {
+					.boneNames = {"NPC R Foot [Rft ]",},
+					.zoomScale = ZoomIn_RightFoot,
+				};
+			}
+			case CameraTracking::Mid_Butt_Legs: {
+				return BoneTarget {
+					.boneNames = {"NPC L Butt","NPC R Butt","NPC L Foot [Lft ]","NPC R Foot [Rft ]",},
+					.zoomScale = ZoomIn_ButtLegs,
+				};
+			}
+			case CameraTracking::VoreHand_Right: {
+				return BoneTarget {
+					.boneNames = {"AnimObjectA",},
+					.zoomScale = ZoomIn_VoreRight,
+				};
+			}
+			case CameraTracking::Finger_Right: {
+				return BoneTarget {
+					.boneNames = {"NPC R Finger12 [RF12]",},
+					.zoomScale = ZoomIn_FingerRight,
+				};
+			}
+			case CameraTracking::Finger_Left: {
+				return BoneTarget {
+					.boneNames = {"NPC L Finger12 [LF12]",},
+					.zoomScale = ZoomIn_FingerLeft,
+				};
+			}
+			case CameraTracking::ObjectA: {
+				return BoneTarget {
+					.boneNames = {"AnimObjectA",},
+					.zoomScale = ZoomIn_ObjectA,
+				};
+			}
+			case CameraTracking::ObjectB: {
+				return BoneTarget {
+					.boneNames = {"AnimObjectB",},
+					.zoomScale = ZoomIn_ObjectB,
+				};
+			}
+		}
+		return BoneTarget();
+	}
+
+	const BoneTarget GetBoneTarget_MCM(CameraTracking_MCM Camera_MCM) {
+		switch (Camera_MCM) {
+			case CameraTracking_MCM::None: {
+				return BoneTarget();
+			}
+			case CameraTracking_MCM::Spine: {
+				return BoneTarget {
+					.boneNames = {"NPC Spine2 [Spn2]","NPC Neck [Neck]",},
+					.zoomScale = ZoomIn_Cam_Spine,
+				};
+			}
+			case CameraTracking_MCM::Clavicle: {
+				return BoneTarget {
+					.boneNames = {"NPC R Clavicle [RClv]","NPC L Clavicle [LClv]",},
+					.zoomScale = ZoomIn_Cam_Clavicle,
+				};
+			}
+			case CameraTracking_MCM::Breasts_01: {
+				return BoneTarget {
+					.boneNames = {"NPC L Breast","NPC R Breast",},
+					.zoomScale = ZoomIn_Cam_Breasts_01,
+				};
+			}
+			case CameraTracking_MCM::Breasts_02: {
+				return BoneTarget {
+					.boneNames = {"L Breast02","R Breast02",},
+					.zoomScale = ZoomIn_Cam_Breasts_02,
+				};
+			}
+			case CameraTracking_MCM::Breasts_03: {
+				return BoneTarget {
+					.boneNames = {"L Breast03","R Breast03",},
+					.zoomScale = ZoomIn_Cam_Breasts_03,
+				};
+			}
+			case CameraTracking_MCM::Neck: {
+				return BoneTarget {
+					.boneNames = {"NPC Neck [Neck]",},
+					.zoomScale = ZoomIn_Cam_Neck,
+				};
+			}
+			case CameraTracking_MCM::Butt: {
+				return BoneTarget {
+					.boneNames = {"NPC L Butt","NPC R Butt",},
+					.zoomScale = ZoomIn_Cam_Butt,
+				};
+			}
+		}
+		return BoneTarget();
+	}
 }
 
 namespace Gts {
+
+	BoneTarget GetBoneTargets(CameraTracking Camera_Anim, CameraTracking_MCM Camera_MCM) {
+		if (Camera_Anim != CameraTracking::None) { // must take priority
+			return GetBoneTarget_Anim(Camera_Anim);
+		} else {
+			return GetBoneTarget_MCM(Camera_MCM);
+		}
+	}
 
 	float HighHeelOffset() {
 		Actor* player = PlayerCharacter::GetSingleton();
@@ -321,7 +486,7 @@ namespace Gts {
 
 	NiPoint3 FirstPersonPoint() {
 		auto camera = PlayerCamera::GetSingleton();
-		auto camState = camera->cameraStates[CameraState::kFirstPerson].get();
+		auto camState = camera->cameraStates[RE::CameraState::kFirstPerson].get();
 		NiPoint3 cameraTrans;
 		camState->GetTranslation(cameraTrans);
 		return cameraTrans;
@@ -329,7 +494,7 @@ namespace Gts {
 
 	NiPoint3 ThirdPersonPoint() {
 		auto camera = PlayerCamera::GetSingleton();
-		auto camState = camera->cameraStates[CameraState::kThirdPerson].get();
+		auto camState = camera->cameraStates[RE::CameraState::kThirdPerson].get();
 		NiPoint3 cameraTrans;
 		camState->GetTranslation(cameraTrans);
 		return cameraTrans;
@@ -337,7 +502,7 @@ namespace Gts {
 
 	float ZoomFactor() {
 		auto camera = PlayerCamera::GetSingleton();
-		auto camState = camera->cameraStates[CameraState::kThirdPerson].get();
+		auto camState = camera->cameraStates[RE::CameraState::kThirdPerson].get();
 		if (camState) {
 			ThirdPersonState* tpState = skyrim_cast<ThirdPersonState*>(camState);
 			if (tpState) {

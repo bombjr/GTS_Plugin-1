@@ -183,22 +183,24 @@ namespace {
 			}
 
 			double Finish = Time::WorldTimeElapsed();
-			auto giant = giantHandle.get().get();
+			auto giantref = giantHandle.get().get();
 		
 			if (Finish - Start > 0.02) { 
 
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.10f);
-				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 10, 0.25f, Event, 1.0f, Source);
-				DoDustExplosion(giant, dust + (animSpeed * 0.05f), Event, Node);
-				DoFootstepSound(giant, 1.0f, Event, Node);
+				DoDamageEffect(giantref, Damage_Stomp * perk, Radius_Stomp, 10, 0.25f, Event, 1.0f, Source);
+				DoDustExplosion(giantref, dust + (animSpeed * 0.05f), Event, Node);
+				DoFootstepSound(giantref, 1.0f, Event, Node);
 				
-				DrainStamina(giant, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8f); // cancel stamina drain
+				DrainStamina(giantref, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8f); // cancel stamina drain
 
-				FootGrindCheck(giant, Radius_Stomp, false, right);
+				FootGrindCheck(giantref, Radius_Stomp, false, right);
 
-				DelayedLaunch(giant, 0.80f * perk, 2.0f* animSpeed, Event);
+				DelayedLaunch(giantref, 0.80f * perk, 2.0f* animSpeed, Event);
 
-				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
+
+				SetBusyFoot(giantref, BusyFoot::None);
 
 				return false;
 			}
@@ -241,6 +243,7 @@ namespace {
 				LaunchTask(giant, 0.90f * perk, 3.2f + animSpeed/2, Event);
 
 				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+
 				return false;
 			}
 			return true;
@@ -256,6 +259,8 @@ namespace {
 		Rumbling::Start("StompR_Loop", &data.giant, 0.25f, 0.15f, RNode);
 		ManageCamera(&data.giant, true, CameraTracking::R_Foot);
 		Stomp_IncreaseAnimSpeed(data);
+
+		SetBusyFoot(&data.giant, BusyFoot::RightFoot);
 	}
 
 	void GTSstompstartL(AnimationEventData& data) {
@@ -264,6 +269,8 @@ namespace {
 		Rumbling::Start("StompL_Loop", &data.giant, 0.25f, 0.15f, LNode);
 		ManageCamera(&data.giant, true, CameraTracking::L_Foot);
 		Stomp_IncreaseAnimSpeed(data);
+
+		SetBusyFoot(&data.giant, BusyFoot::LeftFoot);
 	}
 
 	void GTSstompimpactR(AnimationEventData& data) {
@@ -317,9 +324,9 @@ namespace {
 
 	void LeftStompEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
-			bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
-			const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StompLeft";
-			DoStompOrUnderStomp(player, StompType);
+		bool UnderStomp = AnimationUnderStomp::ShouldStompUnder(player);
+		const std::string_view StompType = UnderStomp ? "UnderStompLeft" : "StompLeft";
+		DoStompOrUnderStomp(player, StompType);
 	}
 }
 

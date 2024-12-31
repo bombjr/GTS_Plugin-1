@@ -5,6 +5,8 @@
 using namespace RE;
 
 namespace Gts {
+	BoneTarget GetBoneTargets(CameraTracking Camera_Anim, CameraTracking_MCM Camera_MCM);
+
 	float HighHeelOffset();
 
 	void SetINIFloat(std::string_view name, float value);

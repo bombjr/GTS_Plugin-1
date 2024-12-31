@@ -156,6 +156,7 @@ namespace {
 		if (data.animSpeed == 1.0f) {
 			data.animSpeed = 1.3f;
 		}
+		SetBusyFoot(&data.giant, BusyFoot::LeftFoot);
 	}
 	void GTS_Trample_Leg_Raise_R(AnimationEventData& data) {
 		data.stage = 1;
@@ -163,6 +164,7 @@ namespace {
 		if (data.animSpeed == 1.0f) {
 			data.animSpeed = 1.3f;
 		}
+		SetBusyFoot(&data.giant, BusyFoot::RightFoot);
 	}
 
 	void GTS_Trample_Cam_Start_L(AnimationEventData& data) {
@@ -192,14 +194,15 @@ namespace {
 ////////////////////////////////////////////////////////////D A M A G E
 
 	void GTS_Trample_Footstep_L(AnimationEventData& data) { // Stage 1 footsteps
+		FootTrample_Stage1(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "TrampleL");
+		SetBusyFoot(&data.giant, BusyFoot::None);
 		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;
 		data.stage = 0;
-
-		FootTrample_Stage1(&data.giant, false, FootEvent::Left, DamageSource::CrushedLeft, LNode, "TrampleL");
 	}
 	void GTS_Trample_Footstep_R(AnimationEventData& data) { // stage 1 footsteps
 		FootTrample_Stage1(&data.giant, true, FootEvent::Right, DamageSource::CrushedRight, RNode, "TrampleR");
+		SetBusyFoot(&data.giant, BusyFoot::None);
 
 		data.animSpeed = 1.0f;
 		data.canEditAnimSpeed = false;

@@ -53,16 +53,20 @@ namespace {
         LaunchTask(giant, 0.825f * perk, 2.10f, Event);
 
         FootStepManager::PlayVanillaFootstepSounds(giant, right);
+
+        SetBusyFoot(giant, BusyFoot::None);
 	}
 
     void GTS_UnderStomp_CamOnR(AnimationEventData& data) {
         DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.4f);
         ManageCamera(&data.giant, true, CameraTracking::R_Foot);
+        SetBusyFoot(&data.giant, BusyFoot::RightFoot);
     }
 
     void GTS_UnderStomp_CamOnL(AnimationEventData& data) {
         DrainStamina(&data.giant, "StaminaDrain_Stomp", "DestructionBasics", true, 1.4f);
         ManageCamera(&data.giant, true, CameraTracking::L_Foot);
+        SetBusyFoot(&data.giant, BusyFoot::LeftFoot);
     }
 
     void GTS_UnderStomp_CamOffR(AnimationEventData& data) {ManageCamera(&data.giant, false, CameraTracking::R_Foot);}
@@ -82,6 +86,23 @@ namespace Gts {
 
     static inline float Remap(float x, float in_min, float in_max, float out_min, float out_max) {
         return out_min + (x - in_min) * (out_max - out_min) / (in_max - in_min);
+    }
+
+    bool AnimationUnderStomp::ShouldStompUnder_NPC(Actor* giant, float distance) {
+        //log::info("Distance of {} is {}", giant->GetDisplayFullName(), distance);
+        const float min_distance = 37.5f;
+        const float blending = std::clamp(distance / min_distance, 0.0f, 1.0f);
+
+        bool blend = false;
+
+        if (distance <= min_distance) {
+            giant->SetGraphVariableFloat("GTS_StompBlend", blending);
+            blend = true;
+        }
+
+        //log::info("Blend Bool: {}, Blending Float: {}, dist min dist: {}", blend, blending, distance / min_distance);
+            
+        return blend;
     }
 
     bool AnimationUnderStomp::ShouldStompUnder(Actor* giant) {

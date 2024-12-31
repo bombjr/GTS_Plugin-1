@@ -19,7 +19,7 @@ namespace {
 
     float Perk_LifeAbsorption_GetBonus(Actor* giant) {
         float bonus = std::clamp(GetGtsSkillLevel(giant) - 75.0f, 0.0f, 25.0f) * 0.02f;
-        return 0.25f + bonus;
+        return 0.30f + bonus;
     }
 
     void ManageSpellPerks(const AddPerkEvent& evt) {
@@ -67,42 +67,41 @@ namespace {
         ActorHandle gianthandle = giant->CreateRefHandle();
         double Start = Time::WorldTimeElapsed();
 
-        double stack_duration = 240.0;
-        if (!data) {
-            return;
-        }
-        if (data->Perk_lifeForceStolen < 0.0f) {
-            data->Perk_lifeForceStolen = 0.0f;
-        }
-        if (data->Perk_lifeForceStacks < 0) {
-            data->Perk_lifeForceStacks = 0;
-        }
-
-        data->Perk_lifeForceStacks += 1;
-        data->Perk_lifeForceStolen += stack_power;
-
-        //log::info("Life force stolen: {}, added power: {}", data->Perk_lifeForceStolen, stack_power);
-
-        TaskManager::Run(name, [=](auto& progressData) {
-            if (!gianthandle) {
-                return false;
+        double stack_duration = 300.0;
+        if (data) {
+            if (data->Perk_lifeForceStolen < 0.0f) {
+                data->Perk_lifeForceStolen = 0.0f;
             }
-            Actor* giantref = gianthandle.get().get();
-            double Finish = Time::WorldTimeElapsed();
+            if (data->Perk_lifeForceStacks < 0) {
+                data->Perk_lifeForceStacks = 0;
+            }
 
-            if (Finish - Start >= stack_duration) {
-                if (data) {
-                    if (data->Perk_lifeForceStacks > 0) {
-                        data->Perk_lifeForceStacks -= 1;
-                        data->Perk_lifeForceStolen -= stack_power;
-                    } else if (data->Perk_lifeForceStacks == 0) {
-                        return false;
-                    }
+            data->Perk_lifeForceStacks += 1;
+            data->Perk_lifeForceStolen += stack_power;
+
+            //log::info("Life force stolen: {}, added power: {}", data->Perk_lifeForceStolen, stack_power);
+
+            TaskManager::Run(name, [=](auto& progressData) {
+                if (!gianthandle) {
+                    return false;
                 }
-                return false;
-            }
-            return true;
-        });
+                Actor* giantref = gianthandle.get().get();
+                double Finish = Time::WorldTimeElapsed();
+
+                if (Finish - Start >= stack_duration) {
+                    if (data) {
+                        if (data->Perk_lifeForceStacks > 0) {
+                            data->Perk_lifeForceStacks -= 1;
+                            data->Perk_lifeForceStolen -= stack_power;
+                        } else if (data->Perk_lifeForceStacks == 0) {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+                return true;
+            });
+        }
     }
 
 

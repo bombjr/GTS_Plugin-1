@@ -91,6 +91,7 @@ namespace Gts {
 		TESObjectREFR* Throw_Offender;
 
 		AttachToNode AttachmentNode;
+		BusyFoot FootInUse;
 		
 		float rip_lastScale;
 		float rip_offset;

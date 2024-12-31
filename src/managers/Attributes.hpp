@@ -25,7 +25,7 @@ namespace Gts {
 			static float AlterMovementSpeed(Actor* actor, const NiPoint3& direction);
 			static float AlterGetAvMod(float orginal_value, Actor* a_this, ACTOR_VALUE_MODIFIER a_modifier, ActorValue a_value);
 		private:
-			SoftPotential speed_adjustment_walk {
+			const SoftPotential speed_adjustment_walk {
 				.k = 0.265f, // 0.125
 				.n = 1.11f, // 0.86
 				.s = 2.0f, // 1.12

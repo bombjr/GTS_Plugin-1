@@ -5,11 +5,6 @@
 using namespace RE;
 
 namespace Gts {
-	struct BoneTarget {
-		std::vector<std::string> boneNames = {};
-		float zoomScale = 1.0f;
-	};
-
 	class ThirdPersonCameraState : public CameraState {
 		public:
 			virtual NiPoint3 GetPlayerLocalOffset(const NiPoint3& cameraPos) override;

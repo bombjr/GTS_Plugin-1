@@ -52,6 +52,32 @@ namespace {
 		EnsureINIFloat("fLodDistance:LOD", ini_adjustment);
 	}
 
+	void Foot_PerformIdleEffects_Main(Actor* actor) {
+		if (actor) {
+			auto& CollisionDamage = CollisionDamage::GetSingleton();
+			if (GetBusyFoot(actor) != BusyFoot::RightFoot) { // These are needed to get rid of annoying pushing away during stomps
+				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+			} 
+			if (GetBusyFoot(actor) != BusyFoot::LeftFoot) {
+				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+			}
+		}
+	}
+
+	void Foot_PerformIdleEffects_Others(Actor* actor) {
+		if (actor && Runtime::GetBool("PreciseDamageOthers")) {
+			auto& CollisionDamage = CollisionDamage::GetSingleton();
+			if (actor->formID != 0x14 && !IsTeammate(actor)) {
+				if (GetBusyFoot(actor) != BusyFoot::RightFoot) {
+					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+				}
+				if (GetBusyFoot(actor) != BusyFoot::LeftFoot) {
+					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+				}
+			}
+		}
+	}
+
 	void ManageActorControl() { // Rough control other fix
 		auto profiler = Profilers::Profile("Manager: Actor Control");
 		Actor* target = GetPlayerOrControlled();
@@ -312,33 +338,25 @@ void GtsManager::Update() {
 
 	for (auto actor: find_actors()) {
 		if (actor) {
-			auto& CollisionDamage = CollisionDamage::GetSingleton();
 			auto& sizemanager = SizeManager::GetSingleton();
 
 			if (actor->formID == 0x14 || IsTeammate(actor)) {
-
-				ScareActors(actor);
-				FixActorFade(actor);
-
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
-				
 				ClothManager::GetSingleton().CheckClothingRip(actor);
-				TinyCalamity_SeekActors(actor);
-				SpawnActionIcon(actor);
+				GameModeManager::GetSingleton().GameMode(actor); // Handle Game Modes
+				Foot_PerformIdleEffects_Main(actor); // Just idle zones for pushing away/dealing minimal damage
+				TinyCalamity_SeekActors(actor); // Active only on Player
+				SpawnActionIcon(actor); // Icons for interactions with others, Player only
+				FixActorFade(actor);
+				ScareActors(actor);
 
+				
+				
 				if (IsCrawling(actor)) {
 					ApplyAllCrawlingDamage(actor, 1000, 0.25f);
 				}
+			}
 
-				GameModeManager::GetSingleton().GameMode(actor); // Handle Game Modes
-			}
-			if (Runtime::GetBool("PreciseDamageOthers")) {
-				if (actor->formID != 0x14 && !IsTeammate(actor)) {
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
-				}
-			}
+			Foot_PerformIdleEffects_Others(actor); // Just idle zones for pushing away/dealing minimal damage, but this one is for others as well
 			update_actor(actor);
 			apply_actor(actor);
 		}

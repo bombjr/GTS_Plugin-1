@@ -8,7 +8,7 @@
 using namespace RE;
 
 namespace {
-	const float OFFSET = -0.02f * 70.0f; // About 2cm down
+	const float OFFSET = 0.04f * 70.0f; // About 4cm down
 }
 
 namespace Gts {
@@ -22,16 +22,12 @@ namespace Gts {
 				playerTrans.scale = rootModel->parent ? rootModel->parent->world.scale : 1.0f;  // Only do translation/rotation
 				auto transform = playerTrans.Invert();
 				auto rightFoot = find_node(player, rightFootLookup);
-				if (rightFoot != nullptr) {
+				if (rightFoot) {
 					float playerScale = get_visual_scale(player);
 					auto rightPosLocal = transform * (rightFoot->world * NiPoint3());
 					this->smoothFootPos.target = rightPosLocal;
-					NiPoint3 highheelOffset = HighHeelManager::GetHHOffset(player) * HighHeelManager::GetHHMultiplier(player);
 
 					this->smoothFootPos.target.z += OFFSET*playerScale;
-					if (highheelOffset.Length() > 1e-4) {
-						this->smoothFootPos.target -= highheelOffset * 1.6f;
-					}
 				}
 			}
 		}

@@ -1,12 +1,13 @@
 #include "managers/animation/Utils/CooldownManager.hpp"
 #include "magic/effects/Potions/EssencePotion.hpp"
 #include "magic/effects/common.hpp"
+#include "data/persistent.hpp"
+#include "ActionSettings.hpp"
+#include "data/runtime.hpp"
 #include "magic/magic.hpp"
 #include "scale/scale.hpp"
-#include "data/persistent.hpp"
-#include "data/runtime.hpp"
 
-// A potion that increases max possible size
+// A potion that PERMANENTLY increases max possible size
 
 namespace {
     void shake_screen_do_moan(Actor* giant, float power) {
@@ -23,6 +24,22 @@ namespace {
 			shake_camera(giant, 0.50f * shake, 0.38f * shake);
 		}
     }
+
+	void PermBonusMaxSize_Modify(Actor* caster, float power) {
+		if (caster && caster->formID == 0x14) {
+			float scale = get_visual_scale(caster);
+
+			TESGlobal* BonusSize = Runtime::GetGlobal("ExtraPotionSize"); 
+			// Bonus size is added on top of all size calculations through this global
+			// Applied inside GtsManager.cpp (script)
+			if (BonusSize) {
+				BonusSize->value += power/Characters_AssumedCharSize; // convert to m
+			}
+
+			SpawnCustomParticle(caster, ParticleType::Red, NiPoint3(), "NPC COM [COM ]", scale * ((power < 0.10 ? power : 0.08f) * 25)); // Just some nice visuals
+			shake_screen_do_moan(caster, power < 0.10 ? power : 0.08f);
+		}
+	}
 }
 
 namespace Gts {
@@ -51,19 +68,7 @@ namespace Gts {
 		auto caster = GetCaster();
 
 		if (caster) { // player exclusive
-			if (caster->formID == 0x14) {
-				float scale = get_visual_scale(caster);
-
-				TESGlobal* BonusSize = Runtime::GetGlobal("ExtraPotionSize"); 
-				// Bonus size is added on top of all size calculations through this global
-				// Applied inside GtsManager.cpp (script)
-				if (BonusSize) {
-					BonusSize->value += this->power/1.82f; // convert to m
-				}
-
-				SpawnCustomParticle(caster, ParticleType::Red, NiPoint3(), "NPC COM [COM ]", scale * ((this->power < 0.10 ? this->power : 0.08f) * 25)); // Just some nice visuals
-				shake_screen_do_moan(caster, (this->power < 0.10 ? this->power : 0.08f));
-			}
+			PermBonusMaxSize_Modify(caster, this->power);
 			Potion_Penalty(caster);
         }
 	}
