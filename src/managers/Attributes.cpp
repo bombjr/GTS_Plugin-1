@@ -205,11 +205,11 @@ namespace Gts {
 					Bonus = actorData->smt_run_speed;
 				}
 
-				float power = 1.0f * Slowdown * (Bonus/2.2f + 1.0f)/MS_mult/MS_mult_limit/Multy/bonusspeed;
+				float power = 1.0f * Slowdown * (Bonus/2.0f + 1.0f)/MS_mult/MS_mult_limit/Multy/bonusspeed;
 				if (scale > 1.0f) {
 					return power;
 				} else {
-					return scale * Slowdown * (Bonus/2.2f + 1.0f);
+					return scale * Slowdown * (Bonus/2.0f + 1.0f);
 				}
 			}
 			case ActorValue::kAttackDamageMult: {

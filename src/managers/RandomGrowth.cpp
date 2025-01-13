@@ -46,7 +46,7 @@ namespace {
 			return false;
 		}
 
-		if (!IsFemale(actor)) {
+		if (!IsFemale(actor, true)) {
 			return false;
 		}
 

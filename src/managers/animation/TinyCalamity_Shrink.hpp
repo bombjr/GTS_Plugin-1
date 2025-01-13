@@ -1,6 +1,3 @@
-
-
-    
 using namespace std;
 using namespace SKSE;
 using namespace RE;
@@ -23,6 +20,6 @@ namespace Gts
             static std::vector<Actor*> GetShrinkActors(Actor* giant);
             static float GetShrinkUntil(Actor* giant);
 
-        };
-    }
+    };
+}
 

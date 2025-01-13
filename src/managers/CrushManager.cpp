@@ -168,6 +168,7 @@ namespace Gts {
 
 				// Do crush
 				KillActor(giant, tiny);
+				DecreaseShoutCooldown(giant);
 				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
 
 				if (!IsLiving(tiny) || LessGore()) {

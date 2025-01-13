@@ -19,7 +19,7 @@ namespace Gts {
 			static bool IsEmotionBusy(Actor* giant, CharEmotionType Type);
 
 			static float GetEmotionValue(Actor* giant, CharEmotionType Type, std::uint32_t emotion_value);
-			void OverridePhenome(Actor* giant, int number, float halflife, float target);
-			void OverrideModifier(Actor* giant, int number, float halflife, float target);
+			void OverridePhenome(Actor* giant, int number, float mfg_speed, float target);
+			void OverrideModifier(Actor* giant, int number, float mfg_speed, float target);
 	};
 }

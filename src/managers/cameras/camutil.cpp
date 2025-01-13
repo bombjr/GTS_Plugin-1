@@ -1,6 +1,7 @@
 #include "managers/cameras/camutil.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/cameras/state.hpp"
+#include "managers/camera.hpp"
 #include "managers/highheel.hpp"
 #include "ActionSettings.hpp"
 #include "api/APIManager.hpp"
@@ -177,6 +178,86 @@ namespace {
 			}
 		}
 		return BoneTarget();
+	}
+
+	NiPoint3 CameraStateToCoords(Actor* giant) {
+		int cameraMode = Runtime::GetInt("CameraMode");
+		NiPoint3 result = NiPoint3();
+		switch (cameraMode) {
+			case 3: // Between Foot
+				for (auto Foot: {"NPC L Foot [Lft ]", "NPC R Foot [Rft ]"}) {
+					auto node = find_node(giant, Foot);
+					if (Foot) {
+						result += node->world.translate / 2;
+					}
+				}
+			break; 
+			case 4: { // Left Foot
+				auto node = find_node(giant, "NPC L Foot [Lft ]");
+				if (node) {
+					result = node->world.translate;
+				}
+			}
+			break;
+			case 5: { // Right Foot
+				auto node = find_node(giant, "NPC R Foot [Rft ]");
+				if (node) {
+					result = node->world.translate;
+				}
+			break;
+			}
+		}
+		return result;
+	}
+
+	void ReadBoneTargets(Actor* giant, NiPoint3& point) {
+		auto player = PlayerCharacter::GetSingleton();
+		auto& sizemanager = SizeManager::GetSingleton();
+
+		int MCM_Mode = Runtime::GetInt("AltCameraTarget");
+		CameraTracking_MCM Camera_MCM = static_cast<CameraTracking_MCM>(MCM_Mode);
+		CameraTracking Camera_Anim = sizemanager.GetTrackedBone(player);
+
+		BoneTarget targets = BoneTarget();
+
+		NiPoint3 FootPos = CameraStateToCoords(giant);
+		
+		if (FootPos.Length() > 0.0f) {
+			point = FootPos;
+			// Just update foot coords
+		} else {
+			if (Camera_Anim != CameraTracking::None) {
+				targets = GetBoneTarget_Anim(Camera_Anim);
+			} else {
+				targets = GetBoneTarget_MCM(Camera_MCM);
+			}
+
+			if (!targets.boneNames.empty()) {
+				for (auto node_name: targets.boneNames) {
+					auto node = find_node_any(giant, node_name);
+					if (node) {
+						point += node->world.translate / targets.boneNames.size();
+					}
+				}
+			}
+		}
+	}
+
+	void UpdateNiFrustum(Actor* cameraActor, float hullMult) {
+		//TODO Wait For IC 2.0
+									
+		if (!IsFirstPerson() && !IsFakeFirstPerson()) {
+			if (get_visual_scale(cameraActor) < get_natural_scale(cameraActor)) {
+				auto niCamera = GetNiCamera();
+				if (niCamera) {
+					//CamHull Should be the same as FNearDistance
+					//TODO Find the Offset For that value and assign CamHull to it.
+					//TODO Also Connect this to the camera rotation matrix Z coord. it should be somethin like: camhullSize * (LookUpDownAngle Remaped to something like 0.8-1.0 * min(visual scale, 1.0)).
+					//TODO Also Move this to its own func.
+					niCamera->GetRuntimeData2().viewFrustum.fNear = camhullSize * hullMult;
+				}
+			}
+		}
 	}
 }
 
@@ -574,24 +655,14 @@ namespace Gts {
 							if (auto node = find_node_any(cameraActor, "NPC Pelvis [Pelv]")) {
 
 									auto rayStart = node->world.translate;
+
+									//ReadBoneTargets(cameraActor, rayStart);
+
 									auto hullMult = min(get_visual_scale(cameraActor), 1.0f);
+									//UpdateNiFrustum(cameraActor, hullMult);
 
 									//offset Height by camera hull size. Fixes cases where the bone is closer to the ground than the hull size.
 									rayStart.z += max(camhullSize * hullMult, 3.0f);
-
-									//TODO Wait For IC 2.0
-									
-									//if (!IsFirstPerson() && !IsFakeFirstPerson()) {
-									//	auto niCamera = GetNiCamera();
-									//	if (niCamera) {
-											//CamHull Should be the same as FNearDistance
-											//TODO Find the Offset For that value and assign CamHull to it.
-											//TODO Also Connect this to the camera rotation matrix Z coord. it should be somethin like: camhullSize * (LookUpDownAngle Remaped to something like 0.8-1.0 * min(visual scale, 1.0)).
-											//TODO Also Move this to its own func.
-									//		niCamera->GetRuntimeData2().viewFrustum.fNear = camhullSize * hullMult;
-									//	}
-									//}
-
 
 									if (IsDebugEnabled()) {
 										DebugAPI::DrawSphere(glm::vec3(rayStart.x, rayStart.y, rayStart.z), 1.0f, 10, { 0.5f, 1.0f, 0.0f, 1.0f }, 10.0f);
@@ -604,8 +675,6 @@ namespace Gts {
 
 							UpdatePlayerCamera(localShifted);
 							UpdateNiCamera(localShifted);
-							//UpdateSceneManager(localShifted); // These 2 mess up UI, so keep them off
-							//UpdateRenderManager(localShifted);
 						}
 					}
 				}

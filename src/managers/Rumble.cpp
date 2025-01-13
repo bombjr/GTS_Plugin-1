@@ -17,16 +17,17 @@ using namespace RE;
 
 namespace Gts {
 
-	RumbleData::RumbleData(float intensity, float duration, float halflife, float shake_duration, std::string node) :
+	RumbleData::RumbleData(float intensity, float duration, float halflife, float shake_duration, bool ignore_scaling, std::string node) :
 		state(RumbleState::RampingUp),
 		duration(duration),
 		shake_duration(shake_duration),
+		ignore_scaling(ignore_scaling),
 		currentIntensity(Spring(0.0f, halflife)),
 		node(node),
 		startTime(0.0f) {
 	}
 
-	RumbleData::RumbleData(float intensity, float duration, float halflife, float shake_duration, std::string_view node) : RumbleData(intensity, duration, halflife, shake_duration, std::string(node)) {
+	RumbleData::RumbleData(float intensity, float duration, float halflife, float shake_duration, bool ignore_scaling, std::string_view node) : RumbleData(intensity, duration, halflife, shake_duration, ignore_scaling, std::string(node)) {
 	}
 
 	void RumbleData::ChangeTargetIntensity(float intensity) {
@@ -73,23 +74,23 @@ namespace Gts {
 		} catch (std::out_of_range e) {}
 	}
 
-	void Rumbling::For(std::string_view tagsv, Actor* giant, float intensity, float halflife, std::string_view nodesv, float duration, float shake_duration) {
+	void Rumbling::For(std::string_view tagsv, Actor* giant, float intensity, float halflife, std::string_view nodesv, float duration, float shake_duration, const bool ignore_scaling) {
 		std::string tag = std::string(tagsv);
 		std::string node = std::string(nodesv);
 		auto& me = Rumbling::GetSingleton();
 		me.data.try_emplace(giant);
-		me.data.at(giant).tags.try_emplace(tag, intensity, duration, halflife, shake_duration, node);
+		me.data.at(giant).tags.try_emplace(tag, intensity, duration, halflife, shake_duration, ignore_scaling, node);
 		// Reset if already there (but don't reset the intensity this will let us smooth into it)
 		me.data.at(giant).tags.at(tag).ChangeTargetIntensity(intensity);
 		me.data.at(giant).tags.at(tag).ChangeDuration(duration);
 	}
 
-	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node, float shake_duration) {
-		Rumbling::For(tag, giant, intensity, halflife, node, 1.0f, shake_duration);
+	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node, float shake_duration, const bool ignore_scaling) {
+		Rumbling::For(tag, giant, intensity, halflife, node, 1.0f, shake_duration, ignore_scaling);
 	}
 
-	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife) {
-		Rumbling::Once(tag, giant, intensity, halflife, "NPC Root [Root]", 0.0f);
+	void Rumbling::Once(std::string_view tag, Actor* giant, float intensity, float halflife, const bool ignore_scaling) {
+		Rumbling::Once(tag, giant, intensity, halflife, "NPC Root [Root]", 0.0f, ignore_scaling);
 	}
 
 
@@ -138,9 +139,12 @@ namespace Gts {
 			//    - Multiple effects can add rumble to the same node
 			//    - We sum those effects up into cummulativeIntensity
 			float duration_override = 0.0f;
+			bool ignore_scaling = false;
+
 			std::unordered_map<NiAVObject*, float> cummulativeIntensity;
 			for (const auto &[tag, rumbleData]: data.tags) {
 				duration_override = rumbleData.shake_duration;
+				ignore_scaling = rumbleData.ignore_scaling;
 				auto node = find_node(actor, rumbleData.node);
 				if (node) {
 					cummulativeIntensity.try_emplace(node);
@@ -172,7 +176,7 @@ namespace Gts {
 			}
 
 			averagePos = averagePos * (1.0f / totalWeight);
-			ApplyShakeAtPoint(actor, 0.4f * totalWeight, averagePos, duration_override);
+			ApplyShakeAtPoint(actor, 0.4f * totalWeight, averagePos, duration_override, ignore_scaling);
 
 			// There is a way to patch camera not shaking more than once so we won't need totalWeight hacks, but it requires ASM hacks
 			// Done by this mod: https://github.com/jarari/ImmersiveImpactSE/blob/b1e0be03f4308718e49072b28010c38c455c394f/HitStopManager.cpp#L67
@@ -187,14 +191,14 @@ namespace Gts {
 		}
 	}
 
-	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv) {
+	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv, const bool ignore_scaling) {
 		auto node = find_node(caster, nodesv);
 		if (node) {
-			ApplyShakeAtPoint(caster, modifier, node->world.translate, 0.0f);
+			ApplyShakeAtPoint(caster, modifier, node->world.translate, 0.0f, ignore_scaling);
 		}
 	}
 
-	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override) {
+	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override, const bool ignore_scaling) {
 		if (caster) {
 			// Reciever is always PC, if it is not PC - we do nothing anyways
 			Actor* receiver = PlayerCharacter::GetSingleton();
@@ -229,7 +233,7 @@ namespace Gts {
 					scale_bonus = 0.1f;
 				} 
 
-				if (sourcesize < 2.0f) {  // slowly gain power of shakes
+				if (sourcesize < 2.0f && !ignore_scaling) {  // slowly gain power of shakes
 					float reduction = (sourcesize - 1.0f);
 					if (reduction < 0.0f) {
 						reduction = 0.0f;

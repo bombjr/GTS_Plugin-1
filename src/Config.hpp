@@ -58,6 +58,18 @@ namespace Gts {
 				float _maxVoiceFrequency;
 	};
 
+	class UtilBools {
+		public:
+			UtilBools() = default;
+			[[nodiscard]] inline bool GetFemaleOverride() const noexcept {
+				return _ignoreFemaleCheck;
+			}
+			UtilBools(const toml::value& data);
+
+			private:
+				bool _ignoreFemaleCheck;
+	};
+
 
 	class Tremor {
 		public:
@@ -113,6 +125,10 @@ namespace Gts {
 				return _voice;
 			}
 
+			[[nodiscard]] inline const UtilBools& GetUtilBools() const noexcept {
+				return _utilBools;
+			}
+
 			[[nodiscard]] static const Config& GetSingleton() noexcept;
 
 			Config(const toml::value& data);
@@ -122,5 +138,6 @@ namespace Gts {
 			Frame _frame;
 			Tremor _tremor;
 			Voice _voice;
+			UtilBools _utilBools;
 	};
 }

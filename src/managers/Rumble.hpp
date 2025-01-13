@@ -20,14 +20,15 @@ namespace Gts {
 	// Holds rumble data
 	class RumbleData {
 		public:
-			RumbleData(float intensity, float duration, float halflife, float shake_duration, std::string node);
-			RumbleData(float intensity, float duration, float halflife, float shake_duration, std::string_view node);
+			RumbleData(float intensity, float duration, float halflife, float shake_duration, bool ignore_scaling, std::string node);
+			RumbleData(float intensity, float duration, float halflife, float shake_duration, bool ignore_scaling, std::string_view node);
 			void ChangeTargetIntensity(float intensity);
 			void ChangeDuration(float duration);
 
 			RumbleState state;
 			float duration; // Value of 0 means keep going until stopped
 			float shake_duration; // For custom duration that don't need to rely on halflife
+			bool ignore_scaling; // Ignores beginning scale restrictions on Shake Power when needed
 			Spring currentIntensity;
 			std::string node;
 			double startTime;
@@ -61,19 +62,19 @@ namespace Gts {
 			static void Stop(std::string_view tag, Actor* giant);
 
 			// Same as Start except with a duration (can still use Stop to end it early)
-			static void For(std::string_view tagsv, Actor* giant, float intensity, float halflife, std::string_view nodesv, float duration, float shake_duration);
+			static void For(std::string_view tagsv, Actor* giant, float intensity, float halflife, std::string_view nodesv, float duration, float shake_duration, const bool ignore_scaling = false);
 
 			// A quick rumble. This should be a short instance like a single stomp. May not be for one frame but will be short
 			// - To Sermit: This is currently set to 1.0s but can tinker with it
-			static void Once(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node, float shake_duration);
+			static void Once(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node, float shake_duration, const bool ignore_scaling = false);
 
 			// Without node name will happen at NPC Root Node
-			static void Once(std::string_view tag, Actor* giant, float intensity, float halflife);
+			static void Once(std::string_view tag, Actor* giant, float intensity, float halflife, const bool ignore_scaling = false);
 		private:
 			std::unordered_map<Actor*, ActorRumbleData> data;
 	};
 
 	void ApplyShake(Actor* caster, float modifier, float radius);
-	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv);
-	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override);
+	void ApplyShakeAtNode(Actor* caster, float modifier, std::string_view nodesv, const bool ignore_scaling = false);
+	void ApplyShakeAtPoint(Actor* caster, float modifier, const NiPoint3& coords, float duration_override, const bool ignore_scaling = false);
 }

@@ -19,6 +19,16 @@ step = 0
 
 maxVoiceFrequency = 1.0
 
+[UtilBools]
+# Change it to true if you want random animations, game mode and random growth to work on Males
+# Warning: may look cringe, ugly and personally i dislike it and hope that you won't use it
+# Moans and Laughs will still be disabled on males despite that toggle, you don't want Males to moan or laugh in female voice, do you?
+#
+# No further support will be added for to this toggle.
+# accepts true or false only
+
+ignoreFemaleCheck = false
+
 [tremor]
 # linear, smoothstep, softcore, cubic
 method = "linear"

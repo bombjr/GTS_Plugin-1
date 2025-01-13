@@ -1,16 +1,33 @@
 #include "managers/animation/Utils/CooldownManager.hpp"
+#include "managers/animation/TinyCalamity_Shrink.hpp"
 #include "managers/GtsSizeManager.hpp"
 #include "managers/animation/Grab.hpp"
+#include "utils/actorBools.hpp"
 #include "data/persistent.hpp"
 #include "ActionSettings.hpp"
 #include "data/transient.hpp"
 #include "data/runtime.hpp"
-#include "actorBools.hpp"
+
 
 // Planning to switch to it later and remove these functions from ActorUtils.cpp, delayed because it's hard to see important changes
 
-/*namespace Gts {
-   bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
+namespace Gts {
+	bool IsStaggered(Actor* tiny) {
+		bool staggered = false;
+		if (tiny) {
+			staggered = static_cast<bool>(tiny->AsActorState()->actorState2.staggered);
+		}
+		return staggered;
+	}
+
+	bool IsBeingKilledWithMagic(Actor* tiny) {
+		bool shrinking = false;
+		if (tiny) {
+			tiny->GetGraphVariableBool("GTS_Being_Shrunk", shrinking);
+		}
+		return shrinking;
+	}
+   /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;
 		actor->GetGraphVariableBool("GTS_DisableHH", disable);
 		if (actor->formID == 0x14 && IsFirstPerson()) {
@@ -404,5 +421,5 @@
 
 	bool IsGtsTeammate(Actor* actor) {
 		return Runtime::HasKeyword(actor, "CountAsFollower");
-	}
-}*/
+	}*/
+}

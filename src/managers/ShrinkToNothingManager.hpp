@@ -36,6 +36,9 @@ namespace Gts {
 			static bool CanShrink(Actor* giant, Actor* tiny);
 			static bool AlreadyShrinked(Actor* actor);
 			static void Shrink(Actor* giant, Actor* tiny);
+
+			static void SpawnDeathEffects(Actor* tiny);
+			static void TransferInventoryTask(Actor* giant, Actor* tiny);
 		private:
 			std::unordered_map<FormID, ShrinkData> data;
 	};

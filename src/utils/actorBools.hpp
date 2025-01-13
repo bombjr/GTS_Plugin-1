@@ -7,9 +7,10 @@ using namespace SKSE;
 using namespace RE;
 using namespace Gts;
 
-/*namespace Gts {    
-	
-    bool BehaviorGraph_DisableHH(Actor* actor);
+namespace Gts {    
+	bool IsStaggered(Actor* tiny);
+	bool IsBeingKilledWithMagic(Actor* tiny);
+    /*bool BehaviorGraph_DisableHH(Actor* actor);
 	bool IsEquipBusy(Actor* actor);
 	
 	bool IsRagdolled(Actor* actor);
@@ -65,6 +66,5 @@ using namespace Gts;
 	bool IsHuman(Actor* actor);
 	bool IsBlacklisted(Actor* actor);
 
-    bool IsGtsTeammate(Actor* actor);
-	
-}*/
+    bool IsGtsTeammate(Actor* actor);*/
+}

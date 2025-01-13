@@ -71,6 +71,7 @@ namespace Gts {
 			} else if (data.state == OverkillState::Overkilling) {
 				if (data.delay.ShouldRun()) {
                     if (tiny->Is3DLoaded() && !tiny->IsDead()) {
+						DecreaseShoutCooldown(giant);
                         KillActor(giant, tiny);
                     }
 

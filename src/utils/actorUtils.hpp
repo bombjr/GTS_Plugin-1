@@ -55,7 +55,7 @@ namespace Gts {
 	bool Potion_IsUnderGrowthPotion(Actor* actor);
 	
 	bool IsInsect(Actor* actor, bool performcheck);
-	bool IsFemale(Actor* actor);
+	bool IsFemale(Actor* actor, bool check_config = false);
 	bool IsDragon(Actor* actor);
 	bool IsGiant(Actor* actor);
 	bool IsMammoth(Actor* actor);
@@ -135,6 +135,8 @@ namespace Gts {
 
 	// GTS State Controllers end
 	void PlayAnimation(Actor* actor, std::string_view animName);
+
+	void DecreaseShoutCooldown(Actor* giant);
 
 	void Disintegrate(Actor* actor);
 	void UnDisintegrate(Actor* actor);

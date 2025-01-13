@@ -16,6 +16,7 @@
 #include "managers/hitmanager.hpp"
 #include "managers/highheel.hpp"
 #include "managers/highheel.hpp"
+#include "utils/actorBools.hpp"
 #include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
 #include "ActionSettings.hpp"
@@ -98,6 +99,9 @@ namespace Gts {
 
 	void LaunchActor::ApplyLaunchTo(Actor* giant, Actor* tiny, float force, float launch_power) {
 		auto profiler = Profilers::Profile("Other: Launch Actors Decide");
+		if (IsBeingKilledWithMagic(tiny)) {
+			return;
+		}
 		if (IsBeingHeld(giant, tiny)) {
 			return;
 		}

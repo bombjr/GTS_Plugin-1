@@ -46,7 +46,7 @@ namespace {
 		data->modifierKeyFrame.SetValue(Modifier, Value);
 	}
 
-	void Task_UpdatePhenome(Actor* giant, int phenome, float halflife, float target) {
+	void Task_UpdatePhenome(Actor* giant, int phenome, float mfg_speed, float target) {
 		
 		if (!EmotionManager::IsEmotionBusy(giant, CharEmotionType::Phenome)) {
 			std::string name = std::format("Phenome_{}_{}_{}_{}", giant->formID, phenome, target, Time::WorldTimeElapsed());
@@ -69,7 +69,7 @@ namespace {
 				}
 
 				float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
-				float speed = 1.25f * AnimSpeed * halflife * Speed_up;
+				float speed = 1.25f * AnimSpeed * mfg_speed * Speed_up;
 				//log::info("Running Facial Task: {}", name);
 				float value = static_cast<float>(pass * speed);
 				auto FaceData = GetFacialData(giantref);
@@ -102,7 +102,7 @@ namespace {
 		}
 	}
 
-	void Task_UpdateModifier(Actor* giant, int modifier, float halflife, float target) {
+	void Task_UpdateModifier(Actor* giant, int modifier, float mfg_speed, float target) {
 		if (!EmotionManager::IsEmotionBusy(giant, CharEmotionType::Modifier)) {
 			std::string name = std::format("Modifier_{}_{}_{}", giant->formID, modifier, target);
 			ActorHandle giantHandle = giant->CreateRefHandle();
@@ -124,7 +124,7 @@ namespace {
 				}
 
 				float AnimSpeed = AnimationManager::GetSingleton().GetAnimSpeed(giant);
-				float speed = 1.0f * AnimSpeed * halflife * Speed_up;
+				float speed = 1.0f * AnimSpeed * mfg_speed * Speed_up;
 
 				float value = static_cast<float>(pass * speed);
 				auto FaceData = GetFacialData(giantref);
@@ -215,11 +215,11 @@ namespace Gts {
 		return value;
 	}
 
-	void EmotionManager::OverridePhenome(Actor* giant, int number, float halflife, float target) {
-		Task_UpdatePhenome(giant, number, halflife, target);
+	void EmotionManager::OverridePhenome(Actor* giant, int number, float mfg_speed, float target) {
+		Task_UpdatePhenome(giant, number, mfg_speed, target);
 	}
 
-	void EmotionManager::OverrideModifier(Actor* giant, int number, float halflife, float target) {
-		Task_UpdateModifier(giant, number, halflife, target);
+	void EmotionManager::OverrideModifier(Actor* giant, int number, float mfg_speed, float target) {
+		Task_UpdateModifier(giant, number, mfg_speed, target);
 	}
 }

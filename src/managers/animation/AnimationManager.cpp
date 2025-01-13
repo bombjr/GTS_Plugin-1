@@ -1,3 +1,4 @@
+#include "managers/animation/TinyCalamity_Instakill.hpp"
 #include "managers/animation/Sneak_Slam_FingerGrind.hpp"
 #include "managers/animation/Stomp_Under_FullBody.hpp"
 #include "managers/animation/TinyCalamity_Shrink.hpp"
@@ -122,6 +123,9 @@ namespace Gts {
 
 		Animation_TinyCalamity::RegisterEvents();
 		Animation_TinyCalamity::RegisterTriggers();
+
+		Animation_TinyCalamity_InstaKill::RegisterEvents();
+		Animation_TinyCalamity_InstaKill::RegisterTriggers();
 
 		AnimationButtCrush::RegisterEvents();
 		AnimationButtCrush::RegisterTriggers();

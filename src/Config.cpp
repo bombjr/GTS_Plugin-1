@@ -41,6 +41,10 @@ namespace Gts {
 		this->_maxVoiceFrequency = toml::find_or<float>(data, "maxVoiceFrequency", 1.0f);
 	}
 
+	UtilBools::UtilBools(const toml::value& data) {
+		this->_ignoreFemaleCheck = toml::find_or<bool>(data, "ignoreFemaleCheck", false);
+	}
+
 	Tremor::Tremor(const toml::value& data) {
 		this->_method = toml::find_or<std::string>(data, "method", "linear");
 		this->_halfScale = toml::find_or<float>(data, "halfScale", 0.91f);
@@ -55,5 +59,6 @@ namespace Gts {
 		this->_frame =  toml::find<Frame>(data, "frame");
 		this->_tremor =  toml::find<Tremor>(data, "tremor");
 		this->_voice =  toml::find<Voice>(data, "voice");
+		this->_utilBools = toml::find<UtilBools>(data, "UtilBools");
 	}
 }

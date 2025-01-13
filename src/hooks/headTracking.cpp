@@ -142,6 +142,23 @@ namespace Hooks
 				return;
 			}
 		);
+
+		static FunctionHook<bool(IAnimationGraphManagerHolder* graph, const BSFixedString& a_variableName, const bool a_in)> SetGraphVariableBool(
+            REL::RelocationID(32141, 32885),
+            [](IAnimationGraphManagerHolder* graph, const BSFixedString& a_variableName, const bool a_in){
+                //log::info("SetGraph hooked");
+                if (a_variableName == "bHeadTrackSpine") { // Disable weird spine rotation during crawl/prone
+				    // Done through hook since TDM seems to adjust it constantly
+                    auto actor = skyrim_cast<Actor*>(graph);
+                    if (actor) {
+                        //log::info("Holder found: {}", actor->GetDisplayFullName());
+                        bool Disable = !(IsCrawling(actor) || IsProning(actor));
+                        return SetGraphVariableBool(graph, a_variableName, Disable);
+                    }
+                }
+            	return SetGraphVariableBool(graph, a_variableName, a_in);
+            }
+        );
 	}
 }
 

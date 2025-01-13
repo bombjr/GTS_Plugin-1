@@ -17,6 +17,7 @@
 #include "managers/explosion.hpp"
 #include "utils/DeathReport.hpp"
 #include "managers/highheel.hpp"
+#include "utils/actorBools.hpp"
 #include "utils/actorUtils.hpp"
 #include "colliders/actor.hpp"
 #include "managers/Rumble.hpp"
@@ -34,6 +35,7 @@
 #include "utils/debug.hpp"
 #include "utils/av.hpp"
 #include "profiler.hpp"
+#include "Config.hpp"
 #include "events.hpp"
 #include "spring.hpp"
 #include "timer.hpp"
@@ -475,7 +477,16 @@ namespace Gts {
 		return false;
 	}
 
-	bool IsFemale(Actor* actor) {
+	bool IsFemale(Actor* actor, bool check_config) {
+		if (check_config) {
+			auto profiler = Profilers::Profile("ActorUtils: FemaleCheck");
+			auto config = Config::GetSingleton().GetUtilBools();
+			bool Ignore_Female_Rules = config.GetFemaleOverride();
+			if (Ignore_Female_Rules) {
+				return true;
+			}
+		}
+
 		auto base = actor->GetActorBase();
 		int sex = 0;
 		if (base) {
@@ -1227,6 +1238,25 @@ namespace Gts {
 		actor->NotifyAnimationGraph(animName);
 	}
 
+	void DecreaseShoutCooldown(Actor* giant) {
+		auto process = giant->GetActorRuntimeData().currentProcess;
+		if (giant->formID == 0x14 && process && Runtime::HasPerk(giant, "EternalCalamity")) {
+			auto high = process->high;
+			float by = 0.90f;
+			if (high) {
+				float& rec_time = high->voiceRecoveryTime;
+				//log::info("Recovery Time: {}", rec_time);
+				if (rec_time > 0.0f) {
+					HasSMT(giant) ? by = 0.85f : by = 0.90f;
+
+					rec_time < 0.0f ? rec_time == 0.0f : rec_time *= by;
+
+					//log::info("New Recovery Time: {}", rec_time);
+				}
+			}
+		}
+	}
+
 	void Disintegrate(Actor* actor) {
 		std::string taskname = std::format("Disintegrate_{}", actor->formID);
 		auto tinyref = actor->CreateRefHandle();
@@ -1341,7 +1371,7 @@ namespace Gts {
 
 	void PushActorAway(Actor* source, Actor* receiver, float afKnockBackForce) {
 		// Force < 1.0 can introduce weird sliding issues to Actors, not recommended to pass force < 1.0
-		if (receiver->IsDead()) {
+		if (receiver->IsDead() || IsBeingKilledWithMagic(receiver)) {
 			return;
 		}
 
@@ -1866,7 +1896,10 @@ namespace Gts {
 		bool dwemer = Runtime::HasKeyword(actor, "DwemerKeyword");
 		bool undead = Runtime::HasKeyword(actor, "UndeadKeyword");
 		bool creature = Runtime::HasKeyword(actor, "CreatureKeyword");
-		if (!dragon && !animal && !dwemer && !undead && !creature) {
+		bool humanoid = Runtime::HasKeyword(actor, "ActorTypeNPC");
+		if (humanoid) {
+			return true;
+		} if (!dragon && !animal && !dwemer && !undead && !creature) {
 			return true; // Detect non-vampire
 		} if (!dragon && !animal && !dwemer && !creature && undead && vampire) {
 			return true; // Detect Vampire
@@ -2692,9 +2725,12 @@ namespace Gts {
 						}
 						Actor* Tiny = tinyHandle.get().get();
 						double Finish = Time::WorldTimeElapsed();
+
+						object->local.scale = 0.01f;
+						update_node(object);
+
 						if (Finish - Start > 0.25 && !IsGtsBusy(Tiny)) {
 							object->local.scale = 1.0f;
-							//object->SetAppCulled(false);
 							update_node(object);
 							return false;
 						}
@@ -2794,7 +2830,9 @@ namespace Gts {
 		if (tiny->IsDead() || IsRagdolled(tiny) || IsBeingHugged(tiny) || GetAV(tiny, ActorValue::kHealth) <= 0.0f) {
 			return;
 		}
-		StaggerActor_Directional(giant, power, tiny);
+		if (!IsBeingKilledWithMagic(tiny)) {
+			StaggerActor_Directional(giant, power, tiny);
+		}
 	}
 
 	void StaggerActor_Around(Actor* giant, const float radius, bool launch) {
@@ -2939,7 +2977,7 @@ namespace Gts {
 			auto transient = Transient::GetSingleton().GetData(actor);
 			if (transient) {
 				transient->SMT_Bonus_Duration += duration;
-				log::info("Adding perk duration");
+				//log::info("Adding perk duration");
 			}
 		}
 	}

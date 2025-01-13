@@ -84,7 +84,7 @@ namespace {
 		auto& persist = Persistent::GetSingleton();
 		
 		for (auto actor: find_actors()) {
-			if (actor->formID != 0x14 && IsTeammate(actor) && (actor->IsInCombat() || !persist.vore_combatonly) || (EffectsForEveryone(actor) && IsFemale(actor))) {
+			if (actor->formID != 0x14 && IsTeammate(actor) && (actor->IsInCombat() || !persist.vore_combatonly) || (EffectsForEveryone(actor) && IsFemale(actor, true))) {
 				AbleToVore.push_back(actor);
 			}
 		}
@@ -123,7 +123,7 @@ namespace Gts {
 			auto& persist = Persistent::GetSingleton();
 			for (auto actor: find_actors()) {
 					std::vector<Actor*> AbleToAct = {};
-					if (IsTeammate(actor) && actor->formID != 0x14 && IsFemale(actor) || (EffectsForEveryone(actor) && IsFemale(actor))) {
+					if (IsTeammate(actor) && actor->formID != 0x14 && IsFemale(actor, true) || (EffectsForEveryone(actor) && IsFemale(actor, true))) {
 						if (actor->IsInCombat() || !persist.vore_combatonly) {
 							AbleToAct.push_back(actor);
 						}

@@ -16,7 +16,7 @@ using namespace Gts;
 namespace {
 	float Get_Speed_Override(Actor* giant, float incoming_speed) {
 		float new_speed = incoming_speed;
-		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant) && get_visual_scale(giant) > 1.5f) {
+		if (giant->formID != 0x14 && IsTeammate(giant) && IsHuman(giant) && IsFemale(giant, true) && get_visual_scale(giant) > 1.5f) {
 			float speed_cap = 400.0f / get_visual_scale(giant);
 			float speed = AnimationManager::GetAnimSpeed(giant);
 			new_speed *= speed * speed;

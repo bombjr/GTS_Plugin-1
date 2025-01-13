@@ -1,5 +1,5 @@
-#include "managers/GtsSizeManager.hpp"
 #include "managers/perks/PerkHandler.hpp"
+#include "managers/GtsSizeManager.hpp"
 #include "data/transient.hpp"
 #include "data/runtime.hpp"
 #include "node.hpp"

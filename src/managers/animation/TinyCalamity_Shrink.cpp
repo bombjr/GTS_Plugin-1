@@ -1,5 +1,5 @@
-#include "managers/animation/TinyCalamity_Shrink.hpp"
 #include "managers/animation/Utils/AnimationUtils.hpp"
+#include "managers/animation/TinyCalamity_Shrink.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/damage/LaunchActor.hpp"

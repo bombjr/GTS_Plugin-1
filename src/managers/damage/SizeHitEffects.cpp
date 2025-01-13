@@ -53,7 +53,7 @@ namespace {
 
 		bool GrowthEnabled = sizemanager.GetHitGrowth(PlayerCharacter::GetSingleton()) >= 1.0f;
 		bool HasPerk = Runtime::HasPerkTeam(receiver, "GrowthOnHitPerk");
-		bool Teammate = IsTeammate(receiver) && IsFemale(receiver);
+		bool Teammate = IsTeammate(receiver) && IsFemale(receiver, true);
 		bool IsPlayer = receiver->formID == 0x14;
 		
 		if (IsPlayer || Teammate) {

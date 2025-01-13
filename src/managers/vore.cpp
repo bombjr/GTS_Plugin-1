@@ -83,6 +83,7 @@ namespace Gts {
 				}
 
 				Vore_AdvanceQuest(giantref.get().get(), tiny, IsDragon(tiny), IsGiant(tiny)); // Progress quest
+				DecreaseShoutCooldown(giantref.get().get());
 
 				std::string taskname = std::format("VoreAbsorb_{}", tiny->formID);
 

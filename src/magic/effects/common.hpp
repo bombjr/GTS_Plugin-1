@@ -471,6 +471,7 @@ namespace Gts {
 			AdjustSizeReserve(caster, target_scale/25);
 			AdjustSizeLimit(0.0066f * target_scale, caster);
 			AdjustMassLimit(0.0066f * target_scale, caster);
+			
 		}
 	}
 }

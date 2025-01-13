@@ -36,6 +36,17 @@ namespace {
 			transient->SMT_Penalty_Duration = 0.0f;
 		}
 	}
+
+	void AdjustCalamityDuration(Actor* caster, ActiveEffect* Effect) {
+		if (Runtime::HasPerkTeam(caster, "LifeSteal")) {
+			if (Effect) {
+				float level = GetGtsSkillLevel(caster) - 85.0f;
+				float extra = std::clamp(level, 0.0f, 15.0f) * 2.0f;
+				Effect->duration += extra;
+				// up to +30 seconds
+			}
+		}
+	}
 }
 
 namespace Gts {
@@ -45,25 +56,21 @@ namespace Gts {
 	}
 
 	void TinyCalamity::OnStart() {
-		//std::string message = std::format("While Tiny Calamity is active, your size-related actions are massively empowered, but your max scale is limited. You can perform all size-related actions (Vore, Grab, Hug Crush, etc) while being same size, but performing them wastes some of Tiny Calamity's duration.");
-		//TutorialMessage(message, "Calamity");
 		auto caster = GetCaster();
-		if (!caster) {
-			return;
-		}
-		
-		
-		Runtime::PlaySoundAtNode("TinyCalamitySound", caster, 1.0f, 1.0f, "NPC COM [COM ]");
-		auto node = find_node(caster, "NPC Root [Root]");
-		StartShrinkingGaze(caster);
+		if (caster) {
+			Runtime::PlaySoundAtNode("TinyCalamitySound", caster, 1.0f, 1.0f, "NPC COM [COM ]");
+			AdjustCalamityDuration(caster, GetActiveEffect());
+			auto node = find_node(caster, "NPC Root [Root]");
+			StartShrinkingGaze(caster);
 
-		if (node) {
-			NiPoint3 position = node->world.translate;
-			float scale = get_visual_scale(caster);
-			TinyCalamityExplosion(caster, 84);
+			if (node) {
+				NiPoint3 position = node->world.translate;
+				float scale = get_visual_scale(caster);
+				TinyCalamityExplosion(caster, 84);
 
-			SpawnParticle(caster, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0f, 7, nullptr); // Spawn
-			Rumbling::For("TinyCalamity", caster, 4.0f, 0.14f, "NPC COM [COM ]", 0.10f, 0.0f);
+				SpawnParticle(caster, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), position, scale * 3.0f, 7, nullptr); // Spawn
+				Rumbling::For("TinyCalamity", caster, 4.0f, 0.14f, "NPC COM [COM ]", 0.10f, 0.0f);
+			}
 		}
 	}
 

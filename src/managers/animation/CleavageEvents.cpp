@@ -392,6 +392,7 @@ namespace {
 			AdjustSizeLimit(0.0095f, giant);
 			AdjustMassLimit(0.0095f, giant);
 
+            DecreaseShoutCooldown(giant);
             KillActor(giant, tiny, true);
 
             if (tiny->formID != 0x14) {

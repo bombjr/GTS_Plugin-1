@@ -1,11 +1,13 @@
 #include "managers/animation/Utils/CooldownManager.hpp"
 #include "managers/animation/Utils/AnimationUtils.hpp"
+#include "managers/animation/TinyCalamity_Shrink.hpp"
+#include "managers/animation/AnimationManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
 #include "managers/damage/TinyCalamity.hpp"
+#include "managers/perks/PerkHandler.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "magic/effects/common.hpp"
-#include "managers/perks/PerkHandler.hpp"
 #include "managers/Attributes.hpp"
 #include "utils/MovementForce.hpp"
 #include "managers/highheel.hpp"
@@ -36,43 +38,6 @@ namespace {
 			Runtime::CastSpell(giant, giant, "GtsVoreFearSpell");
 		}
 	}
-
-    void Task_WrathfulCalamityTask(Actor* giant, Actor* tiny, float duration) {
-        ActorHandle tinyhandle = tiny->CreateRefHandle();
-        ActorHandle gianthandle = giant->CreateRefHandle();
-        std::string name = std::format("IRCalamity_{}", tiny->formID);
-
-        auto node = find_node(tiny, "NPC Root [Root]");
-		if (node) {
-			SpawnParticle(tiny, 3.00f, "GTS/gts_tinyrune.nif", NiMatrix3(), node->world.translate, 1.0f, 7, node); 
-		}
-        Task_AdjustHalfLifeTask(tiny, 0.10f, 3.0);
-        SetBeingHeld(tiny, true);
-        
-        double Start = Time::WorldTimeElapsed();
-
-        TaskManager::Run(name, [=](auto& progressData) {
-			if (!tinyhandle) {
-				return false;
-			}
-            if (!gianthandle) {
-                return false;
-            }
-			Actor* tinyref = tinyhandle.get().get();
-            Actor* giantref = gianthandle.get().get();
-            double Finish = Time::WorldTimeElapsed();
-
-            set_target_scale(tinyref, 0.03f);
-
-			if (get_visual_scale(tinyref) <= Minimum_Actor_Scale) {
-                SetBeingHeld(tinyref, false);
-                giantref->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, GetMaxAV(giantref, ActorValue::kHealth) * 0.075f);
-                ShrinkToNothingManager::Shrink(giantref, tinyref);
-				return false;
-			}
-			return true;
-		});
-    }
 
     void PlayGoreEffects(Actor* giant, Actor* tiny) {
         if (!IsLiving(tiny)) {
@@ -149,38 +114,48 @@ namespace Gts {
             bool OnCooldown = IsActionOnCooldown(giant, CooldownSource::Misc_TinyCalamityRage);
             for (auto tiny: preys) {
                 if (tiny) {
-                    float health = GetHealthPercentage(tiny);
+                    if (IsHuman(tiny)) {
+                        float health = GetHealthPercentage(tiny);
 
-                    float gts_hp = GetMaxAV(giant, ActorValue::kHealth);
-                    float tiny_hp = GetMaxAV(tiny, ActorValue::kHealth);
+                        float gts_hp = GetMaxAV(giant, ActorValue::kHealth);
+                        float tiny_hp = GetMaxAV(tiny, ActorValue::kHealth);
 
-                    float difference = std::clamp(gts_hp / tiny_hp, 0.5f, 2.0f);
+                        float difference = std::clamp(gts_hp / tiny_hp, 0.5f, 2.0f);
 
-                    threshold *= difference;
+                        threshold *= difference;
 
-                    if (health <= threshold && !OnCooldown) {
-                        if (IsBeingHeld(giant, tiny)) {
-                            return false;
-                        }
-                        Task_WrathfulCalamityTask(giant, tiny, duration);
-                        ApplyActionCooldown(giant, CooldownSource::Misc_TinyCalamityRage);
-                        perform = true;
-                    } else {
-                        if (giant->formID == 0x14) {
-                            if (!OnCooldown) {
-                                std::string message = std::format("{} is too healthy for Wrathful Calamity", tiny->GetDisplayFullName());
-                                Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0f, threshold * 100.0f);
-                                shake_camera(giant, 0.45f, 0.30f);
-                                NotifyWithSound(giant, message);
-                            } else {
-                                std::string message = std::format("{} is on a cooldown: {:.1f} sec", "Wrathful Calamity", GetRemainingCooldown(giant, CooldownSource::Misc_TinyCalamityRage));
-                                shake_camera(giant, 0.45f, 0.30f);
-                                NotifyWithSound(giant, message);
+                        if (health <= threshold && !OnCooldown) {
+                            if (IsBeingHeld(giant, tiny) || IsRagdolled(tiny)) {
+                                return false;
+                            }
+                            ApplyActionCooldown(giant, CooldownSource::Misc_TinyCalamityRage);
+                            Animation_TinyCalamity::AddToData(giant, tiny, 1.0f);
+
+                            AnimationManager::StartAnim("InstaKill_Start_Tiny", tiny);
+                            AnimationManager::StartAnim("InstaKill_Start_GTS", giant);
+
+                            DisarmActor(giant, false);
+                            DisarmActor(tiny, false);
+                            FaceOpposite(giant, tiny);
+                            
+                            perform = true;
+                        } else {
+                            if (giant->formID == 0x14) {
+                                if (!OnCooldown) {
+                                    std::string message = std::format("{} is too healthy for Wrathful Calamity", tiny->GetDisplayFullName());
+                                    Notify("Health: {:.0f}%; Requirement: {:.0f}%", health * 100.0f, threshold * 100.0f);
+                                    shake_camera(giant, 0.45f, 0.30f);
+                                    NotifyWithSound(giant, message);
+                                } else {
+                                    std::string message = std::format("{} is on a cooldown: {:.1f} sec", "Wrathful Calamity", GetRemainingCooldown(giant, CooldownSource::Misc_TinyCalamityRage));
+                                    shake_camera(giant, 0.45f, 0.30f);
+                                    NotifyWithSound(giant, message);
+                                }
                             }
                         }
                     }
-                }
-            }   
+                } 
+            }  
         }
         return perform;
     }
@@ -188,7 +163,7 @@ namespace Gts {
     void TinyCalamity_ShrinkActor(Actor* giant, Actor* tiny, float shrink) {
         auto profiler = Profilers::Profile("Calamity: Shrink");
         if (HasSMT(giant)) {
-            bool HasPerk = Runtime::HasPerk(giant, "SmallMassiveThreatSizeSteal");
+            bool HasPerk = Runtime::HasPerk(giant, "LifeSteal");
             float limit = Minimum_Actor_Scale;
             if (HasPerk) {
 				DamageAV(giant, ActorValue::kHealth, -shrink * 1.25f);
@@ -287,9 +262,10 @@ namespace Gts {
             TriggerScreenBlood(50);
             tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
         }
-
-        giant->SetGraphVariableFloat("GiantessScale", OldScale);
+        
         Runtime::PlaySoundAtNode("TinyCalamity_Crush", giant, 1.0f, 1.0f, "NPC COM [COM ]");
+        giant->SetGraphVariableFloat("GiantessScale", OldScale);
+        DecreaseShoutCooldown(giant);
 
         ScareEnemies(giant);
     }
@@ -422,7 +398,7 @@ namespace Gts {
 				cap = 1.10f;
 			}
 
-			currentspeed += 0.004400f * speed * Gigantism * 5; // increase MS
+			currentspeed += 0.004400f * speed * Gigantism * 10; // increase MS
 
 			if (currentspeed > cap) {
 				currentspeed = cap;
@@ -431,7 +407,7 @@ namespace Gts {
             FullSpeed_ApplyEffect(giant, currentspeed);
 		} else { // else decay bonus speed over time
 			if (currentspeed > 0.0f) {
-				currentspeed -= (0.045000f * 5) / decay;
+				currentspeed -= (0.045000f * 10) / decay;
 			} else if (currentspeed <= 0.0f) {
 				currentspeed = 0.0f;
 			} 
