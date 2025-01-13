@@ -52,16 +52,6 @@ namespace {
 		EnsureINIFloat("fLodDistance:LOD", ini_adjustment);
 	}
 
-	void Headtracking_ManageSpineToggle(Actor* actor) {
-		if (actor && actor->formID != 0x14) { // Player is handled inside HeadTracking.cpp -> SetGraphVariableBool hook
-			if (IsCrawling(actor) || IsProning(actor)) {
-				actor->SetGraphVariableBool("bHeadTrackSpine", false);
-			} else {
-				actor->SetGraphVariableBool("bHeadTrackSpine", true);
-			}
-		}
-	}
-
 	void Foot_PerformIdleEffects_Main(Actor* actor) {
 		if (actor) {
 			auto& CollisionDamage = CollisionDamage::GetSingleton();
@@ -84,8 +74,6 @@ namespace {
 				if (GetBusyFoot(actor) != BusyFoot::LeftFoot) {
 					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
 				}
-
-				Headtracking_ManageSpineToggle(actor);
 			}
 		}
 	}
@@ -355,7 +343,6 @@ void GtsManager::Update() {
 			if (actor->formID == 0x14 || IsTeammate(actor)) {
 				ClothManager::GetSingleton().CheckClothingRip(actor);
 				GameModeManager::GetSingleton().GameMode(actor); // Handle Game Modes
-				Headtracking_ManageSpineToggle(actor); // Toggle spine HT on/off based on GTS state
 				Foot_PerformIdleEffects_Main(actor); // Just idle zones for pushing away/dealing minimal damage
 				TinyCalamity_SeekActors(actor); // Active only on Player
 				SpawnActionIcon(actor); // Icons for interactions with others, Player only
@@ -368,7 +355,6 @@ void GtsManager::Update() {
 			}
 
 			Foot_PerformIdle_Headtracking_Effects_Others(actor); // Just idle zones for pushing away/dealing minimal damage, but this one is for others as well
-			// Also manages spine headtracking 
 			update_actor(actor);
 			apply_actor(actor);
 		}

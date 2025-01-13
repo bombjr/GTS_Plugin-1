@@ -9,6 +9,37 @@ using namespace SKSE;
 
 
 namespace {
+
+	static auto ptrOffset = REL::Module::get().version().compare(SKSE::RUNTIME_SSE_1_6_629) == std::strong_ordering::less ? -0xB8 : -0xC0;
+	// Credits to ERSH
+
+	void Headtracking_ManageSpineToggle(Actor* actor) {
+		if (actor && actor->Is3DLoaded()) { // Player is handled inside HeadTracking.cpp -> SetGraphVariableBool hook
+			std::string taskname = std::format("SpineBool_{}", actor->formID);
+			ActorHandle giantHandle = actor->CreateRefHandle();
+
+			double Start = Time::WorldTimeElapsed();
+
+			TaskManager::RunFor(taskname, 1.0f, [=](auto& progressData){
+				if (!giantHandle) {
+					return false;
+				}
+
+				double Finish = Time::WorldTimeElapsed();
+
+				double timepassed = Finish - Start;
+				if (timepassed > 0.10) {
+					auto giant = giantHandle.get().get();
+					bool Disable = !(IsCrawling(giant) || IsProning(giant));
+					giant->SetGraphVariableBool("bHeadTrackSpine", Disable);
+					//log::info("Setting {} for {}", Disable, giant->GetDisplayFullName());
+					return false;
+				}
+				return true;
+			});
+		}
+	}
+
 	void ForceLookAtCleavage(Actor* actor, NiPoint3& target) { // Forces someone to look at breasts
 		if (actor->formID != 0x14) {
 			auto process = actor->GetActorRuntimeData().currentProcess;
@@ -159,6 +190,32 @@ namespace Hooks
             	return SetGraphVariableBool(graph, a_variableName, a_in);
             }
         );
+
+		static CallHook<bool(RE::ActorState* a_this, int16_t a_flag)>Sneak_AddMovementFlags( // Mostly from DynamicCollisionAdjustment
+			REL::RelocationID(36926, 37951), REL::Relocate(0xE4, 0xA0),
+			[](RE::ActorState* a_this, int16_t a_flag) {
+				auto actor = SKSE::stl::adjust_pointer<RE::Actor>(a_this, ptrOffset); // Some black magic from Ersh
+				if (actor) {
+					Headtracking_ManageSpineToggle(actor); // Toggle spine HT on/off based on GTS state
+				}
+
+				return Sneak_AddMovementFlags(a_this, a_flag);
+            }
+        );
+
+		static CallHook<bool(RE::ActorState* a_this, int16_t a_flag)>Sneak_RemoveMovementFlags( // Mostly from DynamicCollisionAdjustment
+			REL::RelocationID(36926, 37951), REL::Relocate(0xEB, 0xB2),
+			[](RE::ActorState* a_this, int16_t a_flag) {
+				auto actor = SKSE::stl::adjust_pointer<RE::Actor>(a_this, ptrOffset); // Some black magic from Ersh
+				if (actor) {
+					Headtracking_ManageSpineToggle(actor); // Toggle spine HT on/off based on GTS state
+				}
+
+				return Sneak_RemoveMovementFlags(a_this, a_flag);
+            }
+        );
 	}
+
+
 }
 
