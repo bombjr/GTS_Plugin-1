@@ -106,7 +106,7 @@ namespace {
                 bool OnCooldown = IsActionOnCooldown(player, Source);
                 if (!OnCooldown) {
                     if (Runtime::HasPerkTeam(player, perk)) {
-                        float HpThreshold = (GetHugCrushThreshold(player, tiny, false) * 1.5f) + GetMasteryReduction(player);
+                        float HpThreshold = (GetHugCrushThreshold(player, tiny, true) * 0.125f) + GetMasteryReduction(player);
                         float health = GetHealthPercentage(tiny);
                         if (health <= HpThreshold) {
                             AnimationManager::StartAnim(pass_anim, player);
@@ -153,9 +153,19 @@ namespace {
 
     void CleavageEnterEvent(const InputEventData& data) {
         Actor* giant = GetPlayerOrControlled();
-                    Utils_UpdateHighHeelBlend(giant, false);
-                    PassAnimation("Cleavage_EnterState", false);
-                    AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
+        Utils_UpdateHighHeelBlend(giant, false);
+        PassAnimation("Cleavage_EnterState", false);
+        AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
+
+        if (giant->formID == 0x14 && Runtime::HasPerkTeam(giant, "Breasts_Intro") && Grab::GetHeldActor(giant)) {
+            auto Camera = PlayerCamera::GetSingleton();
+            bool Sheathed = Camera->isWeapSheathed;
+            if (!Sheathed) {
+                std::string message = std::format("You need to sheathe weapon/magic first");
+                shake_camera(giant, 0.45f, 0.30f);
+                NotifyWithSound(giant, message);
+            }
+        }
     }
     void CleavageExitEvent(const InputEventData& data) {
         PassAnimation("Cleavage_ExitState", true);

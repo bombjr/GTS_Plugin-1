@@ -32,14 +32,17 @@ namespace {
 	const std::string_view RNode = "NPC R Foot [Rft ]";
 	const std::string_view LNode = "NPC L Foot [Lft ]";
 
-	void PerformKick(std::string_view kick_type, float stamina_drain) {
+	void PerformKick(std::string_view kick_type, float stamina_drain, bool strong) {
 		auto player = PlayerCharacter::GetSingleton();
-			float WasteStamina = stamina_drain * GetWasteMult(player);
-			if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
-				AnimationManager::StartAnim(kick_type, player);
-			} else {
-				NotifyWithSound(player, "You're too tired for a kick");
-			}
+		std::string_view KickType;
+
+		float WasteStamina = stamina_drain * GetWasteMult(player);
+		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
+			AnimationManager::StartAnim(kick_type, player);
+		} else {
+			strong ? KickType = "strong kick" : KickType = "light kick";
+			NotifyWithSound(player, std::format("You're too tired for {}", KickType));
+		}
 	}
 
 	void StartDamageAt(Actor* actor, float power, float crush, float pushpower, bool Right, std::string_view node, DamageSource Source) {
@@ -124,24 +127,24 @@ namespace {
 	//  Animation Triggers
 	// ======================================================================================
 	void LightKickLeftEvent(const InputEventData& data) {
-		PerformKick("SwipeLight_Left", 35.0f);
+		PerformKick("SwipeLight_Left", 35.0f, false);
 	}
 	void LightKickRightEvent(const InputEventData& data) {
-		PerformKick("SwipeLight_Right", 35.0f);
+		PerformKick("SwipeLight_Right", 35.0f, false);
 	}
 
 	void HeavyKickLeftEvent(const InputEventData& data) {
-		PerformKick("SwipeHeavy_Left", 110.0f);
+		PerformKick("SwipeHeavy_Left", 110.0f, true);
 	}
 	void HeavyKickRightEvent(const InputEventData& data) {
-		PerformKick("SwipeHeavy_Right", 110.0f);
+		PerformKick("SwipeHeavy_Right", 110.0f, true);
 	}
 
 	void HeavyKickRightLowEvent(const InputEventData& data) {
-		PerformKick("StrongKick_Low_Right", 110.0f);
+		PerformKick("StrongKick_Low_Right", 110.0f, true);
 	}
 	void HeavyKickLeftLowEvent(const InputEventData& data) {
-		PerformKick("StrongKick_Low_Left", 110.0f);
+		PerformKick("StrongKick_Low_Left", 110.0f, true);
 	}
 }
 

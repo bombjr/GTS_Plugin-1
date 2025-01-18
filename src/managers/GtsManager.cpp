@@ -20,6 +20,7 @@
 #include "utils/DynamicScale.hpp"
 #include "managers/highheel.hpp"
 #include "utils/actorUtils.hpp"
+#include "utils/actorBools.hpp"
 #include "data/persistent.hpp"
 #include "managers/Rumble.hpp"
 #include "scale/modscale.hpp"
@@ -110,30 +111,40 @@ namespace {
 		}
 	}
 
-	void FixActorFade(Actor* actor) {
+	void FixActorFade() {
 		auto profiler = Profilers::Profile("Manager: Fade Fix");
+		// No fix: 
+		// -Followers fade away at ~x1000 scale, may even fade earlier than that
+		// -Proteus Player gets disabled at ~x2200 scale
 
-		static Timer ApplyTimer = Timer(2.00);
+		// With fix:
+		// -Followers render even at x26000 scale
+		// -Proteus Player is also rendered even at x26000 scale
+		// -At this point only draw distance limit of the game hides the characters at such gigantic scales
 
-		if (!ApplyTimer.ShouldRunFrame()) {
-			return;
-		}
-
+		static Timer ApplyTimer = Timer(1.00);
 		bool reset = false;
-		NiAVObject* node = find_node(actor, "skeleton_female.nif");
-		
-		if (get_visual_scale(actor) < 1.5f) {
-			reset = true;
-		}
-		if (node) {
-			if (!reset) {
-				node->GetFlags().set(RE::NiAVObject::Flag::kIgnoreFade);
-				node->GetFlags().set(RE::NiAVObject::Flag::kAlwaysDraw);
-				node->GetFlags().set(RE::NiAVObject::Flag::kHighDetail);
-			} else {
-				node->GetFlags().reset(RE::NiAVObject::Flag::kIgnoreFade);
-				node->GetFlags().reset(RE::NiAVObject::Flag::kAlwaysDraw);
-				node->GetFlags().reset(RE::NiAVObject::Flag::kHighDetail);
+
+		if (ApplyTimer.ShouldRunFrame()) {
+			for (auto actor: find_actors()) {
+				if (actor) {
+					for (auto fp : {true, false}) {
+						auto model = actor->Get3D(fp);
+						if (model) {
+							get_visual_scale(actor) < 1.5f ? reset = true : reset = false; 
+
+							if (!reset || IsGtsBusy(actor) || actor->formID == 0x14) {
+								model->GetFlags().set(RE::NiAVObject::Flag::kIgnoreFade);
+								model->GetFlags().set(RE::NiAVObject::Flag::kAlwaysDraw);
+								model->GetFlags().set(RE::NiAVObject::Flag::kHighDetail);
+							} else {
+								model->GetFlags().reset(RE::NiAVObject::Flag::kIgnoreFade);
+								model->GetFlags().reset(RE::NiAVObject::Flag::kAlwaysDraw);
+								model->GetFlags().reset(RE::NiAVObject::Flag::kHighDetail);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -286,8 +297,10 @@ namespace {
 		if (scale < 1e-5) {
 			return;
 		}
-		float speedmultcalc = GetAnimationSlowdown(actor); // For all other movement types
-		persi_actor_data->anim_speed = speedmultcalc;
+		IsInSexlabAnim(actor, PlayerCharacter::GetSingleton()) ? 
+		persi_actor_data->anim_speed = GetAnimationSlowdown(PlayerCharacter::GetSingleton())  // Copy player speed onto the actor
+		: 
+		persi_actor_data->anim_speed = GetAnimationSlowdown(actor); // else behave as usual
 	}
 
 	void update_actor(Actor* actor) {
@@ -335,6 +348,7 @@ void GtsManager::Update() {
 	UpdateMaxScale(); // Update max scale of each actor in the scene
 	ManageActorControl(); // Sadly have to call it non stop since im unsure how to easily fix it otherwise :(
 	ShiftAudioFrequency();
+	FixActorFade();
 
 	for (auto actor: find_actors()) {
 		if (actor) {
@@ -346,7 +360,6 @@ void GtsManager::Update() {
 				Foot_PerformIdleEffects_Main(actor); // Just idle zones for pushing away/dealing minimal damage
 				TinyCalamity_SeekActors(actor); // Active only on Player
 				SpawnActionIcon(actor); // Icons for interactions with others, Player only
-				FixActorFade(actor);
 				ScareActors(actor);
 
 				if (IsCrawling(actor)) {

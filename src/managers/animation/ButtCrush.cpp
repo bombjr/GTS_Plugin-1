@@ -347,7 +347,7 @@ namespace {
 
 	void ButtCrushAttackEvent(const InputEventData& data) {
 		Actor* player = GetPlayerOrControlled();
-			AnimationManager::StartAnim("ButtCrush_Attack", player);
+		AnimationManager::StartAnim("ButtCrush_Attack", player);
 	}
 }
 

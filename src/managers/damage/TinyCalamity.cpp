@@ -120,7 +120,7 @@ namespace Gts {
                         float gts_hp = GetMaxAV(giant, ActorValue::kHealth);
                         float tiny_hp = GetMaxAV(tiny, ActorValue::kHealth);
 
-                        float difference = std::clamp(gts_hp / tiny_hp, 0.5f, 2.0f);
+                        float difference = std::clamp(gts_hp / tiny_hp, 1.0f, 2.0f);
 
                         threshold *= difference;
 

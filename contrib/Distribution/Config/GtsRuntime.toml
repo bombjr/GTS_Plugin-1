@@ -436,6 +436,7 @@ DwarwenAutomatonFaction = "Skyrim.esm|043598"
 DraugrFaction = "Skyrim.esm|02430D"
 GtsWasDigested = "GTS.esp|4FF13D"
 GtsWasEaten = "GTS.esp|4ff13C"
+SexLabAnimatingFaction = "SexLab.esm|00E50F"
 
 [impacts]
 GtsBloodSprayImpactSet = "GTS.esp|01CEA7"

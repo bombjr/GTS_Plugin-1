@@ -10,6 +10,7 @@ using namespace Gts;
 namespace Gts {    
 	bool IsStaggered(Actor* tiny);
 	bool IsBeingKilledWithMagic(Actor* tiny);
+	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2);
     /*bool BehaviorGraph_DisableHH(Actor* actor);
 	bool IsEquipBusy(Actor* actor);
 	

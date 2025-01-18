@@ -97,21 +97,39 @@ namespace Gts {
 		return false;
 	}
 
+	bool HasFirstPersonBody() {
+		auto camera = RE::PlayerCamera::GetSingleton();
+		if (camera->currentState) {
+			std::uint32_t cameraID = camera->currentState->id;
+			if (cameraID == RE::CameraState::kThirdPerson) {
+				auto thirdPersonState = static_cast<RE::ThirdPersonState*>(camera->cameraStates[cameraID].get());
+				if (thirdPersonState && thirdPersonState->currentZoomOffset <= -0.275f) {
+					return true;
+				}
+			} else if (cameraID == RE::CameraState::kFirstPerson) {
+				auto actor3D = RE::PlayerCharacter::GetSingleton()->Get3D(0);
+				if (actor3D && !actor3D->GetFlags().any(RE::NiAVObject::Flag::kHidden) & 1) {
+					return true;
+				}
+			}
+		}
+
+		// Reports TRUE if we're using IFPV first person mode
+				
+		return false;
+	}
+
 	bool IsFakeFirstPerson() {
-		constexpr float fakeFpMinCurrentZoom = -0.275f;
-		auto fMinCurrentZoom = reinterpret_cast<float*>(REL::RelocationID(509882, 382633).address());
-		if (!fMinCurrentZoom) return false;
-
-		auto playercamera = PlayerCamera::GetSingleton();
-
-		if (!playercamera) {
-			return false;
+		auto camera = PlayerCamera::GetSingleton();
+		if (camera) {
+			auto thirdPersonState = static_cast<RE::ThirdPersonState*>(camera->cameraStates[RE::CameraStates::kThirdPerson].get());
+			if (thirdPersonState) {
+				auto currentZoom = thirdPersonState->currentZoomOffset;
+				if (currentZoom == -0.275f) {
+					return true;
+				}
+			}
 		}
-
-		if (playercamera->currentState == playercamera->cameraStates[CameraState::kThirdPerson] && fakeFpMinCurrentZoom == *fMinCurrentZoom) {
-			return true;
-		}
-
 		return false;
 	}
 

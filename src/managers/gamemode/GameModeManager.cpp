@@ -166,7 +166,7 @@ namespace Gts {
 						float MaxSize = Runtime::GetFloat("CurseOfGrowthMaxSize");                                       // Slider that determines max size cap.
 						float sizelimit = std::clamp(1.0f * (GtsSkillLevel/100.0f * MaxSize), 1.0f, MaxSize);            // Size limit between 1 and [Slider]], based on GTS Skill. Cap is Slider value.
 						int Random = RandomInt(1, 20);                                                                   // Randomize power
-						int GrowthTimer = RandomInt(0, 6);                                                               // Randomize 're-trigger' delay, kinda
+						int GrowthTimer = RandomInt(1, 6);                                                               // Randomize 're-trigger' delay, kinda
 						int StrongGrowthChance = RandomInt(0, 6);                                                        // Self-explanatory
 						int MegaGrowth = RandomInt(0, 20);                                                               // A chance to multiply growth again
 						float GrowthPower = GtsSkillLevel*0.00240f / Random;                                              // Randomized strength of growth

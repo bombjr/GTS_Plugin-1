@@ -27,6 +27,15 @@ namespace Gts {
 		}
 		return shrinking;
 	}
+
+	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2) {
+		if (Runtime::GetFaction("SexLabAnimatingFaction")) {
+			if (Runtime::InFaction(actor_1, "SexLabAnimatingFaction") && Runtime::InFaction(actor_2, "SexLabAnimatingFaction")) {
+				return true;
+			}
+		}
+		return false;
+	}
    /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;
 		actor->GetGraphVariableBool("GTS_DisableHH", disable);

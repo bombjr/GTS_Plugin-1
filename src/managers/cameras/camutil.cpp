@@ -264,24 +264,14 @@ namespace {
 namespace Gts {
 
 	BoneTarget GetBoneTargets(CameraTracking Camera_Anim, CameraTracking_MCM Camera_MCM) {
+		if (HasFirstPersonBody()) {
+			return BoneTarget();
+		}
 		if (Camera_Anim != CameraTracking::None) { // must take priority
 			return GetBoneTarget_Anim(Camera_Anim);
 		} else {
 			return GetBoneTarget_MCM(Camera_MCM);
 		}
-	}
-
-	float HighHeelOffset() {
-		Actor* player = PlayerCharacter::GetSingleton();
-		float hh = 0.0f;
-		if (player) {
-			hh = HighHeelManager::GetBaseHHOffset(player).z;
-			hh *= HighHeelManager::GetHHMultiplier(player);
-			if (IsFootGrinding(player) || IsTrampling(player) || IsStomping(player) || IsVoring(player)) {
-				hh = 0.0f;
-			}
-		}
-		return hh;
 	}
 
 	void SetINIFloat(std::string_view name, float value) {
@@ -653,24 +643,22 @@ namespace Gts {
 							//upside this only needs 1 raycast, downside you need to have a target
 
 							if (auto node = find_node_any(cameraActor, "NPC Pelvis [Pelv]")) {
+								auto rayStart = node->world.translate;
 
-									auto rayStart = node->world.translate;
+								//ReadBoneTargets(cameraActor, rayStart);
 
-									//ReadBoneTargets(cameraActor, rayStart);
+								auto hullMult = min(get_visual_scale(cameraActor), 1.0f);
+								//UpdateNiFrustum(cameraActor, hullMult);
 
-									auto hullMult = min(get_visual_scale(cameraActor), 1.0f);
-									//UpdateNiFrustum(cameraActor, hullMult);
+								//offset Height by camera hull size. Fixes cases where the bone is closer to the ground than the hull size.
+								rayStart.z += max(camhullSize * hullMult, 3.0f);
 
-									//offset Height by camera hull size. Fixes cases where the bone is closer to the ground than the hull size.
-									rayStart.z += max(camhullSize * hullMult, 3.0f);
+								if (IsDebugEnabled()) {
+									DebugAPI::DrawSphere(glm::vec3(rayStart.x, rayStart.y, rayStart.z), 1.0f, 10, { 0.5f, 1.0f, 0.0f, 1.0f }, 10.0f);
+								}
 
-									if (IsDebugEnabled()) {
-										DebugAPI::DrawSphere(glm::vec3(rayStart.x, rayStart.y, rayStart.z), 1.0f, 10, { 0.5f, 1.0f, 0.0f, 1.0f }, 10.0f);
-									}
-
-									//Cast a ray from the bone to the new camera pos in worldspace as the camera. If the ray hits move the camera to the pos of the hit
-									localShifted = ComputeRaycast(rayStart, localShifted, hullMult);
-
+								//Cast a ray from the bone to the new camera pos in worldspace as the camera. If the ray hits move the camera to the pos of the hit
+								localShifted = ComputeRaycast(rayStart, localShifted, hullMult);
 							}
 
 							UpdatePlayerCamera(localShifted);

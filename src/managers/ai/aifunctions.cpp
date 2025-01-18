@@ -8,6 +8,7 @@
 #include "managers/explosion.hpp"
 #include "utils/papyrusUtils.hpp"
 #include "utils/actorUtils.hpp"
+#include "utils/actorBools.hpp"
 #include "utils/findActor.hpp"
 #include "data/persistent.hpp"
 #include "data/transient.hpp"
@@ -310,7 +311,7 @@ namespace Gts {
 		}
 		for (auto tiny: FindSomeActors("AiActors", 2)) {
 			if (tiny != giant && tiny->formID != 0x14 && !IsTeammate(tiny)) {
-				if (tiny->IsDead()) {
+				if (tiny->IsDead() || IsInSexlabAnim(tiny, giant)) {
 					return;
 				}
 				if (IsBeingHeld(giant, tiny)) {
