@@ -405,6 +405,28 @@ namespace {
 		Actor* player = GetPlayerOrControlled();
 		AnimationManager::StartAnim("Breasts_Pull", player);
 	}
+
+	void DelayedBreastDeattach(Actor* tiny) {
+		std::string taskname = std::format("ResetBreastAttachment_{}", tiny->formID);
+		double Start = Time::WorldTimeElapsed();
+		auto tinyref = tiny->CreateRefHandle();
+		
+		TaskManager::RunFor(taskname, 1.0f, [=](auto& progressData){
+			if (!tinyref) {
+				return false;
+			}
+
+			double Finish = Time::WorldTimeElapsed();
+			auto tinyget = tinyref.get().get();
+
+			double timepassed = Finish - Start;
+			if (timepassed > 0.50) {
+				SetBetweenBreasts(tinyget, false);
+				return false;
+			}
+			return true;
+		});
+	}
 }
 
 
@@ -433,9 +455,8 @@ namespace Gts {
             if (tiny && tiny->Is3DLoaded() && (GetAV(tiny, ActorValue::kHealth) <= 1.0f || tiny->IsDead())) {
 
                 ModSizeExperience_Crush(giant, tiny, false);
-
-                CrushManager::Crush(giantess, tiny);
-                
+				CrushManager::Crush(giantess, tiny);
+				DelayedBreastDeattach(tiny);
                 SetBeingHeld(tiny, false);
 
                 Runtime::PlaySoundAtNode("DefaultCrush", giantess, 1.0f, 1.0f, "NPC L Hand [LHnd]");
@@ -452,8 +473,7 @@ namespace Gts {
                 AdjustSizeReserve(giantess, get_visual_scale(tiny)/10);
                 SpawnHurtParticles(giantess, tiny, 3.0f, 1.6f);
                 SpawnHurtParticles(giantess, tiny, 3.0f, 1.6f);
-                
-                SetBetweenBreasts(tiny, false);
+            
                 StartCombat(tiny, giantess);
                 
                 AdvanceQuestProgression(giantess, tiny, stage, 1.0f, false);

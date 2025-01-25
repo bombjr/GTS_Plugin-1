@@ -173,23 +173,22 @@ namespace {
 			Runtime::PlaySoundAtNode("growthSound", receiver, GrowthValue * 2, 1.0f, "NPC Pelvis [Pelv]");
 		}
 		if (ShrinkChance >= 2) {
-			if (SizeDifference >= 2.5f && LaughChance >= 5 && !LaughBlocked) {
-				Task_FacialEmotionTask_Smile(receiver, 1.4f, "HitGrowthSmile");
-				ApplyActionCooldown(receiver, CooldownSource::Emotion_Laugh);
-				PlayLaughSound(receiver, 1.0f, 1);
-				particlescale = 2.2f;
-				shrinkmult = 6.0f;
-			}
-			update_target_scale(attacker, -GrowthValue/(3.0f * Adjustment*BalanceMode) * shrinkmult, SizeEffectType::kShrink); // Shrink Attacker
-			update_target_scale(receiver, GrowthValue/(3.0f * Adjustment*BalanceMode), SizeEffectType::kGrow); // Grow receiver
+			if (get_target_scale(attacker) >= 0.06f/Adjustment) {
+				if (SizeDifference >= 2.5f && LaughChance >= 5 && !LaughBlocked) {
+					Task_FacialEmotionTask_Smile(receiver, 1.4f, "HitGrowthSmile");
+					ApplyActionCooldown(receiver, CooldownSource::Emotion_Laugh);
+					PlayLaughSound(receiver, 1.0f, 1);
+					particlescale = 2.2f;
+					shrinkmult = 6.0f;
+				}
+			
+				update_target_scale(attacker, -GrowthValue/(3.0f * Adjustment*BalanceMode) * shrinkmult, SizeEffectType::kShrink); // Shrink Attacker
+				update_target_scale(receiver, GrowthValue/(3.0f * Adjustment*BalanceMode), SizeEffectType::kGrow); // Grow receiver
 
-			if (!BlockParticle) {
-				SpawnCustomParticle(attacker, ParticleType::Red, NiPoint3(), "NPC Root [Root]", particlescale);
-				ApplyActionCooldown(attacker, CooldownSource::Misc_BeingHit);
-			}
-
-			if (get_target_scale(attacker) <= 0.12f/Adjustment) {
-				set_target_scale(attacker, 0.12f/Adjustment);
+				if (!BlockParticle) {
+					SpawnCustomParticle(attacker, ParticleType::Red, NiPoint3(), "NPC Root [Root]", particlescale);
+					ApplyActionCooldown(attacker, CooldownSource::Misc_BeingHit);
+				}
 			}
 		}
 	}
