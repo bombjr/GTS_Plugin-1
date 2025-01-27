@@ -32,6 +32,29 @@ namespace {
 			NotifyWithSound(tiny, message);
 		}
 	}
+
+	void DelayedGrabTask(Actor* pred, Actor* prey) { // Needed to fix tinies becoming immune to size stuff if animation wasnt started
+		Grab::GetSingleton().GrabActor(pred, prey);
+
+		std::string taskname = std::format("GrabCheck_{}_{}", pred->formID, prey->formID);
+		ActorHandle giantHandle = pred->CreateRefHandle();
+		ActorHandle tinyHandle = pred->CreateRefHandle();
+
+		TaskManager::RunOnce(taskname, [=](auto& update){
+			if (!giantHandle) {
+				return;
+			}
+			if (!tinyHandle) {
+				return;
+			}
+
+			auto giant = giantHandle.get().get();
+			auto tiny = tinyHandle.get().get();
+			if (!IsGtsBusy(giant)) { // Means anim isn't applied so we cancel everything
+				Grab::CancelGrab(giant, tiny);
+			}
+		});
+	}
 }
 
 namespace Gts {
@@ -197,9 +220,7 @@ namespace Gts {
 			ShrinkUntil(pred, prey, 10.2f, shrinkrate, true);
 			return;
 		}
-
-		Grab::GetSingleton().GrabActor(pred, prey);
-		
+		DelayedGrabTask(pred, prey);
 		Utils_UpdateHighHeelBlend(pred, false);
 		AnimationManager::StartAnim("GrabSomeone", pred);
 	}

@@ -647,7 +647,7 @@ namespace Gts {
 
 			ForceRagdoll(tinyref, false); 
 
-			Grab::ReattachTiny(giantref, tinyref);
+			Grab::ReattachTiny(giantref, tinyref); // Teleports tiny to us if we change locations for example
 
 			ShutUp(tinyref);
 			ShutUp(giantref);	
@@ -669,18 +669,7 @@ namespace Gts {
 					// For debugging
 
 					PushActorAway(giantref, tinyref, 1.0f);
-					tinyref->SetGraphVariableBool("GTSBEH_T_InStorage", false);
-					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
-					SetBetweenBreasts(tinyref, false);
-					SetBeingEaten(tinyref, false);
-					SetBeingHeld(tinyref, false);
-					giantref->SetGraphVariableInt("GTS_GrabbedTiny", 0); // Tell behaviors 'we have nothing in our hands'. A must.
-					giantref->SetGraphVariableInt("GTS_Grab_State", 0);
-					giantref->SetGraphVariableInt("GTS_Storing_Tiny", 0);
-					DrainStamina(giant, "GrabAttack", "DestructionBasics", false, 0.75f);
-					Grab::ExitGrabState(giantref);
-					ManageCamera(giantref, false, CameraTracking::Grab_Left); // Disable any camera edits
-					Grab::DetachActorTask(giantref);
+					Grab::CancelGrab(giantref, tinyref);
 					return false;
 				}
 			}
@@ -689,7 +678,7 @@ namespace Gts {
 				if (!AttachToObjectA(gianthandle, tinyhandle)) {
 					// Unable to attach
 					log::info("Can't attach to ObjectA");
-					Grab::DetachActorTask(giantref);
+					Grab::CancelGrab(giantref, tinyref);
 					return false;
 				}
 			} else if (IsBetweenBreasts(tinyref)) {
@@ -711,8 +700,7 @@ namespace Gts {
 						NiPoint3 coords = ObjectL->world.translate;
 
 						if (!AttachTo(giantref, tinyref, coords)) {
-							Anims_FixAnimationDesync(giantref, tinyref, true);
-							Grab::DetachActorTask(giantref);
+							Grab::CancelGrab(giantref, tinyref);
 							return false;
 						}
 					}
@@ -728,7 +716,7 @@ namespace Gts {
 					}
 
 					if (!AttachToObjectB(gianthandle, tinyhandle)) { // Attach to ObjectB non stop
-						Grab::DetachActorTask(giantref);
+						Grab::CancelGrab(giantref, tinyref);
 						return false;
 					}
 					return true;
@@ -739,8 +727,7 @@ namespace Gts {
 				}
 				if (!AttachToCleavage(gianthandle, tinyhandle)) {
 					// Unable to attach
-					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
-					Grab::DetachActorTask(giantref);
+					Grab::CancelGrab(giantref, tinyref);
 					log::info("Can't attach to Cleavage");
 					return false;
 				}
@@ -750,11 +737,8 @@ namespace Gts {
 			} else {
 				if (!AttachToHand(gianthandle, tinyhandle)) {
 					// Unable to attach
-
-					Attachment_SetTargetNode(giantref, AttachToNode::None);
-					Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
+					Grab::CancelGrab(giantref, tinyref);
 					log::info("Can't attach to hand");
-					Grab::DetachActorTask(giantref);
 					return false;
 				}
 			}
@@ -808,6 +792,23 @@ namespace Gts {
 			return actor;
 		} else {
 			return nullptr;
+		}
+	}
+
+	void Grab::CancelGrab(Actor* giantref, Actor* tinyref) {
+		if (giantref && tinyref) {
+			tinyref->SetGraphVariableBool("GTSBEH_T_InStorage", false);
+			Anims_FixAnimationDesync(giantref, tinyref, true); // Reset anim speed override
+			SetBetweenBreasts(tinyref, false);
+			SetBeingEaten(tinyref, false);
+			SetBeingHeld(tinyref, false);
+			giantref->SetGraphVariableInt("GTS_GrabbedTiny", 0); // Tell behaviors 'we have nothing in our hands'. A must.
+			giantref->SetGraphVariableInt("GTS_Grab_State", 0);
+			giantref->SetGraphVariableInt("GTS_Storing_Tiny", 0);
+			DrainStamina(giantref, "GrabAttack", "DestructionBasics", false, 0.75f);
+			Grab::ExitGrabState(giantref);
+			ManageCamera(giantref, false, CameraTracking::Grab_Left); // Disable any camera edits
+			Grab::DetachActorTask(giantref);
 		}
 	}
 

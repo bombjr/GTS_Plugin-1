@@ -43,6 +43,8 @@ namespace Gts {
 			static TESObjectREFR* GetHeldObj(Actor* giant);
 			// Same as `GetHeldObj` but with a conversion to actor if possible
 			static Actor* GetHeldActor(Actor* giant);
+			static void CancelGrab(Actor* giantref, Actor* tinyref);
+			
 			std::unordered_map<Actor*, GrabData> data;
 	};
 

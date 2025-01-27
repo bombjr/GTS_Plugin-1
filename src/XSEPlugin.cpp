@@ -31,7 +31,7 @@ using namespace SKSE::stl;
 namespace {
 
 	void PrintStartupBanner() {
-		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.00 was succesfully initialized. Waiting for New Game/Save Load. ]");
+		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.0.1 was succesfully initialized. Waiting for New Game/Save Load. ]");
 		Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
 		Cprint("[GTSPlugin.dll]: Git Info:");
 		Cprint("\t -- Commit: {}", git_CommitSubject());
