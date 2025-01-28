@@ -237,6 +237,8 @@ SKSEPluginLoad(const LoadInterface * a_skse){
 	InitializeSerialization();
 	InitializeEventSystem();
 
+	logger::info("SKSEPluginLoad OK");
+
 	return true;
 }
 
