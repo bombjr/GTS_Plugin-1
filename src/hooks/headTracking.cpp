@@ -1,5 +1,6 @@
 #include "hooks/headTracking.hpp"
 #include "utils/actorUtils.hpp"
+#include "utils/actorBools.hpp"
 #include "scale/modscale.hpp"
 #include "scale/scale.hpp"
 #include "node.hpp"
@@ -30,7 +31,7 @@ namespace {
 				double timepassed = Finish - Start;
 				if (timepassed > 0.10) {
 					auto giant = giantHandle.get().get();
-					bool Disable = !(IsCrawling(giant) || IsProning(giant));
+					bool Disable = !(IsCrawling(giant) || IsProning(giant) || IsHandStomping_L(actor) || IsHandStomping_H(actor));
 					giant->SetGraphVariableBool("bHeadTrackSpine", Disable);
 					//log::info("Setting {} for {}", Disable, giant->GetDisplayFullName());
 					return false;
@@ -183,7 +184,7 @@ namespace Hooks
                     auto actor = skyrim_cast<Actor*>(graph);
                     if (actor) {
                         //log::info("Holder found: {}", actor->GetDisplayFullName());
-                        bool Disable = !(IsCrawling(actor) || IsProning(actor));
+                        bool Disable = !(IsCrawling(actor) || IsProning(actor) || IsHandStomping_L(actor) || IsHandStomping_H(actor));
                         return SetGraphVariableBool(graph, a_variableName, Disable);
                     }
                 }

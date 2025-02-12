@@ -73,8 +73,8 @@ namespace {
 		"NPC R Hand [RHnd]",
 		"NPC L Breast",
 		"NPC R Breast",
-		"L Breast03",
-		"R Breast03",
+		"L Breast02",
+		"R Breast02",
 	};
 
 	const std::vector<std::string_view> BODY_NODES = {
@@ -135,8 +135,8 @@ namespace {
 
 			auto BreastL = find_node(giantref, "NPC L Breast");
 			auto BreastR = find_node(giantref, "NPC R Breast");
-			auto BreastL03 = find_node(giantref, "L Breast03");
-			auto BreastR03 = find_node(giantref, "R Breast03");
+			auto BreastL02 = find_node(giantref, "L Breast02");
+			auto BreastR02 = find_node(giantref, "R Breast02");
 
 			if (!IsButtCrushing(giantref)) {
 				return false;
@@ -153,11 +153,11 @@ namespace {
 				}
 			}
 
-			if (BreastL03 && BreastR03) {
+			if (BreastL02 && BreastR02) {
 				Rumbling::Once("BreastDot_L", giantref, shake_power, 0.025f, "L Breast03", 0.0f);
 				Rumbling::Once("BreastDot_R", giantref, shake_power, 0.025f, "R Breast03", 0.0f);
-				DoDamageAtPoint(giant, Radius_BreastCrush_BreastDOT, Damage_BreastCrush_BreastDOT * damage, BreastL03, 400, 0.10f, 1.33f, DamageSource::BreastImpact);
-				DoDamageAtPoint(giant, Radius_BreastCrush_BreastDOT, Damage_BreastCrush_BreastDOT * damage, BreastR03, 400, 0.10f, 1.33f, DamageSource::BreastImpact);
+				DoDamageAtPoint(giant, Radius_BreastCrush_BreastDOT, Damage_BreastCrush_BreastDOT * damage, BreastL02, 400, 0.10f, 1.33f, DamageSource::BreastImpact);
+				DoDamageAtPoint(giant, Radius_BreastCrush_BreastDOT, Damage_BreastCrush_BreastDOT * damage, BreastR02, 400, 0.10f, 1.33f, DamageSource::BreastImpact);
 				return true;
 			} else if (BreastL && BreastR) {
 				Rumbling::Once("BreastDot_L", giantref, shake_power, 0.025f, "NPC L Breast", 0.0f);
@@ -168,6 +168,8 @@ namespace {
 			}
 			return false;
 		});
+
+		TaskManager::ChangeUpdate(name, UpdateKind::Havok);
 	}
 
 	void StopDamageOverTime(Actor* giant) {
@@ -233,14 +235,14 @@ namespace {
 
 		auto BreastL = find_node(giant, "NPC L Breast");
 		auto BreastR = find_node(giant, "NPC R Breast");
-		auto BreastL03 = find_node(giant, "L Breast03");
-		auto BreastR03 = find_node(giant, "R Breast03");
+		auto BreastL02 = find_node(giant, "L Breast02");
+		auto BreastR02 = find_node(giant, "R Breast02");
 
 		float shake_power = Rumble_Cleavage_Impact/2 * dust * damage;
 
-		if (BreastL03 && BreastR03) {
-			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastL03, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
-			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastR03, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+		if (BreastL02 && BreastR02) {
+			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastL02, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastR02, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
 			DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Left, "L Breast03");
 			DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Right, "R Breast03");
 			DoFootstepSound(giant, 1.25f, FootEvent::Right, "R Breast03");
@@ -250,8 +252,8 @@ namespace {
 			Rumbling::Once("Breast_R", giant, shake_power * smt, 0.075f, "R Breast03", 0.0f);
 			ModGrowthCount(giant, 0, true); // Reset limit
 		} else if (BreastL && BreastR) {
-			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastL, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
-			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastR, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastL, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+			DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastR, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
 			DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Left, "NPC L Breast");
 			DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Right, "NPC R Breast");
 			DoFootstepSound(giant, 1.25f, FootEvent::Right, "NPC R Breast");
@@ -265,7 +267,7 @@ namespace {
 				Notify("Error: Missing Breast Nodes"); // Will help people to troubleshoot it. Not everyone has 3BB/XPMS32 body.
 				Notify("Error: effects not inflicted");
 				Notify("Suggestion: install Female body replacer");
-			} else if (!BreastR03) {
+			} else if (!BreastR02) {
 				Notify("Error: Missing 3BB Breast Nodes"); // Will help people to troubleshoot it. Not everyone has 3BB/XPMS32 body.
 				Notify("Error: effects not inflicted");
 				Notify("Suggestion: install 3BB/SMP Body");
@@ -329,7 +331,7 @@ namespace {
 		DamageAV(giant, ActorValue::kStamina, WasteStamina);
 		
 		Runtime::PlaySoundAtNode("growthSound", giant, 1.0f, 1.0f, "NPC Pelvis [Pelv]");
-		Task_FacialEmotionTask_Moan(giant, 2.2f, "BoobCrush_Growth");
+		Task_FacialEmotionTask_Moan(giant, 0.675f, "BoobCrush_Growth", 0.20f);
 		
 		StartRumble("CleavageRumble", data.giant, 0.06f, 0.60f);
 	}

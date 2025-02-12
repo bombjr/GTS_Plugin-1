@@ -202,43 +202,42 @@ namespace Gts {
 	}
 
 	inline void AdjustSizeLimit(float value, Actor* caster) {  // A function that adjusts Size Limit (Globals)
-		if (caster->formID != 0x14) {
-			return;
-		}
-		float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
+		if (caster->formID == 0x14) {
+			float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
 
-		auto globalMaxSizeCalc = Runtime::GetFloat("GlobalMaxSizeCalc");
-		if (globalMaxSizeCalc < 10.0f) {
-			Runtime::SetFloat("GlobalMaxSizeCalc", globalMaxSizeCalc + (value * 1.45f * 50 * progressionMultiplier * TimeScale())); // Always apply it
+			auto globalMaxSizeCalc = Runtime::GetFloat("GlobalMaxSizeCalc");
+			if (globalMaxSizeCalc < 10.0f) {
+				Runtime::SetFloat("GlobalMaxSizeCalc", globalMaxSizeCalc + (value * 1.45f * 50 * progressionMultiplier * TimeScale())); // Always apply it
+			}
 		}
 	}
 
 	inline void AdjustMassLimit(float value, Actor* caster) { // Adjust Size Limit for Mass Based Size Mode
-		if (caster->formID != 0x14) {
-			return;
-		}
-		auto selectedFormula = Runtime::GetInt("SelectedSizeFormula");
-		float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
-		if (selectedFormula) {
-			if (selectedFormula >= 1.0f) {
-				SoftPotential mod {
-					.k = 0.070f,
-					.n = 3.0f,
-					.s = 0.54f,
-				};
-				auto globalMassSize = Runtime::GetFloat("GtsMassBasedSize");
-				float modifier = soft_core(globalMassSize, mod);
-				if (modifier <= 0.10f) {
-					modifier = 0.10f;
-				}
-				value *= 10.0f * modifier;
-				//log::info("Modifier: {}", modifier);
-				auto sizeLimit = Runtime::GetFloat("sizeLimit");
-				if (Runtime::HasPerk(caster, "ColossalGrowth")) {
-					sizeLimit = 999999.0f;
-				}
-				if (globalMassSize + 1.0f < sizeLimit) {
-					Runtime::SetFloat("GtsMassBasedSize", globalMassSize + value * progressionMultiplier * TimeScale());
+		if (caster->formID == 0x14) {
+			auto selectedFormula = Runtime::GetInt("SelectedSizeFormula");
+			float progressionMultiplier = Persistent::GetSingleton().progression_multiplier;
+			if (selectedFormula) {
+				if (selectedFormula >= 1.0f) {
+					SoftPotential mod {
+						.k = 0.070f,
+						.n = 3.0f,
+						.s = 0.54f,
+					};
+					auto globalMassSize = Runtime::GetFloat("GtsMassBasedSize");
+					
+					float modifier = soft_core(globalMassSize, mod);
+					if (modifier <= 0.10f) {
+						modifier = 0.10f;
+					}
+					value *= 10.0f * modifier;
+
+					auto sizeLimit = Runtime::GetFloat("sizeLimit");
+					if (Runtime::HasPerk(caster, "ColossalGrowth")) {
+						sizeLimit = 999999.0f;
+					}
+					if (globalMassSize + 1.0f < sizeLimit) {
+						Runtime::SetFloat("GtsMassBasedSize", globalMassSize + value * progressionMultiplier * TimeScale());
+					}
 				}
 			}
 		}

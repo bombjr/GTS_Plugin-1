@@ -140,6 +140,7 @@ namespace Gts {
 			float base_volume_meters = unit_to_meter(base_volume);
 
 			const float rip_initScale = -1.0f;
+			float breast_size_buff = 0.0f;
 
 			result.base_height = base_height_meters;
 			result.base_volume = base_volume_meters;
@@ -230,6 +231,8 @@ namespace Gts {
 		
 			result.rip_lastScale = rip_initScale;
 			result.rip_offset = rip_initScale;
+
+			result.breast_size_buff = breast_size_buff;
 
 			this->_actor_data.try_emplace(key, result);
 		}

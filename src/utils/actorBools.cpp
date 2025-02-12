@@ -9,7 +9,8 @@
 #include "data/runtime.hpp"
 
 
-// Planning to switch to it later and remove these functions from ActorUtils.cpp, delayed because it's hard to see important changes
+// I'm planning to switch to it later and remove these functions from ActorUtils.cpp
+// delayed because it's hard to see important changes since there's like 100+ file changes when switching to it
 
 namespace Gts {
 	bool IsStaggered(Actor* tiny) {
@@ -20,7 +21,19 @@ namespace Gts {
 		return staggered;
 	}
 
-	bool IsBeingKilledWithMagic(Actor* tiny) {
+	bool IsHandStomping_L(Actor* actor) { // Returns true when doing Hand Slam attacks during sneak and crawl states
+		bool stomping = false;
+		actor->GetGraphVariableBool("GTS_IsHandStomping", stomping); // When we do either the right or left LIGHT hand slam(Sneak/crawl Stomp)
+		return stomping;
+	}
+
+	bool IsHandStomping_H(Actor* actor) { // Returns true when doing Hand Slam attacks during sneak and crawl states
+		bool stomping = false;
+		actor->GetGraphVariableBool("GTS_IsHandStomping_Strong", stomping); // Enabled when we do either the right or left HEAVY hand slam(Sneak/crawl Stomp)
+		return stomping;
+	}
+	
+	bool IsBeingKilledWithMagic(Actor* tiny) { // Returns true when performing Wrathful Calamity animation on someone
 		bool shrinking = false;
 		if (tiny) {
 			tiny->GetGraphVariableBool("GTS_Being_Shrunk", shrinking);

@@ -135,12 +135,8 @@ namespace {
 
 							if (!reset || IsGtsBusy(actor) || actor->formID == 0x14) {
 								model->GetFlags().set(RE::NiAVObject::Flag::kIgnoreFade);
-								model->GetFlags().set(RE::NiAVObject::Flag::kAlwaysDraw);
-								model->GetFlags().set(RE::NiAVObject::Flag::kHighDetail);
 							} else {
 								model->GetFlags().reset(RE::NiAVObject::Flag::kIgnoreFade);
-								model->GetFlags().reset(RE::NiAVObject::Flag::kAlwaysDraw);
-								model->GetFlags().reset(RE::NiAVObject::Flag::kHighDetail);
 							}
 						}
 					}

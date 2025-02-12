@@ -14,6 +14,15 @@ using namespace SKSE;
 
 namespace {
 	const float launch_up_radius = 24.0f;
+	const float default_gravity = 1.0f;
+
+	void UpdateGravity(Actor* actor, const float size) {
+		auto Controller = actor->GetCharController();
+		if (Controller) {
+			log::info("Gravity is {}", Controller->gravity);
+			Controller->gravity = default_gravity * size;
+		}
+	}
 
 	void Jump_ApplyExtraJumpEffects(Actor* actor, float size, float Might) {
 		if (!actor->IsInMidair()) {
@@ -111,9 +120,11 @@ namespace Hooks {
 				if (actor) {
 					if (actor->formID == 0x14) {
 						float size = get_giantess_scale(actor);
+						//UpdateGravity(actor, size);
+
 						float might = 1.0f + Potion_GetMightBonus(actor);
 						float modifier = size * might; // Compensate it, since SetScale() already boosts jump height by default
-						float scaled = std::clamp(modifier, 1.0f, 99999.0f); // Can't have smaller jump heigh than x1.0
+						float scaled = std::clamp(modifier, 1.0f, 99999.0f); // Can't have smaller jump height than x1.0
 
 						Jump_ApplyExtraJumpEffects(actor, size, might); // Push items and actors, spawn dust ring and shake the ground
 

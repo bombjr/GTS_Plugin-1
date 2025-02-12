@@ -2970,14 +2970,13 @@ namespace Gts {
 	}
 
 	void AddSMTDuration(Actor* actor, float duration, bool perk_check) {
-		if (!HasSMT(actor)) {
-			return;
-		}
-		if (!perk_check || Runtime::HasPerk(actor, "EternalCalamity")) {
-			auto transient = Transient::GetSingleton().GetData(actor);
-			if (transient) {
-				transient->SMT_Bonus_Duration += duration;
-				//log::info("Adding perk duration");
+		if (HasSMT(actor)) {
+			if (!perk_check || Runtime::HasPerk(actor, "EternalCalamity")) {
+				auto transient = Transient::GetSingleton().GetData(actor);
+				if (transient) {
+					transient->SMT_Bonus_Duration += duration;
+					//log::info("Adding perk duration");
+				}
 			}
 		}
 	}
@@ -2985,7 +2984,11 @@ namespace Gts {
 	void AddSMTPenalty(Actor* actor, float penalty) {
 		auto transient = Transient::GetSingleton().GetData(actor);
 		if (transient) {
-			transient->SMT_Penalty_Duration += penalty;
+			float skill_level = (GetGtsSkillLevel(actor) * 0.01f) - 0.65f;
+			float level_bonus = std::clamp(skill_level, 0.0f, 0.35f) * 2.0f;
+			float reduction = 1.0f - level_bonus; // up to 70% reduction of penalty
+
+			transient->SMT_Penalty_Duration += penalty * reduction;
 		}
 	}
 

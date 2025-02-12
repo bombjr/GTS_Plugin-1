@@ -86,8 +86,8 @@ namespace {
 
 		float shake_power = Rumble_Cleavage_Impact/2.5f * dust * damage;
 
-		DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastL, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
-		DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_Impact * damage, BreastR, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+		DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastL, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
+		DoDamageAtPoint(giant, Radius_BreastCrush_BreastImpact, Damage_BreastCrush_BreastImpact * damage, BreastR, 4, 0.70f, 0.8f, DamageSource::BreastImpact);
 		DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Right, "NPC R Breast");
 		DoDustExplosion(giant, 1.25f * dust + damage/10, FootEvent::Left, "NPC L Breast");
 		Rumbling::Once("Breast_L", giant, shake_power * smt, 0.075f, "NPC L Breast", 0.0f);

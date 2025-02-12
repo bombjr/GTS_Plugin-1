@@ -86,7 +86,7 @@ namespace Gts {
     ////////////////breast
 
     const float Damage_BreastCrush_Body = 18.0f; // for body impact
-	const float Damage_BreastCrush_Impact = 32.0f; // when doing impact
+	const float Damage_BreastCrush_BreastImpact = 32.0f; // when doing breast impact
     const float Damage_BreastCrush_BodyDOT = 0.0006f; // damage under body
     const float Damage_BreastCrush_BreastDOT = 0.001f; // damage under breasts
 
@@ -205,9 +205,9 @@ namespace Gts {
     ////////Breast Crush
 
     const float Radius_BreastCrush_BodyImpact = 10.0f;
-    const float Radius_BreastCrush_BreastImpact = 16.0f;
+    const float Radius_BreastCrush_BreastImpact = 13.2f;
     const float Radius_BreastCrush_BodyDOT = 10.0f; 
-    const float Radius_BreastCrush_BreastDOT = 14.0f; 
+    const float Radius_BreastCrush_BreastDOT = 10.0f; 
 
     ///////Proning
 

@@ -130,6 +130,9 @@ namespace {
 	}
 
 	const BoneTarget GetBoneTarget_MCM(CameraTracking_MCM Camera_MCM) {
+		if (HasFirstPersonBody()) {
+			return BoneTarget();
+		}
 		switch (Camera_MCM) {
 			case CameraTracking_MCM::None: {
 				return BoneTarget();
@@ -208,39 +211,6 @@ namespace {
 			}
 		}
 		return result;
-	}
-
-	void ReadBoneTargets(Actor* giant, NiPoint3& point) {
-		auto player = PlayerCharacter::GetSingleton();
-		auto& sizemanager = SizeManager::GetSingleton();
-
-		int MCM_Mode = Runtime::GetInt("AltCameraTarget");
-		CameraTracking_MCM Camera_MCM = static_cast<CameraTracking_MCM>(MCM_Mode);
-		CameraTracking Camera_Anim = sizemanager.GetTrackedBone(player);
-
-		BoneTarget targets = BoneTarget();
-
-		NiPoint3 FootPos = CameraStateToCoords(giant);
-		
-		if (FootPos.Length() > 0.0f) {
-			point = FootPos;
-			// Just update foot coords
-		} else {
-			if (Camera_Anim != CameraTracking::None) {
-				targets = GetBoneTarget_Anim(Camera_Anim);
-			} else {
-				targets = GetBoneTarget_MCM(Camera_MCM);
-			}
-
-			if (!targets.boneNames.empty()) {
-				for (auto node_name: targets.boneNames) {
-					auto node = find_node_any(giant, node_name);
-					if (node) {
-						point += node->world.translate / targets.boneNames.size();
-					}
-				}
-			}
-		}
 	}
 
 	void UpdateNiFrustum(Actor* cameraActor, float hullMult) {
@@ -644,8 +614,6 @@ namespace Gts {
 
 							if (auto node = find_node_any(cameraActor, "NPC Pelvis [Pelv]")) {
 								auto rayStart = node->world.translate;
-
-								//ReadBoneTargets(cameraActor, rayStart);
 
 								auto hullMult = min(get_visual_scale(cameraActor), 1.0f);
 								//UpdateNiFrustum(cameraActor, hullMult);

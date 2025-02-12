@@ -33,11 +33,12 @@
 #include "data/time.hpp"
 #include "node.hpp"
 
+#include "api/RaceMenuFunctions.hpp"
+
 using namespace std;
 using namespace SKSE;
 using namespace RE;
 using namespace Gts;
-
 
 namespace {
     void Absorb_GrowInSize(Actor* giant, Actor* tiny, float multiplier) {
@@ -429,6 +430,7 @@ namespace {
     }
     void GTS_BS_GrowBoobs(const AnimationEventData& data) {
         Animation_Cleavage::LaunchCooldownFor(&data.giant, CooldownSource::Action_Breasts_Absorb);
+        //RaceMenu::legacy_binding::GrowBreastsOverTime(&data.giant);
     }
 
     ///===================================================================

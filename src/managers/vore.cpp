@@ -73,7 +73,7 @@ namespace Gts {
 				SetBeingHeld(tiny, false);
 				AddSMTDuration(giantref.get().get(), 6.0f);
 				if (tiny->formID != 0x14) {
-					KillActor(giantref.get().get(), tiny);
+					KillActor(giantref.get().get(), tiny, true);
 					PerkHandler::UpdatePerkValues(giantref.get().get(), PerkUpdate::Perk_LifeForceAbsorption);
 				} else if (tiny->formID == 0x14) {
 					InflictSizeDamage(giantref.get().get(), tiny, 900000);

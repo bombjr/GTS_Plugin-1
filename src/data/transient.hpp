@@ -95,6 +95,8 @@ namespace Gts {
 		
 		float rip_lastScale;
 		float rip_offset;
+
+		float breast_size_buff;
 	};
 
 	class Transient : public EventListener {

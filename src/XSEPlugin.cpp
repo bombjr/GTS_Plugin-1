@@ -31,10 +31,10 @@ using namespace SKSE::stl;
 namespace {
 
 	void VersionCheck(const LoadInterface* a_skse) {
-		if (a_skse->RuntimeVersion() < SKSE::RUNTIME_SSE_1_5_97 || REL::Module::IsVR()) {
+		if (a_skse->RuntimeVersion() < SKSE::RUNTIME_SSE_1_5_80 || REL::Module::IsVR()) {
 			MessageBoxA(
 				nullptr,
-				"This mod does not support Skyrim VR or versions of Skyrim older than 1.5.97.",
+				"This mod does not support Skyrim VR or versions of Skyrim older than 1.5.80.",
 				"Giantess Mod - Size Matters (GtsPlugin.dll)",
 				MB_OK | MB_ICONERROR | MB_TOPMOST
 			);
@@ -44,7 +44,7 @@ namespace {
 	}
 
 	void PrintStartupBanner() {
-		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.0.1 was succesfully initialized. Waiting for New Game/Save Load. ]");
+		Cprint("[GTSPlugin.dll]: [ Giantess Mod v2.0.1.1 was succesfully initialized. Waiting for New Game/Save Load. ]");
 		Cprint("[GTSPlugin.dll]: Dll Build Date: {} {}", __DATE__, __TIME__);
 		Cprint("[GTSPlugin.dll]: Git Info:");
 		Cprint("\t -- Commit: {}", git_CommitSubject());
