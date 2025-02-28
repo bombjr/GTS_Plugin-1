@@ -41,6 +41,31 @@ namespace Gts {
 		return shrinking;
 	}
 
+	bool IsGrabAttacking(Actor* actor) {
+		bool Attacking = false;
+		actor->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
+
+		return Attacking;
+	}
+
+	bool IsStrangling(Actor* giant) { // returns true When performing DOT on someone
+        bool strangling = false;
+        giant->GetGraphVariableBool("GTS_Isboobs_doting", strangling);
+        return strangling;
+    }
+
+	bool IsUnderGrinding(Actor* giant) {
+		bool undergrinding = false;
+		giant->GetGraphVariableBool("GTS_IsUnderGrinding", undergrinding);
+		return undergrinding;
+	}
+
+	bool IsUnderTrampling(Actor* giant) {
+		bool undertrampling = false;
+		giant->GetGraphVariableBool("GTS_IsUnderTrampling", undertrampling);
+		return undertrampling;
+	}
+
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2) {
 		if (Runtime::GetFaction("SexLabAnimatingFaction")) {
 			if (Runtime::InFaction(actor_1, "SexLabAnimatingFaction") && Runtime::InFaction(actor_2, "SexLabAnimatingFaction")) {

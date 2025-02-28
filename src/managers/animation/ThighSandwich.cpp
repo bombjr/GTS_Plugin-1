@@ -182,7 +182,7 @@ namespace {
 		sandwichdata.EnableRuneTask(&data.giant, false); // Start Growing the Rune
 	}
 	void GTSSandwich_SitStart(AnimationEventData& data) {
-		DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", true, 0.25f);
+		//DrainStamina(&data.giant, "StaminaDrain_Sandwich_Idle", "KillerThighs", true, 0.25f);
 	}
 	void GTSSandwich_MoveBody_end(AnimationEventData& data) {
 		StopBodyRumble("BodyRumble", data.giant);

@@ -20,7 +20,9 @@
 #include "git.h"
 
 #include "skselog.hpp"
-#include "api/APIManager.hpp"
+#include "API/APIManager.hpp"
+
+#include "API/Racemenu.hpp"
 
 using namespace RE::BSScript;
 using namespace Gts;
@@ -93,7 +95,8 @@ namespace {
 
 				// Called after all kPostLoad message handlers have run.
 				case MessagingInterface::kPostPostLoad: 
-				{ 
+				{ 	
+					GTS::Racemenu::Register();
 					break;
 				}
 

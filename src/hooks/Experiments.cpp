@@ -170,6 +170,40 @@ namespace Hooks {
 	}
 
 	void Hook_Experiments::Hook(Trampoline& trampoline) { // This hook is usually commented out inside hooks.cpp
+		/*static FunctionHook<void(AIProcess *ai, Actor* actor, NiPoint3& direction, float force)>PushAwayHook(
+			REL::RelocationID(38858, 39895),
+			[](AIProcess *ai, Actor* actor, NiPoint3& direction, float force) {
+				log::info("PushAway hooked!");
+				Actor* pusher = ai->GetUserData();
+				if (pusher) {
+					log::info("Pusher True: {}", pusher->GetDisplayFullName());
+					log::info("Actor: {}", actor->GetDisplayFullName());
+				}
+				return PushAwayHook(ai, actor, direction, force);
+            }
+        );
+		*/
+	/*static FunctionHook<void(uintptr_t* param_1, uintptr_t param_2,Actor* actor_1,Actor* actor_2, uintptr_t param_5)>ObjectRef_PushActorAway(
+			// 996340 = 55682 (SE)
+			// 9BF370 = 56213 (AE)
+			// param_3 = Actor*
+			// param_4 = Actor*
+			REL::RelocationID(55682, 56213),
+			[](auto* param_1, auto param_2, auto* actor_1, auto* actor_2, auto param_5) {
+				if (actor_1 && actor_2) {
+					float size_difference = GetSizeDifference(actor_2, actor_1, SizeType::GiantessScale, false, false);
+
+					if (size_difference > 1.75f) {
+						return ObjectRef_PushActorAway(param_1, param_2, nullptr, nullptr, param_5);
+					} else if (size_difference >= 1.25f) {
+						StaggerActor_Directional(actor_1, 0.25f, actor_2);
+						return ObjectRef_PushActorAway(param_1, param_2, nullptr, nullptr, param_5);
+					}
+				}
+
+				return ObjectRef_PushActorAway(param_1, param_2, actor_1, actor_2, param_5);
+            }
+        );
 		/*static FunctionHook<void(Actor* target, float amt)>SetScaleHook(
 			REL::RelocationID(19239, 19665),
 			[](Actor* target, float amt) {

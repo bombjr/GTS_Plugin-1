@@ -129,6 +129,7 @@ namespace Gts
 			static std::size_t GetStage(Actor& actor,  std::string_view group);
 			static std::size_t GetStage(Actor* actor,  std::string_view group);
 
+			static void ResetAnimationSpeedData(Actor* actor);
 			// Check if any currently playing anim disabled the HHs
 			static bool HHDisabled(Actor& actor);
 			static bool HHDisabled(Actor* actor);

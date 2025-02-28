@@ -12,6 +12,10 @@ namespace Gts {
 	bool IsHandStomping_L(Actor* actor);
 	bool IsHandStomping_H(Actor* actor);
 	bool IsBeingKilledWithMagic(Actor* tiny);
+	bool IsGrabAttacking(Actor* actor);
+	bool IsStrangling(Actor* giant);
+	bool IsUnderGrinding(Actor* giant);
+	bool IsUnderTrampling(Actor* giant);
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2);
     /*bool BehaviorGraph_DisableHH(Actor* actor);
 	bool IsEquipBusy(Actor* actor);

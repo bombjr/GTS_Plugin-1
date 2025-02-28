@@ -48,6 +48,7 @@ namespace Gts {
 
 	float Potion_GetSizeMultiplier(Actor* giant);
 
+	void Potion_ModShrinkResistance(Actor* giant, float value);
 	void Potion_SetShrinkResistance(Actor* giant, float value);
 	float Potion_GetShrinkResistance(Actor* giant);
 
@@ -111,6 +112,8 @@ namespace Gts {
 	float GetSizeFromBoundingBox(Actor* tiny);
 	float GetRoomStateScale(Actor* giant);
 	float GetProneAdjustment();
+
+	float GetPerkBonus_OnTheEdge(Actor* giant, float amt);
 
 	void override_actor_scale(Actor* giant, float amt, SizeEffectType type);
 	void update_target_scale(Actor* giant, float amt, SizeEffectType type);

@@ -572,9 +572,6 @@ namespace Gts {
 
 			float stamina = GetAV(giantref, ActorValue::kStamina);
 
-			/*log::info("----{} Is Hugging {}", giantref->GetDisplayFullName(), tinyref->GetDisplayFullName());
-			log::info("Anim Speed: GTS: {}, Tiny: {}", AnimationManager::GetAnimSpeed(giantref), AnimationManager::GetAnimSpeed(tinyref));*/
-
 			Utils_UpdateHugBehaviors(giantref, tinyref); // Record GTS/Tiny Size-Difference value for animation blending
 			Anims_FixAnimationDesync(giantref, tinyref, false); // Share GTS Animation Speed with hugged actor to avoid de-sync
 

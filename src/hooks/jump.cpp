@@ -68,11 +68,9 @@ namespace Hooks {
 			float result = GetFallDistance(a_this);
 			auto actor = GetCharContActor(a_this);
 			if (actor) {
-				if (actor->formID == 0x14) {// Apply to Player only
-					float scale = std::clamp(get_giantess_scale(actor), 1.0f, 99999.0f);
-					if (scale > 1e-4) {
-						result /= scale;
-					}
+				float scale = std::clamp(get_giantess_scale(actor), 1.0f, 99999.0f);
+				if (scale > 1e-4) {
+					result /= scale;
 				}
 			}
 

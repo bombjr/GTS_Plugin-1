@@ -96,6 +96,8 @@ namespace Gts {
 			bool emotion_modifier_busy = false;
 			bool emotion_phenome_busy = false;
 
+			bool ImmuneToBreastOneShot = true;
+
 			float IsNotImmune = 1.0f;
 
 			NiPoint3 POS_Last_Leg_L = NiPoint3(0.0f, 0.0f, 0.0f);
@@ -216,6 +218,8 @@ namespace Gts {
 
 			result.emotion_modifier_busy = emotion_modifier_busy;
 			result.emotion_phenome_busy = emotion_phenome_busy;
+
+			result.ImmuneToBreastOneShot = ImmuneToBreastOneShot;
 
 			result.IsNotImmune = IsNotImmune;
 

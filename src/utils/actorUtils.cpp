@@ -153,20 +153,6 @@ namespace {
 		return true;
 	}
 
-	float GetPerkBonus_OnTheEdge(Actor* giant, float amt) {
-		float bonus = 1.0f;
-		bool perk = Runtime::HasPerkTeam(giant, "OnTheEdge");
-		if (perk) {
-			float GetHP = std::clamp(GetHealthPercentage(giant) + 0.4f, 0.5f, 1.0f); // Bonus Size Gain if Actor has perk
-			if (amt > 0) {
-				bonus /= GetHP;
-			} else if (amt < 0) {
-				bonus *= GetHP;
-			} // When health is < 60%, empower growth by up to 50%. Max value at 10% health.
-		}
-		return bonus;
-	}
-
 	float ShakeStrength(Actor* Source) {
 		float Size = get_visual_scale(Source);
 		float k = 0.065f;
@@ -419,6 +405,13 @@ namespace Gts {
 		return 1.0f;
 	}
 
+	void Potion_ModShrinkResistance(Actor* giant, float value) {
+		auto transient = Transient::GetSingleton().GetData(giant);
+		if (transient) {
+			transient->ShrinkResistance += value;
+		}
+	}
+
 	void Potion_SetShrinkResistance(Actor* giant, float value) {
 		auto transient = Transient::GetSingleton().GetData(giant);
 		if (transient) {
@@ -432,10 +425,7 @@ namespace Gts {
 		if (transient) {
 			Resistance -= transient->ShrinkResistance;
 		}
-		if (Resistance <= 0.25f) {
-			Resistance = 0.25f; // cap it just in case
-		}
-		return Resistance;
+		return std::clamp(Resistance, 0.05f, 1.0f);
 	}
 
 	void Potion_SetUnderGrowth(Actor* actor, bool set) {
@@ -1080,6 +1070,20 @@ namespace Gts {
 			}
 		}
 	}
+
+	float GetPerkBonus_OnTheEdge(Actor* giant, float amt) {
+		// When health is < 60%, empower growth by up to 50%. Max value at 10% health.
+		float bonus = 1.0f;
+		bool perk = Runtime::HasPerkTeam(giant, "OnTheEdge");
+		if (perk) {
+			float hpFactor = std::clamp(GetHealthPercentage(giant) + 0.4f, 0.5f, 1.0f);
+			bonus = (amt > 0.0f) ? (2.0f - hpFactor) : hpFactor;
+			// AMT > 0 = increase size gain ( 1.5 at low hp )
+			// AMT < 0 = decrease size loss ( 0.5 at low hp )
+		}	
+		return bonus;
+	}
+
 	void override_actor_scale(Actor* giant, float amt, SizeEffectType type) { // This function overrides gts manager values. 
 	    // It ignores half-life, allowing more than 1 growth/shrink sources to stack nicely
 		auto Persistent = Persistent::GetSingleton().GetData(giant);
@@ -2932,7 +2936,7 @@ namespace Gts {
 			return;
 		}
 
-		TESGlobal* BonusSize = Runtime::GetGlobal("ExtraPotionSize"); 
+		TESGlobal* BonusSize = Runtime::GetGlobal("ExtraPotionSize");  // Gts_ExtraPotionSize
 
 		ModSizeExperience(player, 0.45f);
 

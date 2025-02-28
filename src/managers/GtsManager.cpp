@@ -175,12 +175,16 @@ namespace {
 		float currentOtherScale = Get_Other_Scale(actor);
 		trans_actor_data->otherScales = currentOtherScale;
 
+		float natural_scale = get_natural_scale(actor, false);
+
 		float target_scale = persi_actor_data->target_scale;
 		
 		// Smooth target_scale towards max_scale if target_scale > max_scale
-		float max_scale = persi_actor_data->max_scale;
+		
+		float max_scale = persi_actor_data->max_scale/natural_scale;
+
 		if (target_scale > max_scale) {
-			float minimum_scale_delta = 0.000005f; // 0.00005f
+			float minimum_scale_delta = 0.000005f;
 			if (fabs(target_scale - max_scale) < minimum_scale_delta) {
 				float target = max_scale;
 				persi_actor_data->target_scale = target;

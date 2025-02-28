@@ -194,7 +194,7 @@ namespace {
 				
 				DrainStamina(giantref, "StaminaDrain_Stomp", "DestructionBasics", false, 1.8f); // cancel stamina drain
 
-				FootGrindCheck(giantref, Radius_Stomp, false, right);
+				FootGrindCheck(giantref, Radius_Stomp, right, FootActionType::Grind_Normal);
 
 				DelayedLaunch(giantref, 0.80f * perk, 2.0f* animSpeed, Event);
 

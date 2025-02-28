@@ -1,5 +1,5 @@
 #pragma once 
-#include "SmoothCamAPI.hpp"
+#include "API/Impl/SmoothCamAPI.hpp"
 
 namespace Gts {
 

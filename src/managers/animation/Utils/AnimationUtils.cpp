@@ -81,17 +81,17 @@ namespace Gts {
 	const std::string_view leftToeLookup = "NPC L Joint 3 [Lft ]";
 	const std::string_view rightToeLookup = "NPC R Joint 3 [Rft ]";
 
-	void BlockFirstPerson(Actor* actor, bool block) { // Credits to ArranzCNL for this function. Forces Third Person because we don't have FP working yet.
-		auto playerControls = RE::PlayerControls::GetSingleton();
-		auto camera = RE::PlayerCamera::GetSingleton();
-		auto controlMap = RE::ControlMap::GetSingleton();
-		if (block) {
-			controlMap->enabledControls.reset(RE::UserEvents::USER_EVENT_FLAG::kPOVSwitch); // Block POV Switching
-			camera->ForceThirdPerson();
-			return;
+	void RestoreBreastAttachmentState(Actor* giant, Actor* tiny) { // Fixes tiny going under our foot if someone suddenly ragdolls us during breast anims such as Absorb
+		if (IsRagdolled(giant) && Attachment_GetTargetNode(giant) != AttachToNode::None) {
+			Attachment_SetTargetNode(giant, AttachToNode::None);
+			giant->SetGraphVariableBool("GTS_OverrideZ", false);
+
+			if (IsHostile(giant, tiny)) {
+				AnimationManager::StartAnim("Breasts_Idle_Unwilling", tiny);
+			} else {
+				AnimationManager::StartAnim("Breasts_Idle_Willing", tiny);
+			}
 		}
-		//playerControls->data.povScriptMode = block;
-		controlMap->enabledControls.set(RE::UserEvents::USER_EVENT_FLAG::kPOVSwitch); // Allow POV Switching
 	}
 
 	void Task_ApplyAbsorbCooldown(Actor* giant) {
@@ -720,6 +720,8 @@ namespace Gts {
 			}
 			return true;
 		});
+
+		TaskManager::ChangeUpdate(name, UpdateKind::Havok);
 	}
 
 	void DoFingerGrind(Actor* giant, Actor* tiny) {
@@ -843,7 +845,7 @@ namespace Gts {
 		}
 	}
 
-	void FootGrindCheck(Actor* actor, float radius, bool strong, bool Right) {  // Check if we hit someone with stomp. Yes = Start foot grind. Left Foot.
+	void FootGrindCheck(Actor* actor, float radius, bool Right, FootActionType Type) {  // Check if we hit someone with Trample/Grind. If we did - start Grind/Trample.
 		if (actor) {
 			float giantScale = get_visual_scale(actor);
 			const float BASE_CHECK_DISTANCE = 180.0f;
@@ -915,20 +917,23 @@ namespace Gts {
 											if (CanDoDamage(giant, tiny, false)) {
 												if (aveForce >= 0.00f && !tiny->IsDead() && GetAV(tiny, ActorValue::kHealth) > 0.0f) {
 													SetBeingGrinded(tiny, true);
-													if (!strong) {
-														DoFootGrind(giant, tiny, Right);
-														if (!Right) {
-															AnimationManager::StartAnim("GrindLeft", giant);
-														} else {
-															AnimationManager::StartAnim("GrindRight", giant);
-														}
-													} else {
-														if (!Right) {
-															AnimationManager::StartAnim("TrampleStartL", giant);
-														} else {
-															AnimationManager::StartAnim("TrampleStartR", giant);
-														}
-														DoFootTrample(giant, tiny, Right);
+													std::string_view action;
+													switch (Type) {
+														case FootActionType::Grind_Normal:
+															Right ? action = "GrindRight" : action =  "GrindLeft";
+															AnimationManager::StartAnim(action, giant);
+															DoFootGrind(giant, tiny, Right);
+														break;
+														case FootActionType::Grind_UnderStomp: // Used for both standing and sneaking
+															Right ? action = "UnderGrindR" : action =  "UnderGrindL";
+															AnimationManager::StartAnim(action, giant);
+															DoFootGrind(giant, tiny, Right);
+														break;
+														case FootActionType::Trample_NormalOrUnder:
+															Right ? action = "TrampleStartR" : action = "TrampleStartL";
+															AnimationManager::StartAnim(action, giant);
+															DoFootTrample(giant, tiny, Right);
+														break;
 													}
 												}
 											}

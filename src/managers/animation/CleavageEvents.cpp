@@ -33,7 +33,8 @@
 #include "data/time.hpp"
 #include "node.hpp"
 
-#include "api/RaceMenuFunctions.hpp"
+#include "API/Impl/SmoothCamAPI.hpp"
+#include "API/Racemenu.hpp"
 
 using namespace std;
 using namespace SKSE;
@@ -41,6 +42,50 @@ using namespace RE;
 using namespace Gts;
 
 namespace {
+    static void GrowBreastsOverTime(Actor* giant) {// Should probably be capped at +50 or +100% of natural breast size
+        // As a fun thing can probably even try to calculate total player weight based on morph values if we will manage to use RaceMenu functions directly
+        // If RaceMenu API won't be found - it won't work. It doesn't on my end at least.
+        std::string taskname = std::format("GrowBreasts_{}", giant->formID);
+        ActorHandle giantHandle = giant->CreateRefHandle();
+
+        bool AllowBreastGrow = true;  // Should be tied to UI settings
+        if (!AllowBreastGrow) {
+            return;
+        }
+
+        auto transient = Transient::GetSingleton().GetActorData(giant);
+        double startTime = Time::WorldTimeElapsed();
+
+        float duration = 3.0f;
+        float total_size_add = 1.0f;
+        float initial_size = 0.0f;
+        if (transient) {
+            initial_size = transient->breast_size_buff;
+        }
+
+        TaskManager::Run(taskname, [=](auto& progressData){
+            if (!giantHandle) {
+                return false;
+            }
+
+            double endTime = Time::WorldTimeElapsed();
+
+            Actor* giant = giantHandle.get().get();
+            float timepassed = endTime - startTime;
+            float breast_buff = (initial_size) + (timepassed * 0.33f) * total_size_add;
+
+            GTS::Racemenu::SetMorph(giant, "Breasts", breast_buff, true);
+
+            if (timepassed >= static_cast<double>(duration)) {
+                if (transient) {
+                    transient->breast_size_buff = breast_buff;
+                }
+                return false;
+            }
+            return true;
+        });
+    }
+
     void Absorb_GrowInSize(Actor* giant, Actor* tiny, float multiplier) {
         if (Runtime::HasPerkTeam(giant, "HugCrush_Greed")) {
 			multiplier *= 1.15f;
@@ -95,7 +140,7 @@ namespace {
                 DamageAV(tiny, ActorValue::kStamina, stamina_damage);
             }
             if (hearts) {
-                SpawnHearts(giant, tiny, 35, 0.5f, false);
+                SpawnHearts(giant, tiny, 35, 0.4f, false);
             }
         }
     }
@@ -265,9 +310,6 @@ namespace {
     ///===================================================================
 
     ///=================================================================== Vore
-
-    void GTS_BS_Smile(const AnimationEventData& data) {
-    }
     void GTS_BS_OpenMouth(const AnimationEventData& data) {
         auto giant = &data.giant;
 		auto tiny = Grab::GetHeldActor(giant);
@@ -348,8 +390,8 @@ namespace {
         float growth = 0.0650f;
 
 		if (tiny) {
-            Rumbling::Once("AbsorbPulse_R", giant, 0.45f, 0.0f, "L Breast02", 0.0f);
-            Rumbling::Once("AbsorbPulse_L", giant, 0.45f, 0.0f, "R Breast02", 0.0f);
+            Rumbling::Once("AbsorbPulse_R", giant, 0.8f, 0.05f, "L Breast02", 0.0f, true);
+            Rumbling::Once("AbsorbPulse_L", giant, 0.8f, 0.05f, "R Breast02", 0.0f, true);
 
             float volume = std::clamp(0.12f * get_visual_scale(giant), 0.12f, 1.0f);
 
@@ -371,13 +413,20 @@ namespace {
 
     void GTS_BS_FinishAbsorb(const AnimationEventData& data) {
         Actor* giant = &data.giant;
-        Task_FacialEmotionTask_Moan(giant, 1.1f, "AbsorbMoan");
+        
         auto tiny = Grab::GetHeldActor(giant);
         float growth = 1.05f;
 
-		if (tiny) {
-            SpawnHearts(giant, tiny, 35, 0.75f, false);
+        if (RandomBool(50.0f)) {
+            Task_FacialEmotionTask_SlightSmile(giant, 1.75f, "AbsorbSmile", 0.05f);
+            PlayLaughSound(giant, 0.8f, 1);
+        } else {
+            Task_FacialEmotionTask_Moan(giant, 1.1f, "AbsorbMoan");
             PlayMoanSound(giant, 0.8f);
+        }
+
+		if (tiny) {
+            SpawnHearts(giant, tiny, 35.0f, 1.15f, false);
             Attacked(tiny, giant);
 
             AdvanceQuestProgression(giant, tiny, QuestStage::HugSteal, 1.0f, false);
@@ -430,7 +479,7 @@ namespace {
     }
     void GTS_BS_GrowBoobs(const AnimationEventData& data) {
         Animation_Cleavage::LaunchCooldownFor(&data.giant, CooldownSource::Action_Breasts_Absorb);
-        //RaceMenu::legacy_binding::GrowBreastsOverTime(&data.giant);
+        GrowBreastsOverTime(&data.giant);
     }
 
     ///===================================================================
@@ -565,7 +614,6 @@ namespace Gts
         AnimationManager::RegisterEvent("GTS_BS_DamageTiny_H", "Cleavage", GTS_BS_DamageTiny_H);
         AnimationManager::RegisterEvent("GTS_BS_Shake", "Cleavage", GTS_BS_Shake);
 
-        AnimationManager::RegisterEvent("GTS_BS_Smile", "Cleavage", GTS_BS_Smile);
         AnimationManager::RegisterEvent("GTS_BS_OpenMouth", "Cleavage", GTS_BS_OpenMouth);
         AnimationManager::RegisterEvent("GTS_BS_CloseMouth", "Cleavage", GTS_BS_CloseMouth);
 

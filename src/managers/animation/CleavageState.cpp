@@ -48,7 +48,6 @@ GTSBEh_T_Boobs_Crush_Heavy
 GTSBEh_T_Boobs_Vore
 GTSBEh_T_Boobs_Absorb 
 
-
 IsInCleavageState(Actor* actor)
 */
 
@@ -195,6 +194,11 @@ namespace {
             AttemptBreastActionOnTiny("Cleavage_Vore_Tiny");
         }
     }
+    void CleavageDOTEvent(const InputEventData& data) {
+        if (PassAnimation("Cleavage_DOT_Start", true)) {
+            //AttemptBreastActionOnTiny("Cleavage_Vore_Tiny");
+        }
+    }
 }
 
 namespace Gts
@@ -226,6 +230,8 @@ namespace Gts
         InputManager::RegisterInputEvent("CleavageSuffocate", CleavageSuffocateEvent, CleavageCondition);
         InputManager::RegisterInputEvent("CleavageAbsorb", CleavageAbsorbEvent, CleavageCondition);
         InputManager::RegisterInputEvent("CleavageVore", CleavageVoreEvent, CleavageCondition);
+
+        InputManager::RegisterInputEvent("CleavageDOT", CleavageDOTEvent, CleavageDOTCondition);
 	}
 
 	void Animation_Cleavage::RegisterTriggers() {

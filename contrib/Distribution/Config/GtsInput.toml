@@ -372,6 +372,16 @@ duration = 0
 # Eat the tiny with mouth
 # WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
 
+[[InputEvent]]
+name = "CleavageDOT"
+keys = ["E"]
+trigger = "once"
+exclusive = false
+duration = 0
+blockinput = "default"
+
+# Start strangling the tiny
+# WORKS ONLY WHEN SOMEONE IS BETWEEN THE BREASTS!
 
 #========================================================
 #============ H U G S
@@ -546,6 +556,7 @@ keys = ["E"]
 exclusive = false
 duration = 0.5 
 trigger = "continuous"
+blockinput = "never"
 
 # Damage actor that is currently held in hand
 # Crushes actor if there's no health left.

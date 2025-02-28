@@ -1,4 +1,4 @@
-#include "SmoothCamAPI.hpp"
+#include "API/Impl/SmoothCamAPI.hpp"
 #include "APIManager.hpp"
 
 using namespace RE;

@@ -1,14 +1,15 @@
 #include "managers/animation/Utils/AnimationUtils.hpp"
 #include "managers/animation/AnimationManager.hpp"
 #include "managers/damage/CollisionDamage.hpp"
+#include "managers/animation/Stomp_Under.hpp"
 #include "managers/animation/FootTrample.hpp"
 #include "managers/damage/LaunchActor.hpp"
 #include "managers/GtsSizeManager.hpp"
+#include "managers/audio/footstep.hpp"
 #include "managers/InputManager.hpp"
 #include "managers/CrushManager.hpp"
 #include "utils/InputConditions.hpp"
 #include "managers/explosion.hpp"
-#include "managers/audio/footstep.hpp"
 #include "managers/highheel.hpp"
 #include "utils/actorUtils.hpp"
 #include "managers/Rumble.hpp"
@@ -76,23 +77,24 @@ namespace {
 			}
 
 			double Finish = Time::WorldTimeElapsed();
-			auto giant = giantHandle.get().get();
+			auto giantref = giantHandle.get().get();
 
 			if (Finish - Start > 0.06) { 
-				DoDamageEffect(giant, Damage_Trample * perk, Radius_Trample, 100, 0.10f, Event, 1.10f, Source);
-				DrainStamina(giant, "StaminaDrain_Trample", "DestructionBasics", true, 0.6f); // start stamina drain
+				DoDamageEffect(giantref, Damage_Trample * perk, Radius_Trample, 100, 0.10f, Event, 1.10f, Source);
+				DrainStamina(giantref, "StaminaDrain_Trample", "DestructionBasics", true, 0.6f); // start stamina drain
 
 				float shake_power = Rumble_Trample_Stage1 * smt * GetHighHeelsBonusDamage(giant, true);
 				
-				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);
+				Rumbling::Once(rumble, giantref, shake_power, 0.0f, Node, 0.0f);
 				
-				DoDustExplosion(giant, dust * smt, Event, Node);
-				DoFootstepSound(giant, 1.0f, Event, Node);
+				DoDustExplosion(giantref, dust * smt, Event, Node);
+				DoFootstepSound(giantref, 1.0f, Event, Node);
 				
-				FootGrindCheck(giant, Radius_Trample, true, right);
-				DelayedLaunch(giant, 0.65f * perk, 1.15f * perk, Event);
+				FootGrindCheck(giantref, Radius_Trample, right, FootActionType::Trample_NormalOrUnder);
+				
+				DelayedLaunch(giantref, 0.65f * perk, 1.15f * perk, Event);
 
-				FootStepManager::PlayVanillaFootstepSounds(giant, right);
+				FootStepManager::PlayVanillaFootstepSounds(giantref, right);
 
 				return false;
 			}
@@ -244,8 +246,11 @@ namespace {
 		auto player = PlayerCharacter::GetSingleton();
 		float WasteStamina = 35.0f * GetWasteMult(player);
 
+		bool UnderTrample = AnimationUnderStomp::ShouldStompUnder(player);
+        const std::string_view TrampleType_L = UnderTrample ? "UnderTrampleL" : "TrampleL";
+
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
-			AnimationManager::StartAnim("TrampleL", player);
+			AnimationManager::StartAnim(TrampleType_L, player);
 		} else {
 			NotifyWithSound(player, "You're too tired to perform trample");
 		}
@@ -254,8 +259,12 @@ namespace {
 	void TrampleRightEvent(const InputEventData& data) {
 		auto player = PlayerCharacter::GetSingleton();
 		float WasteStamina = 35.0f * GetWasteMult(player);
+
+		bool UnderTrample = AnimationUnderStomp::ShouldStompUnder(player);
+		const std::string_view TrampleType_R = UnderTrample ? "UnderTrampleR" : "TrampleR";
+
 		if (GetAV(player, ActorValue::kStamina) > WasteStamina) {
-			AnimationManager::StartAnim("TrampleR", player);
+			AnimationManager::StartAnim(TrampleType_R, player);
 		} else {
 			NotifyWithSound(player, "You're too tired to perform trample");
 		}
@@ -291,7 +300,11 @@ namespace Gts
 		AnimationManager::RegisterTrigger("TrampleL", "Trample", "GTSBeh_Trample_L");
 		AnimationManager::RegisterTrigger("TrampleR", "Trample", "GTSBeh_Trample_R");
 
+		AnimationManager::RegisterTrigger("UnderTrampleL", "Trample", "GTSBeh_UnderTrample_StartL");
+		AnimationManager::RegisterTrigger("UnderTrampleR", "Trample", "GTSBeh_UnderTrample_StartR");
+
 		AnimationManager::RegisterTrigger("TrampleStartL", "Trample", "GTSBEH_Trample_Start_L");
 		AnimationManager::RegisterTrigger("TrampleStartR", "Trample", "GTSBEH_Trample_Start_R");
+
 	}
 }

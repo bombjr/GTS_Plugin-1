@@ -7,6 +7,7 @@
 #include "managers/animation/Stomp_Under_Slam.hpp"
 #include "managers/animation/Stomp_Under_Butt.hpp"
 #include "managers/animation/AnimationManager.hpp"
+#include "managers/animation/CleavageStrangle.hpp"
 #include "managers/animation/Grab_Sneak_Vore.hpp"
 #include "managers/animation/Sneak_KneeCrush.hpp"
 #include "managers/animation/CleavageEvents.hpp"
@@ -40,6 +41,7 @@
 #include "managers/animation/Grab.hpp"
 #include "managers/perks/PerkHandler.hpp"
 #include "utils/InputFunctions.hpp"
+#include "utils/actorBools.hpp"
 #include "data/persistent.hpp"
 #include "scale/scale.hpp"
 #include "data/time.hpp"
@@ -120,6 +122,9 @@ namespace Gts {
 		Animation_Cleavage::RegisterTriggers();
 
 		Animation_CleavageEvents::RegisterEvents();
+
+		Animation_CleavageStrangle::RegisterEvents();
+		Animation_CleavageStrangle::RegisterTriggers();
 
 		Animation_TinyCalamity::RegisterEvents();
 		Animation_TinyCalamity::RegisterTriggers();
@@ -223,7 +228,9 @@ namespace Gts {
 				if (data.canEditAnimSpeed) {
 					data.animSpeed += (bonus*GetAnimationSlowdown(player));
 				}
-				data.animSpeed = std::clamp(data.animSpeed, 0.33f, 3.0f);
+				float min = IsStrangling(player) ? 0.50f : 0.33f;
+				float max = IsStrangling(player) ? 1.75f : 3.0f;
+				data.animSpeed = std::clamp(data.animSpeed, min, max);
 			}
 		} catch (std::out_of_range e) {}
 	}
@@ -291,6 +298,9 @@ namespace Gts {
 				// Better to wait for full support someday
 				return; // Don't start animations in FP, it's not supported.
 			}
+		}
+		if (IsTransitioning(&giant)) {
+			return;
 		}
 		try {
 			auto& me = AnimationManager::GetSingleton();
@@ -383,6 +393,19 @@ namespace Gts {
 			return AnimationManager::GetStage(*actor, group);
 		} else {
 			return 0;
+		}
+	}
+
+	void AnimationManager::ResetAnimationSpeedData(Actor* actor) {
+		try {
+			auto& me = AnimationManager::GetSingleton();
+			auto& actorData = me.data.at(actor);
+			for ( auto &[group, data]: actorData) {
+				data.animSpeed = 1.0f;
+				data.canEditAnimSpeed = false;
+				data.stage = 0;
+			}
+		} catch (std::out_of_range e) {
 		}
 	}
 

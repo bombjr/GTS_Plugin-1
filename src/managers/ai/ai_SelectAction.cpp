@@ -87,7 +87,7 @@ namespace {
 			} else if (rng <= 8) {
 				AI_Kicks(pred, action_rng);
 			} else if (rng <= 9) {
-				AI_Tramples(pred, action_rng);
+				AI_Tramples(pred, prey, action_rng);
 			}
 		}
 	}

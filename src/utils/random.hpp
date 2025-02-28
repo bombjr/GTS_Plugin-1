@@ -59,11 +59,15 @@ namespace Gts {
 	// Random Bool Chance
 	// -------------------
 
-	//Returns a boolean based on the percentage chance of the value being true
-	//ie. RandomPercent(70) -> 70% Chance of returning true
-	[[nodiscard]] inline bool RandomPercent(float a_chance) {
-        std::uniform_real_distribution<> dist(0.f, 100.f);
-        return a_chance - dist(generator) >= -std::numeric_limits<float>::epsilon();
+	/// <summary>
+    /// Use Bernouli distribution to generate a random boolean
+    /// </summary>
+    /// <param name="a_trueChance">0-100 chance for the value to be true, 0 is always false 100 is always true</param>
+    /// <returns>true or false</returns>
+    [[nodiscard]] static inline int RandomBool(const float a_trueChance = 50.0f) {
+        float probability = a_trueChance / 100.0f;
+        std::bernoulli_distribution dist(probability);
+        return dist(generator);
     }
 
 	// -------------------

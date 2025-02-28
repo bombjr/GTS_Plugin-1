@@ -1,10 +1,13 @@
 #pragma once
-#include "utils/actorUtils.hpp"
 #include "managers/animation/Grab.hpp"
 #include "managers/animation/HugShrink.hpp"
 #include "managers/animation/HugHeal.hpp"
-#include "data/runtime.hpp"
+#include "utils/actorBools.hpp"
+#include "utils/actorUtils.hpp"
 #include "data/persistent.hpp"
+#include "data/runtime.hpp"
+
+
 
 /*  Arial:
 	Input Conditions.
@@ -75,6 +78,19 @@ static bool CleavageCondition() {
 		if (Runtime::HasPerkTeam(target, "Breasts_Intro")) {
 			Actor* tiny = Grab::GetHeldActor(target);
 			if (tiny && IsBetweenBreasts(tiny)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+static bool CleavageDOTCondition() {
+	Actor* target = GetPlayerOrControlled();
+	if (target) {
+		if (Runtime::HasPerkTeam(target, "Breasts_Strangle")) {
+			Actor* tiny = Grab::GetHeldActor(target);
+			if (IsInCleavageState(target) && tiny && IsBetweenBreasts(tiny)) {
 				return true;
 			}
 		}
@@ -302,14 +318,18 @@ static bool GrabCondition_Start() {
 }
 
 static bool GrabCondition_Attack() {
-	auto target = GetPlayerOrControlled();
+	/*auto target = GetPlayerOrControlled();
 
-	if (IsGtsBusy(target) && !IsUsingThighAnimations(target)) {
-		return false;
-	}
-	if (IsStomping(target) && IsTransitioning(target)) {
-		return false;
-	}
+	auto grabbedActor = Grab::GetHeldActor(target);
+	if (grabbedActor) {
+		bool CanAttack = !IsTransitioning(target) && !IsUsingThighAnimations(target) && !IsStomping(target);
+		if (CanAttack) {
+			if (!IsGrabAttacking(target) || IsGrabAttacking(target)) {
+				return true; // Disallow to interract with objects
+			}
+		}
+	}*/
+
 	return true;
 }
 

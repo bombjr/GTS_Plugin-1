@@ -29,6 +29,7 @@ namespace Gts {
 
     const float Damage_Grab_Attack = 4.8f;
     const float Damage_Breast_Squish = 2.2f;
+    const float Damage_Breast_Strangle = 0.00980f;
     ////////////////Defaults
 
     const float Damage_Default_Underfoot = 0.003f; // when we just stand still

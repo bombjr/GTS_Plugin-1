@@ -146,15 +146,20 @@ namespace Gts {
         }
     }
 
-    void AI_Tramples(Actor* pred, int rng) {
+    void AI_Tramples(Actor* pred, Actor* prey, int rng) {
         if (!Persistent::GetSingleton().Stomp_Ai) {
             return;
         }
         Utils_UpdateHighHeelBlend(pred, false);
+
+        bool UnderTrample = AnimationUnderStomp::ShouldStompUnder_NPC(pred, GetDistanceBetween(pred, prey));
+		const std::string_view TrampleType_R = UnderTrample ? "UnderTrampleR" : "TrampleR";
+        const std::string_view TrampleType_L = UnderTrample ? "UnderTrampleL" : "TrampleL";
+
         if (rng <= 5) {
-            AnimationManager::StartAnim("TrampleL", pred);
+            AnimationManager::StartAnim(TrampleType_R, pred);
         } else {
-            AnimationManager::StartAnim("TrampleR", pred);
+            AnimationManager::StartAnim(TrampleType_L, pred);
         }
     }
 

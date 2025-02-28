@@ -5,6 +5,7 @@
 #include "managers/hitmanager.hpp"
 #include "managers/Attributes.hpp"
 #include "utils/actorUtils.hpp"
+#include "utils/actorBools.hpp"
 #include "data/persistent.hpp"
 #include "data/runtime.hpp"
 #include "scale/scale.hpp"
@@ -24,12 +25,6 @@ namespace {
 		return GTSBusy;
 	}
 
-	bool IsGrabAttacking(Actor* actor) {
-		bool Attacking = false;
-		actor->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
-
-		return Attacking;
-	}
 	bool AllowToPerformSneak(RE::IDEvent* id) {
 		bool allow = true;
 		if (id) {
