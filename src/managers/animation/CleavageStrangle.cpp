@@ -52,6 +52,7 @@ namespace {
 			if (!tinyhandle) {
 				return false;
 			}
+
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
 
@@ -59,7 +60,7 @@ namespace {
 				return false; // end task in that case
 			}
             
-            if (!IsStrangling(giantref) && !IsGtsBusy(giantref)) {
+            if (!IsStrangling(giantref)) {
                 return false;
             }
             if (!IsGtsBusy(tinyref)) { // If for some reason Tiny isn't in expected anim

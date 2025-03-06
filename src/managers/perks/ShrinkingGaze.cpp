@@ -140,13 +140,14 @@ namespace {
 												Laugh_Chance(giant, 1.25f, "CalamityShrink");
 												if (!ShrinkToNothing(giant, otherActor, true, 1.50f)) {
 													ShrinkTheTargetOr(giant, otherActor, stare_threshold_s, tiny_size, difference, data);
-													AdjustMassLimit(tiny_size * 0.0075f, giant);
+													AdjustMassLimit(tiny_size * 0.00025f, giant);
 												} else {
 													if (!IsActionOnCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze)) {
 														SpawnParticle(otherActor, 6.00f, "GTS/Effects/TinyCalamity.nif", NiMatrix3(), otherActor->GetPosition(), tiny_size * 4.5f, 7, nullptr); 
 														Runtime::PlaySoundAtNode("Magic_ProtectTinies", otherActor, 0.5f, 0.5f, "NPC Root [Root]");
 														ApplyActionCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze);
 													}
+													AdjustMassLimit(0.0075f, giant);
 													data->MovementSlowdown = 1.0f;
 													MoanOr(giant);
 												}

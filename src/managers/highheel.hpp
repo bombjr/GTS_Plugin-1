@@ -8,9 +8,10 @@ using namespace RE;
 
 namespace Gts {
 	struct HHData {
-		Spring multiplier = Spring(1.0f, 0.5f); // Used to smotthly disable/enable the highheels
+		Spring multiplier = Spring(1.0f, 0.5f); // Used to smoothly disable/enable model .z offset of heels
 		bool wasWearingHh = false;
 		NiPoint3 lastBaseHHOffset;
+		float InitialHeelHeight; // initial heel height, used in calculating damage bonus
 	};
 
 	class HighHeelManager : public EventListener {
@@ -27,7 +28,8 @@ namespace Gts {
 			static void UpdateHHOffset(Actor* actor);
 			static NiPoint3 GetBaseHHOffset(Actor* actor); // Unscaled HH as read from the shoe data
 			static NiPoint3 GetHHOffset(Actor* actor); // Scaled HH
-			static float GetHHMultiplier(Actor* actor); // get current multiplier of HH
+			static float GetInitialHeelHeight(Actor* actor); // Get base heel height value, used for calculating damage bonus
+			static float GetHHMultiplier(Actor* actor); // get current 'height' multiplier of HH for dll to smoothly enable/disable hh visual .z offset
 
 			void ApplyHH(Actor* actor, bool force);
 

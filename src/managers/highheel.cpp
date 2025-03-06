@@ -97,7 +97,7 @@ namespace Gts {
 				} else if (!IsGtsBusy(actor)) {
 					speedup = 3.0f;
 				}
-				// Should disable HH?
+				// Should HH be disabled?
 				bool disableHH = DisableHighHeels(actor);
 
 				if (disableHH) {
@@ -107,12 +107,12 @@ namespace Gts {
 					hhData.multiplier.target = 1.0f;
 					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 				}
-
-				NiPoint3 new_hh;
+				
 				if (!Persistent::GetSingleton().highheel_correction) {
 					return;
 				}
 				this->UpdateHHOffset(actor);
+				NiPoint3 new_hh;
 
 				// With model scale do it in unscaled coords
 				new_hh = this->GetBaseHHOffset(actor) * hhData.multiplier.value;
@@ -151,7 +151,7 @@ namespace Gts {
 	}
 
 
-	void HighHeelManager::UpdateHHOffset(Actor* actor) {
+	void HighHeelManager::UpdateHHOffset(Actor* actor) { // This seems to be the most expensive HH function so far, not sure how to optimize it properly
 		auto profiler = Profilers::Profile("HH: UpdateHHOffset");
 		auto models = GetModelsForSlot(actor, BGSBipedObjectForm::BipedObjectSlot::kFeet);
 		NiPoint3 result = NiPoint3();
@@ -214,16 +214,16 @@ namespace Gts {
 				});
 			}
 		}
-		//log::info("Base HHOffset: {}", Vector2Str(result));
 		auto npcNodeScale = get_npcparentnode_scale(actor);
 
 		auto& me = HighHeelManager::GetSingleton();
 		me.data.try_emplace(actor);
 		auto& hhData = me.data[actor];
-		hhData.lastBaseHHOffset = result * npcNodeScale;
+		hhData.lastBaseHHOffset = result * npcNodeScale; // Record hh height that is affected by natural scale for .z offset of model
+		hhData.InitialHeelHeight = result.z; // Record initial hh height for hh damage boost
 	}
 
-	NiPoint3 HighHeelManager::GetBaseHHOffset(Actor* actor) {
+	NiPoint3 HighHeelManager::GetBaseHHOffset(Actor* actor) { // Unscaled base .z offset of HH, takes Natural Scale into account
 		auto profiler = Profilers::Profile("HH: GetBaseHHOffset");
 		auto& me = HighHeelManager::GetSingleton();
 		me.data.try_emplace(actor);
@@ -231,10 +231,18 @@ namespace Gts {
 		return hhData.lastBaseHHOffset;
 	}
 
-	NiPoint3 HighHeelManager::GetHHOffset(Actor* actor) {
+	NiPoint3 HighHeelManager::GetHHOffset(Actor* actor) { // Scaled .z offset of HH
 		auto profiler = Profilers::Profile("HH: GetHHOffset");
-		auto Scale = get_visual_scale(actor); // used to read Root [Root] only for some reason
+		auto Scale = get_visual_scale(actor);
 		return HighHeelManager::GetBaseHHOffset(actor) * Scale;
+	}
+
+	float HighHeelManager::GetInitialHeelHeight(Actor* actor) { // Get raw heel height, used in damage bonus for HH perk
+		auto profiler = Profilers::Profile("HH: GetInitHeight");
+		auto& me = HighHeelManager::GetSingleton();
+		me.data.try_emplace(actor);
+		auto& hhData = me.data[actor];
+		return hhData.InitialHeelHeight * 0.01f;
 	}
 
 	float HighHeelManager::GetHHMultiplier(Actor* actor) {

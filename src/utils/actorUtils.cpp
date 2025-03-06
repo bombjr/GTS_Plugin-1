@@ -1446,7 +1446,7 @@ namespace Gts {
 
 		if (actor) {
 			if (Runtime::HasPerkTeam(actor, "hhBonus")) {
-				hh = HighHeelManager::GetBaseHHOffset(actor).Length()/100;
+				hh = HighHeelManager::GetInitialHeelHeight(actor);
 			}
 		} if (multiply) {
 			value = 1.0f + (hh * 5.0f * adjust);
