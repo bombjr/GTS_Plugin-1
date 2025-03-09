@@ -536,6 +536,8 @@ contrib/Distribution/esps/*
 contrib/Distribution/**/*.dll
 contrib/Distribution/**/*.pdb
 
+contrib/Distribution/Plugin*/*
+
 vcpkg
 
 .clangd

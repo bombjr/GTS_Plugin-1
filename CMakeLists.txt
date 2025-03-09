@@ -60,7 +60,8 @@ source_group(
 ########################################################################################################################
 ## Configure target DLL
 ########################################################################################################################
-find_package(imgui CONFIG REQUIRED)
+
+find_package(Boost REQUIRED)
 find_package(CommonLibSSE CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(toml11 CONFIG REQUIRED)
@@ -69,11 +70,20 @@ find_path(GLUINO_INCLUDE_DIRS "gluino/gluino.h")
 find_path(CLIBUTIL_INCLUDE_DIRS "CLibUtil/string.hpp")
 
 include(FetchContent)
+
 FetchContent_Declare(cmake_git_version_tracking                   
   GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
   GIT_TAG 6c0cb87edd029ddfb403a8e24577c144a03605a6
 )
 FetchContent_MakeAvailable(cmake_git_version_tracking)
+
+FetchContent_Declare(
+  boost_ext_reflect
+  GIT_REPOSITORY https://github.com/qlibs/reflect
+  GIT_SHALLOW ON  # Download the branch without its history
+  GIT_TAG        v1.2.4
+)
+FetchContent_MakeAvailable(boost_ext_reflect)
 
 add_commonlibsse_plugin(${PROJECT_NAME} DECLARATIVE SOURCES ${headers} ${sources})
 add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS "${PROJECT_NAME}")
@@ -86,13 +96,14 @@ target_include_directories(${PROJECT_NAME}
 	${GLM_INCLUDE_DIRS}
 	${GLUINO_INCLUDE_DIRS}
 	${CLIBUTIL_INCLUDE_DIRS}
+	${boost_ext_reflect_SOURCE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE
+	Boost::headers
 	toml11::toml11
 	nlohmann_json::nlohmann_json
-	imgui::imgui
 	cmake_git_version_tracking
 )
 
@@ -105,42 +116,81 @@ target_precompile_headers(${PROJECT_NAME}
 # # Automatic deployment
 # #######################################################################################################################
 
-# Automatic deployment to FOMOD directory.
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(BUILD_NAME "Debug")
+# Use the new cache variable if it is defined.
+if(DEFINED GTS_BUILDPRESET)
+  set(BUILD_NAME "${GTS_BUILDPRESET}")
 else()
-    set(BUILD_NAME "Release")
+  # Extract the last component of the binary directory (assumed to be like "build-debug", "build-release", etc.)
+  get_filename_component(BUILD_FOLDER "${CMAKE_BINARY_DIR}" NAME)
+
+  # Use a regex to extract the suffix after the hyphen.
+  # For example, if BUILD_FOLDER is "build-debug", then BUILD_NAME becomes "Debug"
+  string(REGEX MATCH "[-]([A-Za-z0-9_]+)$" _match "${BUILD_FOLDER}")
+  if(_match)
+    # Remove the hyphen to get a clean build name (e.g. "Debug")
+    string(REGEX REPLACE "[-]" "" BUILD_NAME "${_match}")
+  else()
+    # Fallback in case the regex doesn't match.
+    set(BUILD_NAME "${CMAKE_BUILD_TYPE}")
+  endif()
 endif()
 
-install(DIRECTORY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Papyrus${BUILD_NAME}/")
+message(STATUS "Automatic deployment build name: ${BUILD_NAME}")
 
+# Create the target deployment folder.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin${BUILD_NAME}/")
-		
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin-${BUILD_NAME}/")
+
+# Copy the main DLL.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin${BUILD_NAME}/")
-		
-if(${CMAKE_BUILD_TYPE} STREQUAL Debug OR ${CMAKE_BUILD_TYPE} STREQUAL RelWithDebInfo OR ${CMAKE_BUILD_TYPE} STREQUAL Release)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin${BUILD_NAME}/")
+  COMMAND ${CMAKE_COMMAND} -E copy
+          $<TARGET_FILE:${PROJECT_NAME}>
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin-${BUILD_NAME}/")
+
+# Copy the PDB if available for Debug or RelWithDebInfo configurations.
+if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_PDB_FILE:${PROJECT_NAME}>
+            "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin-${BUILD_NAME}/")
 endif()
+
+# Copy the Fonts folder into a new "GTSPlugin" subfolder in the deployment folder.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Fonts"
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin-${BUILD_NAME}/GTSPlugin/Fonts")
+
+# Copy the contents from the config folder.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Config"
+          "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/Plugin-${BUILD_NAME}/GTSPlugin")
 
 file(GLOB_RECURSE OUTPUT_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/**/*.dll")
 file(GLOB_RECURSE OUTPUT_PDBS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Distribution/**/*.pdb")
 
 set_property(TARGET ${PROJECT_NAME}
-        APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_DLLS}")
+  APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_DLLS}")
 set_property(TARGET ${PROJECT_NAME}
-        APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_PDBS}")
+  APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_PDBS}")
 
-#Also Copy the PDB and dll to the directory defined by this var
-#so i don't have to remember to ctrl c ctrl v all the time
-if (DEFINED ENV{GTSPLUGIN_COPY_DIR})
-	if(${CMAKE_BUILD_TYPE} STREQUAL Debug OR ${CMAKE_BUILD_TYPE} STREQUAL RelWithDebInfo OR ${CMAKE_BUILD_TYPE} STREQUAL Release)
+# Also copy the PDB and DLL to the directory defined by the GTSPLUGIN_COPY_DIR environment variable,
+# if it is defined.
+if(DEFINED ENV{GTSPLUGIN_COPY_DIR})
+  if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo|Release")
+	if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> "$ENV{GTSPLUGIN_COPY_DIR}/")
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "$ENV{GTSPLUGIN_COPY_DIR}/")
+		  COMMAND ${CMAKE_COMMAND} -E copy
+				  $<TARGET_PDB_FILE:${PROJECT_NAME}>
+				  "$ENV{GTSPLUGIN_COPY_DIR}/")
 	endif()
-endif()
 
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy
+              $<TARGET_FILE:${PROJECT_NAME}>
+              "$ENV{GTSPLUGIN_COPY_DIR}/")
+
+  endif()
+endif()

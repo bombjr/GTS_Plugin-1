@@ -21,25 +21,25 @@ jobs:
     name: build
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
+
       - name: Setup CMake
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: "~3.26.2"
-          ninjaVersion: "~1.12.0"
+          cmakeVersion: "~3.31.5"
+          ninjaVersion: "~1.12.1"
 
       - name: Set Env
         uses: TheMrMilchmann/setup-msvc-dev@v3.0.1
         with:
             arch: x64
             toolset: 14.43
-
 
       - name: Compile
         run: |
@@ -49,40 +49,49 @@ jobs:
       - name: Copy Plugin
         shell: bash
         run: |
-          mkdir contrib/Distribution/Plugin || exit 1
+          # Create the unified destination folder for plugin files.
+          mkdir -p contrib/Distribution/Plugin || exit 1
           shopt -s nullglob
+
+            # Find any folder starting with "Plugin-" in contrib/Distribution.
           root_folder=""
-          if [ -d contrib/Distribution/PluginRelease ]; then
-            root_folder=contrib/Distribution/PluginRelease
-          elif [ -d contrib/Distribution/PluginDebug ]; then
-            root_folder=contrib/Distribution/PluginDebug
-          fi
-          if [ -n "${root_folder}" ]; then
-            cp "${root_folder}"/*.dll contrib/Distribution/Plugin/
-            cp "${root_folder}"/*.pdb contrib/Distribution/Plugin/
-            ls -la "${root_folder}"/
-            ls -la "${root_folder}"/*.pdb
-            pdbs=( "${root_folder}"/*.pdb )
-            if [ "${#pdbs[@]}" -gt 0 ]; then
-              cp "${pdbs[@]}" contrib/
+          for folder in contrib/Distribution/Plugin-*; do
+            if [ -d "$folder" ]; then
+              root_folder="$folder"
+              break
             fi
+          done
+
+          if [ -n "$root_folder" ]; then
+            echo "Found build preset folder: $root_folder"
+            # Copy all DLL and PDB files from the found folder into the unified Plugin folder.
+            cp "$root_folder"/*.dll contrib/Distribution/Plugin/ 2>/dev/null
+            cp "$root_folder"/*.pdb contrib/Distribution/Plugin/ 2>/dev/null
+
+            # List the folder contents for debugging purposes.
+            ls -la "$root_folder"/
+            ls -la "$root_folder"/*.pdb 2>/dev/null
+          else
+            echo "No Plugin-* folder found."
+            exit 1
           fi
-          if [ -d contrib/Distribution/PluginRelease ]; then
-            rm -rf "contrib/Distribution/PluginRelease"
-          elif [ -d contrib/Distribution/PluginDebug ]; then
-            rm -rf "contrib/Distribution/PluginDebug"
-          fi
+
+          # Remove the source build preset folder after copying.
+          rm -rf "$root_folder"
           shopt -u nullglob
+
       - uses: actions/upload-artifact@v4
         name: Upload package
         with:
           name: GTSPlugin
           path: "contrib/Distribution/*"
+
       - uses: actions/upload-artifact@v4
         name: Upload debug info
         with:
           name: GTSPluginDebugInfo
-          path: "contrib/*.pdb"
+          path: "contrib/Distribution/Plugin/*.pdb"
+
       - uses: actions/upload-artifact@v4
         name: Update compile_commands.json
         with:
