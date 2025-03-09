@@ -518,7 +518,7 @@ struct SettingsUI {
 
         .bLock = true,
         .bVisible = true,
-    	.f2Offset = {860.0f, 28.5f},
+    	.f2Offset = {870.0f, 28.5f},
     	.sAnchor = "kBottomLeft",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,
@@ -535,7 +535,7 @@ struct SettingsUI {
 
 	    .bLock = true,
 	    .bVisible = true,
-	    .f2Offset = {875.0f, 60.0f},
+	    .f2Offset = {885.0f, 60.0f},
 	    .sAnchor = "kBottomLeft",
 	    .fAlpha = 1.0f,
 	    .fBGAlphaMult = 0.0f,

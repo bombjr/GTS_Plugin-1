@@ -73,7 +73,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("sond", tag)) {
-				PrintMessageBox("Sound: {} not found", tag);
+				//PrintMessageBox("Sound: {} not found", tag);
 				log::warn("Sound: {} not found", tag);
 			}
 		}
@@ -219,7 +219,7 @@ namespace GTS {
 		}
 		catch (const std::out_of_range& oor) {
 			if (!Runtime::Logged("mgef", tag)) {
-				PrintMessageBox("MagicEffect: {} not found", tag);
+				//PrintMessageBox("MagicEffect: {} not found", tag);
 				log::warn("MagicEffect: {} not found", tag);
 			}
 			data = nullptr;
@@ -252,7 +252,7 @@ namespace GTS {
 		}
 		catch (const std::out_of_range& oor) {
 			if (!Runtime::Logged("spel", tag)) {
-				PrintMessageBox("Spell: {} not found", tag);
+				//PrintMessageBox("Spell: {} not found", tag);
 				log::warn("Spell: {} not found", tag);
 			}
 			data = nullptr;
@@ -307,7 +307,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("perk", tag)) {
-				PrintMessageBox("Perk: {} not found", tag);
+				//PrintMessageBox("Perk: {} not found", tag);
 				log::warn("Perk: {} not found", tag);
 			}
 		}
@@ -354,7 +354,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("expl", tag)) {
-				PrintMessageBox("Explosion: {} not found", tag);
+				//("Explosion: {} not found", tag);
 				log::warn("Explosion: {} not found", tag);
 			}
 		}
@@ -412,7 +412,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("glob", tag)) {
-				PrintMessageBox("Global: {} not found", tag);
+				//PrintMessageBox("Global: {} not found", tag);
 				log::warn("Global: {} not found", tag);
 			}
 		}
@@ -496,7 +496,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("qust", tag)) {
-				PrintMessageBox("Quest: {} not found", tag);
+				//PrintMessageBox("Quest: {} not found", tag);
 				log::warn("Quest: {} not found", tag);
 			}
 		}
@@ -524,7 +524,7 @@ namespace GTS {
 			data = Runtime::GetSingleton().factions.at(std::string(tag)).data;
 		}
 		catch (const std::out_of_range& oor) {
-			PrintMessageBox("Quest: {} not found", tag);
+			//PrintMessageBox("Quest: {} not found", tag);
 			data = nullptr;
 		}
 		return data;
@@ -554,7 +554,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("impc", tag)) {
-				PrintMessageBox("ImpactEffect: {} not found", tag);
+				//PrintMessageBox("ImpactEffect: {} not found", tag);
 				log::warn("ImpactEffect: {} not found", tag);
 			}
 		}
@@ -577,7 +577,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("impc", tag)) {
-				PrintMessageBox("Race: {} not found", tag);
+				//PrintMessageBox("Race: {} not found", tag);
 				log::warn("Race: {} not found", tag);
 			}
 		}
@@ -626,7 +626,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("cont", tag)) {
-				PrintMessageBox("Item: {} not found", tag);
+				//PrintMessageBox("Item: {} not found", tag);
 				log::warn("Item: {} not found", tag);
 			}
 		}
@@ -642,7 +642,7 @@ namespace GTS {
 		catch (const std::out_of_range& oor) {
 			data = nullptr;
 			if (!Runtime::Logged("cont", tag)) {
-				PrintMessageBox("Container: {} not found", tag);
+				//PrintMessageBox("Container: {} not found", tag);
 				log::warn("Container: {} not found", tag);
 			}
 		}
