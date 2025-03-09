@@ -1,20 +1,15 @@
 #pragma once
-#include "events.hpp"
+
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "data/world.hpp"
 
-using namespace Gts;
-
-namespace Util {
+namespace DebugUtil {
 
 	inline glm::vec3 CompMult(const glm::vec3& a, const glm::vec3& b) {
 		return glm::vec3(a[0]*b[0], a[1]*b[1], a[2]*b[2]);
 	}
+
 	inline glm::vec3 HkVecToGlmVec(const RE::hkVector4 &vec) {
 		return glm::vec3(vec.quad.m128_f32[0], vec.quad.m128_f32[1], vec.quad.m128_f32[2]);
 	}
@@ -22,6 +17,7 @@ namespace Util {
 	inline glm::vec3 HkToGlm(const RE::hkVector4 &vec) {
 		return HkVecToGlmVec(vec)  * World::WorldScaleInverse();
 	}
+
 	inline glm::mat3 HkToGlm(const RE::hkRotation &mat) {
 		return glm::mat3(
 			HkVecToGlmVec(mat.col0),
@@ -29,6 +25,7 @@ namespace Util {
 			HkVecToGlmVec(mat.col2)
 			);
 	}
+
 	inline glm::mat4 HkToGlm(const RE::hkTransform &transform) {
 		return glm::mat4(
 			glm::vec4(HkVecToGlmVec(transform.rotation.col0), 0.0f),
@@ -37,6 +34,7 @@ namespace Util {
 			glm::vec4(HkToGlm(transform.translation), 1.0f)
 			);
 	}
+
 	inline glm::mat4 HkToGlm(const RE::hkQsTransform &transform) {
 		glm::quat quat = glm::quat(HkVecToGlmVec(transform.rotation.vec));
 		glm::mat4 rotMat = glm::mat4_cast(quat);
@@ -59,8 +57,7 @@ namespace Util {
 		return glm::vec3(mat * glm::vec4(vec, 1.0f));
 	}
 
-	inline bool IsRoughlyEqual(float first, float second, float maxDif)
-	{
+	inline bool IsRoughlyEqual(float first, float second, float maxDif){
 		return abs(first - second) <= maxDif;
 	}
 
@@ -84,14 +81,12 @@ namespace Util {
 		return result;
 	}
 
-	inline glm::vec3 GetCameraPos()
-	{
+	inline glm::vec3 GetCameraPos() {
 		auto playerCam = RE::PlayerCamera::GetSingleton();
 		return glm::vec3(playerCam->pos.x, playerCam->pos.y, playerCam->pos.z);
 	}
 
-	inline glm::quat GetCameraRot()
-	{
+	inline glm::quat GetCameraRot() {
 		auto playerCam = RE::PlayerCamera::GetSingleton();
 
 		auto cameraState = playerCam->currentState.get();
@@ -105,19 +100,16 @@ namespace Util {
 		return glm::quat(niRotation.w, niRotation.x, niRotation.y, niRotation.z);
 	}
 
-	inline glm::vec3 NormalizeVector(glm::vec3 p)
-	{
+	inline glm::vec3 NormalizeVector(glm::vec3 p) {
 		return glm::normalize(p);
 	}
 
-	inline glm::vec3 GetForwardVector(glm::quat quatIn)
-	{
+	inline glm::vec3 GetForwardVector(glm::quat quatIn) {
 		// rotate Skyrim's base forward vector (positive Y forward) by quaternion
 		return RotateVector(quatIn, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
-	inline bool IsPosBehindPlayerCamera(glm::vec3 pos)
-	{
+	inline bool IsPosBehindPlayerCamera(glm::vec3 pos) {
 		auto cameraPos = GetCameraPos();
 		auto cameraRot = GetCameraRot();
 
@@ -145,19 +137,17 @@ namespace Util {
 		return glm::vec3(targetPosRotated.x + origin.x, targetPosRotated.y + origin.y, targetPosRotated.z + origin.z);
 	}
 
-	inline glm::vec3 GetAnyPerpendicularUnitVector(const glm::vec3& vec)
-	{
+	inline glm::vec3 GetAnyPerpendicularUnitVector(const glm::vec3& vec) {
 		if (vec.y != 0.0f || vec.z != 0.0f) {
 			return glm::vec3(1, 0, 0);
-		} else {
-			return glm::vec3(0, 1, 0);
 		}
+		return glm::vec3(0, 1, 0);
+		
 	}
 }
 
-using namespace Util;
+namespace GTS {
 
-namespace Gts {
 	inline RE::NiPoint3 Glm2Ni(const glm::vec3 &position) {
 		return RE::NiPoint3(position[0], position[1], position[2]);
 	}
@@ -176,10 +166,9 @@ namespace Gts {
 	}
 }
 
-struct ObjectBound
-{
-	ObjectBound()
-	{
+struct ObjectBound {
+
+	ObjectBound() {
 		boundMin = glm::vec3();
 		boundMax = glm::vec3();
 		worldBoundMin = glm::vec3();
@@ -187,8 +176,7 @@ struct ObjectBound
 		rotation = glm::vec3();
 	}
 
-	ObjectBound(glm::vec3 pBoundMin, glm::vec3 pBoundMax, glm::vec3 pWorldBoundMin, glm::vec3 pWorldBoundMax, glm::vec3 pRotation)
-	{
+	ObjectBound(glm::vec3 pBoundMin, glm::vec3 pBoundMax, glm::vec3 pWorldBoundMin, glm::vec3 pWorldBoundMax, glm::vec3 pRotation) {
 		boundMin = pBoundMin;
 		boundMax = pBoundMax;
 		worldBoundMin = pWorldBoundMin;
@@ -196,26 +184,23 @@ struct ObjectBound
 		rotation = pRotation;
 	}
 
-	inline glm::vec3 GetBoundRightVectorRotated()
-	{
+	inline glm::vec3 GetBoundRightVectorRotated() {
 		glm::vec3 bound(abs(boundMin.x - boundMax.x), 0.0f, 0.0f);
-		auto boundRotated = RotateVector(rotation, bound);
+		auto boundRotated = DebugUtil::RotateVector(rotation, bound);
 
 		return boundRotated;
 	}
 
-	inline glm::vec3 GetBoundForwardVectorRotated()
-	{
+	inline glm::vec3 GetBoundForwardVectorRotated() {
 		glm::vec3 bound(0.0f, abs(boundMin.y - boundMax.y), 0.0f);
-		auto boundRotated = RotateVector(rotation, bound);
+		auto boundRotated = DebugUtil::RotateVector(rotation, bound);
 
 		return boundRotated;
 	}
 
-	inline glm::vec3 GetBoundUpVectorRotated()
-	{
+	inline glm::vec3 GetBoundUpVectorRotated() {
 		glm::vec3 bound(0.0f, 0.0f, abs(boundMin.z - boundMax.z));
-		auto boundRotated = RotateVector(rotation, bound);
+		auto boundRotated = DebugUtil::RotateVector(rotation, bound);
 
 		return boundRotated;
 	}
@@ -227,8 +212,7 @@ struct ObjectBound
 	glm::vec3 rotation;
 };
 
-class DebugAPILine
-{
+class DebugAPILine {
 	public:
 		DebugAPILine(glm::vec3 from, glm::vec3 to, glm::vec4 color, float lineThickness, unsigned __int64 destroyTickCount);
 
@@ -242,8 +226,7 @@ class DebugAPILine
 		unsigned __int64 DestroyTickCount;
 };
 
-class DebugAPI
-{
+class DebugAPI {
 	public:
 		static void Update();
 
@@ -299,8 +282,8 @@ class DebugAPI
 		static DebugAPILine* GetExistingLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color, float lineThickness);
 };
 
-class DebugOverlayMenu : RE::IMenu, public Gts::EventListener
-{
+class DebugOverlayMenu : RE::IMenu, public GTS::EventListener {
+
 	public:
 		static constexpr const char* MENU_PATH = "GTS_Plugin/GTS_overlay_menu";
 		static constexpr const char* MENU_NAME = "GTS Ovelay Menu";
@@ -313,7 +296,7 @@ class DebugOverlayMenu : RE::IMenu, public Gts::EventListener
 		void DataReady() override;
 		void Start() override;
 		void Update() override;
-		void MenuChange(const MenuOpenCloseEvent* a_event) override;
+		void MenuChange(const RE::MenuOpenCloseEvent* a_event) override;
 
 		static std::vector<std::string> Hidden_Sources;
 
@@ -336,11 +319,9 @@ class DebugOverlayMenu : RE::IMenu, public Gts::EventListener
 		void Init();
 		bool inited = false;
 
-		class Logger : public RE::GFxLog
-		{
+		class Logger : public RE::GFxLog {
 			public:
-				void LogMessageVarg(LogMessageType, const char* a_fmt, std::va_list a_argList) override
-				{
+				void LogMessageVarg(LogMessageType, const char* a_fmt, std::va_list a_argList) override {
 					std::string fmt(a_fmt ? a_fmt : "");
 					while (!fmt.empty() && fmt.back() == '\n') {
 						fmt.pop_back();
@@ -352,7 +333,7 @@ class DebugOverlayMenu : RE::IMenu, public Gts::EventListener
 					std::vsnprintf(buf.data(), buf.size(), fmt.c_str(), args);
 					va_end(args);
 
-					log::info("{}"sv, buf.data());
+					logger::info("{}"sv, buf.data());
 				}
 		};
 };

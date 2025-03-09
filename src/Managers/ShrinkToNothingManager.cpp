@@ -1,0 +1,177 @@
+#include "Managers/ShrinkToNothingManager.hpp"
+#include "Managers/AI/AIFunctions.hpp"
+#include "Managers/Perks/PerkHandler.hpp"
+#include "Magic/Effects/Common.hpp"
+#include "Utils/looting.hpp"
+
+using namespace GTS;
+
+namespace {
+	float GetXPModifier(Actor* tiny) {
+		float mult = 1.0f;
+		if (tiny->IsDead()) {
+			mult = 0.25f;
+		}
+		
+		return mult;
+	}
+}
+
+namespace GTS {
+	ShrinkToNothingManager& ShrinkToNothingManager::GetSingleton() noexcept {
+		static ShrinkToNothingManager instance;
+		return instance;
+	}
+
+	std::string ShrinkToNothingManager::DebugName() {
+		return "::ShrinkToNothingManager";
+	}
+
+	void ShrinkToNothingManager::Update() {
+		auto profiler = Profilers::Profile("ShrinkToNothingManager: Update");
+		for (auto &[tinyId, data]: this->data) {
+			auto tiny = TESForm::LookupByID<Actor>(tinyId);
+			auto giantHandle = data.giant;
+			if (!tiny) {
+				continue;
+			}
+			if (!giantHandle) {
+				continue;
+			}
+			auto giant = giantHandle.get().get();
+			if (!giant) {
+				continue;
+			}
+
+			if (data.state == ShrinkState::Healthy) {
+				SetReanimatedState(tiny);
+				data.state = ShrinkState::Shrinking;
+			} else if (data.state == ShrinkState::Shrinking) {
+				ModSizeExperience(giant, 0.24f * GetXPModifier(tiny)); // Adjust Size Matter skill
+				Attacked(tiny, giant);
+				if (giant->formID == 0x14 && IsDragon(tiny)) {
+					CompleteDragonQuest(tiny, ParticleType::Red, tiny->IsDead());
+				}
+
+				ShrinkToNothingManager::SpawnDeathEffects(tiny);
+				DecreaseShoutCooldown(giant);
+				KillActor(giant, tiny);
+
+				PerkHandler::UpdatePerkValues(giant, PerkUpdate::Perk_LifeForceAbsorption);
+
+				AddSMTDuration(giant, 5.0f);
+
+				ShrinkToNothingManager::TransferInventoryTask(giant, tiny); // Also plays STN sound
+
+				data.state = ShrinkState::Shrinked;
+			}
+		}
+	}
+	
+
+
+	void ShrinkToNothingManager::Reset() {
+		this->data.clear();
+	}
+
+	void ShrinkToNothingManager::ResetActor(Actor* actor) {
+		if (actor) {
+			this->data.erase(actor->formID);
+		}
+	}
+
+	void ShrinkToNothingManager::Shrink(Actor* giant, Actor* tiny) {
+		if (!tiny) {
+			return;
+		}
+		if (!giant) {
+			return;
+		}
+		if (ShrinkToNothingManager::CanShrink(giant, tiny)) {
+			ShrinkToNothingManager::GetSingleton().data.try_emplace(tiny->formID, giant);
+		}
+	}
+
+	bool ShrinkToNothingManager::AlreadyShrinked(Actor* actor) {
+		if (!actor) {
+			return false;
+		}
+		auto& m = ShrinkToNothingManager::GetSingleton().data;
+		return !(m.find(actor->formID) == m.end());
+	}
+
+	bool ShrinkToNothingManager::CanShrink(Actor* giant, Actor* tiny) {
+		if (ShrinkToNothingManager::AlreadyShrinked(tiny)) {
+			return false;
+		}
+		if (IsEssential(giant, tiny)) {
+			return false;
+		}
+		if (IsFlying(tiny)) {
+			if (get_visual_scale(tiny) < Minimum_Actor_Scale) {
+				set_target_scale(tiny, Minimum_Actor_Scale);
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	void ShrinkToNothingManager::SpawnDeathEffects(Actor* tiny) {
+		if (!IsLiving(tiny)) {
+			SpawnDustParticle(tiny, tiny, "NPC Root [Root]", 3.6f);
+		} else {
+			if (!LessGore()) {
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_real_distribution<float> dis(-0.2f, 0.2f);
+				auto root = find_node(tiny, "NPC Root [Root]");
+				if (root) {
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 0.20f, "GTS/Damage/Explode.nif", NiMatrix3(), root->world.translate, 2.0f, 7, root);
+					SpawnParticle(tiny, 1.20f, "GTS/Damage/ShrinkOrCrush.nif", NiMatrix3(), root->world.translate, get_visual_scale(tiny) * 10, 7, root);
+				}
+				Runtime::CreateExplosion(tiny, get_visual_scale(tiny)/4, "GTSExplosionBlood");
+				Runtime::PlayImpactEffect(tiny, "GTSBloodSprayImpactSet", "NPC Root [Root]", NiPoint3{0, 0, -1}, 512, false, false);
+			} else {
+				Runtime::PlaySound("SKSoundBloodGush", tiny, 1.0f, 1.0f);
+			}
+		}
+	}
+
+	void ShrinkToNothingManager::TransferInventoryTask(Actor* giant, Actor* tiny) {
+		ActorHandle giantHandle = giant->CreateRefHandle();
+		ActorHandle tinyHandle = tiny->CreateRefHandle();
+		std::string taskname = std::format("STN {}", tiny->formID);
+
+		float currentSize = get_visual_scale(tiny);
+
+		Runtime::PlaySound("GTSSoundShrinkToNothing", giant, 1.0f, 1.0f);
+
+		TaskManager::RunOnce(taskname, [=](auto& update){
+			if (!tinyHandle) {
+				return;
+			}
+			if (!giantHandle) {
+				return;
+			}
+			auto giant = giantHandle.get().get();
+			auto tiny = tinyHandle.get().get();
+			TransferInventory(tiny, giant, currentSize * GetSizeFromBoundingBox(tiny), false, true, DamageSource::Crushed, true);
+			// Actor reset is done within TransferInventory
+		});
+		if (tiny->formID != 0x14) {
+			Disintegrate(tiny); // Set critical stage 4 on actors
+		} else {
+			TriggerScreenBlood(50);
+			tiny->SetAlpha(0.0f); // Player can't be disintegrated, so we make player Invisible
+		}
+	}
+
+	ShrinkData::ShrinkData(Actor* giant) :
+		delay(Timer(0.01)),
+		state(ShrinkState::Healthy),
+		giant(giant ? giant->CreateRefHandle() : ActorHandle()) {
+	}
+}

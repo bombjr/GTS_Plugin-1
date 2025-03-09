@@ -1,10 +1,8 @@
 #pragma once
+
 #include "UI/DebugAPI.hpp"
-#include "data/world.hpp"
 
-#include <windows.h>
-
-using namespace Gts;
+using namespace GTS;
 
 std::vector<DebugAPILine*> DebugAPI::LinesToDraw;
 
@@ -138,11 +136,11 @@ void DebugAPI::DrawSphere(glm::vec3 origin, float radius, int liftetimeMS, const
 
 void DebugAPI::DrawCircle(glm::vec3 origin, float radius, glm::vec3 eulerAngles, int liftetimeMS, const glm::vec4& color, float lineThickness)
 {
-	glm::vec3 lastEndPos = GetPointOnRotatedCircle(origin, radius, CIRCLE_NUM_SEGMENTS, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
+	glm::vec3 lastEndPos = DebugUtil::GetPointOnRotatedCircle(origin, radius, CIRCLE_NUM_SEGMENTS, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
 
 	for (int i = 0; i <= CIRCLE_NUM_SEGMENTS; i++)
 	{
-		glm::vec3 currEndPos = GetPointOnRotatedCircle(origin, radius, (float)i, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
+		glm::vec3 currEndPos = DebugUtil::GetPointOnRotatedCircle(origin, radius, (float)i, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
 
 		DrawLineForMS(
 			lastEndPos,
@@ -157,11 +155,11 @@ void DebugAPI::DrawCircle(glm::vec3 origin, float radius, glm::vec3 eulerAngles,
 
 void DebugAPI::DrawHalfCircle(glm::vec3 origin, float radius, glm::vec3 eulerAngles, int liftetimeMS, const glm::vec4& color, float lineThickness)
 {
-	glm::vec3 lastEndPos = GetPointOnRotatedCircle(origin, radius, CIRCLE_NUM_SEGMENTS/2, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
+	glm::vec3 lastEndPos = DebugUtil::GetPointOnRotatedCircle(origin, radius, CIRCLE_NUM_SEGMENTS/2, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
 
 	for (int i = 0; i <= CIRCLE_NUM_SEGMENTS/2; i++)
 	{
-		glm::vec3 currEndPos = GetPointOnRotatedCircle(origin, radius, (float)i, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
+		glm::vec3 currEndPos = DebugUtil::GetPointOnRotatedCircle(origin, radius, (float)i, (float)(CIRCLE_NUM_SEGMENTS - 1), eulerAngles);
 
 		DrawLineForMS(
 			lastEndPos,
@@ -181,7 +179,7 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 	glm::vec3 axis = end - start;
 	float length = glm::length(axis);
 	glm::vec3 localZ = axis/length;
-	glm::vec3 localX = GetAnyPerpendicularUnitVector(localZ);
+	glm::vec3 localX = DebugUtil::GetAnyPerpendicularUnitVector(localZ);
 	glm::vec3 localY = glm::cross(localZ, localX);
 	localX = glm::cross(localY, localZ); // Reorthonalize
 
@@ -299,14 +297,14 @@ void DebugAPI::DrawCapsule(glm::vec3 start, glm::vec3 end, float radius, glm::ma
 }
 
 void DebugAPI::DrawBox(glm::vec3 origin, glm::vec3 halfExtents, glm::mat4 transform, int liftetimeMS, const glm::vec4& color, float lineThickness) {
-	glm::vec3 p000 = ApplyTransform(origin + CompMult(glm::vec3(-1.,-1.,-1.), halfExtents), transform);
-	glm::vec3 p100 = ApplyTransform(origin + CompMult(glm::vec3( 1.,-1.,-1.), halfExtents), transform);
-	glm::vec3 p101 = ApplyTransform(origin + CompMult(glm::vec3( 1.,-1., 1.), halfExtents), transform);
-	glm::vec3 p001 = ApplyTransform(origin + CompMult(glm::vec3(-1.,-1., 1.), halfExtents), transform);
-	glm::vec3 p010 = ApplyTransform(origin + CompMult(glm::vec3(-1., 1.,-1.), halfExtents), transform);
-	glm::vec3 p110 = ApplyTransform(origin + CompMult(glm::vec3( 1., 1.,-1.), halfExtents), transform);
-	glm::vec3 p111 = ApplyTransform(origin + CompMult(glm::vec3( 1., 1., 1.), halfExtents), transform);
-	glm::vec3 p011 = ApplyTransform(origin + CompMult(glm::vec3(-1., 1., 1.), halfExtents), transform);
+	glm::vec3 p000 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3(-1.,-1.,-1.), halfExtents), transform);
+	glm::vec3 p100 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3( 1.,-1.,-1.), halfExtents), transform);
+	glm::vec3 p101 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3( 1.,-1., 1.), halfExtents), transform);
+	glm::vec3 p001 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3(-1.,-1., 1.), halfExtents), transform);
+	glm::vec3 p010 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3(-1., 1.,-1.), halfExtents), transform);
+	glm::vec3 p110 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3( 1., 1.,-1.), halfExtents), transform);
+	glm::vec3 p111 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3( 1., 1., 1.), halfExtents), transform);
+	glm::vec3 p011 = DebugUtil::ApplyTransform(origin + DebugUtil::CompMult(glm::vec3(-1., 1., 1.), halfExtents), transform);
 	DrawLineForMS(
 		p000,
 		p100,
@@ -416,13 +414,13 @@ DebugAPILine* DebugAPI::GetExistingLine(const glm::vec3& from, const glm::vec3& 
 		DebugAPILine* line = LinesToDraw[i];
 
 		if (
-			IsRoughlyEqual(from.x, line->From.x, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(from.y, line->From.y, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(from.z, line->From.z, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(to.x, line->To.x, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(to.y, line->To.y, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(to.z, line->To.z, DRAW_LOC_MAX_DIF) &&
-			IsRoughlyEqual(lineThickness, line->LineThickness, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(from.x, line->From.x, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(from.y, line->From.y, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(from.z, line->From.z, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(to.x, line->To.x, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(to.y, line->To.y, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(to.z, line->To.z, DRAW_LOC_MAX_DIF) &&
+			DebugUtil::IsRoughlyEqual(lineThickness, line->LineThickness, DRAW_LOC_MAX_DIF) &&
 			color == line->Color) {
 			return line;
 		}
@@ -433,7 +431,7 @@ DebugAPILine* DebugAPI::GetExistingLine(const glm::vec3& from, const glm::vec3& 
 
 void DebugAPI::DrawLine3D(RE::GPtr<RE::GFxMovieView> movie, glm::vec3 from, glm::vec3 to, float color, float lineThickness, float alpha)
 {
-	if (IsPosBehindPlayerCamera(from) && IsPosBehindPlayerCamera(to)) {
+	if (DebugUtil::IsPosBehindPlayerCamera(from) && DebugUtil::IsPosBehindPlayerCamera(to)) {
 		return;
 	}
 
@@ -573,7 +571,7 @@ void DebugOverlayMenu::Init() {
 	}
 	auto scaleformManager = RE::BSScaleformManager::GetSingleton();
 	if (!scaleformManager) {
-		log::error("Gts: failed to initialize DebugOverlayMenu - ScaleformManager not found");
+		log::error("Failed to initialize DebugOverlayMenu - ScaleformManager not found");
 		return;
 	}
 
@@ -592,7 +590,7 @@ void DebugOverlayMenu::Init() {
 	});
 	this->inited = true;
 
-	log::info("Gts: initialize scale forms");
+	log::info("Init Scaleform");
 }
 
 DebugOverlayMenu& DebugOverlayMenu::GetSingleton() noexcept {
@@ -601,21 +599,21 @@ DebugOverlayMenu& DebugOverlayMenu::GetSingleton() noexcept {
 }
 
 std::string DebugOverlayMenu::DebugName() {
-	return "DebugOverlayMenu";
+	return "::DebugOverlayMenu";
 }
 
 void DebugOverlayMenu::DataReady()
 {
-	log::info("Gts: registering DebugOverlayMenu...");
+	log::info("Registering DebugOverlayMenu...");
 
 	auto ui = RE::UI::GetSingleton();
 	if (ui) {
 		ui->Register(MENU_NAME, Creator);
 		DebugOverlayMenu::Start();
 
-		log::info("Gts: successfully registered DebugOverlayMenu");
+		log::info("Successfully registered DebugOverlayMenu");
 	} else {
-		log::error("Gts: failed to register DebugOverlayMenu");
+		log::error("Failed to register DebugOverlayMenu");
 	}
 }
 
@@ -625,7 +623,7 @@ void DebugOverlayMenu::Start()
 	if (msgQ) {
 		msgQ->AddMessage(MENU_NAME, RE::UI_MESSAGE_TYPE::kShow, nullptr);
 	} else {
-		log::warn("Gts: failed to show DebugOverlayMenu");
+		log::warn("Could not show DebugOverlayMenu");
 	}
 }
 
@@ -640,7 +638,7 @@ void DebugOverlayMenu::Unload()
 	if (msgQ) {
 		msgQ->AddMessage(MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
 	} else {
-		log::warn("Gts: failed to hide DebugOverlayMenu");
+		log::warn("Could not hide DebugOverlayMenu");
 	}
 }
 
@@ -690,7 +688,7 @@ void DebugOverlayMenu::MenuChange(const MenuOpenCloseEvent* a_event) {
 		mName == RE::MessageBoxMenu::MENU_NAME ||
 		mName == RE::TweenMenu::MENU_NAME || // tab menu
 		mName == RE::MainMenu::MENU_NAME ||
-		mName == "CustomMenu") { // papyrus custom menues go here
+		mName == "CustomMenu") { // papyrus custom menus go here
 		if (a_event->opening) {
 			DebugOverlayMenu::Hide(mName.c_str());
 		} else {
@@ -738,7 +736,7 @@ void DebugAPI::CacheMenuData()
 	ScreenResY = abs(rect.top - rect.bottom);
 
 	CachedMenuData = true;
-	log::info("Gts: DebugAPI::CacheMenuData");
+	log::info("DebugAPI::CacheMenuData");
 
 }
 

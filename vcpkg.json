@@ -1,37 +1,40 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "gtsplugin",
-  "version-string": "2.0.0",
+  "version-string": "3.0.0",
   "description": "SKSE plugin for Size Matters",
   "features": {
     "plugin": {
       "description": "Build the plugin.",
       "dependencies": [
-	    {
-			"name": "imgui",
-			"features": ["dx11-binding", "win32-binding", "docking-experimental"]
-		},
 		    "clib-util",
         "commonlibsse-ng",
         "glm",
         "toml11",
         "nlohmann-json",
-		    "gluino"
+		    "gluino",
+        "magic-enum",
+        "boost-pfr"
       ]
     }
   },
   "default-features": ["plugin"],
   "overrides": [
     {
-      "name" : "imgui",
-      "version": "1.90"
+      "name": "toml11",
+      "version": "4.3.0"
     },
-	{
-      "name" : "toml11",
-      "version": "3.8.1"
-    },
-	{
-      "name" : "nlohmann-json",
+    {
+      "name": "nlohmann-json",
       "version": "3.11.3"
+    },
+    {
+      "name": "magic-enum",
+      "version": "0.9.7#1"
+    },
+    {
+      "name": "glm",
+      "version": "1.0.1#3"
     }
   ]
 }
