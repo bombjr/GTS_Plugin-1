@@ -46,7 +46,11 @@ namespace {
 			MultiplySlider = 1.0f;
 		}
 
-		if (!Runtime::HasPerkTeam(actor, "GTSPerkRandomGrowth") || MultiplySlider <= 0.0f) {
+		if (!Runtime::HasPerkTeam(actor, "GTSPerkRandomGrowth")) {
+			return false;
+		}
+
+		if (MultiplySlider <= 0.0f) {
 			return false;
 		}
 
@@ -118,9 +122,21 @@ namespace GTS {
 										Runtime::PlaySoundAtNode("GTSSoundRumble", actor, base_power, 1.0f, "NPC COM [COM ]");
 										Runtime::PlaySoundAtNode("GTSSoundGrowth", actor, Volume, 1.0f, "NPC Pelvis [Pelv]");
 
-										TaskManager::RunFor(name, 0.40f * TotalPower, [=](auto& progressData) {
+										double Start = Time::WorldTimeElapsed();
+										TaskManager::Run(name, [=](auto& progressData) {
 											if (!gianthandle) {
 												return false;
+											}
+											if (!Plugin::Live()) {
+												return true; // Pause task while game is paused
+											}
+
+											double LifeTime = 0.40f * TotalPower;
+											double Finish = Time::WorldTimeElapsed();
+											double timepassed = Finish - Start;
+
+											if (timepassed > LifeTime) {
+												return false;// remove task, lifetime is over
 											}
 											auto giantref = gianthandle.get().get();
 											// Grow

@@ -11,13 +11,14 @@ namespace GTS {
 		if (actor_data) {
 			float natural_scale = get_natural_scale(&actor, true);
 			float target_scale = actor_data->target_scale * natural_scale;
+			float max_scale = actor_data->max_scale;
 
 			scale /= natural_scale;
 
-			if (scale < (actor_data->max_scale + EPS)) { // If new value is below max: allow it
+			if (scale < (max_scale + EPS)) { // If new value is below max: allow it
 				actor_data->target_scale = scale;
-			} else if (target_scale < (actor_data->max_scale - EPS) || target_scale > (actor_data->max_scale + EPS)) { // If we are below max currently and we are trying to scale over max: make it max
-				actor_data->target_scale = actor_data->max_scale;
+			} else if (target_scale < (max_scale - EPS) || target_scale > (max_scale + EPS)) { // If we are below max currently and we are trying to scale over max: make it max
+				actor_data->target_scale = max_scale / natural_scale;
 			} else {
 				// If we are over max: forbid it
 			}
@@ -55,15 +56,16 @@ namespace GTS {
         if (actor_data) {
             float natural_scale = get_natural_scale(&actor, true);
             float target_scale = actor_data->target_scale * natural_scale;
+			float max_scale = actor_data->max_scale;
 
             amt /= natural_scale;
 
             if (amt < -EPS) { // If negative change always: allow
                 actor_data->target_scale += amt;
-            } else if (target_scale + amt < (actor_data->max_scale + EPS)) { // If change results is below max: allow it
+            } else if (target_scale + amt < (max_scale + EPS)) { // If change results is below max: allow it
                 actor_data->target_scale += amt;
-            } else if (target_scale < (actor_data->max_scale - EPS) || target_scale > (actor_data->max_scale + EPS)) { // If we are currently below max and we are scaling above max: make it max
-                set_target_scale(actor, actor_data->max_scale);
+            } else if (target_scale < (max_scale - EPS) || target_scale > (max_scale + EPS)) { // If we are currently below max and we are scaling above max: make it max
+                set_target_scale(actor, max_scale);
             } else { // if we are over max then forbid it
             }
         }

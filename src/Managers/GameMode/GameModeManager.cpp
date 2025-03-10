@@ -509,7 +509,8 @@ namespace GTS {
 			return;
 		}
 
-		ApplyGameMode(actor, GameMode, BaseGrowhtRate / 2, BaseShrinkRate);
-
+		if (Runtime::HasPerkTeam(actor, "GTSPerkColossalGrowth")) {
+			ApplyGameMode(actor, GameMode, BaseGrowhtRate / 2, BaseShrinkRate);
+		}
 	}
 }

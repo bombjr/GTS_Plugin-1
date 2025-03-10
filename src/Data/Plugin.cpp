@@ -39,15 +39,26 @@ namespace GTS {
 	}
 
 	bool Plugin::Live() {
-		if (Ready()) {
-			auto ui = RE::UI::GetSingleton();
-			if (!ui->GameIsPaused() || ui->GetMenu(RaceSexMenu::MENU_NAME) || !UIManager::MenuOpen()) {
-				// Not paused
-				return true;
-			}
-		}
-		return false;
-	}
+        if (Ready()) {
+            auto ui = RE::UI::GetSingleton();
+
+            if (UIManager::MenuOpen()) {
+                return false;
+            }
+
+            if (ui->GameIsPaused()) {
+                return false;
+            }
+
+            if (ui->GetMenu(RaceSexMenu::MENU_NAME)) {
+                return false;
+            }
+
+            return true;
+
+        }
+        return false;
+    }
 
 	bool Plugin::AnyMenuOpen() {
 
