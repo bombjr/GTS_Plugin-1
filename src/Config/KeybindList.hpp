@@ -71,7 +71,7 @@ namespace GTS {
             },
             {
                 .Event = "OpenSkillTree",
-                .Keys = {"LSHIFT","F4"},
+                .Keys = {"F4"},
                 .Trigger = "Once",
                 .BlockInput = "Always"
             },

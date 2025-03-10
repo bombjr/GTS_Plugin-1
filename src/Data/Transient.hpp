@@ -32,7 +32,7 @@ namespace GTS {
 		float PerkLifeForceStolen = 0.0f;
 		float ClothRipLastScale = -1.0f;
 		float ClothRipOffset = -1.0f;
-		float IsNotImmune = 1.0f;
+		bool TemporaryDamageImmunity = false;
 		float ShrinkUntil = 0.0f;
 		float BreastSizeBuff = 0.0f;
 

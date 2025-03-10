@@ -505,7 +505,8 @@ struct SettingsUI {
     std::string sDisplayUnits = "kMetric";
     float fScale = 1.0f;
     float fItemWidth = 0.55f;
-    std::array<float, 3> f3AccentColor = { 0.81834f, 0.797923f, 0.834302f };
+    std::array<float, 3> f3AccentColor = { 0.273f, 0.0106f, 0.0106f };
+    // White: 0.81834f, 0.797923f, 0.834302f
     //std::array<float, 3> f3AccentColor = {0.486f, 0.431f, 0.529f};
 
     bool bEnableAutoSaveOnClose = true;

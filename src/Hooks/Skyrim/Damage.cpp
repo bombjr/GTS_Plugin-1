@@ -33,13 +33,11 @@ namespace GTS {
 				camera->worldFOV += DefaultTP * 0.003f;
 				if (camera->worldFOV >= DefaultTP) {
 					camera->worldFOV = DefaultTP;
-					data->IsNotImmune = 1.0f;
 					return false; // stop it
 				}
 			} else {
 				double timepassed = Finish - Start;
 				if (timepassed > 2.6) {
-					data->IsNotImmune = 1.0f;
 					return false;
 				}
 			}
@@ -68,13 +66,11 @@ namespace GTS {
 				camera->firstPersonFOV += DefaultFP * 0.003f;
 				if (camera->firstPersonFOV >= DefaultFP) {
 					camera->firstPersonFOV = DefaultFP;
-					data->IsNotImmune = 1.0f;
 					return false; // stop it
 				}
 			} else {
 				double timepassed = Finish - Start;
 				if (timepassed > 2.6) {
-					data->IsNotImmune = 1.0f;
 					return false;
 				}
 			}
@@ -82,7 +78,32 @@ namespace GTS {
 		});
 	}
 
-	void StartDamageIsNotImmune(Actor* actor) {
+	void DamageImmunityTask(Actor* actor, TempActorData* data) {
+		std::string name = std::format("CheatDeath_Task_{}", actor->formID);
+		ActorHandle gianthandle = actor->CreateRefHandle();
+
+		double Start = Time::WorldTimeElapsed();
+
+		TaskManager::Run(name,[=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+
+			auto giantref = gianthandle.get().get();
+			double Finish = Time::WorldTimeElapsed();
+
+			double timepassed = Finish - Start;
+			if (timepassed > 2.5 || giantref->IsDead()) {
+				if (data) {
+					data->TemporaryDamageImmunity = false; // Vulnerable again
+				}
+				return false;
+			}
+			return true;
+		});
+	}
+
+	void StartTemporaryDamageImmunity(Actor* actor) {
 		if (actor->formID == 0x14) {
 			auto camera = PlayerCamera::GetSingleton();
 			if (!camera) {
@@ -96,12 +117,13 @@ namespace GTS {
 			if (tranData) {
 				tranData->WorldFOVDefault = camera->worldFOV;
 				tranData->FPFOVDefault = camera->firstPersonFOV;
-				tranData->IsNotImmune = 0.0f; // make actor immune to damage
+				tranData->TemporaryDamageImmunity = true; // make actor immune to damage
 				if (TP) {
 					CameraFOVTask_TP(actor, camera, tranData, AllowEdits);
 				} else if (FP) {
 					CameraFOVTask_FP(actor, camera, tranData, AllowEdits);
 				}
+				DamageImmunityTask(actor, tranData);
 			}
 		}
 	}
@@ -115,7 +137,7 @@ namespace GTS {
 		}
 	}
 
-	float TinyShield(Actor* receiver) {
+	float TinyAsShield(Actor* receiver) {
 		float protection = 1.0f;
 		if (receiver->formID == 0x14) {
 			auto grabbedActor = Grab::GetHeldActor(receiver);
@@ -126,8 +148,8 @@ namespace GTS {
 		return protection;
 	}
 
-	float HealthGate(Actor* receiver, Actor* attacker, float a_damage) {
-		float protection = 1.0f;
+	bool HealthGateProtection(Actor* receiver, Actor* attacker, float a_damage) {
+		bool NullifyDamage = false;
 		if (receiver->formID == 0x14) {
 
 			a_damage *= GetDifficultyMultiplier(attacker, receiver); // Take difficulty into account
@@ -146,7 +168,6 @@ namespace GTS {
 						if ((target <= natural) || (target - 0.35f * scale <= natural)) {
 							set_target_scale(receiver, natural); // to prevent becoming < natural scale
 						}
-						//Rumbling::For("CheatDeath", receiver, 4.0f, 0.10f, "NPC COM [COM ]", 1.50f, 2.0f);
 						Runtime::PlaySound("GTSSoundTriggerHG", receiver, 2.0f, 0.5f);
 						shake_camera(receiver, 1.7f, 1.5f);
 						
@@ -162,13 +183,13 @@ namespace GTS {
 						StaggerActor(attacker, receiver, 1.0f);
 						// stagger each-other
 
-						StartDamageIsNotImmune(receiver);
+						StartTemporaryDamageImmunity(receiver); // Secondary source of damage immunity for all following hits for about 1.5 sec
 
 						Cprint("Health Gate triggered, death avoided");
 						Cprint("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35f * scale);
 						Notify("Health Gate triggered, death avoided");
 						Notify("Damage: {:.2f}, Lost Size: {:.2f}", a_damage, -0.35f * scale);
-						protection = 0.0f;
+						NullifyDamage = true; // First source of damage immunity for initial hit
 					}
 				}
 			}
@@ -180,10 +201,13 @@ namespace GTS {
 				ShrinkOutburstExplosion(receiver, true);
 			}
 		}
-		return protection;
+		log::info("Health Gate Activated: {}", NullifyDamage);
+		return NullifyDamage;
 	}
 
-	float GrowthDamageResistance(Actor* receiver) {
+	float GetGrowthDamageResistance(Actor* receiver) {
+		// Applies extra layer of damage reduction when Growth Animations are triggered
+		// Growth animations = the ones that trigger randomly through Random Growth
 		float reduction = 1.0f;
 		if (IsGrowing(receiver)) {
 			int growthtype = 0;
@@ -200,8 +224,9 @@ namespace GTS {
 		return reduction;
 	}
 
-	float HugDamageResistance(Actor* receiver) {
+	float GetHugDamageResistance(Actor* receiver) {
 		float reduction = 1.0f;
+		// Applies extra layer of damage reduction when hugging someone
 		if (HugShrink::GetHuggiesActor(receiver)) {
 			if (Runtime::HasPerk(receiver, "GTSPerkHugsToughGrip")) {
 				reduction -= 0.25f; // 25% resistance
@@ -214,28 +239,32 @@ namespace GTS {
 	}
 
 	float GetTotalDamageResistance(Actor* receiver, Actor* aggressor) {
-		float resistance = GetDamageResistance(receiver) * HugDamageResistance(receiver) * GrowthDamageResistance(receiver);
-		float multiplier = GetDamageMultiplier(aggressor) / game_getactorscale(aggressor); // take GetScale into account since it boosts damage as well
-		float tiny = 1.0f;
-		float IsNotImmune = 1.0f;
-
-		float mult = 1.0f;
-
+		float receiver_resistance = GetDamageResistance(receiver) * GetHugDamageResistance(receiver) * GetGrowthDamageResistance(receiver);
+		float attacker_multiplier = GetDamageMultiplier(aggressor) / game_getactorscale(aggressor); // take GetScale into account since it boosts damage as well
 		auto transient = Transient::GetSingleton().GetData(receiver);
+		float tiny_resistance = 1.0f; // Tiny in hands takes portion of damage (25%) instead of GTS
+		bool DamageImmunity = false;
+		
+		float TakenDamageMult = 1.0f; // 1.0 = take 100% damage
 
 		if (transient) {
 			if (receiver->formID == 0x14) {
-				IsNotImmune = transient->IsNotImmune;
-				tiny = TinyShield(receiver);
+				DamageImmunity = transient->TemporaryDamageImmunity;
+				tiny_resistance = TinyAsShield(receiver);
 			}
 		}
-		//log::info("    - Damage Mult: {}, resistance: {}, shield: {}", multiplier, resistance, tiny);
-		mult *= (multiplier * resistance * tiny * IsNotImmune);
-		return mult;
+
+		TakenDamageMult *= (attacker_multiplier * receiver_resistance * tiny_resistance);
+		if (DamageImmunity) {
+			TakenDamageMult *= 0.0f; // Fully immune to damage for 2.5 sec after triggering health gate
+		}
+		log::info("DamageImmunity: {}", DamageImmunity);
+		//log::info("Total DR: {}", TakenDamageMult);
+		return TakenDamageMult;
 	}
 
 	void RecordPushForce(Actor* giant, Actor* tiny) {
-		// Deal Damage is called earlier than the push so we can just record that
+		// Damage itself is called earlier than the push so we can just record that
 		auto tranData = Transient::GetSingleton().GetData(giant);
 
         if (tranData) {
@@ -247,14 +276,10 @@ namespace GTS {
 		    }
 
 			float difference = giant_scale/tiny_scale;
-
 			float pushResult = 1.0f / (difference*difference*difference);
-
 			float result = std::clamp(pushResult, 0.01f, 1.0f);
 
             tranData->PushForce = result;
-			//log::info("Recording Push Force:{} - {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
-			//log::info("----Value: {}", result);
         } 
 	}
 }
@@ -267,20 +292,30 @@ namespace Hooks {
 		static FunctionHook<void(Actor* a_this, float dmg, Actor* aggressor, uintptr_t maybe_hitdata, TESObjectREFR* damageSrc)> SkyrimTakeDamage(
 			RELOCATION_ID(36345, 37335),
 			[](auto* a_this, auto dmg, auto* aggressor, uintptr_t maybe_hitdata, auto* damageSrc) { // Universal damage function before Difficulty damage
-
+				log::info("Damage Pre: {}", dmg);
 				if (aggressor) { // apply to hits only, We don't want to decrease fall damage for example
 					if (aggressor != a_this) {
-						dmg *= GetTotalDamageResistance(a_this, aggressor);
-						dmg *= HealthGate(a_this, aggressor, dmg);
+						dmg *= GetTotalDamageResistance(a_this, aggressor); 
+						// ^ This function applies damage resistance from being large
+						// Also makes receiver immune to all (?) damage for ~2.5 sec if health gate was triggered
 
+						if (HealthGateProtection(a_this, aggressor, dmg)) { // When Health Gate is true, initial hit full damage immunity is applied here 
+							dmg *= 0.0f;
+						}
 
 						DoOverkill(aggressor, a_this, dmg);
 						RecordPushForce(a_this, aggressor);
 					}
 				}
+				// This hook has a 'small' downside:
+				// - Seems like if NPC is about to deal 250 damage and player has 5 health left: 
+				//    - the game will cut exessive damage, so damage is now 5
+				//    - then we further affect said 5 damage by damage resistance
+				//    - which in some cases may make player unkillable since health never reaches 0...
 
-				SkyrimTakeDamage(a_this, dmg, aggressor, maybe_hitdata, damageSrc);
-				return;
+				log::info("Damage Post: {}", dmg);
+
+				return SkyrimTakeDamage(a_this, dmg, aggressor, maybe_hitdata, damageSrc);
 			}
 		);
 
