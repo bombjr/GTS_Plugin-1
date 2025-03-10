@@ -86,6 +86,9 @@ namespace GTS {
 
 	void RandomGrowth::Update() {
 		static Timer GrowthTimer = Timer(1.0);
+		if (!Plugin::Live()) {
+			return;
+		}
 		if (GrowthTimer.ShouldRunFrame()) {
 			for (auto actor: find_actors()) {
 				if (actor && actor->Is3DLoaded()) {
