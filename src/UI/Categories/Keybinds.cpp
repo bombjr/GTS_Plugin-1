@@ -181,7 +181,18 @@ namespace GTS {
 	            ImGui::SetNextItemOpen(*HeaderState);
 	        }
 
-	        if(ImGui::CollapsingHeader(a_name.c_str())){
+			const std::string VisualName = Event.Disabled ? fmt::format("{} [Disabled]", a_name) : a_name;
+			volatile bool PushedStyle = false;
+
+			//Too lazy to make this look better
+	    	if (Event.Disabled) {
+				const float Alpha = ImGui::GetStyle().Colors[ImGuiCol_Header].w;
+				ImGui::PushStyleColor(ImGuiCol_Header, { 0,0,0, Alpha });
+				ImGui::PushStyleColor(ImGuiCol_HeaderActive, { 0,0,0, Alpha });
+				PushedStyle = true;
+			}
+
+	        if(ImGui::CollapsingHeader(VisualName.c_str())){
 
 	            if (HeaderState){
 	                *HeaderState = true;
@@ -312,6 +323,11 @@ namespace GTS {
 	                *HeaderState = false;
 	            }
 	        }
+
+			if (PushedStyle) {
+				ImGui::PopStyleColor(2);
+			}
+				
 	        
 	        ImGui::EndDisabled();
 	    }

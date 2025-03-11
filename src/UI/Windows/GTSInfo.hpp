@@ -18,7 +18,7 @@ namespace GTS {
         kShrinkResist = (1 << 12),
         kOnTheEdge = (1 << 13),
         kStolenAttributes = (1 << 14),
-        kStolenHealth = (1 << 15),
+        kAbsorbedAttributes = (1 << 15),
         kStolenStamina = (1 << 16),
         kStolenMagicka = (1 << 17),
         kSizeReserve = (1 << 18),

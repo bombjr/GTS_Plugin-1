@@ -71,9 +71,9 @@ namespace GTS {
         const float VisualProgress = MaxScale < 250.0f ? CurrentScale / MaxScale : 0.0f;
 
         //--------- Formatted display strings
-        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format(" ({:.2f}x)", CurrentScale) : "";
+        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format("{:.2f}x", CurrentScale) : "";
         const std::string StringReal = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitReal) ? GTS::GetFormatedHeight(a_Actor).c_str() : "";
-        const std::string ResultingText = fmt::format("{}{}", StringReal, StringScale);
+        const std::string ResultingText = fmt::format("{} {}", StringReal, StringScale);
 
         //---------Total Max Size Calculation and Text Formating
         const float BonusSize_EssenceAndDragons = SizeEssense;
@@ -129,11 +129,38 @@ namespace GTS {
                                     "Absorbed Attributes are permanent Health/Magicka/Stamina attribute boosts of your character\n"
                                     "They're coming from 'Size Conversion' and 'Full Assimilation' perks";
 
+
+
+        const ImVec2 ProgressBarSize = { hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 0.0f : Settings.fFixedWidth , 0.0f };
+        const float ProgressBarHeight = hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 1.1f : Settings.fSizeBarHeightMult;
+
+    	const ImVec4 ColorAVec{ Settings.f3ColorA[0], Settings.f3ColorA[1], Settings.f3ColorA[2] ,1.0f };
+        const ImVec4 ColorBVec{ Settings.f3ColorB[0], Settings.f3ColorB[1], Settings.f3ColorB[2] ,1.0f };
+    	const ImU32 ColorA32 = ImGui::ColorConvertFloat4ToU32(ColorAVec);
+        const ImU32 ColorB32 = ImGui::ColorConvertFloat4ToU32(ColorBVec);
+        const float BorderCol = Settings.fBorderLightness;
+        const float BorderAlpha = Settings.fBorderAlpha;
+
+        ImGui::PushStyleColor(ImGuiCol_Border, { BorderCol, BorderCol, BorderCol, BorderAlpha });
+
         // Visual Scale (Progress) Bar
-        ImUtil::CenteredProgress(VisualProgress, ImVec2(hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ?
-            0.0f :
-            Settings.fFixedWidth, 0.0f), ResultingText.c_str(), Settings.fSizeBarHeightMult
+        ImUtil::CenteredProgress(
+            VisualProgress,
+            ProgressBarSize,
+            ResultingText.c_str(),
+            ProgressBarHeight,
+            Settings.fBorderThickness,
+            Settings.bUseGradient,
+            Settings.fNormalGradientDarkMult,
+            Settings.fNormalGradientLightMult,
+            Settings.bEnableRounding,
+            Settings.bUseCustomGradientColors,
+            ColorA32,
+            ColorB32,
+            Settings.bFlipGradientDirection
         );
+
+        ImGui::PopStyleColor();
 
         // Set up the table with 2 columns: Stat name and value
         if (ImGui::BeginTable("GTSInfoTable", 2, ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Hideable)) {
@@ -288,7 +315,7 @@ namespace GTS {
             // Soul Vore perk data
             if (Runtime::HasPerk(a_Actor, "GTSPerkFullAssimilation")) {
                 // Stolen Health
-                if (hasFlag(a_featureFlags, GTSInfoFeatures::kStolenHealth)) {
+                if (hasFlag(a_featureFlags, GTSInfoFeatures::kAbsorbedAttributes)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
                     ImGui::TextUnformatted("Absorbed Attributes:");

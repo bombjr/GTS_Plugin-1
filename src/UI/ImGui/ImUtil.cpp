@@ -158,45 +158,121 @@ namespace ImUtil {
         return final_result;
     }
 
-    void CenteredProgress(float fraction, const ImVec2& size_arg, const char* overlay, const float heightmult) {
+    void CenteredProgress(float fraction, const ImVec2& size_arg, const char* overlay, const float heightmult,
+        float borderThickness, bool useGradient,
+        float gradientDarkFactor, float gradientLightFactor,
+        bool useRounding,
+        bool useCustomGradientColors,
+        ImU32 gradientStartColor,
+        ImU32 gradientEndColor,
+        bool flipGradientDirection) {
+
         ImGuiWindow* window = ImGui::GetCurrentWindow();
-        if (window->SkipItems){
+
+        if (window->SkipItems) {
             return;
         }
-
         ImGuiContext& g = *GImGui;
         const ImGuiStyle& style = g.Style;
 
         // Calculate progress bar dimensions
         ImVec2 pos = window->DC.CursorPos;
-
         const auto TextSize = ImGui::CalcTextSize(overlay);
         const auto ItemWidth = ImGui::CalcItemWidth();
         const float Width = ItemWidth > TextSize.x ? ItemWidth : TextSize.x;
         ImVec2 ResultSize = { Width, TextSize.y };
-
         ImVec2 size = ImGui::CalcItemSize(size_arg, ResultSize.x, ResultSize.y + style.FramePadding.y * 2.0f * heightmult);
-
-    	ImVec2 possize = {pos.x + size.x, pos.y + size.y};
+        ImVec2 possize = { pos.x + size.x, pos.y + size.y };
         ImRect bb(pos, possize);
-        
+
         // Register the item and handle clipping
         ImGui::ItemSize(size, style.FramePadding.y);
-        if (!ImGui::ItemAdd(bb, 0)){
+        if (!ImGui::ItemAdd(bb, 0)) {
             return;
         }
 
-        // Render background
+        // Get the colors
+        ImU32 border_color = ImGui::GetColorU32(ImGuiCol_Border);
         ImU32 bg_color = ImGui::GetColorU32(ImGuiCol_FrameBg);
-        ImU32 fill_color = ImGui::GetColorU32(ImGuiCol_PlotHistogram);
-        float frame_rounding = style.FrameRounding;
-        window->DrawList->AddRectFilled(bb.Min, bb.Max, bg_color, frame_rounding);
+        //ImU32 fill_color = ImGui::GetColorU32(ImGuiCol_PlotHistogram);
+        ImU32 fill_color = gradientStartColor;
+        float frame_rounding = useRounding ? style.FrameRounding : 0.0f;
 
-        // Render filled portion
+        // Create inner rectangle accounting for border thickness
+        ImRect inner_bb(
+            ImVec2(bb.Min.x + borderThickness, bb.Min.y + borderThickness),
+            ImVec2(bb.Max.x - borderThickness, bb.Max.y - borderThickness)
+        );
+
+        // Render border
+        if (borderThickness > 0.0f) {
+            window->DrawList->AddRect(bb.Min, bb.Max, border_color, frame_rounding, ImDrawFlags_None, borderThickness);
+        }
+
+        // Render background (inner rectangle)
+        window->DrawList->AddRectFilled(inner_bb.Min, inner_bb.Max, bg_color, frame_rounding);
+
+        // Render filled portion with adjusted size for border
         if (fraction > 0.0f) {
-            float fill_width = ImMax(size.x * fraction, 2.0f);
-            ImRect fill_bb(bb.Min, ImVec2(bb.Min.x + fill_width, bb.Max.y));
-            window->DrawList->AddRectFilled(fill_bb.Min, fill_bb.Max, fill_color, frame_rounding);
+            float fill_width = ImMax((inner_bb.Max.x - inner_bb.Min.x) * fraction, 2.0f);
+            ImRect fill_bb(
+                inner_bb.Min,
+                ImVec2(inner_bb.Min.x + fill_width, inner_bb.Max.y)
+            );
+
+            if (useGradient) {
+                ImU32 startColor, endColor;
+
+                if (useCustomGradientColors) {
+                    // Use the custom colors provided
+                    startColor = gradientStartColor;
+                    endColor = gradientEndColor;
+                }
+                else {
+
+                    ImVec4 baseColor = ImGui::ColorConvertU32ToFloat4(fill_color);
+
+
+                    ImVec4 darkColor = ImVec4(
+                        ImClamp(baseColor.x * gradientDarkFactor, 0.0f, 1.0f),
+                        ImClamp(baseColor.y * gradientDarkFactor, 0.0f, 1.0f),
+                        ImClamp(baseColor.z * gradientDarkFactor, 0.0f, 1.0f),
+                        baseColor.w
+                    );
+
+                    ImVec4 lightColor = ImVec4(
+                        ImClamp(baseColor.x * gradientLightFactor, 0.0f, 1.0f),
+                        ImClamp(baseColor.y * gradientLightFactor, 0.0f, 1.0f),
+                        ImClamp(baseColor.z * gradientLightFactor, 0.0f, 1.0f),
+                        baseColor.w
+                    );
+
+
+                    startColor = ImGui::ColorConvertFloat4ToU32(darkColor);
+                    endColor = ImGui::ColorConvertFloat4ToU32(lightColor);
+                }
+
+
+                if (flipGradientDirection) {
+                    ImU32 temp = startColor;
+                    startColor = endColor;
+                    endColor = temp;
+                }
+
+                // Draw gradient fill
+                window->DrawList->AddRectFilledMultiColor(
+                    fill_bb.Min,
+                    fill_bb.Max,
+                    startColor,     // Left color
+                    endColor,       // Right color
+                    endColor,       // Bottom right color
+                    startColor      // Bottom left color
+                );
+            }
+            else {
+                // Draw regular solid fill
+                window->DrawList->AddRectFilled(fill_bb.Min, fill_bb.Max, fill_color, frame_rounding);
+            }
         }
 
         // Render centered text
@@ -206,11 +282,11 @@ namespace ImUtil {
                 bb.Min.x + (size.x - overlay_size.x) * 0.5f,
                 bb.Min.y + (size.y - overlay_size.y) * 0.5f
             );
-            
+
             // Draw text with contrasting shadow
             window->DrawList->AddText(
-                ImVec2(text_pos.x + 1, text_pos.y + 1), 
-                IM_COL32(0,0,0,128 * style.Alpha), 
+                ImVec2(text_pos.x + 1, text_pos.y + 1),
+                IM_COL32(0, 0, 0, 128 * style.Alpha),
                 overlay
             );
             window->DrawList->AddText(text_pos, ImGui::GetColorU32(ImGuiCol_Text), overlay);

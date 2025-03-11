@@ -43,6 +43,6 @@ namespace GTS {
         virtual inline float GetAlphaMult() = 0;
         virtual inline float GetBGAlphaMult() = 0;
 
-        ImVec2 GetAnchorPos(WindowAnchor a_position, ImVec2 a_padding);
+        static ImVec2 GetAnchorPos(WindowAnchor a_position, ImVec2 a_padding, bool AllowCenterY);
     };
 }

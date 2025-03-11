@@ -5,68 +5,156 @@
 
 namespace GTS {
 
+	static void DrawBaseOptions(WindowConfWidget& AwSettings, const char* aTitle) {
+
+		const char* T0 = "Toggle visibility.";
+		const char* T1 = "Adjust the opacity of the entire widget window.";
+
+		const char* T2 = "Automatically handle positioning and size.\n"
+						 "Disabling this allows you to move and resize the widget manually.\n"
+						 "Otherwise, if left enabled you can adjust the position offsets below.";
+
+		const char* T3 = "Choose the alignment point for the widget on screen.";
+		const char* T4 = "Adjust horizontal offset from the selected anchor point.";
+		const char* T5 = "Adjust vertical offset from the selected anchor point.";
+		const char* T6 = "Adjust the opacity of the widget window's backround.";
+		const char* T7 = "Toggle whether the widget fades after no value has changed after a while.";
+		const char* T8 = "Change how long the widget should be shown for after a value has changed.";
+		const char* T9 = "Set the required change (ie Delta) in size for the window to reappear if inactivity fade is enabled.";
+
+		if (ImGui::CollapsingHeader(aTitle, ImUtil::HeaderFlagsDefaultOpen)) {
+			ImUtil::CheckBox("Show Player Stats Widget", &AwSettings.bVisible, T0);
+			ImGui::SameLine();
+			ImUtil::CheckBox("Inactivity Fade", &AwSettings.bEnableFade, T7);
+			ImUtil::SliderF("Fade After", &AwSettings.fFadeAfter, 0.5f, 10.0f, T8, "After %.1f Seconds", !AwSettings.bEnableFade);
+			ImUtil::SliderF("Reappear Delta", &AwSettings.fFadeDelta, 0.0, 0.5f, T9, "After a %.2fx Difference", !AwSettings.bEnableFade);
+
+			ImGui::Spacing();
+
+			ImUtil::SliderF("Widget Alpha", &AwSettings.fAlpha, 0.1f, 1.0f, T1, "%.1fx");
+			ImUtil::SliderF("Widget BG Alpha", &AwSettings.fBGAlphaMult, 0.0f, 1.0f, T6, "%.1fx");
+
+			ImUtil::CheckBox("Lock Widget Position", &AwSettings.bLock, T2);
+
+			ImGui::BeginDisabled(!AwSettings.bLock);
+			{
+				ImUtil::ComboEx<ImWindow::WindowAnchor>("Anchor", AwSettings.sAnchor, T3);
+				ImUtil::SliderF("Offset (Left/Right)", &AwSettings.f2Offset.at(0), -100.0f, 1500.0f, T4, "%.1f%", AwSettings.sAnchor == "kCenter");
+				ImUtil::SliderF("Offset (Up/Down)", &AwSettings.f2Offset.at(1), -100.0f, 1500.0f, T5, "%.1f%");
+			}
+			ImGui::EndDisabled();
+
+			ImGui::Spacing();
+
+		}
+	}
+
+	static void DrawBarOptions(WindowConfWidget& AwSettings, const char* aTitle) {
+
+		const char* T0 = "Change the progress bar's width.";
+		const char* T1 = "Change the progress bar's height multiplier.";
+		const char* T2 = "Round the progress bar's border if it's visible.";
+		const char* T3 = "Change the thickness of the border surrounding the progress bar.";
+		const char* T4 = "Change how light/dark the border is.";
+		const char* T5 = "Change the border's tranparency multiplier.";
+		const char* T6 = "Draw the progress bar with a gradient instead of only a flat color.";
+
+		const char* T7 = "The gradient normally applies a lightening/darkening effect on the base color.\n"
+					     "By enabling this you can select your own color for the gradient to use.";
+
+		const char* T8 = "Change the darkening factor of the gradient.";
+		const char* T9 = "Change the lightening factor of the gradient.";
+		const char* T10 = "Flip the direction of the gradient.";
+
+		const char* TReset = "Reset this color to be the same as the accent color in the interface settings.";
+
+		if (ImGui::CollapsingHeader(aTitle, ImUtil::HeaderFlagsDefaultOpen)) {
+
+
+			ImUtil::SliderF("Width", &AwSettings.fFixedWidth, 120.0f, 600.0f, T0, "%.0f");
+			ImUtil::SliderF("Height ", &AwSettings.fSizeBarHeightMult, 0.01f, 2.5f, T1, "%.2fx");
+
+			ImGui::Spacing();
+
+			ImUtil::CheckBox("Border Rounding", &AwSettings.bEnableRounding, T2);
+			ImUtil::SliderF("Border Thickness", &AwSettings.fBorderThickness, 0.0f, 5.0f, T3, "%.2fx");
+			ImUtil::SliderF("Border Lightness", &AwSettings.fBorderLightness, 0.0f, 1.0f, T4, "%.2fx");
+			ImUtil::SliderF("Border Alpha", &AwSettings.fBorderAlpha, 0.0f, 1.0f, T5, "%.2fx");
+
+			ImGui::Spacing();
+
+			{   // Color A
+
+				ImUtil_Unique {
+					if (ImUtil::Button("[A]", TReset)) {
+						AwSettings.f3ColorA = Config::GetUI().f3AccentColor;
+					}
+				}
+
+				ImGui::SameLine(0.0f, 6.0f);
+
+				ImGui::ColorEdit3("Base Color", AwSettings.f3ColorA.data(), ImGuiColorEditFlags_DisplayHSV);
+
+			}
+
+			ImGui::Spacing();
+
+			ImUtil::CheckBox("Gradient", &AwSettings.bUseGradient, T6);
+			ImGui::BeginDisabled(!AwSettings.bUseGradient);
+
+			ImGui::SameLine();
+
+			ImUtil::CheckBox("Multi Color", &AwSettings.bUseCustomGradientColors, T7);
+
+			ImGui::SameLine();
+
+			ImUtil::CheckBox("Flip Direction", &AwSettings.bFlipGradientDirection, T10);
+
+			if (AwSettings.bUseCustomGradientColors) {
+
+				{   // Color B
+
+					ImUtil_Unique {
+						if (ImUtil::Button("[A]", TReset)) {
+							AwSettings.f3ColorB = Config::GetUI().f3AccentColor;
+						}
+					}
+
+					ImGui::SameLine(0.0f,6.0f);
+
+					ImGui::ColorEdit3("Accent Color", AwSettings.f3ColorB.data(), ImGuiColorEditFlags_DisplayHSV);
+				}
+
+			}
+			else {
+				ImGui::Text("Single Color Gradient Options");
+				ImUtil::SliderF("Darken", &AwSettings.fNormalGradientDarkMult, 0.1f, 1.0f, T8, "%.2fx");
+				ImUtil::SliderF("Lighten", &AwSettings.fNormalGradientLightMult, 1.0f, 2.0f, T9, "%.2fx");
+			}
+
+			ImGui::EndDisabled();
+
+			ImGui::Spacing();
+
+		}
+	}
+
+
+
 	void CategoryWidgets::DrawLeft() {
 
 		// ------- Player Stats Widget
 
+		ImUtil_Unique {
+			DrawBaseOptions(Settings.StatusWindow, "Player Widget");
+		}
+
+		ImUtil_Unique {
+			DrawBarOptions(Settings.StatusWindow, "Player Widget Style");
+		}
+
 		ImUtil_Unique{
-
-			const char* T0 = "Toggle visibility of extra information for the player character.";
-			const char* T1 = "Adjust the opacity of the stats window.";
-
-			const char* T2 = "Automatically handle positioning and size for the stats window.\n"
-							 "Disabling this allows you to move and resize the settings window manually.\n"
-							 "Otherwise, if left enabled you can adjust the position offsets below.";
-
-			const char* T3 = "Choose the alignment point for the window on screen";
-			const char* T4 = "Adjust horizontal offset from the selected anchor point.";
-			const char* T5 = "Adjust vertical offset from the selected anchor point.";
-			const char* T6 = "Adjust the opacity of the stats window's backround.";
-			const char* T7 = "Toggle whether the stats widget fades if the players scale or max scale don't change for a while.";
-			const char* T8 = "Change how long the widget menu should be shown for after a value has changed.";
-			const char* T9 = "Set the width of the stats window. Works only if auto size is disabled.";
-			const char* T10 = "Set the height multiplier of the size bar.";
-			const char* T11 = "Set the required change (ie Delta) in size for the window to reappear if inactivity fade is enabled.";
-
-			if (ImGui::CollapsingHeader("Status Widget",ImUtil::HeaderFlagsDefaultOpen)) {
-				ImUtil::CheckBox("Show Player Stats Widget", &Settings.StatusWindow.bVisible, T0);
-
-				ImGui::Spacing();
-
-				ImUtil::CheckBox("Inactivity Fade", &Settings.StatusWindow.bEnableFade,T7);
-				ImUtil::SliderF("Fade After", &Settings.StatusWindow.fFadeAfter, 0.5f, 10.0f, T8, "After %.1f Seconds", !Settings.StatusWindow.bEnableFade);
-				ImUtil::SliderF("Reappear Delta", &Settings.StatusWindow.fFadeDelta, 0.0, 0.5f, T11, "After a %.2fx Difference", !Settings.StatusWindow.bEnableFade);
-
-				ImGui::Spacing();
-
-				ImUtil::SliderF("Widget Alpha", &Settings.StatusWindow.fAlpha, 0.1f, 1.0f, T1,"%.1fx");
-				ImUtil::SliderF("Widget BG Alpha", &Settings.StatusWindow.fBGAlphaMult, 0.0f, 1.0f, T6, "%.1fx");
-
-				ImGui::Spacing();
-
-				ImUtil::SliderF("Widget Fixed Width", &Settings.StatusWindow.fFixedWidth, 120.0f, 600.0f, T9, "%.0f");
-				ImUtil::SliderF("Bar Height Mult", &Settings.StatusWindow.fSizeBarHeightMult, 0.1f, 2.5f, T10, "%.2fx");
-
-				ImGui::Spacing();
-
-				ImUtil::CheckBox("Lock Widget Position", &Settings.StatusWindow.bLock, T2);
-
-				ImGui::BeginDisabled(!Settings.StatusWindow.bLock);
-				{
-					ImUtil::ComboEx<ImWindow::WindowAnchor>("Anchor", Settings.StatusWindow.sAnchor, T3);
-					ImGui::BeginDisabled(Settings.StatusWindow.sAnchor == "kCenter");
-					{
-						ImUtil::SliderF("Offset (Left/Right)", &Settings.StatusWindow.f2Offset.at(0), 0.0f, 1280.0f, T4, "%.1f%");
-						ImUtil::SliderF("Offset (Up/Down)", &Settings.StatusWindow.f2Offset.at(1), 0.0f, 720.0f, T5,"%.1f%");
-					}
-					ImGui::EndDisabled();
-				}
-				ImGui::Spacing();
-
-				ImGui::EndDisabled();
-			}
-
-			if (ImGui::CollapsingHeader("Status Widget Content Toggles", ImUtil::HeaderFlagsDefaultOpen)) {
+			if (ImGui::CollapsingHeader("Player Widget Content Toggles", ImUtil::HeaderFlagsDefaultOpen)) {
 				ImUtil::Bitfield<GTSInfoFeatures>(&Settings.StatusWindow.iFlags);
 			}
 		}
@@ -74,60 +162,17 @@ namespace GTS {
 
 	void CategoryWidgets::DrawRight() {
 
-		// ------ UnderStomp Angle Window
+		ImUtil_Unique {
+			DrawBaseOptions(Settings.UnderstompWindow, "Understomp Widget");
+		}
+
+		ImUtil_Unique {
+			DrawBarOptions(Settings.UnderstompWindow, "Understomp Widget Style");
+		}
 
 		ImUtil_Unique{
-
-			const char* T0 = "Toggle the visibility of the understomp angle window.";
-			const char* T1 = "Adjust the opacity of the window.";
-
-			const char* T2 = "Automatically handle positioning and size for the the understomp angle window.\n"
-								"Disabling this allows you to move and resize the settings window manually.\n"
-								"Otherwise, if left enabled you can adjust the position offsets below.";
-
-			const char* T3 = "Choose the alignment point for the window on screen";
-			const char* T4 = "Adjust horizontal offset from the selected anchor point.";
-			const char* T5 = "Adjust vertical offset from the selected anchor point.";
-			const char* T6 = "Adjust the opacity of the stats window's backround.";
-			const char* T7 = "Toggle whether the the understomp angle widget fades if the players scale or max scale don't change for a while.";
-			const char* T8 = "Change how long the widget menu should be shown for after a value has changed.";
-			const char* T9 = "Set the width of the the understomp angle window. Works only if auto size is disabled.";
-			const char* T10 = "Set the height multiplier of the size bar.";
-			const char* T11 = "Set the required change (ie Delta) in size for the window to reappear if inactivity fade is enabled.";
-
-			if (ImGui::CollapsingHeader("Understomp Status Widget",ImUtil::HeaderFlagsDefaultOpen)) {
-				ImUtil::CheckBox("Show Understomp Status Widget", &Settings.UnderstompWindow.bVisible, T0);
-
-				ImGui::Spacing();
-
-				ImUtil::CheckBox("Inactivity Fade", &Settings.UnderstompWindow.bEnableFade,T7);
-				ImUtil::SliderF("Fade After", &Settings.UnderstompWindow.fFadeAfter, 0.5f, 10.0f, T8, "After %.1f Seconds", !Settings.UnderstompWindow.bEnableFade);
-				ImUtil::SliderF("Reappear Delta", &Settings.UnderstompWindow.fFadeDelta, 0.0, 0.5f, T11, "After a %.2fx Difference", !Settings.UnderstompWindow.bEnableFade);
-
-				ImGui::Spacing();
-
-				ImUtil::SliderF("Widget Alpha", &Settings.UnderstompWindow.fAlpha, 0.1f, 1.0f, T1,"%.1fx");
-				ImUtil::SliderF("Widget BG Alpha", &Settings.UnderstompWindow.fBGAlphaMult, 0.0f, 1.0f, T6, "%.1fx");
-
-				ImGui::Spacing();
-
-				ImUtil::SliderF("Widget Fixed Width", &Settings.UnderstompWindow.fFixedWidth, 120.0f, 600.0f, T9, "%.0f");
-				ImUtil::SliderF("Bar Height Mult", &Settings.UnderstompWindow.fSizeBarHeightMult, 0.1f, 2.5f, T10, "%.2fx");
-
-				ImGui::Spacing();
-
-				ImUtil::CheckBox("Lock Widget Position", &Settings.UnderstompWindow.bLock, T2);
-				ImGui::BeginDisabled(!Settings.UnderstompWindow.bLock);
-				{
-					ImUtil::ComboEx<ImWindow::WindowAnchor>("Anchor", Settings.UnderstompWindow.sAnchor, T3);
-					ImGui::BeginDisabled(Settings.UnderstompWindow.sAnchor == "kCenter");
-					{
-						ImUtil::SliderF("Offset (Left/Right)", &Settings.UnderstompWindow.f2Offset.at(0), 0.0f, 1280.0f, T4, "%.1f%");
-						ImUtil::SliderF("Offset (Up/Down)", &Settings.UnderstompWindow.f2Offset.at(1), 0.0f, 720.0f, T5,"%.1f%");
-					}
-					ImGui::EndDisabled();
-				}
-				ImGui::EndDisabled();
+			if (ImGui::CollapsingHeader("Understomp Widget Content Toggles", ImUtil::HeaderFlagsDefaultOpen)) {
+				ImUtil::CheckBox("Show Text", reinterpret_cast<bool*>(&Settings.UnderstompWindow.iFlags));
 			}
 		}
 	}

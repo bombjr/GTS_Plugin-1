@@ -49,24 +49,10 @@ namespace GTS {
                 ImGui::ShowStackToolWindow();
             }
 
-            //No longer needed since Settings now draws ontop again
-
-            //auto UI = UI::GetSingleton();
-
-
-            //if (Plugin::AnyMenuOpen() || UI->IsMenuOpen(RE::FaderMenu::MENU_NAME)) {
-
-            //    for (const auto& window : windows) {
-
-            //        if (window->Name == "Settings" && window->Show) {
-            //            logger::warn("WindowManager::Update -> Force closed settings!");
-            //            UIManager::CloseSettings();
-            //        }
-            //        //Redundant
-            //        window->Show = false;
-            //    }
-            //    return;
-            //}
+            //Things Like the inventory menu draw before our hudmenu hook, this check prevents the widgets from drawing ontop of some things.
+            if (Plugin::AnyWidgetMenuOpen() && !UIManager::ShouldDrawOverTop.load()) {
+                return;
+            }
 
             for (const auto& window : windows) {
 

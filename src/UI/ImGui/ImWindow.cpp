@@ -2,7 +2,7 @@
 
 namespace GTS {
 
-    ImVec2 ImWindow::GetAnchorPos(WindowAnchor a_position, ImVec2 a_padding) {
+    ImVec2 ImWindow::GetAnchorPos(WindowAnchor a_position, ImVec2 a_padding, bool AllowCenterY) {
         auto v = ImGui::GetMainViewport();
         auto s = ImGui::GetWindowSize();
 
@@ -25,6 +25,9 @@ namespace GTS {
             case WindowAnchor::kBottomRight:
                 return { Origin.x - a_padding.x, Origin.y - a_padding.y };
             case WindowAnchor::kCenter: default:
+				if (AllowCenterY) {
+                    return { Origin.x * 0.5f, Origin.y - a_padding.y };
+				}
                 return { Origin.x * 0.5f, Origin.y * 0.5f };
         }
     }
