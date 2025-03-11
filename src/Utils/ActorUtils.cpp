@@ -815,10 +815,6 @@ namespace GTS {
 		return AttributeManager::GetSingleton().GetAttributeBonus(actor, ActorValue::kAttackDamageMult);
 	}
 
-	float Damage_CalculateSizeDamage(Actor* giant, Actor* tiny) {
-		return GetDamageMultiplier(giant) * GetDamageResistance(tiny);
-	}
-
 	float GetSizeDifference(Actor* giant, Actor* tiny, SizeType Type, bool Check_SMT, bool HH) {
 		float hh_gts = 0.0f; 
 		float hh_tiny = 0.0f;

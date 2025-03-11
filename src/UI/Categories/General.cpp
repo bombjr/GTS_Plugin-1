@@ -18,7 +18,8 @@ namespace GTS {
 		ImUtil_Unique {
 
 			const char* T0 = "The automatic check can sometimes be unreliable.\n"
-							 "By pressing this you can forcefully try play an animation.\n"
+							 "By pressing this you can forcefully try to play an animation.\n"
+							 "It is highly recommended to stand still on the ground when using this.\n\n"
 							 "A messagebox should appear stating wether the animation was successfully played or not.";
 
 			if (ImGui::CollapsingHeader("Animations Check", ImUtil::HeaderFlagsDefaultOpen)) {
@@ -85,8 +86,9 @@ namespace GTS {
 
 	    ImUtil_Unique {
 
-	        const char* T0 = "Enable or disable compatibility with the Devourment mod.\n"
-	                         "If enabled, when this mod's vore actions are completed, the NPC will be delegated to the Devourment mod.";
+	        const char* T0 = "Enable or disable experimental compatibility with the Devourment mod.\n"
+							 "This compatibility toggle may lead to issues such as actors being swallowed with delay (because Papyrus lags) or other bugs\n\n"
+							 "If enabled, when this mod's vore actions are completed, the NPC will be delegated to the Devourment mod.";
 
 	        const char* T1 = "Enable or disable compatibility with the Alternate Conversation Camera mod.\n"
 	                         "If enabled, this mod's camera offsets during dialogue will be disabled.";
@@ -110,7 +112,8 @@ namespace GTS {
 	                         "Animations may not look good and could cause issues even.\n"
 	                         "Use at your own risk.";
 
-			const char* T1 = "Apply computationally expensive damage calculations to all actors.";
+			const char* T1 = "Apply computationally expensive damage calculations to all NPC's in the scene.\n"
+							 "This toggle can be EXTREMELY fps hungry, it is highly recommended to keep it off.";
 
 	        if (ImGui::CollapsingHeader("Experimental", ImUtil::HeaderFlagsDefaultOpen)) {
 	            ImUtil::CheckBox("Allow Male Actors", &Settings.bEnableMales, T0);

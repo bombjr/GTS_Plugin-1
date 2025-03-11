@@ -143,6 +143,7 @@ namespace GTS {
 			// Fix: negative bonuses when natural scale is < 1.0
 			// No Fix: 0.91/1.0 = 0.91   (0.91 is just example of current size)
 			// Fix:    0.91/0.91(natural size) = 1.0
+			// Problem: DR resets after reaching 1.0. Not sure how to fix
 		}
 		switch (av) {
 

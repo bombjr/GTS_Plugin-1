@@ -84,7 +84,7 @@ namespace {
 		} else if (random == 4) {
 			Cprint("{} was absorbed by {}", TinyName, GiantName);
 		} else if (random == 5) {
-			Cprint("{} was shrinkned to nothing by {}", TinyName, GiantName);
+			Cprint("{} was shrunken to nothing by {}", TinyName, GiantName);
 		} else if (random == 6) {
 			Cprint("{} size was completely drained by {}", TinyName, GiantName);
 		} else if (random >= 7) {

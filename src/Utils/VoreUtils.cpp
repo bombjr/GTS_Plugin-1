@@ -169,7 +169,6 @@ namespace GTS {
 
             if (giant->formID == 0x14) {
 				SurvivalMode_AdjustHunger(giant, tinySize * Box_Scale * multiplier, WasLiving, true);
-                AdjustSizeLimit(0.0260f * multiplier, giant);
                 AdjustMassLimit(0.0106f * multiplier, giant);
             }
             if (VoreController::GetSingleton().GetVoreData(giant).GetTimer() == true) {

@@ -58,15 +58,15 @@ namespace GTS {
 
         ImUtil_Unique{
 
-            const char* T0 = "Toggle whether the player should receive size-related damage.";
-            const char* T1 = "Toggle whether followers should receive size-related damage.";
+            const char* T0 = "Toggle whether the player should receive friendly size-related damage.";
+            const char* T1 = "Toggle whether followers should receive friendly size-related damage.";
             const char* T2 = "Toggle whether the player and followers stagger / ragdoll due to others' size.";
             const char* T3 = "Toggle whether other NPCs stagger / ragdoll due to others' size.";
 
             if (ImGui::CollapsingHeader("Misc Settings", ImUtil::HeaderFlagsDefaultOpen)) {
 
-                ImUtil::CheckBox("Player Size Damage Immunity", &Settings.bPlayerFriendlyImmunity, T0);
-                ImUtil::CheckBox("Followers Size Damage Immunity", &Settings.bFollowerFriendlyImmunity, T1);
+                ImUtil::CheckBox("Player: Friendly Size Damage Immunity", &Settings.bPlayerFriendlyImmunity, T0);
+                ImUtil::CheckBox("Followers: Friendly Size Damage Immunity", &Settings.bFollowerFriendlyImmunity, T1);
                 ImUtil::CheckBox("Allow Friendly Stagger", &Settings.bAllowFriendlyStagger, T2);
                 ImUtil::CheckBox("Allow Stagger", &Settings.bAllowOthersStagger, T3);
 
@@ -113,7 +113,7 @@ namespace GTS {
 	            constexpr float Min = 0.0;
 
                 const bool IsMassBased = Settings.sSizeMode == "kMassBased";
-                const float MassLimit = Persistent::GetSingleton().GTSMassBasedSizeLimit.value;
+                const float MassLimit = get_natural_scale(PlayerCharacter::GetSingleton()) + Persistent::GetSingleton().GTSMassBasedSizeLimit.value;
 
                 {   //Player Size
                     float* Scale = &Settings.fMaxPlayerSizeOverride;

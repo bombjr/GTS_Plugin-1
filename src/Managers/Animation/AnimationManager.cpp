@@ -51,17 +51,6 @@
 
 using namespace GTS;
 
-
-namespace {
-	bool IsInRaceMenu() {
-		auto ui = UI::GetSingleton();
-		if (ui->GetMenu("RaceSex Menu")) {
-			return true; // Disallow to do animations in RaceMenu
-		}
-		return false;
-	}
-}
-
 namespace GTS {
 
 	AnimationEventData::AnimationEventData(Actor& giant, TESObjectREFR* tiny) : giant(giant), tiny(tiny) {}
@@ -303,7 +292,7 @@ namespace GTS {
 		}
 
 		if (giant.formID == 0x14) {
-			if (IsFirstPerson() || IsInRaceMenu()) { 
+			if (IsFirstPerson() || Plugin::IsInRaceMenu()) { 
 				//Time::WorldTimeElapsed() > 1.0
 				//ForceThirdPerson(&giant);
 				// It kinda works in fp that way, but it introduces some issues with animations such as Hugs and Butt Crush.

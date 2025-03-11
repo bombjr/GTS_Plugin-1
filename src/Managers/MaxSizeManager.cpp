@@ -35,6 +35,7 @@ namespace {
         }
 
         float size_calc = NaturalScale + Persistent::GetSingleton().GTSMassBasedSizeLimit.value * NaturalScale;
+        size_calc += Persistent::GetSingleton().GTSExtraPotionSize.value * MassMode_ElixirPowerMultiplier; // less effective in mass mode
         float GetLimit = std::clamp(size_calc, NaturalScale, low_limit);
 
         return GetLimit;

@@ -411,7 +411,7 @@ struct SettingsCamera {
 
     // Distance and zoom controls
 
-    bool bEnableAutoFNearDist = true;
+    bool bEnableAutoFNearDist = false;
 
     bool bEnableSkyrimCameraAdjustments = true;
 

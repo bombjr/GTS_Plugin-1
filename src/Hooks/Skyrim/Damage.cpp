@@ -8,6 +8,11 @@
 #include "Managers/Animation/Utils/CooldownManager.hpp"
 
 #include "Utils/DifficultyUtils.hpp"
+#include "Utils/ActorBools.hpp"
+
+namespace {
+	constexpr float AddToDamage = 1.75f; // It's needed so there's more room for error when calculating damage that should kill
+}
 
 namespace GTS {
 
@@ -201,7 +206,7 @@ namespace GTS {
 				ShrinkOutburstExplosion(receiver, true);
 			}
 		}
-		log::info("Health Gate Activated: {}", NullifyDamage);
+		//log::info("Health Gate Activated: {}", NullifyDamage);
 		return NullifyDamage;
 	}
 
@@ -258,7 +263,7 @@ namespace GTS {
 		if (DamageImmunity) {
 			TakenDamageMult *= 0.0f; // Fully immune to damage for 2.5 sec after triggering health gate
 		}
-		log::info("DamageImmunity: {}", DamageImmunity);
+		//log::info("DamageImmunity: {}", DamageImmunity);
 		//log::info("Total DR: {}", TakenDamageMult);
 		return TakenDamageMult;
 	}
@@ -292,12 +297,21 @@ namespace Hooks {
 		static FunctionHook<void(Actor* a_this, float dmg, Actor* aggressor, uintptr_t maybe_hitdata, TESObjectREFR* damageSrc)> SkyrimTakeDamage(
 			RELOCATION_ID(36345, 37335),
 			[](auto* a_this, auto dmg, auto* aggressor, uintptr_t maybe_hitdata, auto* damageSrc) { // Universal damage function before Difficulty damage
-				log::info("Damage Pre: {}", dmg);
-				if (aggressor) { // apply to hits only, We don't want to decrease fall damage for example
+				
+				if (aggressor) { // apply to hits only, we don't want to decrease fall damage for example
 					if (aggressor != a_this) {
-						dmg *= GetTotalDamageResistance(a_this, aggressor); 
-						// ^ This function applies damage resistance from being large
-						// Also makes receiver immune to all (?) damage for ~2.5 sec if health gate was triggered
+						
+						bool ShouldBeKilled = DontAlterDamage(a_this, dmg, AddToDamage);
+						// ^ Attempt to fix being unkillable below 5% hp, the bug seems to be player exclusive
+						if (a_this->formID == 0x14) {
+							log::info("Damage Pre: {}", dmg);
+							log::info("Should be killed: {}", ShouldBeKilled);
+						}
+						if (!ShouldBeKilled) {
+							dmg *= GetTotalDamageResistance(a_this, aggressor); 
+							// ^ This function applies damage resistance from being large
+							// Also makes receiver immune to all (?) damage for ~2.5 sec if health gate was triggered
+						}
 
 						if (HealthGateProtection(a_this, aggressor, dmg)) { // When Health Gate is true, initial hit full damage immunity is applied here 
 							dmg *= 0.0f;
@@ -309,11 +323,13 @@ namespace Hooks {
 				}
 				// This hook has a 'small' downside:
 				// - Seems like if NPC is about to deal 250 damage and player has 5 health left: 
-				//    - the game will cut exessive damage, so damage is now 5
+				//    - the game will cut excessive damage, so damage is now 5
 				//    - then we further affect said 5 damage by damage resistance
 				//    - which in some cases may make player unkillable since health never reaches 0...
 
-				log::info("Damage Post: {}", dmg);
+				if (a_this->formID == 0x14) {
+					log::info("Damage Post: {}", dmg);
+				}
 
 				return SkyrimTakeDamage(a_this, dmg, aggressor, maybe_hitdata, damageSrc);
 			}

@@ -4,6 +4,14 @@
 
 namespace GTS {
 
+	bool Plugin::IsInRaceMenu() {
+		auto ui = UI::GetSingleton();
+		if (ui->GetMenu(RaceSexMenu::MENU_NAME)) {
+			return true; // Disallow to do animations in RaceMenu, not more than that. Allows scaling and such.
+		}
+		return false;
+	}
+
 	bool Plugin::Enabled() {
 		return Plugin::GetSingleton().enabled.load();
 	}
@@ -42,15 +50,11 @@ namespace GTS {
         if (Ready()) {
             auto ui = RE::UI::GetSingleton();
 
-            if (UIManager::MenuOpen()) {
+            if (UIManager::MenuOpen() && GTS::UIManager::GamePaused) {
                 return false;
             }
 
-            if (ui->GameIsPaused()) {
-                return false;
-            }
-
-            if (ui->GetMenu(RaceSexMenu::MENU_NAME)) {
+            if (ui->GameIsPaused() && !IsInRaceMenu()) { // We don't want to pause dll scaling in racemenu
                 return false;
             }
 

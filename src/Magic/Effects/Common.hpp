@@ -400,7 +400,6 @@ namespace GTS {
 
 		power *= PERK_BONUS; // multiply power by perk bonuses
 
-		AdjustSizeLimit(0.0300f * target_scale * power, caster);
 		AdjustMassLimit(0.0002f * target_scale * power, caster);
 
 		auto GtsSkillLevel = GetGtsSkillLevel(caster);
@@ -433,7 +432,7 @@ namespace GTS {
 		return true;
 	}
 
-	inline bool ShrinkToNothing(Actor* caster, Actor* target, bool check_ticks, float time_mult) {
+	inline bool ShrinkToNothing(Actor* caster, Actor* target, bool check_ticks, float time_mult, float mass_mult = 1.0f) {
 		if (!caster) {
 			return false;
 		}
@@ -466,8 +465,7 @@ namespace GTS {
 				AdvanceQuestProgression(caster, target, QuestStage::ShrinkToNothing, 0.25f, false);
 			}
 
-			AdjustSizeLimit(0.0060f, caster);
-			AdjustMassLimit(0.0060f, caster);
+			AdjustMassLimit(0.0060f * mass_mult, caster);
 
 			AdjustSizeReserve(caster, target_scale * bbscale/25);
 			PrintDeathSource(caster, target, DamageSource::Shrinked);
@@ -481,9 +479,7 @@ namespace GTS {
 		float target_scale = get_visual_scale(target) * GetSizeFromBoundingBox(target);
 		if (caster->formID == 0x14) {
 			AdjustSizeReserve(caster, target_scale/25);
-			AdjustSizeLimit(0.0066f * target_scale, caster);
 			AdjustMassLimit(0.0066f * target_scale, caster);
-			
 		}
 	}
 }

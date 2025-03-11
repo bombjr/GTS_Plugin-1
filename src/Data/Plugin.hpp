@@ -5,6 +5,7 @@ namespace GTS {
 
 	class Plugin {
 		public:
+			static bool IsInRaceMenu();
 			static bool Enabled();
 			static bool InGame();
 			static bool Ready();

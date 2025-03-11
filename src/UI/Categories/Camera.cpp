@@ -106,6 +106,7 @@ namespace GTS {
 	        const char* T4 = "Enable camera collision with statics (basically any solid, non-movable object).";
 	        const char* T5 = "Change the scale at which the above collision settings should apply.";
 			const char* T6 = "Dynamically change the camera near distance value to fix clipping issues when small.\n"
+							 "May introduce visual issues such as moving/disappearing shadows.\n\n"
 	    				     "Starts applyng when smaller than 1.0x scale.\n"
 	    					 "Disables itself when past 1.0x scale\n\n"
 	    					 "Note: Can conflict with other mods that also change this value";

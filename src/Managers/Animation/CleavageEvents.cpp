@@ -423,7 +423,6 @@ namespace {
             PrintBreastAbsorbed(giant, tiny);
 
             AdjustSizeReserve(giant, 0.0285f);
-            AdjustSizeLimit(0.0095f, giant);
             AdjustMassLimit(0.0095f, giant);
 
             DecreaseShoutCooldown(giant);

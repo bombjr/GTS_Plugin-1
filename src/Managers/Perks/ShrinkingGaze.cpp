@@ -128,7 +128,7 @@ namespace {
 
 											if (data->ShrinkTicksCalamity >= stare_threshold_s) {
 												Laugh_Chance(giant, 1.25f, "CalamityShrink");
-												if (!ShrinkToNothing(giant, otherActor, true, 1.50f)) {
+												if (!ShrinkToNothing(giant, otherActor, true, 1.50f, 1.20f)) {
 													ShrinkTheTargetOr(giant, otherActor, stare_threshold_s, tiny_size, difference, data);
 													AdjustMassLimit(tiny_size * 0.00025f, giant);
 												} else {
@@ -137,7 +137,6 @@ namespace {
 														Runtime::PlaySoundAtNode("GTSSoundMagicProctectTinies", otherActor, 0.5f, 0.5f, "NPC Root [Root]");
 														ApplyActionCooldown(otherActor, CooldownSource::Misc_ShrinkParticle_Gaze);
 													}
-													AdjustMassLimit(0.0075f, giant);
 													data->MovementSlowdown = 1.0f;
 													MoanOr(giant);
 												}

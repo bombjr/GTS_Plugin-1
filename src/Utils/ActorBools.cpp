@@ -67,6 +67,15 @@ namespace GTS {
 		return false;
 	}
 
+	bool DontAlterDamage(Actor* a_this, float dmg, float Damage_Add) { // Used inside Damage.cpp (hook), a way to fix almost unkillable player in some cases
+		if (a_this->formID == 0x14) {
+			float currentHP = GetAV(a_this, ActorValue::kHealth);
+			bool ShouldBeKilled = GetHealthPercentage(a_this) <= 0.05f && dmg + Damage_Add >= currentHP;
+			return ShouldBeKilled;
+		}
+		return false;
+	}
+
    /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;
 		actor->GetGraphVariableBool("GTS_DisableHH", disable);

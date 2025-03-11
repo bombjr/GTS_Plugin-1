@@ -191,7 +191,7 @@ namespace {
 			ShrinkPulse_DecreaseSize(huggedActor, scale);
 			ShrinkPulse_GainSize(giant, huggedActor, false);
 
-			Rumbling::For("ShrinkPulse", giant, Rumble_Hugs_Shrink, 0.10f, "NPC COM [COM ]", 0.50f / AnimationManager::GetAnimSpeed(giant), 0.0f);
+			Rumbling::For("ShrinkPulse", giant, Rumble_Hugs_Shrink, 0.10f, "NPC COM [COM ]", 0.50f / AnimationManager::GetAnimSpeed(giant), 0.0f, true);
 			ModSizeExperience(giant, scale/6);
 		}
 	}
@@ -206,7 +206,7 @@ namespace {
 		if (huggedActor) {
 			HugCrushOther(giant, huggedActor);
 			PrintDeathSource(giant, huggedActor, DamageSource::Hugs);
-			Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f);
+			Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f, true);
 			HugShrink::DetachActorTask(giant);
 
 			AdjustFacialExpression(giant, 0, 0.0f, CharEmotionType::Phenome);
@@ -220,8 +220,7 @@ namespace {
 				auto caster = giant;
 				float target_scale = get_visual_scale(huggedActor);
 				AdjustSizeReserve(caster, 0.0225f);
-				AdjustSizeLimit(0.0060f, caster);
-				AdjustMassLimit(0.0060f, caster);
+				AdjustMassLimit(0.0075f, caster);
 			}
 			HugShrink::Release(giant);
 		}
@@ -493,7 +492,7 @@ namespace GTS {
 				Attacked(tinyref, giantref); // make it look like we attack the tiny
 			}
 
-			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Shrink, 0.12f, "NPC COM [COM ]", 0.0f);
+			Rumbling::Once("HugSteal", giantref, Rumble_Hugs_Shrink, 0.12f, "NPC COM [COM ]", 0.0f, true);
 			
 			return true;
 		});
@@ -640,7 +639,7 @@ namespace GTS {
 			if (giant->formID == 0x14) {
 				shake_camera(giant, 0.25f * sizedifference, 0.35f);
 			} else {
-				Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10f);
+				Rumbling::Once("HugRelease", giant, Rumble_Hugs_Release, 0.10f, true);
 			}
 			Notify(message);
 			AbortHugAnimation(giant, huggedActor);
