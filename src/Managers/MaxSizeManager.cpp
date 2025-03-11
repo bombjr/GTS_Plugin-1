@@ -27,15 +27,18 @@ namespace {
 
     float get_mass_based_limit(Actor* actor, float NaturalScale) { // get mass based size limit for Player if using Mass Based mode
         float low_limit = get_endless_height(actor);
+        const bool MassMode = Config::GetBalance().sSizeMode == "kMassBased";
 
         if (low_limit <= 0.0f) {
 
             low_limit = Persistent::GetSingleton().GTSGlobalSizeLimit.value; // Cap max size through normal size rules
             // Else max possible size is unlimited
         }
-
+        float PotionSize = Persistent::GetSingleton().GTSExtraPotionSize.value;
         float size_calc = NaturalScale + Persistent::GetSingleton().GTSMassBasedSizeLimit.value * NaturalScale;
-        size_calc += Persistent::GetSingleton().GTSExtraPotionSize.value * MassMode_ElixirPowerMultiplier; // less effective in mass mode
+        
+        MassMode ? size_calc += (PotionSize * MassMode_ElixirPowerMultiplier) : size_calc += PotionSize; // less effective in mass mode
+
         float GetLimit = std::clamp(size_calc, NaturalScale, low_limit);
 
         return GetLimit;
