@@ -251,17 +251,30 @@ struct WindowConfWidget {
 
     // Positioning and appearance
     std::array<float, 2> f2Offset = {20.0f, 20.0f};
+    std::array<float, 3> f3ColorA = { 1.0f, 1.0f, 1.0f };
+    std::array<float, 3> f3ColorB = { 1.0f, 1.0f, 1.0f };
+    bool bEnableRounding = true;
+    bool bUseCustomGradientColors = false;
+    bool bUseGradient = true;
+    bool bFlipGradientDirection = false;
+    float fNormalGradientLightMult = 0.7f;
+    float fNormalGradientDarkMult = 1.3f;
+    float fBorderThickness = 3.0f;
+    float fBorderLightness = 0.5;
+    float fBorderAlpha = 8.0f;
+
+
     std::string sAnchor = "kTopRight";
     float fAlpha = 1.0f;
     float fBGAlphaMult = 1.0f;
 
     bool bEnableFade = true;
-    float fFadeAfter = 6.0f;
-    float fFixedWidth = 160.0f;
+    float fFadeAfter = 1.0f;
+    float fFixedWidth = 100.0f;
     float fSizeBarHeightMult = 1.0f;
-    float fFadeDelta = 0.05f;
+    float fFadeDelta = 0.0f;
     // Display control
-    uint32_t iFlags = 22;
+    uint32_t iFlags = 0;
 };
 TOML_SERIALIZABLE(WindowConfWidget);
 
@@ -520,6 +533,8 @@ struct SettingsUI {
         .bLock = true,
         .bVisible = true,
     	.f2Offset = {870.0f, 28.5f},
+    	.f3ColorA = f3AccentColor,
+        .f3ColorB = f3AccentColor,
     	.sAnchor = "kBottomLeft",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,
@@ -534,18 +549,20 @@ struct SettingsUI {
 
     WindowConfWidget UnderstompWindow = {
 
-	    .bLock = true,
-	    .bVisible = true,
-	    .f2Offset = {885.0f, 60.0f},
-	    .sAnchor = "kBottomLeft",
-	    .fAlpha = 1.0f,
-	    .fBGAlphaMult = 0.0f,
-	    .bEnableFade = true,
-	    .fFadeAfter = 1.8f,
-	    .fFixedWidth = 120.0f,
-	    .fSizeBarHeightMult = 0.1f,
-	    .fFadeDelta = 0.05f,
-	    .iFlags = 0,
+        .bLock = true,
+        .bVisible = true,
+        .f2Offset = {885.0f, 60.0f},
+    	.f3ColorA = f3AccentColor,
+        .f3ColorB = f3AccentColor,
+        .sAnchor = "kBottomLeft",
+        .fAlpha = 1.0f,
+        .fBGAlphaMult = 0.0f,
+        .bEnableFade = true,
+        .fFadeAfter = 1.8f,
+        .fFixedWidth = 120.0f,
+        .fSizeBarHeightMult = 0.1f,
+        .fFadeDelta = 0.05f,
+        .iFlags = 0,
 
     };
 

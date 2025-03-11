@@ -132,7 +132,7 @@ namespace GTS {
         if (sUI.bLock) {
             //X,Y
             const ImVec2 Offset{ sUI.f2Offset[0], sUI.f2Offset[1] };
-            ImGui::SetWindowPos(GetAnchorPos(StringToEnum<WindowAnchor>(sUI.sAnchor), Offset));
+            ImGui::SetWindowPos(GetAnchorPos(StringToEnum<WindowAnchor>(sUI.sAnchor), Offset, true));
 
         }
 
@@ -142,18 +142,50 @@ namespace GTS {
 
             ImGui::PushFont(ImFontManager::GetFont("widgetbody"));
 
-            const std::string Text = fmt::format(
-                fmt::runtime([this]() -> std::string {
-                    if (AreEqual(Angle,0.0,0.01))
-                        return "Far Stomp";
-                    if (AreEqual(Angle, 1.0, 0.01))
-                        return "Under Stomp";
-                    return "Angle {:.2f}x";
-                }()),
-                Angle);
+            std::string Text = "";
 
-            ImUtil::CenteredProgress(Angle / 1.0f, { sUI.fFixedWidth, 0.0f }, Text.c_str(), sUI.fSizeBarHeightMult);
-           
+            if (sUI.iFlags > 0) {
+				Text = fmt::format(
+	                fmt::runtime([this]() -> std::string {
+	                    if (AreEqual(Angle, 0.0, 0.01))
+	                        return "Far Stomp";
+	                    if (AreEqual(Angle, 1.0, 0.01))
+	                        return "Under Stomp";
+	                    return "Angle {:.2f}x";
+	                }()),
+	                Angle
+                );
+            }
+
+
+            const float VisualProgress = Angle / 1.0f;
+            const ImVec4 ColorAVec{ sUI.f3ColorA[0], sUI.f3ColorA[1], sUI.f3ColorA[2] ,1.0f };
+            const ImVec4 ColorBVec{ sUI.f3ColorB[0], sUI.f3ColorB[1], sUI.f3ColorB[2] ,1.0f };
+            const ImU32 ColorA32 = ImGui::ColorConvertFloat4ToU32(ColorAVec);
+            const ImU32 ColorB32 = ImGui::ColorConvertFloat4ToU32(ColorBVec);
+            const float BorderCol = sUI.fBorderLightness;
+            const float BorderAlpha = sUI.fBorderAlpha;
+
+            ImGui::PushStyleColor(ImGuiCol_Border, { BorderCol, BorderCol, BorderCol, BorderAlpha });
+
+            // Visual Scale (Progress) Bar
+            ImUtil::CenteredProgress(
+                VisualProgress,
+                { sUI.fFixedWidth, 0.0f },
+                Text.c_str(),
+                sUI.fSizeBarHeightMult,
+                sUI.fBorderThickness,
+                sUI.bUseGradient,
+                sUI.fNormalGradientDarkMult,
+                sUI.fNormalGradientLightMult,
+                sUI.bEnableRounding,
+                sUI.bUseCustomGradientColors,
+                ColorA32,
+                ColorB32,
+                sUI.bFlipGradientDirection
+            );
+
+            ImGui::PopStyleColor();
             ImGui::PopFont();
         }
 

@@ -118,7 +118,7 @@ namespace GTS {
 	        if(!ImGui::GetIO().MouseDown[0]){
 	            //X,Y
 	            const ImVec2 Offset {sUI.f2Offset[0], sUI.f2Offset[1]};
-	            ImGui::SetWindowPos(GetAnchorPos(StringToEnum<ImWindow::WindowAnchor>(sUI.sAnchor), Offset));
+	            ImGui::SetWindowPos(GetAnchorPos(StringToEnum<ImWindow::WindowAnchor>(sUI.sAnchor), Offset, false));
 	        }
 	    }
 
@@ -130,7 +130,7 @@ namespace GTS {
 			TotalWidth += (ImGui::CalcTextSize(Lables[1]).x + 2.0f * Style.FramePadding.x);
 		}
 
-		if (Config::GetAdvanced().bHideLoadButton) {
+		if (!Config::GetAdvanced().bHideLoadButton) {
 			//Load
 			TotalWidth += Style.ItemSpacing.x + 2; // Add Seperator offset
 			TotalWidth += (ImGui::CalcTextSize(Lables[0]).x + 2.0f * Style.FramePadding.x);
@@ -234,13 +234,16 @@ namespace GTS {
 	    {   //Footer - Mod Info
 
 	        ImGui::PushFont(ImFontManager::GetFont("subscript"));
-			const std::string FooterMessage = fmt::format("GTSPlugin {}\n"
-												 "Build Date: {} {}\n"
-												 "{}",
-												 PluginVersion,
-												 __DATE__,
-												 __TIME__,
-												git::AnyUncommittedChanges() ? "Development Version" : fmt::format("SHA1 {}",git::CommitSHA1().c_str()));
+
+			const std::string FooterMessage = fmt::format(
+			 "GTSPlugin {}\n"
+			 "Build Date: {} {}\n"
+			 "{}",
+			 PluginVersion,
+			 __DATE__,
+			 __TIME__,
+			git::AnyUncommittedChanges() ? "Development Version" : fmt::format("SHA1 {}",git::CommitSHA1().c_str()));
+
 	        ImGui::TextColored(ImUtil::ColorSubscript, FooterMessage.c_str());
 	        ImGui::PopFont();
 	    }
