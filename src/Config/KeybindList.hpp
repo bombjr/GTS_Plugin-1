@@ -241,6 +241,11 @@ namespace GTS {
                 .Keys = {"NUMPAD2"},
             },
             {
+                .Event = "LightSwipeRight",
+                .Keys = {"LALT", "E"},
+                .Trigger = "Release",
+            },
+            {
                 .Event = "LightSwipeLeft",
                 .Keys = {"LALT", "Q"},
                 .Trigger = "Release",
