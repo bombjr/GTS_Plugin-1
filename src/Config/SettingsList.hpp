@@ -257,11 +257,11 @@ struct WindowConfWidget {
     bool bUseCustomGradientColors = false;
     bool bUseGradient = true;
     bool bFlipGradientDirection = false;
-    float fNormalGradientLightMult = 0.7f;
-    float fNormalGradientDarkMult = 1.3f;
-    float fBorderThickness = 3.0f;
-    float fBorderLightness = 0.5;
-    float fBorderAlpha = 8.0f;
+    float fNormalGradientLightMult = 1.5f;
+    float fNormalGradientDarkMult = 1.0f;
+    float fBorderThickness = 2.0f;
+    float fBorderLightness = 0.15f;
+    float fBorderAlpha = 0.50f;
 
 
     std::string sAnchor = "kTopRight";
@@ -532,10 +532,10 @@ struct SettingsUI {
 
         .bLock = true,
         .bVisible = true,
-    	.f2Offset = {870.0f, 28.5f},
+    	.f2Offset = {0.0f, 28.5f},
     	.f3ColorA = f3AccentColor,
         .f3ColorB = f3AccentColor,
-    	.sAnchor = "kBottomLeft",
+    	.sAnchor = "kCenter",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,
         .bEnableFade = true,
@@ -551,18 +551,18 @@ struct SettingsUI {
 
         .bLock = true,
         .bVisible = true,
-        .f2Offset = {885.0f, 60.0f},
+        .f2Offset = {0.0f, 60.0f},
     	.f3ColorA = f3AccentColor,
         .f3ColorB = f3AccentColor,
-        .sAnchor = "kBottomLeft",
+        .sAnchor = "kCenter",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,
         .bEnableFade = true,
         .fFadeAfter = 1.8f,
         .fFixedWidth = 120.0f,
-        .fSizeBarHeightMult = 0.1f,
+        .fSizeBarHeightMult = 0.01f,
         .fFadeDelta = 0.05f,
-        .iFlags = 0,
+        .iFlags = 1,
 
     };
 

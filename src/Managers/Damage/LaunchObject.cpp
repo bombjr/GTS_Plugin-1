@@ -263,11 +263,6 @@ namespace GTS {
 			for (const auto& object: refs) {
 				if (object) {
 					TESObjectREFR* objectref = object.get().get();
-
-					if (objectref->formID == 0x14 && !Config::GetGameplay().ActionSettings.bEnablePlayerPushBack) {
-						continue;
-					}
-
 					PushObjectsTowards(giant, objectref, bone, power, radius, Kick);
 				}
 			}

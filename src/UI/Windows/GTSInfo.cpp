@@ -71,7 +71,7 @@ namespace GTS {
         const float VisualProgress = MaxScale < 250.0f ? CurrentScale / MaxScale : 0.0f;
 
         //--------- Formatted display strings
-        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format("{:.2f}x", CurrentScale) : "";
+        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format("({:.2f}x)", CurrentScale) : "";
         const std::string StringReal = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitReal) ? GTS::GetFormatedHeight(a_Actor).c_str() : "";
         const std::string ResultingText = fmt::format("{} {}", StringReal, StringScale);
 
