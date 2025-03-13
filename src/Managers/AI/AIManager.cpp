@@ -89,9 +89,10 @@ namespace {
 			const bool IsVisible = a_Actor->GetAlpha() > 0.0f; //For devourment
 			const bool IsInNormalState = a_Actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kNormal;
 			const bool IsHoldingSomeone = Grab::GetHeldActor(a_Actor) != nullptr || IsInCleavageState(a_Actor);
+			const bool IsInCombat = (a_Actor->IsInCombat()) || (a_Actor->GetActorRuntimeData().currentCombatTarget.get().get() != nullptr);
 
 			//Is In combat or do we allow ai outside of combat?
-			if ((a_Actor->IsInCombat() || !a_CombatOnly) && !IsGtsBusy(a_Actor) && HasHP && IsVisible && IsInNormalState && !IsHoldingSomeone) {
+			if ((IsInCombat || !a_CombatOnly) && !IsGtsBusy(a_Actor) && HasHP && IsVisible && IsInNormalState && !IsHoldingSomeone) {
 
 				//Follower Check
 				if (IsTeammate(a_Actor)) {
@@ -259,14 +260,20 @@ namespace GTS {
 				//logger::trace("AIManager Found Performers");
 
 				//Pick random
-				int idx = RandomInt(0, static_cast<int>(PerformerList.size()) - 1);
-				Actor* Performer = PerformerList.at(idx);
-				TryStartAction(Performer);
+				//int idx = RandomInt(0, static_cast<int>(PerformerList.size()) - 1);
+				//Actor* Performer = PerformerList.at(idx);
+
+				for (const auto& Performer : PerformerList) {
+					TryStartAction(Performer);
+				}
 			}
 		}
 	}
 
+
 	void AIManager::TryStartAction(Actor* a_Performer) const {
+
+		if (!a_Performer) return;
 
 		//Actor* container from each filter result.
 		std::vector<Actor*> CanVore = {};
