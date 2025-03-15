@@ -335,6 +335,10 @@ struct SettingsAudio {
     bool bSlowGrowMoans = true;
     bool bEnableVoiceOverride = true;
     bool bMuteVoreDeathScreams = true;
+    bool bMuteHugCrushDeathScreams = true;
+    bool bMuteFingerSnapDeathScreams = true;
+    bool bMuteBreastAbsorptionDeathScreams = true;
+    
     float fMaxVoiceFrequency = 1.0f;
 
 };

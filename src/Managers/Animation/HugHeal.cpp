@@ -48,7 +48,15 @@ namespace {
 		static Timer HeartTimer = Timer(0.5);
 		float hp = GetAV(tinyref, ActorValue::kHealth);
 		float maxhp = GetMaxAV(tinyref, ActorValue::kHealth);
+		
 		bool Healing = IsHugHealing(giantref);
+
+		const bool Teammate = IsTeammate(tinyref);
+		const bool Player = tinyref->formID == 0x14;
+		const bool IsPlayerOrMate = (Player || Teammate);
+		const bool BothTeammates = IsTeammate(giantref) && Teammate;
+		
+		const bool ShouldContinue = (BothTeammates || IsPlayerOrMate);
 		
 		if (Healing && HeartTimer.ShouldRunFrame()) {
 			SpawnHearts(giantref, tinyref, 0.0f, 2.4f, true);
@@ -56,7 +64,7 @@ namespace {
 
 		if (!Healing && hp >= maxhp) {
 
-			if ((IsTeammate(giantref) && IsTeammate(tinyref) || tinyref->formID == 0x14) && !Config::GetGameplay().ActionSettings.bHugsStopAtFullHP) {
+			if (ShouldContinue && !Config::GetGameplay().ActionSettings.bHugsStopAtFullHP) {
 				return true;
 			}
 

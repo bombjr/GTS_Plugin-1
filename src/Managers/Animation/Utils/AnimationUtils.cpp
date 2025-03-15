@@ -314,8 +314,11 @@ namespace GTS {
 		AddSMTDuration(giant, 5.0f);
 		ApplyShakeAtNode(tiny, 3, "NPC Root [Root]");
 
+		//bool = Silent; True = mute death, false = no mute
+		const auto& MuteHugCrush = Config::GetAudio().bMuteHugCrushDeathScreams;
+
 		DecreaseShoutCooldown(giant);
-		KillActor(giant, tiny, true);
+		KillActor(giant, tiny, MuteHugCrush);
 
 		if (tiny->formID != 0x14) {
 			Disintegrate(tiny); // Set critical stage 4 on actor

@@ -554,43 +554,43 @@ namespace GTS {
                 .Keys = {"LSHIFT", "2"},
             },
             {
-                .Event = "TotalControlGrow",
+                .Event = "ManualGrow",
                 .Keys = {"UP", "LEFT"},
                 .Trigger = "Continuous",
             },
             {
-                .Event = "TotalControlShrink",
+                .Event = "ManualShrink",
                 .Keys = {"DOWN", "LEFT"},
                 .Trigger = "Continuous",
             },
             {
-                .Event = "TotalControlGrowOther",
+                .Event = "ManualGrowOther",
                 .Keys = {"LSHIFT", "UP", "LEFT"},
                 .Trigger = "Continuous",
             },
             {
-                .Event = "TotalControlShrinkOther",
+                .Event = "ManualShrinkOther",
                 .Keys = {"LSHIFT", "DOWN", "LEFT"},
                 .Trigger = "Continuous",
             },
 
             {
-                .Event = "TotalControlGrowOverTime",
+                .Event = "ManualGrowOverTime",
                 .Keys = {"NUMPAD8"},
                 .Trigger = "Once",
             },
             {
-                .Event = "TotalControlShrinkOverTime",
+                .Event = "ManualShrinkOverTime",
                 .Keys = {"NUMPAD4"},
                 .Trigger = "Once",
             },
             {
-                .Event = "TotalControlGrowOtherOverTime",
+                .Event = "ManualGrowOtherOverTime",
                 .Keys = {"NUMPAD5"},
                 .Trigger = "Once",
             },
             {
-                .Event = "TotalControlShrinkOtherOverTime",
+                .Event = "ManualShrinkOtherOverTime",
                 .Keys = {"NUMPAD2"},
                 .Trigger = "Once",
             },

@@ -646,15 +646,15 @@ namespace GTS {
 		InputManager::RegisterInputEvent("ShrinkOutburst", ShrinkOutburstEvent, ShrinkOutburstCondition);
 		InputManager::RegisterInputEvent("ProtectSmallOnes", ProtectSmallOnesEvent, ProtectSmallOnesCondition);
 
-		InputManager::RegisterInputEvent("TotalControlGrow", TotalControlGrowEvent, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlShrink", TotalControlShrinkEvent, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlGrowOther", TotalControlGrowOtherEvent, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualGrow", TotalControlGrowEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualShrink", TotalControlShrinkEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualGrowOther", TotalControlGrowOtherEvent, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualShrinkOther", TotalControlShrinkOtherEvent, TotalControlCondition);
 
-		InputManager::RegisterInputEvent("TotalControlGrowOverTime", TotalControlGrowPlayer_OverTime, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlShrinkOverTime", TotalControlShrinkPlayer_OverTime, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlGrowOtherOverTime", TotalControlEnlargeTeammate_OverTime, TotalControlCondition);
-		InputManager::RegisterInputEvent("TotalControlShrinkOtherOverTime", TotalControlShrinkTeammate_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualGrowOverTime", TotalControlGrowPlayer_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualShrinkOverTime", TotalControlShrinkPlayer_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualGrowOtherOverTime", TotalControlEnlargeTeammate_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("ManualShrinkOtherOverTime", TotalControlShrinkTeammate_OverTime, TotalControlCondition);
 
 		InputManager::RegisterInputEvent("Vore", VoreInputEvent, VoreCondition);
 		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower, VoreCondition_Follower);

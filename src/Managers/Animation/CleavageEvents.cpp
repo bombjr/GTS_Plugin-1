@@ -426,7 +426,10 @@ namespace {
             AdjustMassLimit(0.0095f, giant);
 
             DecreaseShoutCooldown(giant);
-            KillActor(giant, tiny, true);
+            //bool = Silent; True = mute death, false = no mute
+		    const auto& MuteAbsorptionScreams = Config::GetAudio().bMuteBreastAbsorptionDeathScreams;
+
+            KillActor(giant, tiny, MuteAbsorptionScreams);
 
             if (tiny->formID != 0x14) {
                 Disintegrate(tiny);

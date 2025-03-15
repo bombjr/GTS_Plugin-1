@@ -72,7 +72,7 @@ namespace GTS {
             ImGui::Text("Curse Game Modes");
             ImUtil::SliderF("Curse Update Interval", &a_Settings->fGameModeUpdateInterval, 2.0f, 10.0f, T6, "Every %.2f Seconds");
             ImUtil::SliderF("Curse of Growth Limit", &a_Settings->fCurseGrowthSizeLimit, 1.1f, 50.0f, T3, "%.2fx");
-        	ImUtil::SliderF("Target Scale", &a_Settings->fCurseTargetScale, 1.1f, 2.0f, T5, "%.2fx");
+        	ImUtil::SliderF("Target Scale", &a_Settings->fCurseTargetScale, 1.1f, 4.0f, T5, "%.2fx");
 
             ImGui::EndDisabled();
             ImGui::Spacing();
@@ -178,10 +178,20 @@ namespace GTS {
                                  "Set to 0.0 to disable it entirely.\n"
 								 "Note: If Balance Mode is enabled the multiplier is locked to 1.0x. It can still be disabled however by setting it to 0.0";
 
+                const char* THelp = "Random Growth chance is decreased if your size is > than x1.5, up to 4 times decreased chance\n"
+                                    "If you have 'Breaching Growth' perk, random growth has a chance to start 'Large Growth' animation";
+
                 const char* FmtBalance = BalancedMode ? "Balance Mode (1.0x)" : "%.2fx";
 
                 const char* Fmt1 = Settings.GamemodePlayer.fRandomGrowthDelay != 0.0f ? FmtBalance : "Disabled";
                 const char* Fmt2 = Settings.GamemodeFollower.fRandomGrowthDelay != 0.0f ? FmtBalance : "Disabled";
+
+                
+
+                ImGui::TextColored(ImUtil::ColorSubscript,"About Random Growth (?)");
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip(THelp);
+                }
 
                 ImUtil::SliderF("Growth Delay Player", &Settings.GamemodePlayer.fRandomGrowthDelay, 0.00f, 4.0f, T1, Fmt1);
                 ImUtil::SliderF("Growth Delay Followers", &Settings.GamemodeFollower.fRandomGrowthDelay, 0.00f, 4.0f, T1, Fmt2);

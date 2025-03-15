@@ -482,7 +482,7 @@ namespace GTS {
 
 			if (actor->formID == 0x14) {
 
-				if (Runtime::HasMagicEffect(PlayerCharacter::GetSingleton(), "GTSPotionEffectSizeAmplify")) {
+				if (Runtime::HasMagicEffect(actor, "GTSPotionEffectSizeAmplify")) {
 					BonusGrowth = CurrentScale * 0.25f + 0.75f;
 				}
 
@@ -495,10 +495,10 @@ namespace GTS {
 				if (Runtime::HasMagicEffect(actor, "GTSPotionEffectSizeAmplify")) {
 					BonusGrowth = CurrentScale * 0.25f + 0.75f;
 				}
-				GameMode = StringToEnum<SelectedGameMode>(Settings.GamemodeFollower.sGameMode);
 
-				BaseGrowhtRate = Settings.GamemodePlayer.fGrowthRate * BonusGrowth;
-				BaseShrinkRate = Settings.GamemodePlayer.fShrinkRate;
+				BaseGrowhtRate = Settings.GamemodeFollower.fGrowthRate * BonusGrowth;
+				BaseShrinkRate = Settings.GamemodeFollower.fShrinkRate;
+				GameMode = StringToEnum<SelectedGameMode>(Settings.GamemodeFollower.sGameMode);
 			}
 		}
 

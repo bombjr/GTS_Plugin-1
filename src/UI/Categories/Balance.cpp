@@ -29,10 +29,10 @@ namespace GTS {
             const char* T4 = "Affects amount of size you lose when being hit.";
 
             const char* THelp = "Balance mode makes it harder to gain size in general.\n"
-                                "Actors resist size damage while they have stamina and\n"
-                                "you constantly shrink on hit and out of combat.\n"
-                                "On top of that all attribute increases are 50%% weaker and some configuration options are disabled.\n"
-                                "You cannot skip the quest while Balance Mode is enabled.";
+                                "- Enemies resist size damage while they have stamina.\n"
+                                "- You constantly shrink on hit and out of combat.\n\n"
+                                "- On top of that all attribute increases are 50%% weaker and some configuration options are disabled.\n"
+                                "- You cannot skip the quest while Balance Mode is enabled.";
 
             if (ImGui::CollapsingHeader("Balance Mode", ImUtil::HeaderFlagsDefaultOpen)) {
 
