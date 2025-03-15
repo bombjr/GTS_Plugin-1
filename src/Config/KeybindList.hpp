@@ -238,7 +238,7 @@ namespace GTS {
             },
             {
                 .Event = "ToggleFollowerCrawl",
-                .Keys = {"NUMPAD2"},
+                .Keys = {"NUMPAD3"},
             },
             {
                 .Event = "LightSwipeRight",
@@ -574,6 +574,26 @@ namespace GTS {
                 .Trigger = "Continuous",
             },
 
+            {
+                .Event = "TotalControlGrowOverTime",
+                .Keys = {"NUMPAD8"},
+                .Trigger = "Once",
+            },
+            {
+                .Event = "TotalControlShrinkOverTime",
+                .Keys = {"NUMPAD4"},
+                .Trigger = "Once",
+            },
+            {
+                .Event = "TotalControlGrowOtherOverTime",
+                .Keys = {"NUMPAD5"},
+                .Trigger = "Once",
+            },
+            {
+                .Event = "TotalControlShrinkOtherOverTime",
+                .Keys = {"NUMPAD2"},
+                .Trigger = "Once",
+            },
 
             //========================================================
             //========================= M I S C

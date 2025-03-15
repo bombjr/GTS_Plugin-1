@@ -20,6 +20,8 @@ using namespace GTS;
 
 namespace {
 
+	constexpr float DURATION = 2.0f;
+
 	void ReportScaleIntoConsole(Actor* actor, bool enemy) {
 
 		float hh = HighHeelManager::GetBaseHHOffset(actor)[2]/100;
@@ -107,6 +109,191 @@ namespace {
 			giant->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, regenerate * TimeScale());
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////// Growths/Shrinks that have duration but no animation, we forgot to add them
+
+	void TotalControlEnlargeTeammate_OverTime(const ManagedInputEvent& data) {
+		auto casterRef = PlayerCharacter::GetSingleton();
+		if (casterRef) {
+			for (auto targetRef: FindTeammates()) {
+				if (targetRef) {
+					float falloff = 0.11f * get_visual_scale(targetRef);
+					float Volume = std::clamp(get_visual_scale(targetRef)/8.0f, 0.20f, 1.0f);
+					Runtime::PlaySoundAtNode_FallOff("GTSSoundGrowth", targetRef, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
+
+					// Thread safe handles
+					ActorHandle casterHandle = casterRef->CreateRefHandle();
+					ActorHandle targetHandle = targetRef->CreateRefHandle();
+
+					std::string name = std::format("GrowFollower_{}", targetRef->formID);
+					
+					TaskManager::RunFor(name, DURATION, [=](auto& progressData){
+						if (!casterHandle) {
+							return false;
+						}
+						if (!targetHandle) {
+							return false;
+						}
+						float timeDelta = static_cast<float>(progressData.delta * 60); // Was optimised as 60fps
+
+						auto target = targetHandle.get().get();
+						auto caster = casterHandle.get().get();
+
+						float target_scale = get_target_scale(target);
+						float magicka = std::clamp(GetMagikaPercentage(caster), 0.05f, 1.0f);
+
+						float bonus = 1.0f;
+						if (Runtime::HasMagicEffect(caster, "GTSPotionEffectSizeAmplify")) {
+							bonus = target_scale * 0.25f + 0.75f;
+						}
+
+						DamageAV(caster, ActorValue::kMagicka, 0.45f * (target_scale * 0.25f + 0.75f) * magicka * bonus * timeDelta * 1.0f);
+						Grow(target, 0.0030f * magicka * bonus, 0.0f);
+						Rumbling::Once("GrowOtherButton", target, 1.0f, 0.05f);
+
+						return true;
+					});
+				}
+			}
+		}
+	}
+
+	void TotalControlShrinkTeammate_OverTime(const ManagedInputEvent& data) {
+		auto casterRef = PlayerCharacter::GetSingleton();
+		if (casterRef) {
+			for (auto targetRef: FindTeammates()) {
+				if (targetRef) {
+					float scale = get_visual_scale(targetRef);
+					float Volume = std::clamp(scale * 0.10f, 0.10f, 1.0f);
+					
+					float falloff = 0.11f * scale;
+					Runtime::PlaySoundAtNode_FallOff("GTSSoundShrink", targetRef, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
+					
+					// Thread safe handles
+					ActorHandle casterHandle = casterRef->CreateRefHandle();
+					ActorHandle targetHandle = targetRef->CreateRefHandle();
+
+					std::string name = std::format("ShrinkFollower_{}", targetRef->formID);
+
+					TaskManager::RunFor(name, DURATION, [=](auto& progressData){
+						if (!casterHandle) {
+							return false;
+						}
+						if (!targetHandle) {
+							return false;
+						}
+
+						auto target = targetHandle.get().get();
+						auto caster = casterHandle.get().get();
+
+						float target_scale = get_target_scale(target);
+						float magicka = std::clamp(GetMagikaPercentage(caster), 0.05f, 1.0f);
+
+						float bonus = 1.0f;
+						if (Runtime::HasMagicEffect(caster, "GTSPotionEffectSizeAmplify")) {
+							bonus = target_scale * 0.25f + 0.75f;
+						}
+
+						if (target_scale > get_natural_scale(target, true)) {
+							DamageAV(caster, ActorValue::kMagicka, 0.25f * (target_scale * 0.25f + 0.75f) * magicka * bonus * TimeScale() * 1.0f);
+							ShrinkActor(target, 0.0030f * magicka * bonus, 0.0f);
+							Rumbling::Once("ShrinkOtherButton", target, 1.0f, 0.05f);
+						}
+						return true;
+					});
+				}
+			}
+		}
+	}
+
+	void TotalControlGrowPlayer_OverTime(const ManagedInputEvent& data) {
+		auto casterRef = PlayerCharacter::GetSingleton();
+		if (casterRef) {
+			float scale = get_visual_scale(casterRef);
+			float Volume = std::clamp(scale * 0.20f, 0.20f, 1.0f);
+
+			float falloff = 0.11f * scale;
+
+			Runtime::PlaySoundAtNode_FallOff("GTSSoundGrowth", casterRef, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
+		
+			// Thread safe handles
+			ActorHandle casterHandle = casterRef->CreateRefHandle();
+
+			std::string name = std::format("GrowPlayer_{}", casterRef->formID);
+
+			TaskManager::RunFor(name, DURATION, [=](auto& progressData){
+				if (!casterHandle) {
+					return false;
+				}
+
+				auto caster = casterHandle.get().get();
+
+				float caster_scale = get_visual_scale(caster);
+				float target_scale = get_target_scale(caster);
+
+				float bonus = 1.0f;
+				if (Runtime::HasMagicEffect(caster, "GTSPotionEffectSizeAmplify")) {
+					bonus = target_scale * 0.25f + 0.75f;
+				}
+
+				float stamina = std::clamp(GetStaminaPercentage(caster), 0.05f, 1.0f);
+				DamageAV(caster, ActorValue::kStamina, 0.45f * (caster_scale * 0.5f + 0.5f) * stamina * TimeScale());
+
+				Grow(caster, 0.0030f * stamina, 0.0f);
+
+				Rumbling::Once("GrowButton", caster, 1.0f, 0.05f);
+
+				return true;
+			});
+		}
+	}
+	
+
+	void TotalControlShrinkPlayer_OverTime(const ManagedInputEvent& data) {
+		auto casterRef = PlayerCharacter::GetSingleton();
+		if (casterRef) {
+			float scale = get_visual_scale(casterRef);
+			float Volume = std::clamp(scale * 0.10f, 0.10f, 1.0f);
+			float falloff = 0.11f * scale;
+
+			Runtime::PlaySoundAtNode_FallOff("GTSSoundShrink", casterRef, Volume, 1.0f, "NPC Pelvis [Pelv]", falloff);
+		
+			// Thread safe handles
+			ActorHandle casterHandle = casterRef->CreateRefHandle();
+
+			std::string name = std::format("ShrinkPlayer_{}", casterRef->formID);
+
+			TaskManager::RunFor(name, DURATION, [=](auto& progressData){
+				if (!casterHandle) {
+					return false;
+				}
+
+				auto caster = casterHandle.get().get();
+
+				float caster_scale = get_visual_scale(caster);
+				float target_scale = get_target_scale(caster);
+
+				float stamina = std::clamp(GetStaminaPercentage(caster), 0.05f, 1.0f);
+
+				float bonus = 1.0f;
+				if (Runtime::HasMagicEffect(caster, "GTSPotionEffectSizeAmplify")) {
+					bonus = target_scale * 0.25f + 0.75f;
+				}
+
+				if (target_scale > Minimum_Actor_Scale * 2.0f) {
+					DamageAV(caster, ActorValue::kStamina, 0.25f * (caster_scale * 0.5f + 0.5f) * stamina * TimeScale());
+					ShrinkActor(caster, 0.0020f * stamina, 0.0f);
+					Rumbling::Once("ShrinkButton", caster, 0.60f, 0.05f);
+				} else {
+					set_target_scale(caster, Minimum_Actor_Scale * 2.0f);
+					return false;
+				}
+				return true;
+			});
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////
 
 	void TotalControlGrowEvent(const ManagedInputEvent& data) {
 		auto player = PlayerCharacter::GetSingleton();
@@ -463,6 +650,11 @@ namespace GTS {
 		InputManager::RegisterInputEvent("TotalControlShrink", TotalControlShrinkEvent, TotalControlCondition);
 		InputManager::RegisterInputEvent("TotalControlGrowOther", TotalControlGrowOtherEvent, TotalControlCondition);
 		InputManager::RegisterInputEvent("TotalControlShrinkOther", TotalControlShrinkOtherEvent, TotalControlCondition);
+
+		InputManager::RegisterInputEvent("TotalControlGrowOverTime", TotalControlGrowPlayer_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlShrinkOverTime", TotalControlShrinkPlayer_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlGrowOtherOverTime", TotalControlEnlargeTeammate_OverTime, TotalControlCondition);
+		InputManager::RegisterInputEvent("TotalControlShrinkOtherOverTime", TotalControlShrinkTeammate_OverTime, TotalControlCondition);
 
 		InputManager::RegisterInputEvent("Vore", VoreInputEvent, VoreCondition);
 		InputManager::RegisterInputEvent("PlayerVore", VoreInputEvent_Follower, VoreCondition_Follower);
