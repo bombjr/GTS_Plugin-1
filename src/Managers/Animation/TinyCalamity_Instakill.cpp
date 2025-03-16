@@ -70,39 +70,41 @@ namespace {
 	void AttachToObjectBTask(Actor* giant) {
 		auto Tinies = Animation_TinyCalamity::GetShrinkActors(giant);
 		for (auto tiny: Tinies) {
-			std::string name = std::format("CalamityKill_{}_{}", giant->formID, tiny->formID);
-			ActorHandle gianthandle = giant->CreateRefHandle();
-			ActorHandle tinyhandle = tiny->CreateRefHandle();
-			TaskManager::Run(name, [=](auto& progressData) {
-				if (!gianthandle) {
-					return false;
-				}
-				if (!tinyhandle) {
-					return false;
-				}
-				auto tinyref = tinyhandle.get().get();
-				auto giantref = gianthandle.get().get();
-				
-				ShutUp(tinyref);
-				ShutUp(giantref);
+			if (tiny) {
+				std::string name = std::format("CalamityKill_{}_{}", giant->formID, tiny->formID);
+				ActorHandle gianthandle = giant->CreateRefHandle();
+				ActorHandle tinyhandle = tiny->CreateRefHandle();
+				TaskManager::Run(name, [=](auto& progressData) {
+					if (!gianthandle) {
+						return false;
+					}
+					if (!tinyhandle) {
+						return false;
+					}
+					auto tinyref = tinyhandle.get().get();
+					auto giantref = gianthandle.get().get();
+					
+					ShutUp(tinyref);
+					ShutUp(giantref);
 
-				Anims_FixAnimationDesync(giantref, tinyref, false); // Share GTS Animation Speed with hugged actor to avoid de-sync
+					Anims_FixAnimationDesync(giantref, tinyref, false); // Share GTS Animation Speed with hugged actor to avoid de-sync
 
-				bool IsDead = (giantref->IsDead() || tinyref->IsDead());
-				if (IsDead || !IsGtsBusy(giantref)) {
-					return false;
-				}
-				// Ensure they are NOT in ragdoll
-				AttachToObjectB(giantref, tinyref);
-				ForceRagdoll(tinyref, false);
-				
-				if (!FaceOpposite(giant, tiny)) {
-					return false;
-				}
+					bool IsDead = (giantref->IsDead() || tinyref->IsDead());
+					if (IsDead || !IsGtsBusy(giantref)) {
+						return false;
+					}
+					// Ensure they are NOT in ragdoll
+					AttachToObjectB(giantref, tinyref);
+					ForceRagdoll(tinyref, false);
+					
+					if (!FaceOpposite(giant, tiny)) {
+						return false;
+					}
 
-				// All good try another frame
-				return true;
-			});
+					// All good try another frame
+					return true;
+				});
+			}
 		}
 	}
 

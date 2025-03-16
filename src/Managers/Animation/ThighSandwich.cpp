@@ -158,10 +158,12 @@ namespace {
 	void GTSSandwich_MoveBody_start(AnimationEventData& data) {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		for (auto tiny: sandwichdata.GetActors()) {
-			AllowToBeCrushed(tiny, false);
-			SetBeingHeld(tiny, true);
-			sandwichdata.MoveActors(true);
-			DisableCollisions(tiny, &data.giant);
+			if (tiny) {
+				AllowToBeCrushed(tiny, false);
+				SetBeingHeld(tiny, true);
+				sandwichdata.MoveActors(true);
+				DisableCollisions(tiny, &data.giant);
+			}
 		}
 		StartBodyRumble("BodyRumble", data.giant, 0.5f, 0.25f);
 	}
@@ -212,9 +214,11 @@ namespace {
 
 		
 		for (auto tiny: sandwichdata.GetActors()) {
-			DoThighDamage(&data.giant, tiny, data.animSpeed, 1.0f, 1.0f);
-			tiny->NotifyAnimationGraph("ragdoll");
-			AllowToBeCrushed(tiny, true);
+			if (tiny) {
+				DoThighDamage(&data.giant, tiny, data.animSpeed, 1.0f, 1.0f);
+				tiny->NotifyAnimationGraph("ragdoll");
+				AllowToBeCrushed(tiny, true);
+			}
 		}
 		
 		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact, 0.15f, "AnimObjectA", 0.0f);
@@ -227,10 +231,12 @@ namespace {
 		sandwichdata.EnableSuffocate(true);
 		
 		for (auto tiny: sandwichdata.GetActors()) {
-			DoThighDamage(&data.giant, tiny, data.animSpeed, 2.2f, 0.75f);
-			Attacked(tiny, &data.giant);
-			tiny->NotifyAnimationGraph("ragdoll");
-			AllowToBeCrushed(tiny, true);
+			if (tiny) {
+				DoThighDamage(&data.giant, tiny, data.animSpeed, 2.2f, 0.75f);
+				Attacked(tiny, &data.giant);
+				tiny->NotifyAnimationGraph("ragdoll");
+				AllowToBeCrushed(tiny, true);
+			}
 		}
 		
 		Rumbling::Once("ThighImpact", &data.giant, Rumble_ThighSandwich_ThighImpact_Heavy, 0.15f, "AnimObjectA", 0.0f);
@@ -259,9 +265,11 @@ namespace {
 		sandwichdata.EnableSuffocate(false);
 		sandwichdata.EnableRuneTask(&data.giant, true); // Launch Rune Shrinking
 		for (auto tiny: sandwichdata.GetActors()) {
-			SetBeingHeld(tiny, false);
-			PushActorAway(&data.giant, tiny, 1.0f);
-			EnableCollisions(tiny);
+			if (tiny) {
+				SetBeingHeld(tiny, false);
+				PushActorAway(&data.giant, tiny, 1.0f);
+				EnableCollisions(tiny);
+			}
 		}
 		sandwichdata.MoveActors(false);
 
@@ -278,7 +286,9 @@ namespace {
 	void GTSSandwich_DropDown(AnimationEventData& data) {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		for (auto tiny: sandwichdata.GetActors()) {
-			AllowToBeCrushed(tiny, true);
+			if (tiny) {
+				AllowToBeCrushed(tiny, true);
+			}
 		}
 		
 		sandwichdata.ReleaseAll();
@@ -291,8 +301,10 @@ namespace {
 		auto& sizemanager = SizeManager::GetSingleton();
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		for (auto tiny: sandwichdata.GetActors()) {
-			SetBeingHeld(tiny, false);
-			EnableCollisions(tiny);
+			if (tiny) {
+				SetBeingHeld(tiny, false);
+				EnableCollisions(tiny);
+			}
 		}
 		DrainStamina(&data.giant, "StaminaDrain_Sandwich", "GTSPerkThighAbilities", false, 2.5f);
 		ManageCamera(&data.giant, false, CameraTracking::Thigh_Sandwich); // Allow sandwich repeat

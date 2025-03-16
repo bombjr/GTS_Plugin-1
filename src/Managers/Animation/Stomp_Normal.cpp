@@ -92,11 +92,13 @@ namespace {
 		if (footNode) {
 			auto footPos = footNode->world.translate;
 			for (auto tiny: FindSquished(giant)) {
-				std::uniform_real_distribution<float> dist(-10.f, 10.f);
-				float dx = dist(e2);
-				float dy = dist(e2);
-				auto randomOffset = NiPoint3(dx, dy, 0.0f);
-				tiny->SetPosition(footPos + randomOffset, true);
+				if (tiny) {
+					std::uniform_real_distribution<float> dist(-10.f, 10.f);
+					float dx = dist(e2);
+					float dy = dist(e2);
+					auto randomOffset = NiPoint3(dx, dy, 0.0f);
+					tiny->SetPosition(footPos + randomOffset, true);
+				}
 			}
 		}
 	}
@@ -106,19 +108,21 @@ namespace {
 	*/
 	void KeepInPlace(Actor* giant, float duration) {
 		for (auto tiny: FindSquished(giant)) {
-			auto giantRef = giant->CreateRefHandle();
-			auto tinyRef = tiny->CreateRefHandle();
-			auto currentPos = tiny->GetPosition();
-			TaskManager::RunFor(duration, [=](const auto& data){
-				if (!tinyRef) {
-					return false;	
-				}
-				if (!giantRef) {
-					return false;	
-				}
-				AttachTo(giantRef, tinyRef, currentPos);
-				return true;
-			});
+			if (tiny) {
+				auto giantRef = giant->CreateRefHandle();
+				auto tinyRef = tiny->CreateRefHandle();
+				auto currentPos = tiny->GetPosition();
+				TaskManager::RunFor(duration, [=](const auto& data){
+					if (!tinyRef) {
+						return false;	
+					}
+					if (!giantRef) {
+						return false;	
+					}
+					AttachTo(giantRef, tinyRef, currentPos);
+					return true;
+				});
+			}
 		}
 	}
 
