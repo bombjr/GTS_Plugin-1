@@ -2,6 +2,7 @@
 
 namespace GTS {
 
+	float GetNPCSpeedOverride(Actor* giant, float incoming_speed);
 	float GetScareThreshold(Actor* giant);
 	void Task_InitHavokTask(Actor* tiny);
 	void SendDeathEvent(Actor* giant, Actor* tiny);

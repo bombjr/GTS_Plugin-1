@@ -1216,7 +1216,6 @@ namespace GTS {
 			auto ai = actor->GetActorRuntimeData().currentProcess;
 			if (ai) {
 				if (ai->high) {
-					float Greeting = ai->high->greetingTimer;
 					ai->high->greetingTimer = 5;
 				}
 			}

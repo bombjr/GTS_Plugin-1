@@ -46,6 +46,12 @@ namespace GTS {
 		return strangling;
 	}
 
+	bool IsExitingStrangle(Actor* giant) { // returns true when GTS leaves DOT state through another anim
+		bool leaving = false;
+		giant->GetGraphVariableBool("GTS_Isboobs_leaving", leaving);
+		return leaving;
+	}
+
 	bool IsUnderGrinding(Actor* giant) {
 		bool undergrinding = false;
 		giant->GetGraphVariableBool("GTS_IsUnderGrinding", undergrinding);

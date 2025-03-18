@@ -1,4 +1,5 @@
 #include "Managers/Animation/Grab.hpp"
+#include "Managers/Animation/GrabUtils.hpp"
 #include "Managers/Animation/AnimationManager.hpp"
 
 #include "Managers/Animation/Controllers/GrabAnimationController.hpp"
@@ -16,6 +17,8 @@
 
 #include "Utils/AttachPoint.hpp"
 #include "Utils/InputConditions.hpp"
+
+#include "Utils/ActorBools.hpp"
 
 using namespace GTS;
 
@@ -544,65 +547,6 @@ namespace GTS {
 		Grab::Release(giant);
 	}
 
-	void Grab::ReattachTiny(Actor* giant, Actor* tiny) {
-		auto HandNode = find_node(giant, "NPC L Hand [LHnd]");
-		if (HandNode) {
-			NiPoint3 GiantDist = HandNode->world.translate;
-			NiPoint3 TinyDist = tiny->GetPosition();
-			float distance = (GiantDist - TinyDist).Length();
-			float reattach_dist = std::clamp(512.0f * get_visual_scale(giant), 512.0f, 4096.0f);
-
-			if (distance > reattach_dist) {
-
-				log::info("Moving tiny to giant");
-				tiny->MoveTo(giant);
-
-				double Start = Time::WorldTimeElapsed();
-				std::string name = std::format("Reattach_{}", tiny->formID);
-				ActorHandle gianthandle = giant->CreateRefHandle();
-				ActorHandle tinyhandle = tiny->CreateRefHandle();
-				TaskManager::Run(name, [=](auto& progressData) {
-					if (!gianthandle) {
-						return false;
-					}
-					if (!tinyhandle) {
-						return false;
-					}
-					auto giantref = gianthandle.get().get();
-					auto tinyref = tinyhandle.get().get();
-
-					double Finish = Time::WorldTimeElapsed();
-					double timepassed = Finish - Start;
-					if (timepassed > 0.25) {
-						tinyref->MoveTo(giantref);
-						DisableCollisions(tinyref, giantref);
-						if (IsBetweenBreasts(tinyref)) {
-							if (IsHostile(giantref, tinyref)) {
-								AnimationManager::StartAnim("Breasts_Idle_Unwilling", tinyref);
-							} else {
-								AnimationManager::StartAnim("Breasts_Idle_Willing", tinyref);
-							}
-						}
-					}
-					if (timepassed > 1.25) { // One last time
-						tinyref->MoveTo(giantref);
-						DisableCollisions(tinyref, giantref);
-						if (IsBetweenBreasts(tinyref)) {
-							if (IsHostile(giantref, tinyref)) {
-								AnimationManager::StartAnim("Breasts_Idle_Unwilling", tinyref);
-							} else {
-								AnimationManager::StartAnim("Breasts_Idle_Willing", tinyref);
-							}
-						}
-						return false;
-					}
-					return true;
-				});
-			}
-		}
-	}
-			
-
 	void Grab::AttachActorTask(Actor* giant, Actor* tiny) {
 		if (!giant) {
 			return;
@@ -622,112 +566,12 @@ namespace GTS {
 			}
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
-
-			if (!tinyref) {
-				return false; // end task in that case
-			}
-
-			// Exit on death
-			float sizedifference = GetSizeDifference(giantref, tinyref, SizeType::VisualScale, true, false);
-
-			ForceRagdoll(tinyref, false); 
-
-			Grab::ReattachTiny(giantref, tinyref); // Teleports tiny to us if we change locations for example
-
-			ShutUp(tinyref);
-			ShutUp(giantref);	
-
-			bool Attacking = false;
-			giantref->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
-
-			bool Dead = (giantref->IsDead() || tinyref->IsDead());
-			bool CanCancel = (Dead || !IsVoring(giantref)) && (!Attacking || IsBeingEaten(tinyref));
-			bool small_size = sizedifference < Action_Grab;
-
-			if (CanCancel) {
-				if (Dead || GetAV(tinyref, ActorValue::kHealth) <= 0.0f 
-					|| small_size
-					|| (!IsBetweenBreasts(tinyref) 
-					&& GetAV(giantref, ActorValue::kStamina) < 2.0f)) {
-
-					//PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
-					// For debugging
-
-					PushActorAway(giantref, tinyref, 1.0f);
-					Grab::CancelGrab(giantref, tinyref);
-					return false;
-				}
-			}
-
-			if (IsBeingEaten(tinyref) && !IsBetweenBreasts(tinyref) && !IsInCleavageState(giantref)) {
-				if (!AttachToObjectA(gianthandle, tinyhandle)) {
-					// Unable to attach
-					log::info("Can't attach to ObjectA");
-					Grab::CancelGrab(giantref, tinyref);
-					return false;
-				}
-			} else if (IsBetweenBreasts(tinyref)) {
-				bool hostile = IsHostile(giantref, tinyref);
-				float restore = 0.04f * TimeScale();
-				if (!hostile) {
-					tinyref->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kHealth, restore);
-					tinyref->AsActorValueOwner()->RestoreActorValue(ACTOR_VALUE_MODIFIER::kDamage, ActorValue::kStamina, restore);
-				}
-
-				RestoreBreastAttachmentState(giantref, tinyref); // If someone suddenly ragdolls us during breast anims
-
-				Anims_FixAnimationDesync(giantref, tinyref, false);
-
-				float AnimSpeed_GTS = AnimationManager::GetAnimSpeed(giantref);
-				float AnimSpeed_Tiny = AnimationManager::GetAnimSpeed(tinyref);
-
-				if (Attachment_GetTargetNode(giantref) == AttachToNode::ObjectL) {
-					auto ObjectL = find_node(giantref, "AnimObjectL");
-					if (ObjectL) {
-						NiPoint3 coords = ObjectL->world.translate;
-
-						if (!AttachTo(giantref, tinyref, coords)) {
-							Grab::CancelGrab(giantref, tinyref);
-							return false;
-						}
-					}
-					return true;
-				} else if (Attachment_GetTargetNode(giantref) == AttachToNode::ObjectB) { // Used in Cleavage state
-					if (IsDebugEnabled()) {
-						auto node = find_node(tinyref, "NPC Root [Root]");
-						if (node) {
-							NiPoint3 point = node->world.translate;
-							
-							DebugAPI::DrawSphere(glm::vec3(point.x, point.y, point.z), 6.0f, 40, {0.0f, 1.0f, 0.0f, 1.0f});
-						}
-					}
-
-					if (!AttachToObjectB(gianthandle, tinyhandle)) { // Attach to ObjectB non stop
-						Grab::CancelGrab(giantref, tinyref);
-						return false;
-					}
-					return true;
-				}
-				
-				if (hostile) {
-					DamageAV(tinyref, ActorValue::kStamina, restore * 2);
-				}
-				if (!AttachToCleavage(gianthandle, tinyhandle)) {
-					// Unable to attach
-					Grab::CancelGrab(giantref, tinyref);
-					log::info("Can't attach to Cleavage");
-					return false;
-				}
-			} else if (AttachToHand(gianthandle, tinyhandle)) {
-				GrabStaminaDrain(giantref, tinyref, sizedifference);
-				return true;
-			} else {
-				if (!AttachToHand(gianthandle, tinyhandle)) {
-					// Unable to attach
-					Grab::CancelGrab(giantref, tinyref);
-					log::info("Can't attach to hand");
-					return false;
-				}
+			ReattachTiny(giantref, tinyref);
+			
+			if (tinyref && (tinyref->Is3DLoaded() || IsCurrentlyReattaching(giantref))) {
+				return HandleGrabLogic(giantref, tinyref, gianthandle, tinyhandle);
+			} else { // Else if Tiny is null or isn't 3d loaded
+				return FailSafeAbort(giantref, tinyref);
 			}
 
 			// All good try another frame
@@ -780,6 +624,18 @@ namespace GTS {
 			return actor;
 		} else {
 			return nullptr;
+		}
+	}
+
+	void Grab::FailSafeReset(Actor* giantref) {
+		if (giantref) {
+			giantref->SetGraphVariableInt("GTS_GrabbedTiny", 0); // Tell behaviors 'we have nothing in our hands'. A must.
+			giantref->SetGraphVariableInt("GTS_Grab_State", 0);
+			giantref->SetGraphVariableInt("GTS_Storing_Tiny", 0);
+			DrainStamina(giantref, "GrabAttack", "GTSPerkDestructionBasics", false, 0.75f);
+			Grab::ExitGrabState(giantref);
+			ManageCamera(giantref, false, CameraTracking::Grab_Left); // Disable any camera edits
+			Grab::DetachActorTask(giantref);
 		}
 	}
 

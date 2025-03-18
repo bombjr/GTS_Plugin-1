@@ -73,7 +73,7 @@ namespace {
 			return false;
 		}
 
-		if (a_Actor->formID == 0x14) {
+		if (a_Actor->formID == 0x14 && !Config::GetAdvanced().bPlayerAI) {
 			return false;
 		}
 
@@ -91,11 +91,13 @@ namespace {
 			const bool IsHoldingSomeone = Grab::GetHeldActor(a_Actor) != nullptr || IsInCleavageState(a_Actor);
 			const bool IsInCombat = (a_Actor->IsInCombat()) || (a_Actor->GetActorRuntimeData().currentCombatTarget.get().get() != nullptr);
 
+			const bool IsPlayer = a_Actor->formID == 0x14 && Config::GetAdvanced().bPlayerAI;
+
 			//Is In combat or do we allow ai outside of combat?
 			if ((IsInCombat || !a_CombatOnly) && !IsGtsBusy(a_Actor) && HasHP && IsVisible && IsInNormalState && !IsHoldingSomeone) {
 
 				//Follower Check
-				if (IsTeammate(a_Actor)) {
+				if (IsTeammate(a_Actor) || IsPlayer) {
 					return true;
 				}
 

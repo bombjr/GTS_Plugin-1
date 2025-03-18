@@ -17,35 +17,6 @@
 
 using namespace GTS;
 
-// Animation: Stomp
-//  - Stages
-/*
-   GTSSandwich_EnterAnim           // Animation was just fired
-   GTSSandwich_MoveBody_start      // Rumble for entire body
-   GTSSandwich_EnableRune          // Trigger the rune
-   GTSSandwich_SitStart            // When sit start happens
-   GTSSandwich_MoveBody_end        // Stop them (When body pretty much enters 'idle' state)
-   GTSSandwich_MoveLL_start        // Left leg starts to move in space (When starting to crush)
-   GTSSandwich_ThighImpact         // When Both thighs are supposed to deal damage to an actor (When 'Sandwiching') happens
-   GTSSandwich_MoveLL_end          // Left leg isn't moving anymore (These 2 should be repeated)
-   GTSSandwich_ThighLoop_Enter     // Enter Thigh Idle Loop
-
-   GTSSandwich_ThighAttack_start   // When we trigger Thigh Attack
-
-   GTSSandwich_ThighLoop_Exit      // Exit thigh idle loop
-   GTSSandwich_DisableRune         // Remove Rune
-   GTSSandwich_DropDown            // When actor starts to 'jump off' from Rune
-   GTSSandwich_FootImpact          // When both feet collide with the ground
-   GTSSandwich_ExitAnim            // Animation is over
-
-   GTSBEH_ThighSandwich_Start
-   GTSBEH_ThighSandwich_Attack
-   GTSBEH_ThighSandwich_ExitLoop
-
-   //AnimObjectA = Tiny
-   //AnimObjectB = rune
- */
-
 namespace {
 
 	constexpr std::string_view RNode = "NPC R Foot [Rft ]";
@@ -170,7 +141,7 @@ namespace {
 
 	void GTSSandwich_EnableRune(AnimationEventData& data) {
 		ManageCamera(&data.giant, true, CameraTracking::Thigh_Sandwich); // Focus camera on AnimObjectA
-		SandwichingData::EnableRuneTask(&data.giant, false); // Start Growing the Rune
+		SandwichingData::StartRuneTask(&data.giant, RuneTask::kEnlarge); // Start Growing the Rune
 	}
 
 	void GTSSandwich_SitStart(AnimationEventData& data) {
@@ -263,7 +234,7 @@ namespace {
 		auto& sandwichdata = ThighSandwichController::GetSingleton().GetSandwichingData(&data.giant);
 		ManageCamera(&data.giant, false, CameraTracking::Thigh_Sandwich);
 		sandwichdata.EnableSuffocate(false);
-		sandwichdata.EnableRuneTask(&data.giant, true); // Launch Rune Shrinking
+		sandwichdata.StartRuneTask(&data.giant, RuneTask::kShrink); // Launch Rune Shrinking
 		for (auto tiny: sandwichdata.GetActors()) {
 			if (tiny) {
 				SetBeingHeld(tiny, false);

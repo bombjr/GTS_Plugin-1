@@ -316,6 +316,8 @@ struct SettingsAdvanced {
     bool bCooldowns = true;
     bool bPauseGame = true;
     bool bHideLoadButton = true;
+    bool bEnlargeBreastsOnAbsorption = false;
+    bool bPlayerAI = false;
     float fSGTMMult = 0.5f;
     float fAnimSpeedAdjMultPlayer = 1.0f;
     float fAnimSpeedAdjMultTeammate = 1.0f;
@@ -510,6 +512,8 @@ struct SettingsAI {
     bool bAllowPlayer = true;
     bool bAllowFollowers = true;
     bool bDisableAttacks = true;
+    bool bSlowMovementDown = true;
+    bool bSlowRotationDown = true;
 };
 TOML_SERIALIZABLE(SettingsAI);
 

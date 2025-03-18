@@ -34,6 +34,8 @@ namespace {
         ActorHandle tinyhandle = tiny->CreateRefHandle();
         static Timer HeartTimer = Timer(1.75f);
 
+        AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tiny);
+
         TaskManager::Run(task_name, [=](auto& progressData) {
             if (!gianthandle) {
                 return false;
@@ -51,9 +53,16 @@ namespace {
             if (!IsStrangling(giantref)) {
                 return false;
             }
+
+            /*if (!IsGtsBusy(tinyref)) {
+                AnimationManager::StartAnim("Cleavage_Absorb_Tiny", tinyref);
+                // Hide the Tiny by making tiny roll into a ball
+            }*/
+
             if (!IsGtsBusy(tinyref)) { // If for some reason Tiny isn't in expected anim
                 AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tinyref);
             }
+            
             if (HeartTimer.ShouldRunFrame()) {
                 SpawnHearts(giantref, tinyref, 35.0f, 0.425f, false);
             }
@@ -114,6 +123,7 @@ namespace {
                 RestoreBreastAttachmentState(giantref, tinyref); // If someone suddenly ragdolls us during breast anims
                 return false;
             }
+
             if (tiny_health_perc <= threshold || tiny_health - (damage * damage_Setting) <= max_tiny_hp) {
                 if (data) {
                     if (data->ImmuneToBreastOneShot) {

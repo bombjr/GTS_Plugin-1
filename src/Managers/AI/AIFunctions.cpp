@@ -4,6 +4,10 @@
 
 #include "Managers/Animation/Utils/CooldownManager.hpp"
 
+#include "Managers/Animation/AnimationManager.hpp"
+
+#include "Utils/ActorUtils.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -49,9 +53,72 @@ namespace {
 			return true;
 		});
 	}
+
+	bool ShouldBeAltered(Actor* giant) {
+		bool Alter = giant && giant->formID != 0x14 && IsTeammate(giant) && 
+					IsHuman(giant) && IsFemale(giant, true) 
+					&& get_visual_scale(giant) > 1.25f;
+		return Alter;
+	}
+
+	void AlterMovementSpeed(Actor* giant, float& speed) {
+		float speedMult = std::clamp(AnimationManager::GetAnimSpeed(giant), 0.01f, 1.0f);
+		if (get_visual_scale(giant) > 1.75f && giant->AsActorState()->IsSprinting()) {
+			giant->AsActorState()->actorState1.sprinting = 0;
+			giant->AsActorState()->actorState1.walking = 1;
+		}
+
+		float multiplier = (speedMult * speedMult);
+
+		speed *= multiplier;
+		speed = std::clamp(speed, 15.0f, 10000.0f);
+		
+		//log::info("New Speed: {}, SpeedMult: {}, Multiplier: {}", speed, speedMult, multiplier);
+	}
+
+	void AlterRotationSpeed(Actor* giant) {
+		auto AI = giant->GetActorRuntimeData().currentProcess;
+		if (AI) {
+			auto high = AI->high;
+			auto mid = AI->middleHigh;
+
+			float speedMult = std::clamp(AnimationManager::GetAnimSpeed(giant), 0.02f, 1.0f);
+			float multiplier = (speedMult * speedMult);
+
+			if (mid) {
+				if (mid->rotationSpeed.Length() > 0.0f) {
+					mid->rotationSpeed *= multiplier;
+				}
+			}
+
+			/*if (high) {
+				if (high->pathingCurrentRotationSpeed.Length() > 0.0f) {
+					high->pathingCurrentRotationSpeed *= multiplier * speedMult;
+				}
+				if (high->pathingDesiredRotationSpeed.Length() > 0.0f) {
+					high->pathingDesiredRotationSpeed *= multiplier * speedMult;
+				}
+			}*/
+		}
+	}
 }
 
 namespace GTS {
+
+	float GetNPCSpeedOverride(Actor* giant, float incoming_speed) {
+		float new_speed = incoming_speed;
+		if (ShouldBeAltered(giant)) {
+			if (Config::GetAI().bSlowMovementDown) {
+				AlterMovementSpeed(giant, new_speed);
+			}
+
+			if (Config::GetAI().bSlowRotationDown) {
+				AlterRotationSpeed(giant);
+			}
+		}
+		
+		return new_speed;
+	}
 
 	float GetScareThreshold(Actor* giant) {
 		float threshold = 2.5f;

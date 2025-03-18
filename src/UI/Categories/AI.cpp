@@ -61,11 +61,19 @@ namespace GTS {
         }
 
         ImUtil_Unique {
-
-            const char* T0 = "Toggle whether other NPCs should panic when near a GTS.";
+            
+            const char* T0 = "Toggle whether Followers should have movement speed further reduced past x1.25 size.\n"
+                            "- This toggle makes Follower Sprinting less likely based on size, so Followers will try to menacingly walk instead of sprinting\n"
+                            "- Alters SpeedMult Actor Value, can reduce it up to 15\n\n"
+                            "- This toggle requires Dynamic Animation Speed toggle in order to work";
+            const char* T2 = "Toggle whether Followers should have decreased rotation speed past x1.25 size.\n\n"
+                            "- This toggle requires Dynamic Animation Speed toggle in order to work";
+            const char* T3 = "Toggle whether other NPCs should panic when near a GTS.";
 
             if (ImGui::CollapsingHeader("Misc Settings",ImUtil::HeaderFlagsDefaultOpen)) {
-                ImUtil::CheckBox("Actors Panic", &Settings.bPanic, T0);
+                ImUtil::CheckBox("Decrease Movement Speed AV", &Settings.bSlowMovementDown, T0);
+                ImUtil::CheckBox("Decrease Combat Rotation Speed", &Settings.bSlowRotationDown, T2);
+                ImUtil::CheckBox("Actors Panic", &Settings.bPanic, T3);
                 ImGui::Spacing();
             }
 		}

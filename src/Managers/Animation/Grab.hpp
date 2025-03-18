@@ -22,7 +22,6 @@ namespace GTS {
 
 			static void DamageActorInHand(Actor* giant, float Damage);
 			static void DetachActorTask(Actor* giant);
-			static void ReattachTiny(Actor* giant, Actor* tiny);
 			static void AttachActorTask(Actor* giant, Actor* tiny);
 			virtual void Reset() override;
 			virtual void ResetActor(Actor* actor) override;
@@ -37,6 +36,7 @@ namespace GTS {
 			static TESObjectREFR* GetHeldObj(Actor* giant);
 			// Same as `GetHeldObj` but with a conversion to actor if possible
 			static Actor* GetHeldActor(Actor* giant);
+			static void FailSafeReset(Actor* giantref);
 			static void CancelGrab(Actor* giantref, Actor* tinyref);
 			
 			std::unordered_map<Actor*, GrabData> data;

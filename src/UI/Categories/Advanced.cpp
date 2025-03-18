@@ -59,12 +59,17 @@ namespace GTS {
             const char* T0 = "Immediately return from DamageAV Calls for the player.";
             const char* T1 = "Bypass action cooldowns.";
             const char* T2 = "Multiply the resulting GetAnimationSlowdown Value";
+            const char* T3 = "When performing Breast Absorption, visually enlarge breasts";
+            const char* T4 = "Count Player as NPC, which makes Player perform random animations";
 
             if (ImGui::CollapsingHeader("Cheats",ImUtil::HeaderFlagsDefaultOpen)) {
                 ImUtil::CheckBox("ActorValue Damage",&Settings.bDamageAV, T0);
                 ImUtil::CheckBox("Action Cooldowns",&Settings.bCooldowns, T1);
                 ImUtil::SliderF("Animspeed Player", &Settings.fAnimSpeedAdjMultPlayer, 0.2f, 1.0f, T2);
                 ImUtil::SliderF("Animspeed Teammate", &Settings.fAnimSpeedAdjMultTeammate, 0.2f, 1.0f, T2);
+
+                ImUtil::CheckBox("Enlarge Breasts On Absorbtion", &Settings.bEnlargeBreastsOnAbsorption, T3);
+                ImUtil::CheckBox("Player AI", &Settings.bPlayerAI, T4);
 
                 ImGui::Spacing();
             }

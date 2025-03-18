@@ -241,7 +241,5 @@ namespace GTS
 
         AnimationManager::RegisterTrigger("Cleavage_Vore_Tiny", "Cleavage", "GTSBEH_T_Boobs_Vore");
         AnimationManager::RegisterTrigger("Cleavage_Vore", "Cleavage", "GTSBEH_Boobs_Vore");
-
-
 	}
 }

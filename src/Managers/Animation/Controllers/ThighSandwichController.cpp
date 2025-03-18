@@ -14,16 +14,65 @@ using namespace GTS;
 
 
 namespace {
-
 	constexpr float MINIMUM_SANDWICH_DISTANCE = 70.0f;
 	constexpr float SANDWICH_ANGLE = 60;
 	constexpr float PI = std::numbers::pi_v<float>;
+
+	constexpr string rune_node = "GiantessRune";
 
 	void CantThighSandwichPlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Sandwich) {
 			std::string message = std::format("Player is too big to be sandwiched: x{:.2f}/{:.2f}", sizedifference, Action_Sandwich);
 			NotifyWithSound(tiny, message);
 		}
+	}
+
+	void EnlargeRuneTask(Actor* a_Giant) {
+		double Start = Time::WorldTimeElapsed();
+		std::string name = std::format("ShrinkRune_{}", a_Giant->formID);
+		ActorHandle gianthandle = a_Giant->CreateRefHandle();
+
+		TaskManager::Run(name, [=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+			double Finish = Time::WorldTimeElapsed();
+			auto giantref = gianthandle.get().get();
+			auto node = find_node(giantref, rune_node);
+			double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.70, 0.01, 1.0);
+			if (node) {
+				node->local.scale = static_cast<float>(std::clamp(timepassed, 0.01, 1.0));
+				update_node(node);
+			}
+			if (timepassed >= 0.98 || !IsGtsBusy(giantref)) {
+				return false; // end it
+			}
+			return true;
+		});
+	}
+
+	void ShrinkRuneTask(Actor* a_Giant) {
+		double Start = Time::WorldTimeElapsed();
+		std::string name = std::format("ScaleRune_{}", a_Giant->formID);
+		ActorHandle gianthandle = a_Giant->CreateRefHandle();
+		TaskManager::Run(name, [=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+			double Finish = Time::WorldTimeElapsed();
+			auto giantref = gianthandle.get().get();
+			auto node = find_node(giantref, rune_node);
+			double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.80, 0.01, 9999.0);
+			//log::info("Grow Rune task is running, timepassed: {}, AnimationSlowdown: {} ", timepassed, GetAnimationSlowdown(giantref));
+			if (node) {
+				node->local.scale = static_cast<float>(std::clamp(1.0 - timepassed, 0.005, 1.0));
+				update_node(node);
+			}
+			if (!IsGtsBusy(giantref)) {
+				return false; // end it
+			}
+			return true;
+		});
 	}
 }
 
@@ -57,63 +106,14 @@ namespace GTS {
 		this->MoveTinies = move;
 	}
 
-	void SandwichingData::DisableRuneTask(Actor* a_Giant, bool shrink) {
-		if (shrink == true) {
-			std::string name = std::format("ShrinkRune_{}", a_Giant->formID);
-			TaskManager::Cancel(name);
-		} else if (shrink == false) {
-			std::string name = std::format("ScaleRune_{}", a_Giant->formID);
-			TaskManager::Cancel(name);
-		}
-	}
-
-	void SandwichingData::EnableRuneTask(Actor* a_Giant, bool shrink) {
-		string node_name = "GiantessRune";
-		if (shrink == true) {
-			double Start = Time::WorldTimeElapsed();
-			std::string name = std::format("ShrinkRune_{}", a_Giant->formID);
-			ActorHandle gianthandle = a_Giant->CreateRefHandle();
-			TaskManager::Run(name, [=](auto& progressData) {
-				if (!gianthandle) {
-					return false;
-				}
-				double Finish = Time::WorldTimeElapsed();
-				auto giantref = gianthandle.get().get();
-				auto node = find_node(giantref, node_name, false);
-				double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.70, 0.01, 0.98);
-				//log::info("Shrink Rune task is running, timepassed: {}, AnimationSlowdown: {} ", timepassed, GetAnimationSlowdown(giantref));
-				if (node) {
-					node->local.scale = static_cast<float>(std::clamp(1.0 - timepassed, 0.01, 1.0));
-					update_node(node);
-				}
-				if (timepassed >= 0.98f) {
-					return false; // end it
-				}
-				return true;
-			});
-		}
-		else if (shrink == false) {
-			double Start = Time::WorldTimeElapsed();
-			std::string name = std::format("ScaleRune_{}", a_Giant->formID);
-			ActorHandle gianthandle = a_Giant->CreateRefHandle();
-			TaskManager::Run(name, [=](auto& progressData) {
-				if (!gianthandle) {
-					return false;
-				}
-				double Finish = Time::WorldTimeElapsed();
-				auto giantref = gianthandle.get().get();
-				auto node = find_node(giantref, node_name, false);
-				double timepassed = std::clamp(((Finish - Start) * GetAnimationSlowdown(giantref)) * 0.80, 0.01, 9999.0);
-				//log::info("Grow Rune task is running, timepassed: {}, AnimationSlowdown: {} ", timepassed, GetAnimationSlowdown(giantref));
-				if (node) {
-					node->local.scale = static_cast<float>(std::clamp(timepassed, 0.01, 1.0));
-					update_node(node);
-				}
-				if (timepassed >= 1.0f) {
-					return false; // end it
-				}
-				return true;
-			});
+	void SandwichingData::StartRuneTask(Actor* a_Giant, RuneTask Type) {
+		switch (Type) {
+			case RuneTask::kEnlarge:
+				EnlargeRuneTask(a_Giant);
+			break;
+			case RuneTask::kShrink:
+				ShrinkRuneTask(a_Giant);
+			break;
 		}
 	}
 
@@ -130,7 +130,7 @@ namespace GTS {
 			float giantScale = get_visual_scale(GiantRef);
 
 			//If AI
-			if (GiantRef->formID != 0x14) {
+			if ((GiantRef->formID != 0x14) || (GiantRef->formID == 0x14 && Config::GetAdvanced().bPlayerAI)) {
 
 				if (auto AITransientData = Transient::GetSingleton().GetData(GiantRef)) {
 					AITransientData->ActionTimer.UpdateDelta(Config::GetAI().ThighSandwich.fInterval);
@@ -355,8 +355,6 @@ namespace GTS {
 	void SandwichingData::ReleaseAll() {
 		this->tinies.clear();
 		this->MoveTinies = false;
-		this->RuneScale = false;
-		this->RuneShrink = false;
 	}
 
 	void ThighSandwichController::ResetActor(Actor* actor) {
@@ -369,18 +367,6 @@ namespace GTS {
 
 	void SandwichingData::EnableSuffocate(bool enable) {
 		this->Suffocate = enable;
-	}
-
-	void SandwichingData::ManageScaleRune(bool enable) {
-		this->RuneScale = enable;
-	}
-
-	void SandwichingData::ManageShrinkRune(bool enable) {
-		this->RuneShrink = enable;
-	}
-
-	void SandwichingData::OverideShrinkRune(float value) {
-		this->ScaleRune.value = value;
 	}
 
 	SandwichingData& ThighSandwichController::GetSandwichingData(Actor* giant) {

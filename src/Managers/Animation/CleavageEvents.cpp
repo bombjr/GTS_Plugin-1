@@ -472,7 +472,7 @@ namespace {
         std::string taskname = std::format("GrowBreasts_{}", giant->formID);
         ActorHandle giantHandle = giant->CreateRefHandle();
 
-        bool AllowBreastGrow = true;  // Should be tied to UI settings
+        bool AllowBreastGrow = Config::GetAdvanced().bEnlargeBreastsOnAbsorption;  // Should be tied to UI settings
         if (!AllowBreastGrow) {
             return;
         }

@@ -2,6 +2,11 @@
 
 namespace GTS {
 
+	enum class RuneTask {
+		kShrink,
+		kEnlarge,
+	};
+
 	class SandwichingData {
 		public:
 			SandwichingData(Actor* giant);
@@ -10,9 +15,6 @@ namespace GTS {
 			void AddTiny(Actor* tiny);
 			void Remove(Actor* tiny);
 			void EnableSuffocate(bool enable);
-			void ManageScaleRune(bool enable);
-			void ManageShrinkRune(bool enable);
-			void OverideShrinkRune(float value);
 			// Release all vories (shall fall into mouth with animation)
 			void ReleaseAll();
 
@@ -21,8 +23,7 @@ namespace GTS {
 
 			// Update all things that are happening like
 			// keeping them on the AnimObjectA and shrinking nodes
-			static void EnableRuneTask(Actor* a_Giant, bool shrink);
-			static void DisableRuneTask(Actor* a_Giant, bool shrink);
+			static void StartRuneTask(Actor* a_Giant, RuneTask Type);
 			void Update();
 			void MoveActors(bool move);
 
@@ -33,8 +34,6 @@ namespace GTS {
 			std::unordered_map<FormID, ActorHandle> tinies = {};
 			bool MoveTinies = false;
 			bool Suffocate = false;
-			bool RuneScale = false;
-			bool RuneShrink = false;
 
 			Spring ScaleRune = Spring(0.0f, 1.5f);
 			Spring ShrinkRune = Spring(0.0f, 1.5f);

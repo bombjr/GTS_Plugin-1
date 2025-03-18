@@ -63,6 +63,8 @@ namespace GTS {
 		bool ImmuneToBreastOneShot = true;
 		bool IsSlowGrowing = false;
 
+		bool ReattachingTiny = false;
+
 		NiPoint3 BoundingBoxCache = { 0.0f, 0.0f, 0.0f };
 		NiPoint3 POSLastLegL = { 0.0f, 0.0f, 0.0f };
 		NiPoint3 POSLastLegR = { 0.0f, 0.0f, 0.0f };
