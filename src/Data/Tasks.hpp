@@ -244,7 +244,8 @@ namespace GTS {
 				auto& me = TaskManager::GetSingleton();
 				try {
 					me.taskings.at(std::string(name))->SetUpdateOn(updateOn);
-				} catch (const std::out_of_range& oor) {
+				}
+				catch (const std::out_of_range&) {
 					// nothing
 				}
 			}

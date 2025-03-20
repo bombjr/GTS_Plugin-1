@@ -37,6 +37,7 @@ namespace GTS {
 
 			//----- Actor Data Struct
 			LoadActorData(serde, RecordType, RecordVersion);
+			LoadKillCountData(serde, RecordType, RecordVersion);
 
 			//----- Camera
 			Persistent.TrackedCameraState.Load(serde, RecordType, RecordVersion, RecordSize);
@@ -75,6 +76,7 @@ namespace GTS {
 
 		//----- Actor Data Struct
 		WriteActorData(serde, ActorStructVersion);
+		WriteKillCountData(serde, KillCountStructVersion);
 
 		//----- Camera
 		Persistent.TrackedCameraState.Save(serde);
@@ -172,21 +174,23 @@ namespace GTS {
 			//Do this last. If we continue early we'll have shifted the read pointer by 4 bytes for the next  read
 			//Corrupting any future deserialization
 			RE::FormID CorrectedFormID;  //Load order may have changed. This is the New FormID
-			if (!serde->ResolveFormID(ReadFormID, CorrectedFormID)) {
-				log::warn("Actor FormID {:08X} could not be resolved. Not adding to ActorDataMap.", ReadFormID);
-				continue;
-			}
+			if (serde->ResolveFormID(ReadFormID, CorrectedFormID)) {
 
-			log::trace("Actor Persistent data loaded for FormID {:08X}", ReadFormID);
+				log::trace("LoadActorData() Actor Persistent data loaded for FormID {:08X}", ReadFormID);
 
-			if (Actor* ActorForm = TESForm::LookupByID<Actor>(CorrectedFormID)) {
-				if (ActorForm) {
-					Persistent::GetSingleton().ActorDataMap.insert_or_assign(CorrectedFormID, Data);
-					continue;
+				if (Actor* ActorForm = TESForm::LookupByID<Actor>(CorrectedFormID)) {
+					if (ActorForm) {
+						Persistent::GetSingleton().ActorDataMap.insert_or_assign(CorrectedFormID, Data);
+					}
+				}
+				else {
+					log::warn("LoadActorData() Actor FormID {:08X} could not be found after loading the save.", CorrectedFormID);
+					Persistent::GetSingleton().ActorDataMap.erase(CorrectedFormID);
 				}
 			}
-
-			log::warn("Actor FormID {:08X} could not be found after loading the save.", CorrectedFormID);
+			else {
+				log::warn("LoadActorData() Actor FormID {:08X} could not be resolved. Not adding to ActorDataMap.", ReadFormID);
+			}
 		}
 	}
 
@@ -211,7 +215,7 @@ namespace GTS {
 	}
 
 	//-----------------
-	// ActorData WRITE
+	// ActorData Write
 	//-----------------
 
 	void Persistent::WriteActorData(SKSE::SerializationInterface* serde, const uint8_t Version) {
@@ -219,7 +223,7 @@ namespace GTS {
 		const size_t NumOfActorRecords = GetSingleton().ActorDataMap.size();
 		
 		if (!serde->OpenRecord(ActorDataRecord, Version)) {
-			log::critical("Unable to open Actor Data in CoSave. Something is really wrong, your save is probably broken!");
+			log::critical("Unable to open ActorDataRecord in CoSave. Something is really wrong, your save is probably broken!");
 			return;
 		}
 
@@ -287,7 +291,7 @@ namespace GTS {
 	}
 
 	//-----------------
-	// ActorData OTHER
+	// ActorData Other
 	//-----------------
 
 	ActorData* Persistent::GetActorData(Actor* actor) {
@@ -300,23 +304,28 @@ namespace GTS {
 	ActorData* Persistent::GetActorData(Actor& actor) {
 		std::unique_lock lock(this->_lock);
 		auto key = actor.formID;
-		ActorData* result = nullptr;
-		try {
-			result = &this->ActorDataMap.at(key);
-		}
-		catch (const std::out_of_range&) {
-			// Add new
+
+		// Lambda to add new ActorData if conditions are met
+		auto addActorData = [&]() -> ActorData* {
 			if (!actor.Is3DLoaded()) {
 				return nullptr;
 			}
-			auto scale = get_scale(&actor);
-			if (scale < 0.0f) {
+			if (get_scale(&actor) < 0.0f) {
 				return nullptr;
 			}
-			this->ActorDataMap.try_emplace(key, &actor);
-			result = &this->ActorDataMap.at(key);
+			auto [iter, inserted] = this->ActorDataMap.try_emplace(key, &actor);
+			return &(iter->second);
+		};
+
+		// Attempt to find the actor's data in the map
+		auto it = this->ActorDataMap.find(key);
+		if (it != this->ActorDataMap.end()) {
+			return &(it->second);
 		}
-		return result;
+
+		// ActorData not found; attempt to add it
+		return addActorData();
+		
 	}
 
 	ActorData* Persistent::GetData(TESObjectREFR* refr) {
@@ -328,16 +337,16 @@ namespace GTS {
 
 	ActorData* Persistent::GetData(TESObjectREFR& refr) {
 		auto key = refr.formID;
-
-		ActorData* result;
-
 		try {
-			result = &this->ActorDataMap.at(key);
+			if (!this->ActorDataMap.contains(key)) {
+				return nullptr;
+			}
+			return &this->ActorDataMap.at(key);
 		}
 		catch (const std::out_of_range&) {
 			return nullptr;
 		}
-		return result;
+		
 	}
 
 	void Persistent::ResetActor(Actor* actor) {
@@ -401,5 +410,115 @@ namespace GTS {
 
 		logger::critical("All Unloaded actors have beeen purged from persistent.");
 
+	}
+
+	//----------------------
+	// KillCountData Read
+	//----------------------
+
+	void Persistent::LoadKillCountData(SKSE::SerializationInterface* serde, const uint32_t RecordType, const uint32_t RecordVersion) {
+
+		if (RecordType != KillCountDataRecord) {
+			return;
+		}
+
+		if (RecordVersion != KillCountStructVersion) {
+			return;
+		}
+
+		size_t RecordCount = 0;
+		uint32_t RecordSize = 0;
+		serde->ReadRecordData(&RecordCount, sizeof(size_t));
+		serde->ReadRecordData(&RecordSize, sizeof(uint32_t));
+
+		//Killcount data must be as big or larger than the value stored in the cosave otherwise we'll write out of struct bounds and corrupt adjacent memory
+		if (sizeof(KillCountData) + sizeof(FormID) < RecordSize || RecordSize == 0) {
+			ReportAndExit("KillCountData structure size missmatch, proceeding will lead to broken save data.\nThe Game will now close.");
+		}
+
+		for (; RecordCount > 0; --RecordCount) {
+
+			KillCountData Data = {};
+			RE::FormID ReadFormID;
+
+			serde->ReadRecordData(&ReadFormID, sizeof(FormID));        //FormID Offset 0x00 (Size 4)
+			serde->ReadRecordData(&Data, RecordSize - sizeof(FormID)); //Struct Offset 0x04 (Size 76 As of V1)
+
+			//Do this last. If we continue early we'll have shifted the read pointer by 4 bytes for the next  read
+			//Corrupting any future deserialization
+			RE::FormID CorrectedFormID;  //Load order may have changed. This is the New FormID
+			if (serde->ResolveFormID(ReadFormID, CorrectedFormID)) {
+
+				log::trace("LoadKillCountData() Actor KillCountData loaded for FormID {:08X}", ReadFormID);
+
+				if (Actor* ActorForm = TESForm::LookupByID<Actor>(CorrectedFormID)) {
+					if (ActorForm) {
+						Persistent::GetSingleton().KillCountDataMap.insert_or_assign(CorrectedFormID, Data);
+					}
+				}
+				else {
+					log::warn("LoadKillCountData() Actor FormID {:08X} could not be found after loading the save.", CorrectedFormID);
+					Persistent::GetSingleton().KillCountDataMap.erase(CorrectedFormID);
+				}
+			}
+			else {
+				log::warn("LoadKillCountData() Actor FormID {:08X} could not be resolved. Not adding to KillCountData.", ReadFormID);
+			}
+		}
+	}
+
+	//----------------------
+	// KillCountData Write
+	//----------------------
+
+	void Persistent::WriteKillCountData(SKSE::SerializationInterface* serde, const uint8_t Version) {
+
+		const size_t NumOfActorRecords = GetSingleton().KillCountDataMap.size();
+		constexpr uint32_t SizeOfDataToWrite = sizeof(KillCountData) + sizeof(FormID);
+
+		if (!serde->OpenRecord(KillCountDataRecord, Version)) {
+			log::critical("Unable to open KillCountDataRecord in CoSave. Something is really wrong, your save is probably broken!");
+			return;
+		}
+
+		serde->WriteRecordData(&NumOfActorRecords, sizeof(size_t));
+		serde->WriteRecordData(&SizeOfDataToWrite, sizeof(uint32_t));
+
+		for (auto const& [ActorFormID, Data] : GetSingleton().KillCountDataMap) {
+
+			//V1
+			WriteActorRecordFormID(serde, &ActorFormID);                    //0x00 - FORMID
+			serde->WriteRecordData(&Data, SizeOfDataToWrite);
+
+			log::trace("Persistent KillCountData serialized for Actor FormID {:08X}", ActorFormID);
+		}
+	}
+
+	//----------------------
+	// KillCountData Other
+	//----------------------
+
+	KillCountData* Persistent::GetKillCountData(Actor& actor) {
+		std::unique_lock lock(this->_lock);
+		auto key = actor.formID;
+		auto it = this->KillCountDataMap.find(key);
+
+		if (it != this->KillCountDataMap.end()) {
+			return &it->second;
+		}
+
+		// Key not found, add new entry
+		if (!actor.Is3DLoaded()) {
+			return nullptr;
+		}
+		auto [newIt, inserted] = this->KillCountDataMap.try_emplace(key, &actor);
+		return &newIt->second;
+	}
+
+	KillCountData* Persistent::GetKillCountData(Actor* actor) {
+		if (!actor) {
+			return nullptr;
+		}
+		return this->GetKillCountData(*actor);
 	}
 }

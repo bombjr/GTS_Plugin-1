@@ -21,7 +21,7 @@ namespace GTS {
 		void TryStartAction(Actor* a_Performer) const;
 
 		SettingsAI& AISettings = Config::GetAI();
-
+		SettingsAdvanced& AdvancedSettings = Config::GetAdvanced();
 	};
 }
 

@@ -13,6 +13,7 @@ namespace GTS {
 	bool IsUnderTrampling(Actor* giant);
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2);
 	bool DontAlterDamage(Actor* a_this, float dmg, float Health_Reduction);
+	bool IsHumanoid(Actor* giant);
     /*bool BehaviorGraph_DisableHH(Actor* actor);
 	bool IsEquipBusy(Actor* actor);
 	

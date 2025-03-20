@@ -82,6 +82,12 @@ namespace GTS {
 		return false;
 	}
 
+	bool IsHumanoid(Actor* giant) {
+		const bool Human = Runtime::HasKeyword(giant, "ActorTypeNPC");
+		return Human;
+	}
+
+
    /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;
 		actor->GetGraphVariableBool("GTS_DisableHH", disable);

@@ -649,8 +649,14 @@ namespace GTS {
 	TESObjectREFR* HugShrink::GetHuggiesObj(Actor* giant) {
 		try {
 			auto& me = HugShrink::GetSingleton();
+
+			if (me.data.empty() || !me.data.contains(giant)) {
+				return nullptr;
+			}
+
 			return me.data.at(giant).tiny;
-		} catch (std::out_of_range e) {
+		}
+		catch (const std::out_of_range&) {
 			return nullptr;
 		}
 

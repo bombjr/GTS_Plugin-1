@@ -150,7 +150,7 @@ namespace GTS {
 					}
 				}
 
-				catch (std::out_of_range) {
+				catch (const std::out_of_range&) {
 					log::warn("Event {} was triggered but there is no event of that name", trigger.GetName());
 					continue;
 				}
@@ -176,7 +176,7 @@ namespace GTS {
 						auto& eventData = this->registedInputEvents.at(trigger.GetName());
 						eventData.callback(trigger);
 					}
-					catch (std::out_of_range) {
+					catch (const std::out_of_range&) {
 						log::warn("Event {} was triggered but there is no event of that name", trigger.GetName());
 					}
 				}

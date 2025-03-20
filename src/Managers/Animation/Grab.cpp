@@ -611,8 +611,14 @@ namespace GTS {
 	TESObjectREFR* Grab::GetHeldObj(Actor* giant) {
 		try {
 			auto& me = Grab::GetSingleton();
+			if (me.data.empty() || !me.data.contains(giant)) {
+				return nullptr;
+			}
+
 			return me.data.at(giant).tiny;
-		} catch (std::out_of_range e) {
+			
+		}
+		catch (const std::out_of_range&) {
 			return nullptr;
 		}
 
@@ -622,9 +628,8 @@ namespace GTS {
 		Actor* actor = skyrim_cast<Actor*>(obj);
 		if (actor) {
 			return actor;
-		} else {
-			return nullptr;
-		}
+		} 
+		return nullptr;
 	}
 
 	void Grab::FailSafeReset(Actor* giantref) {

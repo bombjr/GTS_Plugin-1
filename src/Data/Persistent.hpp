@@ -59,6 +59,51 @@ namespace GTS {
 		explicit ActorData(RE::Actor* actor) {}
 	};
 
+	#pragma pack(push, 1)
+
+	struct KillCountData {
+		// Once done, order of data CANNOT be changed
+		// But we can expand the data by adding new data at the end of current
+
+		uint32_t iTotalKills = 0; // Total kill count when we don't expand all the info
+
+		uint32_t iShrunkToNothing = 0; // Mostly with spells
+		uint32_t iOtherSources = 0;
+		//^  Colliding with someone with Tiny Calamity (leads to exploding the tiny) 
+		// or inflicting too much damage with weapons when size difference is gigantic (also explodes tiny)
+
+		//Breast data
+		uint32_t iBreastAbsorbed = 0;
+		uint32_t iBreastCrushed = 0;
+		// Hug Data
+		uint32_t iHugCrushed = 0;
+		// Grab Data
+		uint32_t iGrabCrushed = 0;
+		// Butt Crush Data
+		uint32_t iButtCrushed = 0;
+		//Thigh Sandwich/Crush
+		uint32_t iThighCrushed = 0;
+		uint32_t iThighSuffocated = 0; // When dying from DOT damage under thighs
+		uint32_t iThighSandwiched = 0; // When dying from Thigh Sandwich
+		uint32_t iThighGrinded = 0; // We with Nick plan Thigh Grind anim, so it may be used later
+
+		uint32_t iFingerCrushed = 0;
+
+		uint32_t iErasedFromExistence = 0; // Wrathful Calamity Finisher
+
+		uint32_t iAbsorbed = 0; // Unused for now, may be useful later
+		uint32_t iCrushed = 0; // Used in most crush sources
+		uint32_t iEaten = 0; // When fully voring someone
+
+		uint32_t iKicked = 0; // Kicked and crushed to death at same time
+		uint32_t iGrinded = 0; // Grinded to death
+
+		KillCountData() = default;
+		explicit KillCountData(RE::Actor* actor) {}
+	};
+
+	#pragma pack(pop)
+
 	class Persistent : public EventListener {
 
 		public:
@@ -100,6 +145,9 @@ namespace GTS {
 			void EraseUnloadedPersistentData();
 
 
+			KillCountData* GetKillCountData(Actor& actor);
+			KillCountData* GetKillCountData(Actor* actor);
+
 			ActorData* GetActorData(Actor& actor);
 			ActorData* GetActorData(Actor* actor);
 			ActorData* GetData(TESObjectREFR* refr);
@@ -113,6 +161,10 @@ namespace GTS {
 			//------ Actor Record Struct
 			constexpr static inline uint8_t ActorStructVersion = 8;
 			const static inline uint32_t ActorDataRecord = _byteswap_ulong('ACTD');
+
+			//------ Actor Record Struct
+			constexpr static inline uint8_t KillCountStructVersion = 1;
+			const static inline uint32_t KillCountDataRecord = _byteswap_ulong('AKCD');
 
 			//----- Camera
 			BasicRecord<int, 'TCST'> TrackedCameraState = 0;
@@ -145,10 +197,13 @@ namespace GTS {
 
 			Persistent() = default;
 			mutable std::mutex _lock;
+
 			std::unordered_map<FormID, ActorData> ActorDataMap;
+			std::unordered_map<FormID, KillCountData> KillCountDataMap;
 
 			static void LoadPersistent(SerializationInterface* serde);
 			static void SavePersistent(SerializationInterface* serde);
+			static void LoadKillCountData(SKSE::SerializationInterface* serde, uint32_t RecordType, uint32_t RecordVersion);
 
 			//Actor Data Load
 			static void LoadActorData(SKSE::SerializationInterface* serde, const uint32_t RecordType, const uint32_t RecordVersion);
@@ -157,6 +212,7 @@ namespace GTS {
 
 			//Actor Data Save
 			static void WriteActorData(SKSE::SerializationInterface* serde, uint8_t Version);
+			static void WriteKillCountData(SKSE::SerializationInterface* serde, uint8_t Version);
 			static void WriteActorRecordFloat(SKSE::SerializationInterface* serde, const float* Data);
 			static void WriteActorRecordFormID(SKSE::SerializationInterface* serde, const FormID* Id);
 			static void DummyWriteFloat(SKSE::SerializationInterface* serde);

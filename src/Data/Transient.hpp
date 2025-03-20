@@ -2,43 +2,8 @@
 // Module that holds data that is not persistent across saves
 
 namespace GTS {
-	struct KillCountData { // Once done, order of data CANNOT be changed
-		// But we can expand the data by adding new data at the end of current 
-		uint16_t iEntrySize = sizeof(KillCountData); // Not used in Data
 
-		int iTotalKills = 0; // Total kill count when we don't expand all the info
 
-		int iShrunkToNothing = 0; // Mostly with spells
-		int iOtherSources = 0; 
-		//^  Colliding with someone with Tiny Calamity (leads to exploding the tiny) 
-		// or inflicting too much damage with weapons when size difference is gigantic (also explodes tiny)
-
-		//Breast data
-		int iBreastAbsorbed = 0;
-		int iBreastCrushed = 0;
-		// Hug Data
-		int iHugCrushed = 0;
-		// Grab Data
-		int iGrabCrushed = 0;
-		// Butt Crush Data
-		int iButtCrushed = 0;
-		//Thigh Sandwich/Crush
-		int iThighCrushed = 0;
-		int iThighSuffocated = 0; // When dying from DOT damage under thighs
-		int iThighSandwiched = 0; // When dying from Thigh Sandwich
-		int iThighGrinded = 0; // We with Nick plan Thigh Grind anim, so it may be used later
-
-		int iFingerCrushed = 0;
-
-		int iErasedFromExistence = 0; // Wrathful Calamity Finisher
-
-		int iAbsorbed = 0; // Unused for now, may be useful later
-		int iCrushed = 0; // Used in most crush sources
-		int iEaten = 0; // When fully voring someone
-
-		int iKicked = 0; // Kicked and crushed to death at same time
-		int iGrinded = 0; // Grinded to death
-	};
 	struct TempActorData {
 
 		float BaseHeight = 0.0f;
@@ -119,9 +84,6 @@ namespace GTS {
 		Timer ActionTimer = Timer(0);
 
 		std::vector<Actor*> shrinkies;
-
-		KillCountData KillData;
-
 
 		explicit TempActorData(Actor* a_Actor) {
 			const auto _BoundValues = get_bound_values(a_Actor);

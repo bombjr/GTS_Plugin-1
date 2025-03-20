@@ -49,6 +49,7 @@ namespace GTS {
 	void Rumbling::Reset() {
 		this->data.clear();
 	}
+
 	void Rumbling::ResetActor(Actor* actor) {
 		this->data.erase(actor);
 	}
@@ -56,15 +57,20 @@ namespace GTS {
 	void Rumbling::Start(std::string_view tag, Actor* giant, float intensity, float halflife, std::string_view node) {
 		Rumbling::For(tag, giant, intensity, halflife, node, 0, 0.0f);
 	}
+
 	void Rumbling::Start(std::string_view tag, Actor* giant, float intensity, float halflife) {
 		Rumbling::For(tag, giant, intensity, halflife, "NPC COM [COM ]", 0, 0.0f);
 	}
+
 	void Rumbling::Stop(std::string_view tagsv, Actor* giant) {
 		string tag = std::string(tagsv);
 		auto& me = Rumbling::GetSingleton();
 		try {
-			me.data.at(giant).tags.at(tag).state = RumbleState::RampingDown;
-		} catch (std::out_of_range e) {}
+			if (!me.data.empty() || !me.data.contains(giant)) {
+				me.data.at(giant).tags.at(tag).state = RumbleState::RampingDown;
+			}
+		}
+		catch (const std::out_of_range&) {}
 	}
 
 	void Rumbling::For(std::string_view tagsv, Actor* giant, float intensity, float halflife, std::string_view nodesv, float duration, float shake_duration, const bool ignore_scaling) {

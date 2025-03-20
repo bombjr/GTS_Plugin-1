@@ -348,8 +348,14 @@ namespace GTS
 	Actor* AnimationBoobCrush::GetBoobCrushVictim(Actor* giant) {
 		try {
 			auto& me = AnimationBoobCrush::GetSingleton();
+
+			if (me.data.empty() || !me.data.contains(giant)) {
+				return nullptr;
+			}
+
 			return me.data.at(giant).tiny;
-		} catch (std::out_of_range& e) {
+		}
+		catch (const std::out_of_range&) {
 			return nullptr;
 		}
 	}

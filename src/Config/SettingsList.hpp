@@ -322,6 +322,9 @@ struct SettingsAdvanced {
     float fSGTMMult = 0.5f;
     float fAnimSpeedAdjMultPlayer = 1.0f;
     float fAnimSpeedAdjMultTeammate = 1.0f;
+    bool bEnableExperimentalDevourmentAI = false;
+    float fExperimentalDevourmentAIProb = 25.0f;
+
 };
 TOML_SERIALIZABLE(SettingsAdvanced);
 

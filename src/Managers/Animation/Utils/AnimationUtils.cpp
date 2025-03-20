@@ -747,7 +747,7 @@ namespace GTS {
 			auto giantref = gianthandle.get().get();
 			auto tinyref = tinyhandle.get().get();
 			auto FrameB = Time::FramesElapsed() - FrameA;
-			if (FrameB <= 3.0f) {
+			if (FrameB <= 3) {
 				return true;
 			}
 
@@ -1046,7 +1046,7 @@ namespace GTS {
 								}
 
 								ApplyActionCooldown(otherActor, CooldownSource::Damage_Hand);
-								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
+								CollisionDamage::DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
 							}
 						}
 					}
@@ -1090,8 +1090,8 @@ namespace GTS {
 			float feet_damage = (Damage_ThighCrush_CrossLegs_FeetImpact * perk * speed);
 			
 			if (CooldownCheck) {
-				CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, true, true, false, false);
-				CollisionDamage::GetSingleton().DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, false, true, false, false);
+				CollisionDamage::DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, true, true, false, false);
+				CollisionDamage::DoFootCollision(actor, feet_damage, radius, random, bbmult, crush_threshold, DamageSource::ThighCrushed, false, true, false, false);
 			}
 
 			float maxFootDistance = radius * giantScale;
@@ -1139,12 +1139,12 @@ namespace GTS {
 											Laugh_Chance(actor, otherActor, 1.35f, "ThighCrush");
 											float difference = giantScale / (tinyScale * GetSizeFromBoundingBox(otherActor));
 											PushTowards(actor, otherActor, leg, pushCalc * difference, true);
-											CollisionDamage.DoSizeDamage(actor, otherActor, damage * speed * perk, bbmult, crush_threshold, random, Cause, true);
+											CollisionDamage::DoSizeDamage(actor, otherActor, damage * speed * perk, bbmult, crush_threshold, random, Cause, true);
 											ApplyActionCooldown(otherActor, CooldownSource::Damage_Thigh);
 										}
 									} else {
 										Utils_PushCheck(actor, otherActor, Get_Bone_Movement_Speed(actor, Cause)); // pass original un-altered force
-										CollisionDamage.DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, true);
+										CollisionDamage::DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, true);
 									}
 								}
 							}
@@ -1224,7 +1224,7 @@ namespace GTS {
 
 								Utils_PushCheck(giant, otherActor, 1.0f);
 
-								CollisionDamage::GetSingleton().DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
+								CollisionDamage::DoSizeDamage(giant, otherActor, damage, bbmult, crushmult, static_cast<int>(random), Cause, true);
 							}
 						}
 					}

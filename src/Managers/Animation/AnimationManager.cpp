@@ -59,7 +59,7 @@ namespace GTS {
 
 	TriggerData::TriggerData(const std::vector< std::string_view>& behavors,  std::string_view group) : behavors({}), group(group) {
 		for (auto& sv: behavors) {
-			this->behavors.push_back(std::string(sv));
+			this->behavors.emplace_back(sv);
 		}
 	}
 
@@ -186,46 +186,79 @@ namespace GTS {
 	void AnimationManager::Reset() {
 		this->data.clear();
 	}
+
 	void AnimationManager::ResetActor(Actor* actor) {
 		this->data.erase(actor);
 	}
 
 	float AnimationManager::GetHighHeelSpeed(Actor* actor) {
 		float Speed = 1.0f;
+		auto& AnimMgr = AnimationManager::GetSingleton();
+
 		try {
-			for (auto& data : AnimationManager::GetSingleton().data.at(actor) | views::values) {
-				Speed *= data.HHspeed;
+
+			if (!AnimMgr.data.empty()) {
+
+				if (AnimMgr.data.contains(actor)) {
+
+					for (auto& data : AnimMgr.data.at(actor) | views::values) {
+						Speed *= data.HHspeed;
+					}
+				}
 			}
-		}
-		catch (std::out_of_range& e) {
 
 		}
+		catch (const std::out_of_range&) {}
+
 		return Speed;
 	}
 
 	float AnimationManager::GetBonusAnimationSpeed(Actor* actor) {
 		float totalSpeed = 1.0f;
+		auto& AnimMgr = AnimationManager::GetSingleton();
+
 		try {
-			for (auto& data : AnimationManager::GetSingleton().data.at(actor) | views::values) {
-				totalSpeed *= data.animSpeed;
+
+			if (!AnimMgr.data.empty()) {
+
+				if (AnimMgr.data.contains(actor)) {
+
+					for (auto& data : AnimMgr.data.at(actor) | views::values) {
+						totalSpeed *= data.animSpeed;
+					}
+				}
 			}
 		}
-		catch (std::out_of_range& e) {}
+		catch (const std::out_of_range&) {}
 		return totalSpeed;
 	}
 
 	void AnimationManager::AdjustAnimSpeed(float bonus) {
-		auto player = PlayerCharacter::GetSingleton();
+
+		const auto player = PlayerCharacter::GetSingleton();
+		auto& AnimMgr = AnimationManager::GetSingleton();
+
 		try {
-			for (auto& data : AnimationManager::GetSingleton().data.at(player) | views::values) {
-				if (data.canEditAnimSpeed) {
-					data.animSpeed += (bonus*GetAnimationSlowdown(player));
+
+			if (!AnimMgr.data.empty()) {
+
+				if (AnimMgr.data.contains(player)) {
+
+					for (auto& data : AnimMgr.data.at(player) | views::values) {
+
+						if (data.canEditAnimSpeed) {
+							data.animSpeed += (bonus * GetAnimationSlowdown(player));
+						}
+
+						float min = IsStrangling(player) ? 0.50f : 0.33f;
+						float max = IsStrangling(player) ? 1.75f : 3.0f;
+						data.animSpeed = std::clamp(data.animSpeed, min, max);
+					}
 				}
-				float min = IsStrangling(player) ? 0.50f : 0.33f;
-				float max = IsStrangling(player) ? 1.75f : 3.0f;
-				data.animSpeed = std::clamp(data.animSpeed, min, max);
 			}
-		} catch (std::out_of_range& e) {}
+		}
+
+		catch (std::out_of_range&) {}
 	}
 
 	float AnimationManager::GetAnimSpeed(Actor* actor) {
@@ -237,6 +270,7 @@ namespace GTS {
 		}
 
 		if (actor) {
+
 			auto saved_data = GTS::Persistent::GetSingleton().GetData(actor);
 			if (saved_data) {
 				if (saved_data->anim_speed > 0.0f) {
@@ -244,14 +278,21 @@ namespace GTS {
 				}
 			}
 
+			const auto& AnimMgr = AnimationManager::GetSingleton();
+			auto& AnimData = AnimMgr.data;
 			try {
+
 				float totalSpeed = 1.0f;
-				for (auto& data : AnimationManager::GetSingleton().data.at(actor) | views::values) {
-					totalSpeed *= data.animSpeed;
+
+				if (auto it = AnimData.find(actor); it != AnimData.end()) {
+					for (const auto& data : it->second | std::views::values) {
+						totalSpeed *= data.animSpeed;
+					}
+					speed *= totalSpeed;
 				}
-				speed *= totalSpeed;
-			} catch (std::out_of_range& e) {
+
 			}
+			catch (const std::out_of_range&) {}
 		}
 		return speed;
 	}
@@ -267,7 +308,7 @@ namespace GTS {
 	}
 
 	void AnimationManager::RegisterTriggerWithStages( std::string_view trigger,  std::string_view group,  std::vector< std::string_view> behaviors) {
-		if (behaviors.size() > 0) {
+		if (!behaviors.empty()) {
 			AnimationManager::GetSingleton().triggers.try_emplace(std::string(trigger), behaviors, group);
 			//log::info("Registering Trigger With Stages: {}, Group {}", trigger, group);
 		}
@@ -318,7 +359,8 @@ namespace GTS {
 			giant.NotifyAnimationGraph(behavorToPlay.behavors[0]);
 
 			PerkHandler::UpdatePerkValues(&giant, PerkUpdate::Perk_Acceleration); // Currently used for Anim Speed buff only
-		} catch (std::out_of_range) {
+		}
+		catch (const std::out_of_range&) {
 			log::error("Requested play of unknown animation named: {}", trigger);
 			return;
 		}
@@ -326,13 +368,19 @@ namespace GTS {
 
 	void AnimationManager::ResetAnimationSpeedData(Actor* actor) {
 		try {
-			auto& me = AnimationManager::GetSingleton();
-			auto& actorData = me.data.at(actor);
-			for (auto& data : actorData | views::values) {
-				data.animSpeed = 1.0f;
-				data.canEditAnimSpeed = false;
-				data.stage = 0;
 
+			auto& me = AnimationManager::GetSingleton();
+
+			if (!me.data.empty()) {
+
+				if (me.data.contains(actor)) {
+
+					for (auto& data : me.data.at(actor) | views::values) {
+						data.animSpeed = 1.0f;
+						data.canEditAnimSpeed = false;
+						data.stage = 0;
+					}
+				}
 			}
 		}
 		catch (std::out_of_range&) {}
@@ -361,9 +409,8 @@ namespace GTS {
 			if (behavorToPlay.behavors.size() < currentTrigger) {
 				giant.NotifyAnimationGraph(behavorToPlay.behavors[currentTrigger]);
 			}
-		} catch (std::out_of_range) {
-			return;
 		}
+		catch (const std::out_of_range&) {}
 	}
 	void AnimationManager::NextAnim(std::string_view trigger, Actor* giant) {
 		if (giant) {
@@ -374,63 +421,86 @@ namespace GTS {
 	void AnimationManager::ActorAnimEvent(Actor* actor, const std::string_view& tag, const std::string_view& payload) {
 		try {
 			if (actor) {
+
+				if (!this->eventCallbacks.contains(std::string(tag))){
+					return;
+				}
+
 				// Try to get the registerd anim for this tag
 				auto& animToPlay = this->eventCallbacks.at(std::string(tag));
-				// If data dosent exist then insert with default
+
+				// If data doesn't exist then insert with default
 				this->data.try_emplace(actor);
 				auto& actorData = this->data.at(actor);
 				auto group = animToPlay.group;
-				// If data dosent exist this will insert it with default
+				// If data doesn't exist this will insert it with default
 				actorData.try_emplace(group, *actor, nullptr);
 				// Get the data or the newly inserted data
-				auto& data = actorData.at(group);
+				auto& actdata = actorData.at(group);
 				// Call the anims function
-				animToPlay.callback(data);
+				animToPlay.callback(actdata);
 				// If the stage is 0 after an anim has been played then
 				//   delete this data so that we can reset for the next anim
-				if (data.stage == 0) {
+				if (actdata.stage == 0) {
 					actorData.erase(group);
 				}
 			}
-		} catch (std::out_of_range& e) {}
+		}
+		catch (const std::out_of_range&) {}
 	}
 
 	// Get the current stage of an animation group
 	std::size_t AnimationManager::GetStage(Actor& actor,  std::string_view group) {
 		try {
 			auto& me = AnimationManager::GetSingleton();
+
+			if (me.data.empty()) {
+				return 0;
+			}
+
+			if (!me.data.contains(&actor)) {
+				return 0;
+			}
+
 			return me.data.at(&actor).at(std::string(group)).stage;
-		} catch (std::out_of_range& e) {
-			return 0;
+
 		}
-	}
-	std::size_t AnimationManager::GetStage(Actor* actor,  std::string_view group) {
-		if (actor) {
-			return AnimationManager::GetStage(*actor, group);
-		} else {
+		catch (const std::out_of_range&) {
 			return 0;
 		}
 	}
 
-	// Check if any currently playing anim disabled the HHs
-	bool AnimationManager::HHDisabled(Actor& actor) {
-		try {
-			auto& me = AnimationManager::GetSingleton();
-			auto& actorData = me.data.at(&actor);
-			for (auto& data : actorData | views::values) {
-				if (data.disableHH) {
-					return true;
-				}
-			}
-			return false;
-		} catch (std::out_of_range& e) {
-			return false;
+	std::size_t AnimationManager::GetStage(Actor* actor,  std::string_view group) {
+		if (actor) {
+			return AnimationManager::GetStage(*actor, group);
+		}
+		else {
+			return 0;
 		}
 	}
+
+	bool AnimationManager::HHDisabled(Actor& actor) {
+		auto& me = AnimationManager::GetSingleton();
+
+		if (!IsHumanoid(&actor) || me.data.empty()) {
+			return false;
+		}
+
+		auto it = me.data.find(&actor);
+		if (it == me.data.end()) {
+			return false;
+		}
+
+		return std::ranges::any_of(it->second | std::views::values, [](const auto& data) {
+			return data.disableHH;
+		});
+	}
+
 	bool AnimationManager::HHDisabled(Actor* actor) {
 		if (actor) {
 			return AnimationManager::HHDisabled(*actor);
-		} else {
+		}
+		else {
 			return false;
 		}
 	}

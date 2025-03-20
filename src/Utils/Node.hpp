@@ -19,7 +19,7 @@ namespace GTS {
 	void update_node(NiAVObject* node);
 
 	std::vector<NiAVObject*> GetModelsForSlot(Actor* actor, BGSBipedObjectForm::BipedObjectSlot slot);
-	void VisitNodes(NiAVObject* root, std::function<bool(NiAVObject& a_obj)> a_visitor);
+	void VisitNodes(NiAVObject* root, const std::function<bool(NiAVObject& a_obj)>& a_visitor);
 	template<typename T>
 	void VisitExtraData(NiAVObject* root, std::string_view name, std::function<bool(NiAVObject& a_obj, T& data)> a_visitor) {
 		VisitNodes(root, [&root, &name, &a_visitor](NiAVObject& node) {

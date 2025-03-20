@@ -204,6 +204,7 @@ namespace {
 
 		// Slider that determines max size cap.
 		float CurseTargetScale;
+		float PowerMult;
 
 		//Get the actor's Gamemode Timer From Transient and set a random value to it.
 		auto ActorData = Transient::GetSingleton().GetData(a_Actor);
@@ -216,18 +217,16 @@ namespace {
 		if (a_Actor->formID == 0x14) {
 			const auto& Settings = Config::GetGameplay().GamemodePlayer;
 
-			//SkillLevel = GetGtsSkillLevel(a_Actor);
 			CurseTargetScale = Settings.fCurseTargetScale;
 			const float RandomDelay = Settings.fGameModeUpdateInterval;
+			PowerMult = Settings.fGrowthRate + 0.019f;
 			ActorData->ActionTimer.UpdateDelta(RandomDelay + RandomFloat(-RandomDelay / 10, RandomDelay / 10));
 		}
 		else if (IsTeammate(a_Actor)) {
 			const auto& Settings = Config::GetGameplay().GamemodeFollower;
-
-			//NPC's Set it trough alteration
-			//SkillLevel = GetAV(a_Actor, ActorValue::kAlteration);
 			CurseTargetScale = Settings.fCurseTargetScale;
 			const float RandomDelay = Settings.fGameModeUpdateInterval;
+			PowerMult = Settings.fGrowthRate + 0.019f;
 			ActorData->ActionTimer.UpdateDelta(RandomDelay + RandomFloat(-RandomDelay / 10, RandomDelay / 10));
 		}
 		else {
@@ -244,21 +243,22 @@ namespace {
 			if (a_CurrentTargetScale >= CurseTargetScale) {
 				return;
 			}
+			const float ScaleMult = (a_CurrentTargetScale - CurseTargetScale) + 1.0f;
+			float ModAmmount = (PowerMult * (RandomFloat(1, 4.5) * ScaleMult));
+			//const float GrowthPower = std::clamp(RandomFloatGauss(0.30f, 0.1f), 0.1f, 0.5f);
 
-			const float GrowthPower = std::clamp(RandomFloatGauss(0.30f, 0.1f), 0.1f, 0.5f);
-
-			if (a_CurrentTargetScale + GrowthPower >= CurseTargetScale) {
+			if (a_CurrentTargetScale + ModAmmount >= CurseTargetScale) {
 				set_target_scale(a_Actor, CurseTargetScale);
 				return;
 			}
 
-			if (RandomBool(33.0)) {
+			if (RandomBool(12.0f)) {
 				PlayMoanSound(a_Actor, a_CurrentTargetScale / 4);
 				Task_FacialEmotionTask_Moan(a_Actor, 2.0f, "CurseOfTheGiantess");
 			}
 
-			update_target_scale(a_Actor, GrowthPower, SizeEffectType::kGrow);
-			Runtime::PlaySoundAtNode("GTSSoundGrowth", a_Actor, GrowthPower * 2.0f, 1.0f, "NPC Pelvis [Pelv]");
+			update_target_scale(a_Actor, ModAmmount, SizeEffectType::kGrow);
+			Runtime::PlaySoundAtNode("GTSSoundGrowth", a_Actor, ModAmmount * 2.0f, 1.0f, "NPC Pelvis [Pelv]");
 		}
 	}
 
@@ -270,6 +270,7 @@ namespace {
 
 		// Slider that determines max size cap.
 		float CurseTargetScale;
+		float PowerMult;
 
 		//Get the actor's Gamemode Timer From Transient and set a random value to it.
 		auto ActorData = Transient::GetSingleton().GetData(a_Actor);
@@ -278,47 +279,52 @@ namespace {
 		Timer* IntervalTimer = &ActorData->ActionTimer;
 		if (!IntervalTimer) return;
 
+
+
 		//Set Values based on Settings and actor type.
 		if (a_Actor->formID == 0x14) {
 			const auto& Settings = Config::GetGameplay().GamemodePlayer;
 
-			//SkillLevel = GetGtsSkillLevel(a_Actor);
+			PowerMult = Settings.fShrinkRate + 0.019f;
 			CurseTargetScale = Settings.fCurseTargetScale;
 			//The larger the actor the faster they shrink
-			const float RandomDelay = Settings.fGameModeUpdateInterval / RandomFloat(1.0, a_CurrentTargetScale / 2.0);
+			const float RandomDelay = Settings.fGameModeUpdateInterval / RandomFloat(1.0, a_CurrentTargetScale / 2.0f);
 			ActorData->ActionTimer.UpdateDelta(RandomDelay + RandomFloat(-RandomDelay / 10, RandomDelay / 10));
 		}
 		else if (IsTeammate(a_Actor)) {
 			const auto& Settings = Config::GetGameplay().GamemodeFollower;
 
-			//NPC's Set it trough alteration
-			//SkillLevel = GetAV(a_Actor, ActorValue::kAlteration);
+			PowerMult = Settings.fShrinkRate + 0.019f;
 			CurseTargetScale = Settings.fCurseTargetScale;
 			//The larger the actor the faster they shrink
-			const float RandomDelay = Settings.fGameModeUpdateInterval / RandomFloat(1.0, a_CurrentTargetScale / 2.0);
+			const float RandomDelay = Settings.fGameModeUpdateInterval / RandomFloat(1.0, a_CurrentTargetScale / 2.0f);
 			ActorData->ActionTimer.UpdateDelta(RandomDelay + RandomFloat(-RandomDelay / 10, RandomDelay / 10));
 		}
 		else {
 			return;
 		}
 
-		if (a_CurrentTargetScale > CurseTargetScale + EPS) {
-
-			if (IntervalTimer->ShouldRunFrame()) {
-
-				float ModAmmount = (0.025f * (RandomFloat(1, 4.5) * a_CurrentTargetScale));
-
-				Runtime::PlaySoundAtNode("GTSSoundShrink", a_Actor, ModAmmount * 2.0f, 1.0, "NPC Pelvis [Pelv]");
-
-				if (a_CurrentTargetScale + ModAmmount < CurseTargetScale) {
-					set_target_scale(a_Actor, CurseTargetScale);
-					return;
-				}
-
-				update_target_scale(a_Actor, -ModAmmount, SizeEffectType::kShrink);
-
-			}
+		if (a_CurrentTargetScale <= CurseTargetScale) {
+			return;
 		}
+
+		const float ScaleMult = (a_CurrentTargetScale - CurseTargetScale) + 1.0f;
+
+		if (IntervalTimer->ShouldRunFrame()) {
+
+			float ModAmmount = (PowerMult * (RandomFloat(1, 4.5) * ScaleMult));
+
+			Runtime::PlaySoundAtNode("GTSSoundShrink", a_Actor, ModAmmount * 2.0f, 1.0, "NPC Pelvis [Pelv]");
+
+			if (a_CurrentTargetScale - ModAmmount <= CurseTargetScale) {
+				set_target_scale(a_Actor, CurseTargetScale);
+				return;
+			}
+
+			update_target_scale(a_Actor, -ModAmmount, SizeEffectType::kShrink);
+
+		}
+		
 	}
 
 }

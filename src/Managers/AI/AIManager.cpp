@@ -6,6 +6,7 @@
 
 #include "Managers/AttackManager.hpp"
 #include "Managers/AI/Vore/VoreAI.hpp"
+#include "Managers/AI/Vore/DevourmentAI.hpp"
 #include "Managers/AI/Thigh/ThighCrushAI.hpp"
 #include "Managers/AI/ButtCrush/ButtCrushAI.hpp"
 #include "Managers/AI/Thigh/ThighSandwichAI.hpp"
@@ -18,6 +19,7 @@ namespace {
 
 	enum class ActionType : uint8_t {
 		kVore,
+		kDevourment,
 		kStomps,
 		kKicks,
 		kThighS,
@@ -86,7 +88,7 @@ namespace {
 		if (IsFemale(a_Actor, true)) {
 
 			const bool HasHP = GetAV(a_Actor, ActorValue::kHealth) > 0;
-			const bool IsVisible = a_Actor->GetAlpha() > 0.0f; //For devourment
+			const bool IsVisible = a_Actor->GetAlpha() > 0.1f; //For devourment
 			const bool IsInNormalState = a_Actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kNormal;
 			const bool IsHoldingSomeone = Grab::GetHeldActor(a_Actor) != nullptr || IsInCleavageState(a_Actor);
 			const bool IsInCombat = (a_Actor->IsInCombat()) || (a_Actor->GetActorRuntimeData().currentCombatTarget.get().get() != nullptr);
@@ -129,7 +131,7 @@ namespace {
 			return false;
 		}
 
-		if (!IsGtsBusy(a_Prey) && a_Prey->GetAlpha() > 0.0f) {
+		if (!IsGtsBusy(a_Prey) && a_Prey->GetAlpha() > 0.1f) {
 
 			//If not a teammate and they are essential but we allow essentials
 			if (a_Prey->formID == 0x14) {
@@ -279,6 +281,7 @@ namespace GTS {
 
 		//Actor* container from each filter result.
 		std::vector<Actor*> CanVore = {};
+		std::vector<Actor*> CanDVVore = {};
 		std::vector<Actor*> CanStompKickSwipe = {};
 		std::vector<Actor*> CanThighSandwich = {};
 		std::vector<Actor*> CanThighCrush = {};
@@ -300,6 +303,15 @@ namespace GTS {
 			CanVore = VoreAI_FilterList(a_Performer, PreyList);
 			if (!CanVore.empty()) {
 				StartableActions.emplace(ActionType::kVore, static_cast<int>(AISettings.Vore.fProbability));
+			}
+		}
+
+		//----------- DEVOURMENT "AI"
+
+		if (AdvancedSettings.bEnableExperimentalDevourmentAI) {
+			CanDVVore = DevourmentAI_FilterList(a_Performer, PreyList);
+			if (!CanDVVore.empty()) {
+				StartableActions.emplace(ActionType::kDevourment, static_cast<int>(AdvancedSettings.fExperimentalDevourmentAIProb));
 			}
 		}
 
@@ -406,6 +418,15 @@ namespace GTS {
 					VoreAI_StartVore(a_Performer, CanVore);
 				}
 
+				return;
+			}
+			case ActionType::kDevourment:{
+
+				logger::trace("AI Starting kDevourment Action");
+
+				if (!CanDVVore.empty()) {
+					DevourmentAI_Start(a_Performer, CanDVVore);
+				}
 				return;
 			}
 			case ActionType::kStomps: {

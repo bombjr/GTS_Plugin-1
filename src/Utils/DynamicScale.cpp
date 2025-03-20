@@ -6,7 +6,6 @@ namespace GTS {
 
 	float GetCeilingHeight(Actor* giant) {
 
-
 		if (!giant) {
 			return std::numeric_limits<float>::infinity();
 		}
@@ -200,7 +199,8 @@ namespace GTS {
 
 		try {
 			return manager.data.at(id);
-		} catch (const std::out_of_range& oor) {
+		}
+		catch (const std::out_of_range&) {
 			throw std::exception("DynamicScale::GetData: Unable to find actor data");
 		}
 	}

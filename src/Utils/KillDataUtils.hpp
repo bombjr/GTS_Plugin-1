@@ -33,5 +33,5 @@ namespace GTS {
 	};
 
     void IncrementKillCount(Actor* giant, SizeKillType Type);
-    int GetKillCount(Actor* giant, SizeKillType Type);
+    uint32_t GetKillCount(Actor* giant, SizeKillType Type);
 }
