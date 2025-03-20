@@ -187,7 +187,7 @@ namespace {
 				const bool Teammate = (IsTeammate(PerformerActor) && (IsTeammate(PreyActor) || PreyActor->formID == 0x14));
 				//Reduce if folllower or player
 
-				const float ShrinkProbability = Teammate ? clamp(Settings.fShrinkProb, 0.0f, 0.15f) : Settings.fShrinkProb;
+				const float ShrinkProbability = Teammate ? Settings.fFriendlyShrinkProb : Settings.fShrinkProb;
 				const int SelectedAction = RandomIntWeighted({
 					HugAI_CanHeal(PerformerActor,PreyActor) ? static_cast<int>(Settings.fHealProb) : 0,
 					HugAI_CanShrink(PerformerActor,PreyActor) ? static_cast<int>(ShrinkProbability) : 0,

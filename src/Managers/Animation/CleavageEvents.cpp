@@ -170,21 +170,6 @@ namespace {
 		});
     }
 
-    void PrintBreastAbsorbed(Actor* giant, Actor* tiny) {
-        int random = RandomInt(0, 4);
-        if (random == 0) {
-            Cprint("Breasts of {} lovingly ate {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
-        } else if (random == 1) {
-            Cprint("{} suddenly disappeared between the breasts of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
-        } else if (random == 2) {
-            Cprint("Mountains of {} greedily absorbed {}", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
-        } else if (random == 3) {
-            Cprint("{} became one with the breasts of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
-        } else {
-            Cprint("{} was gently devoured by the milkers of {}", tiny->GetDisplayFullName(), giant->GetDisplayFullName());
-        }
-    }
-
     ///=================================================================== Functions
     void Deal_breast_damage(Actor* giant, float damage_mult) {
         Actor* tiny = Grab::GetHeldActor(giant);
@@ -418,9 +403,10 @@ namespace {
             Rumbling::Once("AbsorbTiny_R", giant, 0.8f, 0.05f, "L Breast02", 0.0f);
             Rumbling::Once("AbsorbTiny_L", giant, 0.8f, 0.05f, "R Breast02", 0.0f);
 
+            ReportDeath(giant, tiny, DamageSource::BreastAbsorb);
             DamageAV(giant, ActorValue::kHealth, -30); // Heal GTS
             Absorb_GrowInSize(giant, tiny, growth);
-            PrintBreastAbsorbed(giant, tiny);
+            
 
             AdjustSizeReserve(giant, 0.0285f);
             AdjustMassLimit(0.0095f, giant);

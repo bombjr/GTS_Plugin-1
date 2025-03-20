@@ -466,7 +466,7 @@ namespace GTS {
                 
                 AdvanceQuestProgression(giantess, tiny, stage, 1.0f, false);
                 
-                PrintDeathSource(giantess, tiny, source);
+                ReportDeath(giantess, tiny, source);
             } else {
 				if (do_sound) {
 					if (!LessGore()) {

@@ -283,8 +283,6 @@ namespace GTS {
 	void AddSMTDuration(Actor* actor, float duration, bool perk_check = true);
 	void AddSMTPenalty(Actor* actor, float penalty);
 
-	void PrintDeathSource(Actor* giant, Actor* tiny, DamageSource cause);
-	void PrintSuffocate(Actor* pred, Actor* prey);
 	void ShrinkUntil(Actor* giant, Actor* tiny, float expected, float halflife, bool animation);
 	void DisableCollisions(Actor* actor, TESObjectREFR* otherActor);
 	void EnableCollisions(Actor* actor);

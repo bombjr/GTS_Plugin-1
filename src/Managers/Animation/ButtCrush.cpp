@@ -232,8 +232,8 @@ namespace {
 				auto ButtR = find_node(giantref, "NPC R Butt");
 				auto ButtL = find_node(giantref, "NPC L Butt");
 
-				ApplyThighDamage(giantref, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
-				ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::ThighCrushed);
+				ApplyThighDamage(giantref, true, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::Booty);
+				ApplyThighDamage(giant, false, false, Radius_ThighCrush_ButtCrush_Drop, Damage_ButtCrush_LegDrop * damage, 0.35f, 1.0f, 14, DamageSource::Booty);
 
 				float shake_power = Rumble_ButtCrush_ButtImpact/2 * dust * damage;
 

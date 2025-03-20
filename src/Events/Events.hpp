@@ -138,6 +138,7 @@ namespace GTS {
 		KneeLeft,
 		Breast,
 		BreastImpact,
+		BreastAbsorb,
 		Hugs,
 		Booty,
 		BodyCrush,
@@ -153,7 +154,7 @@ namespace GTS {
 		CrushedLeft,
 		FootIdleL,
 		Overkill,
-		Shrinked,
+		ShrinkToNothing,
 		Collision,
 		FootGrindedRight,
 		FootGrindedLeft,
@@ -161,9 +162,11 @@ namespace GTS {
 		FootGrindedLeft_Impact,
 		HandCrushed,
 		ThighSandwiched,
+		ThighSuffocated,
 		ThighCrushed,
 		BlockDamage,
 		HitSteal,
+		EraseFromExistence,
 	};
 
 	enum class GrowthAnimation {

@@ -84,8 +84,8 @@ namespace GTS {
 	    CatMgr.AddCategory(std::make_shared<CategoryInfo>());
 	    CatMgr.AddCategory(std::make_shared<CategoryGeneral>());
 	    CatMgr.AddCategory(std::make_shared<CategoryGameplay>());
+		CatMgr.AddCategory(std::make_shared<CategoryBalance>());
 		CatMgr.AddCategory(std::make_shared<CategoryActions>());
-	    CatMgr.AddCategory(std::make_shared<CategoryBalance>());
 	    CatMgr.AddCategory(std::make_shared<CategoryAudio>());
 	    CatMgr.AddCategory(std::make_shared<CategoryAI>());
 	    CatMgr.AddCategory(std::make_shared<CategoryCamera>());

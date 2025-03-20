@@ -356,7 +356,7 @@ namespace GTS {
 				SetReanimatedState(tiny);
 
 				CrushBonuses(giant, tiny);
-				PrintDeathSource(giant, tiny, Cause);
+				ReportDeath(giant, tiny, Cause);
 				if (!LessGore()) {
 					auto node = find_node(giant, GetDeathNodeName(Cause));
 					if (!IsMechanical(tiny)) {

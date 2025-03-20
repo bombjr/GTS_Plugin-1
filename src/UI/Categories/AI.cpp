@@ -205,9 +205,9 @@ namespace GTS {
             const char* T5 = "Set the interval at which an attempt is made to do any of the following hug actions when hugging someone.";
             const char* T6 = "Set the chance to perform a hug heal action.";
             const char* T7 = "Set the chance to perform a hug crush action.";
-            const char* T8 = "Set the chance to perform a hug shrink action.\n"
-        					 "Note: When the player or another follower is being hugged by a follower the chance to shrink is capped to up to 15%";
-            const char* T9 = "Should the hugged actor be let go if they can't be shrunk any further.\nApplies only to Followers/Player. Others will be always let go.";
+            const char* T8 = "Set the chance to perform a hug shrink action.";
+            const char* T9 = "Set the chance to perform a hug shrink action on a follower/teammate";
+            const char* T10 = "Should the hugged actor be let go if they can't be shrunk any further.\nApplies only to Followers/Player. Others will be always let go.";
 
             if (ImGui::CollapsingHeader("Hugs")) {
 
@@ -220,7 +220,7 @@ namespace GTS {
 
                     ImUtil::CheckBox("Allow Crushing (Followers & Player)", &Settings.Hugs.bKillFollowersOrPlayer,T2);
                     ImUtil::CheckBox("Allow Crushing (Friendly NPCs)", &Settings.Hugs.bKillFriendlies,T3);
-                    ImUtil::CheckBox("Stop When Too Small (Followers & Player)", &Settings.Hugs.bStopIfCantShrink, T9);
+                    ImUtil::CheckBox("Stop When Too Small (Followers & Player)", &Settings.Hugs.bStopIfCantShrink, T10);
 
                     ImGui::Spacing();
 
@@ -228,6 +228,7 @@ namespace GTS {
                     ImUtil::SliderF("Chance To Heal",&Settings.Hugs.fHealProb, 0.0f, 100.0f, T6, "%.0f%%");
                     ImUtil::SliderF("Chance To Crush",&Settings.Hugs.fKillProb, 0.0f, 100.0f, T7, "%.0f%%");
                     ImUtil::SliderF("Chance To Shrink",&Settings.Hugs.fShrinkProb, 0.0f, 100.0f, T8, "%.0f%%");
+                    ImUtil::SliderF("Chance To Shrink Friendly", &Settings.Hugs.fFriendlyShrinkProb, 0.0f, 100.0f, T9, "%.0f%%");
 
                     ImGui::EndDisabled();
                 }

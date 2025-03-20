@@ -3,6 +3,7 @@
 #include "UI/DearImGui/imgui.h"
 #include "Managers/Attributes.hpp"
 #include "Utils/UnitConverter.hpp"
+#include "Utils/KillDataUtils.hpp"
 
 namespace {
     bool CheckOK(RE::Actor* a_Actor) {
@@ -80,13 +81,60 @@ namespace GTS {
         const float BonusSize_TempPotionBoost = BonusSize * 100.0f;
         const float BonusSize_AspectOfGiantess = AspectOfGTS;
 
+        std::string KillsMade = fmt::format(
+            fmt::runtime(
+                "- Dead actors do not count\n"
+                "Erased From Existence: {:d}\n"
+                "Shrunk To Nothing: {:d}\n"
+                "Breast Absorbed: {:d}\n"
+                "Breast Crushed: {:d}\n"
+                "---\n"
+                "Thigh Suffocated: {:d}\n"
+                "Thigh Sandwiched: {:d}\n"
+                "Thigh Crushed: {:d}\n"
+                "---\n"
+                "Grind Crushed: {:d}\n"
+                "Kick Crushed: {:d}\n"
+                "---\n"
+                "Finger Crushed: {:d}\n"
+                "Grab Crushed: {:d}\n"
+                "Butt Crushed: {:d}\n"
+                "Hug Crushed: {:d}\n"
+                "Crushed: {:d}\n"
+                "---\n"
+                "Eaten: {:d}\n\n"
+                "Other Sources: {:d}\n"
+                "- Other Sources are: Tiny Calamity Collision\n"
+                "- Using Tiny as Shield when grabbing tiny\n"
+                "- Exceassive Overkill Weapon Damage when large\n"
+                
+            ),
+            GetKillCount(a_Actor, SizeKillType::kErasedFromExistence),
+            GetKillCount(a_Actor, SizeKillType::kShrunkToNothing),
+            GetKillCount(a_Actor, SizeKillType::kBreastAbsorbed),
+            GetKillCount(a_Actor, SizeKillType::kBreastCrushed),
+            GetKillCount(a_Actor, SizeKillType::kThighSuffocated),
+            GetKillCount(a_Actor, SizeKillType::kThighSandwiched),
+            GetKillCount(a_Actor, SizeKillType::kThighCrushed),
+            GetKillCount(a_Actor, SizeKillType::kGrinded),
+            GetKillCount(a_Actor, SizeKillType::kKicked),
+            GetKillCount(a_Actor, SizeKillType::kFingerCrushed),
+            GetKillCount(a_Actor, SizeKillType::kGrabCrushed),
+            GetKillCount(a_Actor, SizeKillType::kButtCrushed),
+            GetKillCount(a_Actor, SizeKillType::kHugCrushed),
+            GetKillCount(a_Actor, SizeKillType::kCrushed),
+            GetKillCount(a_Actor, SizeKillType::kEaten),
+            GetKillCount(a_Actor, SizeKillType::kOtherSources)
+        );
+
         std::string TotalSizeBonusCalculation = fmt::format(
             fmt::runtime("Size Essence + Absorbed Dragons: +{:.2f}x\n"
             "Potion Of Heights: +{:.0f}%%\n"
             "Aspect Of Giantess: +{:.0f}%%\n\n"
             "- Size Essence Increases your maximum achievable size when the size limit cap is set to \"Skill Based\"\n"
             "- If Size Gain mode is in \"Mass Mode\", then Essence Bonus is reduced by {:.0f}%% \n" 
-            "- You can gain Essence by killing and absorbing dragons when you have the correct perk or by consuming specific potions found all around the world."
+            "- You can gain Essence by killing and absorbing dragons when you have the correct perk\n"
+            "- Or by consuming specific potions found all around the world."
             ),
             MassMode ? BonusSize_EssenceAndDragons * MassMode_ElixirPowerMultiplier : BonusSize_EssenceAndDragons * 1.0f,
             BonusSize_TempPotionBoost,
@@ -96,6 +144,8 @@ namespace GTS {
 
         //------- Tooltip Descriptions
         
+        const char* TKillsMade = KillsMade.c_str();
+
         const char* TBonusSize = TotalSizeBonusCalculation.c_str();
 
         const char* TDamageResist = "This is your damage resistance in percentage. Some GTS perks may further increase it.";
@@ -323,24 +373,17 @@ namespace GTS {
                     ImGui::TableSetColumnIndex(1);
                     ImGui::Text("HP: +%.2f, MP: +%.2f, SP: +%.2f", StolenHealth, StolenMagicka, StolenStamina);
                 }
+            }
 
-                // Stolen Magicka
-                /*if (hasFlag(a_featureFlags, GTSInfoFeatures::kStolenMagicka)) {
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("Absorbed Magicka:");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("+%.2f", StolenMagicka);
-                }
-
-                // Stolen Stamina
-                if (hasFlag(a_featureFlags, GTSInfoFeatures::kStolenStamina)) {
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("Absorbed Stamina:");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("+%.2f", StolenStamina);
-                }*/
+            // Kills Made
+            if (hasFlag(a_featureFlags, GTSInfoFeatures::kKillCounter)) {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::TextUnformatted("Kills Made:");
+                ImUtil::Tooltip(TKillsMade, true);
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%d", GetKillCount(a_Actor, SizeKillType::kTotalKills)
+                );
             }
 
             ImGui::EndTable();

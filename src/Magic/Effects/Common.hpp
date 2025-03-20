@@ -7,6 +7,8 @@
 #include "Managers/ShrinkToNothingManager.hpp"
 #include "Managers/Animation/Utils/CooldownManager.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 namespace GTS {
 
 	// Module that handles various magic effects
@@ -162,7 +164,6 @@ namespace GTS {
 						auto GtsSkillProgress = Runtime::GetGlobal("GTSSkillProgress");
 						
 						if (GtsSkillLevel) {
-
 							if (GtsSkillLevel->value >= 100.0f) {
 								GtsSkillLevel->value = 100.0f;
 								GtsSkillRatio->value = 0.0f;
@@ -468,7 +469,7 @@ namespace GTS {
 			AdjustMassLimit(0.0060f * mass_mult, caster);
 
 			AdjustSizeReserve(caster, target_scale * bbscale/25);
-			PrintDeathSource(caster, target, DamageSource::Shrinked);
+			ReportDeath(caster, target, DamageSource::ShrinkToNothing);
 			ShrinkToNothingManager::Shrink(caster, target);
 			return true;
 		}

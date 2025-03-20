@@ -27,13 +27,25 @@ namespace {
 	const auto& GameplaySettings = Config::GetGameplay();
 
 	constexpr float ini_adjustment = 65535.f; //High Value
+	constexpr float vanilla_interaction_range = 180.0f;
+	constexpr float vanilla_radius_range = 16.0f;
 
 	void FixEmotionsRange() {
 
 		// Makes facial emotions always enabled at any size
 		*Hooks::LOD::fTalkingDistance = ini_adjustment;
 		*Hooks::LOD::fLodDistance = ini_adjustment;
+	}
 
+	void UpdateInterractionDistance() {
+		if (Config::GetGeneral().bOverrideInteractionDist) {
+			float player_scale = std::clamp(get_visual_scale(PlayerCharacter::GetSingleton()), 1.0f, 999999.0f);
+			float new_dist_value = vanilla_interaction_range * player_scale;
+			float new_radius_value = vanilla_radius_range * player_scale;
+
+			*Hooks::Distance::fActivatePickRadius = new_radius_value;
+			*Hooks::Distance::fActivatePickLength = new_dist_value;
+		}
 	}
 
 	void UpdateCameraINIs() {
@@ -490,16 +502,16 @@ void GtsManager::Start() {
 void GtsManager::Update() {
 	auto profiler = Profilers::Profile("GTSManager: Update");
 
-	UpdateFalling();
+	UpdateInterractionDistance(); // Player exclusive
 	UpdateGlobalSizeLimit();
-	UpdateMaxScale(); // Update max scale of each actor in the scene
-	ManageActorControl(); // Sadly have to call it non stop since im unsure how to easily fix it otherwise :(
 	ShiftAudioFrequency();
-	FixActorFade();
+	ManageActorControl(); // Sadly have to call it non stop since im unsure how to easily fix it otherwise :(
 	UpdateCameraINIs();
-	CheckTalkPerk();
 	ApplyTalkToActor();
-
+	UpdateMaxScale(); // Update max scale of each actor in the scene
+	UpdateFalling();
+	CheckTalkPerk();
+	FixActorFade();
 
 	const auto& ActorList = find_actors();
 

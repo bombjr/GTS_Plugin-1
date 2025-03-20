@@ -5,6 +5,9 @@
 #include "Managers/Animation/Controllers/VoreController.hpp"
 #include "Magic/Effects/Common.hpp"
 
+#include "Utils/DeathReport.hpp"
+#include "Utils/KillDataUtils.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -89,34 +92,6 @@ namespace GTS {
         
 	}
 
-    void VoreMessage_SwallowedAbsorbing(Actor* pred, Actor* prey) {
-		if (pred) {
-			int random = RandomInt(0, 3);
-			if (!prey->IsDead() && !Runtime::HasPerk(pred, "GTSPerkFullAssimilation") || random <= 1) {
-				Cprint("{} was Swallowed and is now being slowly absorbed by {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-			} else if (random == 2) {
-				Cprint("{} is now absorbing {}", pred->GetDisplayFullName(), prey->GetDisplayFullName());
-			} else if (random >= 3) {
-				Cprint("{} will soon be completely absorbed by {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-			}
-		}
-	}
-
-	void VoreMessage_Absorbed(Actor* pred, std::string_view prey) {
-		if (pred) {
-			int random = RandomInt(0, 3);
-			if (!Runtime::HasPerk(pred, "GTSPerkFullAssimilation") || random == 0) {
-				Cprint("{} was absorbed by {}", prey, pred->GetDisplayFullName());
-			} else if (Runtime::HasPerk(pred, "GTSPerkFullAssimilation") && random == 1) {
-				Cprint("{} became one with {}", prey, pred->GetDisplayFullName());
-			} else if (Runtime::HasPerk(pred, "GTSPerkFullAssimilation") && random >= 2) {
-				Cprint("{} was greedily devoured by {}", prey, pred->GetDisplayFullName());
-			} else {
-				Cprint("{} was absorbed by {}", prey, pred->GetDisplayFullName());
-			}
-		}
-	}
-
     void CantVorePlayerMessage(Actor* giant, Actor* tiny, float sizedifference) {
 		if (sizedifference < Action_Vore) {
 			std::string message = std::format("Player is too big to be eaten: x{:.2f}/{:.2f}", sizedifference, Action_Vore);
@@ -136,7 +111,7 @@ namespace GTS {
 		}
 	}
 
-	void Task_Vore_FinishVoreBuff(const VoreInformation& VoreInfo, int amount_of_tinies, bool Devourment) {
+	void Task_Vore_FinishVoreBuff(const VoreInformation& VoreInfo, Actor* tiny, int amount_of_tinies, bool Devourment) {
         std::string_view tiny_name = VoreInfo.Tiny_Name; // Used for death message
 		
 		float sizePower = VoreInfo.Vore_Power;
@@ -158,12 +133,15 @@ namespace GTS {
 		size_gain *= Config::GetGameplay().ActionSettings.fVoreGainMult;
 
         if (giant) {
+			if (tiny) {
+            	ReportDeath(giant, tiny, DamageSource::Vored, true);
+			}
+
             GainWeight(giant, 3.0f * tinySize * amount_of_tinies * multiplier); // Self explanatory
             ModSizeExperience(giant, 0.20f * multiplier + (tinySize * 0.02f)); // Gain Size Mastery XP
 
 			update_target_scale(giant, size_gain, SizeEffectType::kGrow); // Give GTS Size
-
-            VoreMessage_Absorbed(giant, tiny_name);
+			
             AdjustSizeReserve(giant, size_gain);
             BuffAttributes(giant);
 
@@ -185,6 +163,8 @@ namespace GTS {
 			std::string name = std::format("Vore_Buff_{}_{}", giant->formID, tiny->formID);
 			VoreInformation VoreInfo = GetVoreInfo(giant, tiny, 1.0f);
 			ActorHandle gianthandle = giant->CreateRefHandle();
+			ActorHandle tinyhandle = tiny->CreateRefHandle();
+
 			double start_time = Time::WorldTimeElapsed();
 
 			float giantSize = get_visual_scale(giant);
@@ -203,6 +183,9 @@ namespace GTS {
 				if (!gianthandle) {
 					return false;
 				}
+				if (!tinyhandle) {
+					return false;
+				}
 				double timepassed = Time::WorldTimeElapsed() - start_time;
 				auto giantref = gianthandle.get().get();
 				
@@ -219,7 +202,7 @@ namespace GTS {
 				}
 
 				if (timepassed >= Duration) {
-					Task_Vore_FinishVoreBuff(VoreInfo, amount_of_tinies, false);
+					Task_Vore_FinishVoreBuff(VoreInfo, tinyhandle.get().get(), amount_of_tinies, false);
 					if (giantref->formID == 0x14) {
 						shake_camera(giantref, 0.50f, 0.75f);
 					}
@@ -241,7 +224,7 @@ namespace GTS {
 			}
 		}
 
-		Task_Vore_FinishVoreBuff(VoreInfo, 1, true);
+		Task_Vore_FinishVoreBuff(VoreInfo, Prey, 1, true);
 	}
 
 	void Devourment_Compatibility(Actor* Pred, Actor* Prey, bool Digested) { // Called from the GtsManagerQuest script, takes priority over GTS Vore
@@ -257,6 +240,7 @@ namespace GTS {
 					Notify("{} was devoured by {}", Prey->GetDisplayFullName(), Pred->GetDisplayFullName());
 					Cprint("{} was devoured by {}", Prey->GetDisplayFullName(), Pred->GetDisplayFullName());
 					DevourmentBonuses(Pred, Prey, true, 1.5f); // Value is multiplier of growth power.
+					IncrementKillCount(Pred, SizeKillType::kEaten);
 					Devoured = true;
 				}
 			}

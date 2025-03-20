@@ -8,6 +8,8 @@
 #include "Utils/VoreUtils.hpp"
 #include "Utils/Looting.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -46,7 +48,7 @@ namespace GTS {
 			}
 
 			Task_Vore_StartVoreBuff(giant, tiny, static_cast<int>(this->tinies.size()));
-			VoreMessage_SwallowedAbsorbing(giant, tiny);
+			ReportDeath(giant, tiny, DamageSource::Vored, false);
 		}
 	}
 	void VoreData::KillAll() {

@@ -4,6 +4,7 @@
 #include "Managers/Animation/AnimationManager.hpp"
 #include "Managers/Damage/CollisionDamage.hpp"
 #include "Managers/CrushManager.hpp"
+#include "Utils/DeathReport.hpp"
 
 using namespace GTS;
 
@@ -74,7 +75,7 @@ namespace {
 					if (giantScale / tinyScale > SCALE_RATIO) {
 						NiPoint3 actorLocation = otherActor->GetPosition();
 						if ((actorLocation-giantLocation).Length() < BASE_CHECK_DISTANCE*giantScale * 3) {
-							PrintDeathSource(giant, otherActor, DamageSource::Booty);
+							ReportDeath(giant, otherActor, DamageSource::Booty);
 							CrushManager::Crush(giant, otherActor);
 						}
 					}

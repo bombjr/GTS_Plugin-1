@@ -205,7 +205,7 @@ namespace {
 		auto huggedActor = HugShrink::GetHuggiesActor(giant);
 		if (huggedActor) {
 			HugCrushOther(giant, huggedActor);
-			PrintDeathSource(giant, huggedActor, DamageSource::Hugs);
+			ReportDeath(giant, huggedActor, DamageSource::Hugs);
 			Rumbling::For("HugCrush", giant, Rumble_Hugs_HugCrush, 0.10f, "NPC COM [COM ]", 0.15f, 0.0f, true);
 			HugShrink::DetachActorTask(giant);
 

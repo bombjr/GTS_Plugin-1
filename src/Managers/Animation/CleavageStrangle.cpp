@@ -34,6 +34,7 @@ namespace {
         ActorHandle tinyhandle = tiny->CreateRefHandle();
         static Timer HeartTimer = Timer(1.75f);
 
+        //AnimationManager::StartAnim("Cleavage_Absorb_Tiny", tiny);
         AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tiny);
 
         TaskManager::Run(task_name, [=](auto& progressData) {

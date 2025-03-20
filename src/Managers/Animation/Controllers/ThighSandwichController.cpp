@@ -10,6 +10,8 @@
 
 #include "Managers/AI/Thigh/ThighSandwichAI.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 using namespace GTS;
 
 
@@ -181,8 +183,8 @@ namespace GTS {
 					float hp = GetAV(tiny, ActorValue::kHealth);
 					InflictSizeDamage(GiantRef, tiny, damage);
 					if (damage > hp && !tiny->IsDead()) {
+						ReportDeath(GiantRef, tiny, DamageSource::ThighSuffocated);
 						this->Remove(tiny);
-						PrintSuffocate(GiantRef, tiny);
 					}
 				}
 			}

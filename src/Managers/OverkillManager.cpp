@@ -3,6 +3,8 @@
 #include "Managers/Perks/PerkHandler.hpp"
 #include "Utils/Looting.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -69,7 +71,7 @@ namespace GTS {
 
                     PlayGoreEffects(tiny, giant);    
                     MoveItems(giantHandle, tinyHandle, tiny->formID, DamageSource::Overkill);
-                    PrintDeathSource(giant, tiny, DamageSource::Overkill);
+                    ReportDeath(giant, tiny, DamageSource::Overkill);
 
                     if (tiny->formID != 0x14) {
                         Disintegrate(tiny); // Set critical stage 4 on actors

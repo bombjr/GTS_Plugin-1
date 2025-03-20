@@ -1,5 +1,6 @@
 #include "Utils/DeathReport.hpp"
 #include "Managers/HighHeel.hpp"
+#include "Utils/KillDataUtils.hpp"
 
 using namespace GTS;
 
@@ -16,6 +17,64 @@ namespace {
 	constexpr std::string_view booty = "NPC Spine [Spn0]";
 	constexpr std::string_view none = "None";
 
+	void VoreMessage_SwallowedAbsorbing(Actor* pred, Actor* prey) {
+		if (pred) {
+			int random = RandomInt(0, 3);
+			if (!prey->IsDead() && !Runtime::HasPerk(pred, "GTSPerkFullAssimilation") || random <= 1) {
+				Cprint("{} was Swallowed and is now being slowly absorbed by {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
+			} else if (random == 2) {
+				Cprint("{} is now absorbing {}", pred->GetDisplayFullName(), prey->GetDisplayFullName());
+			} else if (random >= 3) {
+				Cprint("{} will soon be completely absorbed by {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
+			}
+		}
+	}
+
+	void VoreMessage_Absorbed(Actor* pred, std::string_view prey) {
+		if (pred) {
+			int random = RandomInt(0, 3);
+			if (!Runtime::HasPerk(pred, "GTSPerkFullAssimilation") || random == 0) {
+				Cprint("{} was absorbed by {}", prey, pred->GetDisplayFullName());
+			} else if (Runtime::HasPerk(pred, "GTSPerkFullAssimilation") && random == 1) {
+				Cprint("{} became one with {}", prey, pred->GetDisplayFullName());
+			} else if (Runtime::HasPerk(pred, "GTSPerkFullAssimilation") && random >= 2) {
+				Cprint("{} was greedily devoured by {}", prey, pred->GetDisplayFullName());
+			} else {
+				Cprint("{} was absorbed by {}", prey, pred->GetDisplayFullName());
+			}
+			IncrementKillCount(pred, SizeKillType::kEaten);
+		}
+	}
+
+	void BreastAbsorbedMessage(std::string_view GiantName, std::string_view TinyName) {
+        int random = RandomInt(0, 4);
+        if (random == 0) {
+            Cprint("Breasts of {} lovingly ate {}", GiantName, TinyName);
+        } else if (random == 1) {
+            Cprint("{} suddenly disappeared between the breasts of {}", TinyName, GiantName);
+        } else if (random == 2) {
+            Cprint("Mountains of {} greedily absorbed {}", GiantName, TinyName);
+        } else if (random == 3) {
+            Cprint("{} became one with the breasts of {}", TinyName, GiantName);
+        } else {
+            Cprint("{} was gently devoured by the milkers of {}", TinyName, GiantName);
+        }
+    }
+
+	void ThighSuffocatedMessage(std::string_view GiantName, std::string_view TinyName) {
+		int random = RandomInt(0, 5);
+		if (random <= 1) {
+			Cprint("{} was slowly smothered between {} thighs", TinyName, GiantName);
+		} else if (random == 2) {
+			Cprint("{} was suffocated by the thighs of {}", TinyName, GiantName);
+		} else if (random == 3) {
+			Cprint("Thighs of {} suffocated {} to death", GiantName, TinyName);
+		} else if (random == 4) {
+			Cprint("{} got smothered between the thighs of {}", TinyName, GiantName);
+		} else if (random >= 5) {
+			Cprint("{} lost life to the thighs of {}", TinyName, GiantName);
+		}
+	}
 	void CrushedMessage(std::string_view GiantName, std::string_view TinyName, int random, bool hh) {
 		if (!hh) {
 			if (random < 2) {
@@ -428,7 +487,7 @@ namespace GTS {
 		}
 	}
 
-	void ReportDeath(Actor* giant, Actor* tiny, DamageSource cause) {
+	void ReportDeath(Actor* giant, Actor* tiny, DamageSource cause, bool vore_absorbed) {
 		int random = RandomInt(0, 8);
 
 		std::string_view TinyName = tiny->GetDisplayFullName();
@@ -440,60 +499,85 @@ namespace GTS {
 			case DamageSource::FootIdleL:
 			case DamageSource::WalkRight:
 			case DamageSource::WalkLeft:
+			if (!tiny->IsDead()) {IncrementKillCount(giant, SizeKillType::kCrushed); }
 				CrushedMessage(GiantName, TinyName, random, HighHeelManager::IsWearingHH(giant));
 			break;
 			case DamageSource::HandCrushed:
+				IncrementKillCount(giant, SizeKillType::kGrabCrushed);
 				HandGrabCrushedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Collision:
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				CollisionMessage(GiantName, TinyName, random);
 			break;
-			case DamageSource::Shrinked:
+			case DamageSource::ShrinkToNothing:
+			if (!tiny->IsDead()) {IncrementKillCount(giant, SizeKillType::kShrunkToNothing);}
 				ShrinkToNothingMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Vored:
-				// Nothing for now
+				vore_absorbed ? VoreMessage_Absorbed(giant, TinyName) : VoreMessage_SwallowedAbsorbing(giant, tiny);
 			break;
 			case DamageSource::ThighCrushed:
+				IncrementKillCount(giant, SizeKillType::kThighCrushed);
 				ThighCrushedMessage(GiantName, TinyName, random);
 			break;
-			case DamageSource::BodyCrush:
-				BodyCrushedMessage(GiantName, TinyName, random);
-			break;
 			case DamageSource::ThighSandwiched:
+				IncrementKillCount(giant, SizeKillType::kThighSandwiched);
 				ThighSandwichedMessage(GiantName, TinyName, random);
 			break;
+			case DamageSource::ThighSuffocated:
+				IncrementKillCount(giant, SizeKillType::kThighSuffocated);
+				ThighSuffocatedMessage(GiantName, TinyName);
+			break;
+			case DamageSource::BodyCrush:
+				IncrementKillCount(giant, SizeKillType::kCrushed);
+				BodyCrushedMessage(GiantName, TinyName, random);
+			break;
 			case DamageSource::Overkill:
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				OverkillMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::HitSteal:
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				HitStealMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Explode:
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				PoisonOfShrinkMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::BlockDamage:	
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				DamageShareMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::FootGrindedLeft:
 			case DamageSource::FootGrindedRight:
 			case DamageSource::FootGrindedLeft_Impact:
 			case DamageSource::FootGrindedRight_Impact:
+				IncrementKillCount(giant, SizeKillType::kGrinded);
 				FootGrindedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Melted: 
+				IncrementKillCount(giant, SizeKillType::kOtherSources);
 				MeltedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Breast:
+				IncrementKillCount(giant, SizeKillType::kBreastCrushed);
 				BreastGrabMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::BreastImpact: 
+				IncrementKillCount(giant, SizeKillType::kBreastCrushed);
 				BreastCrushMessage(GiantName, TinyName, random);
 			break;
+			case DamageSource::BreastAbsorb:
+				IncrementKillCount(giant, SizeKillType::kBreastAbsorbed);
+				BreastAbsorbedMessage(GiantName, TinyName);
+			break;
 			case DamageSource::Booty:
+				IncrementKillCount(giant, SizeKillType::kButtCrushed);
 				ButtCrushMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::Hugs: 
+				IncrementKillCount(giant, SizeKillType::kHugCrushed);
 				HugCrushMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::KneeLeft:
@@ -502,6 +586,7 @@ namespace GTS {
 			case DamageSource::KneeIdleR:
 			case DamageSource::KneeDropLeft:
 			case DamageSource::KneeDropRight:
+				IncrementKillCount(giant, SizeKillType::kCrushed);
 				KneeCrushMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::HandCrawlLeft:
@@ -510,25 +595,34 @@ namespace GTS {
 			case DamageSource::HandDropLeft:
 			case DamageSource::HandIdleL:
 			case DamageSource::HandIdleR:
+				IncrementKillCount(giant, SizeKillType::kCrushed);
 				HandCrushedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::HandSlamLeft:
 			case DamageSource::HandSlamRight:
+				IncrementKillCount(giant, SizeKillType::kCrushed);
 				HandSlammedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::RightFinger:
 			case DamageSource::LeftFinger:
 			case DamageSource::RightFinger_Impact:
 			case DamageSource::LeftFinger_Impact:
+				IncrementKillCount(giant, SizeKillType::kFingerCrushed);
 				FingerGrindedMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::HandSwipeLeft:
 			case DamageSource::HandSwipeRight:
+				IncrementKillCount(giant, SizeKillType::kKicked);
 				HandSwipeMessage(GiantName, TinyName, random);
 			break;
 			case DamageSource::KickedLeft:
 			case DamageSource::KickedRight:
+				IncrementKillCount(giant, SizeKillType::kKicked);
 				KickedMessage(GiantName, TinyName, random);
+			break;
+			case DamageSource::EraseFromExistence:
+				Cprint("{} erased {} from the world", GiantName, TinyName);
+				IncrementKillCount(giant, SizeKillType::kErasedFromExistence);
 			break;
 		}		
 	}

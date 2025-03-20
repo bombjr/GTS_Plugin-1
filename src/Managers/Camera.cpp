@@ -11,7 +11,6 @@
 using namespace GTS;
 
 namespace {
-
 	void HorizontalResetEvent(const ManagedInputEvent& data) {
 		auto& camera = CameraManager::GetSingleton();
 		camera.ResetLeftRight();
@@ -249,7 +248,9 @@ namespace GTS {
 			auto ui = RE::UI::GetSingleton();
 			if (ui) {
 				if (ui->IsMenuOpen(DialogueMenu::MENU_NAME)) {
-					return nullptr;
+					if (GetCameraActor() && GetCameraActor()->formID != 0x14) {
+						return nullptr;
+					}
 				}
 			}
 		}

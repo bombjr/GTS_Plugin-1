@@ -114,10 +114,14 @@ namespace GTS {
 
 			const char* T1 = "Apply computationally expensive damage calculations to all NPC's in the scene.\n"
 							 "This toggle can be EXTREMELY fps hungry, it is highly recommended to keep it off.";
+			
+			const char* T2 = "Enable or disable dynamic alteration of fActivatePickLength and fActivatePickRadius ini\n"
+			                 "It will be altered from 180 and 18 (default) to 180 and 18 * Player Scale";
 
 	        if (ImGui::CollapsingHeader("Experimental", ImUtil::HeaderFlagsDefaultOpen)) {
 	            ImUtil::CheckBox("Allow Male Actors", &Settings.bEnableMales, T0);
 				ImUtil::CheckBox("Apply Size Effects to all Actors", &Settings.bAllActorSizeEffects, T1);
+				ImUtil::CheckBox("Override Item/NPC Interaction Range", &Settings.bOverrideInteractionDist, T2);
 	        	ImGui::Spacing();
 	        }
 	    }

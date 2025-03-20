@@ -11,6 +11,8 @@
 
 #include "Magic/Effects/Common.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -69,9 +71,9 @@ namespace {
 			DamageAV(grabbedActor, ActorValue::kHealth, a_damage * 0.50f);
 			if (grabbedActor->IsDead() || GetAV(grabbedActor, ActorValue::kHealth) < a_damage * 0.50f) {
 				if (!IsBetweenBreasts(grabbedActor)) {
-					PrintDeathSource(receiver, grabbedActor, DamageSource::BlockDamage);
+					ReportDeath(receiver, grabbedActor, DamageSource::BlockDamage);
 				} else {
-					PrintDeathSource(receiver, grabbedActor, DamageSource::Breast);
+					ReportDeath(receiver, grabbedActor, DamageSource::Breast);
 				}
 
 				Grab::DetachActorTask(receiver);

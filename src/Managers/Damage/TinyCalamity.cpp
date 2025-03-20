@@ -15,6 +15,8 @@
 #include "Magic/Effects/Common.hpp"
 #include "UI/DebugAPI.hpp"
 
+#include "Utils/DeathReport.hpp"
+
 using namespace GTS;
 
 namespace {
@@ -229,7 +231,7 @@ namespace GTS {
 
         Attacked(tiny, giant);
         
-        PrintDeathSource(giant, tiny, DamageSource::Collision);
+        ReportDeath(giant, tiny, DamageSource::Collision);
 
         float OldScale;
         giant->GetGraphVariableFloat("GiantessScale", OldScale); // save old scale

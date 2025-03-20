@@ -82,7 +82,7 @@ namespace {
 				
 				CrushManager::Crush(giant, tiny);
 				
-				PrintDeathSource(giant, tiny, DamageSource::ThighSandwiched);
+				ReportDeath(giant, tiny, DamageSource::ThighSandwiched);
 				AdvanceQuestProgression(giant, tiny, QuestStage::HandCrush, 1.0f, false);
 				auto node = find_node(giant, "NPC R FrontThigh");
 				

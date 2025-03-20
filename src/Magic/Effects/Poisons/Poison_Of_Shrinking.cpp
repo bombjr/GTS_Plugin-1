@@ -45,7 +45,7 @@ namespace GTS {
 
 		ShrinkActor(target, Power, 0.0f);
 		if (get_visual_scale(target) < 0.08f/GetSizeFromBoundingBox(target) && ShrinkToNothingManager::CanShrink(caster, target)) {
-			PrintDeathSource(caster, target, DamageSource::Explode);
+			ReportDeath(caster, target, DamageSource::Explode);
 			ShrinkToNothingManager::Shrink(caster, target);
 		}
 	}

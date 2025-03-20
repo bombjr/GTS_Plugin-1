@@ -13,12 +13,14 @@
 #include "Magic/Effects/Common.hpp"
 
 #include "Utils/AttachPoint.hpp"
+#include "Utils/KillDataUtils.hpp"
 
 using namespace GTS;
 
 namespace {
 	void FingerSnap_Execute(Actor* giant, Actor* tiny) {
-		Cprint("{} erased {} from the world", giant->GetDisplayFullName(), tiny->GetDisplayFullName());
+		ReportDeath(giant, tiny, DamageSource::EraseFromExistence);
+
 		AdvanceQuestProgression(giant, tiny, QuestStage::ShrinkToNothing, 0.25f, false);
 		ModSizeExperience(giant, 0.24f * 0.25f); // Adjust Size Matter skill
 		ShrinkToNothingManager::SpawnDeathEffects(tiny);

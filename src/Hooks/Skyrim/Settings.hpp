@@ -16,6 +16,11 @@ namespace Hooks {
 		static float* fTalkingDistance = reinterpret_cast<float*>(REL::RelocationID(507570, 378626).address());
 	};
 
+	namespace Distance {
+		static float* fActivatePickLength = reinterpret_cast<float*>(REL::RelocationID(502527, 370109).address());
+		static float* fActivatePickRadius = reinterpret_cast<float*>(REL::RelocationID(502525, 370106).address());
+	}
+
 	namespace Camera {
 
 		//SE OFFSET: 141df37d8

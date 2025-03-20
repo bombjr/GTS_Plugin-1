@@ -187,6 +187,7 @@ struct AIHugAction {
     // Outcome probabilities
     float fHealProb = 30.0f;
     float fShrinkProb = 100.0f;
+    float fFriendlyShrinkProb = 15.0f;
     float fKillProb = 30.0f;
 
     // Timing
@@ -359,6 +360,7 @@ struct SettingsGeneral {
     // Compatibility options
     bool bDevourmentCompat = false;
     bool bConversationCamCompat = false;
+    bool bOverrideInteractionDist = false;
 
     // Protection toggles
     bool bProtectEssentials = true;
@@ -526,9 +528,12 @@ struct SettingsUI {
     std::string sDisplayUnits = "kMetric";
     float fScale = 1.0f;
     float fItemWidth = 0.55f;
-    std::array<float, 3> f3AccentColor = { 0.273f, 0.0106f, 0.0106f };
+    std::array<float, 3> f3AccentColor = { 0.81834f, 0.797923f, 0.834302f }; // Default Menu UI Color
+    // Red: 0.273f, 0.0106f, 0.0106f
     // White: 0.81834f, 0.797923f, 0.834302f
     //std::array<float, 3> f3AccentColor = {0.486f, 0.431f, 0.529f};
+    std::array<float, 3> StatusAccentColor =        {  0.273f, 0.0106f, 0.0106f }; // Default Status Bar Color
+    std::array<float, 3> UnderStompAccentColor =    {  0.273f, 0.0106f, 0.0106f }; // Default Understomp Bar Color
 
     bool bEnableAutoSaveOnClose = true;
 
@@ -541,8 +546,8 @@ struct SettingsUI {
         .bLock = true,
         .bVisible = true,
     	.f2Offset = {0.0f, 28.5f},
-    	.f3ColorA = f3AccentColor,
-        .f3ColorB = f3AccentColor,
+    	.f3ColorA = StatusAccentColor,
+        .f3ColorB = StatusAccentColor,
     	.sAnchor = "kCenter",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,
@@ -560,8 +565,8 @@ struct SettingsUI {
         .bLock = true,
         .bVisible = true,
         .f2Offset = {0.0f, 60.0f},
-    	.f3ColorA = f3AccentColor,
-        .f3ColorB = f3AccentColor,
+    	.f3ColorA = UnderStompAccentColor,
+        .f3ColorB = UnderStompAccentColor,
         .sAnchor = "kCenter",
         .fAlpha = 1.0f,
         .fBGAlphaMult = 0.0f,

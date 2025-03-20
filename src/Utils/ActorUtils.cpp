@@ -2996,25 +2996,6 @@ namespace GTS {
 		}
 	}
 
-	void PrintDeathSource(Actor* giant, Actor* tiny, DamageSource cause) {
-		ReportDeath(giant, tiny, cause);
-	}
-
-	void PrintSuffocate(Actor* pred, Actor* prey) {
-		int random = RandomInt(0, 5);
-		if (random <= 1) {
-			Cprint("{} was slowly smothered between {} thighs", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-		} else if (random == 2) {
-			Cprint("{} was suffocated by the thighs of {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-		} else if (random == 3) {
-			Cprint("Thighs of {} suffocated {} to death", pred->GetDisplayFullName(), prey->GetDisplayFullName());
-		} else if (random == 4) {
-			Cprint("{} got smothered between the thighs of {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-		} else if (random >= 5) {
-			Cprint("{} lost life to the thighs of {}", prey->GetDisplayFullName(), pred->GetDisplayFullName());
-		}
-	}
-
 	void ShrinkUntil(Actor* giant, Actor* tiny, float expected, float halflife, bool animation) {
 		if (HasSMT(giant)) {
 			float Adjustment_Gts = GetSizeFromBoundingBox(giant);

@@ -220,7 +220,7 @@ namespace GTS {
 					scale += 1.0f;
 				}
 				const float BonusDamageMult = Config::GetBalance().fStatBonusDamageMult;
-				const float DamageStorage = 1.0f + ((BonusDamageMult) * scale - 1.0f);
+				const float DamageStorage = 1.0f + ((BonusDamageMult) * (scale - 1.0f));
 
 				float might = 1.0f + Potion_GetMightBonus(actor);
 
