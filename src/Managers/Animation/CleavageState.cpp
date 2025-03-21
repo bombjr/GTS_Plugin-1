@@ -181,6 +181,7 @@ namespace {
 
     void CleavageDOTEvent(const ManagedInputEvent& data) {
         PassAnimation("Cleavage_DOT_Start", true);
+        AttemptBreastActionOnTiny("Cleavage_DOT_Start_Tiny");
     }
 }
 
