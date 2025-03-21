@@ -47,9 +47,9 @@ namespace GTS {
 			Persistent.EnableCrawlFollower.Load(serde, RecordType, RecordVersion, RecordSize);
 
 			//----- Max Size Related
-			Persistent.GTSMassBasedSizeLimit.Load(serde, RecordType, RecordVersion, RecordSize);
-			Persistent.GTSExtraPotionSize.Load(serde, RecordType, RecordVersion, RecordSize);
-			Persistent.GTSGlobalSizeLimit.Load(serde, RecordType, RecordVersion, RecordSize);
+			Persistent.GlobalMassBasedSizeLimit.Load(serde, RecordType, RecordVersion, RecordSize);
+			Persistent.PlayerExtraPotionSize.Load(serde, RecordType, RecordVersion, RecordSize);
+			Persistent.GlobalSizeLimit.Load(serde, RecordType, RecordVersion, RecordSize);
 
 			// ---- Quest Progression
 			Persistent.HugStealCount.Load(serde, RecordType, RecordVersion, RecordSize);
@@ -86,9 +86,9 @@ namespace GTS {
 		Persistent.EnableCrawlFollower.Save(serde);
 
 		//----- Max Size Related
-		Persistent.GTSMassBasedSizeLimit.Save(serde);
-		Persistent.GTSExtraPotionSize.Save(serde);
-		Persistent.GTSGlobalSizeLimit.Save(serde);
+		Persistent.GlobalMassBasedSizeLimit.Save(serde);
+		Persistent.PlayerExtraPotionSize.Save(serde);
+		Persistent.GlobalSizeLimit.Save(serde);
 
 		// ---- Quest Progression
 		Persistent.HugStealCount.Save(serde);
@@ -131,7 +131,7 @@ namespace GTS {
 			serde->ReadRecordData(&ReadFormID, sizeof(ReadFormID));
 
 			//V1
-			DummyReadFloat(serde);                                                          //0x04
+			DummyRead32(serde);                                                             //0x04 - PAD
 			LoadActorRecordFloat(serde, &Data.visual_scale, RecordVersion, 1, 1.0f);        //0x08
 			LoadActorRecordFloat(serde, &Data.visual_scale_v, RecordVersion, 1, 0.0f);      //0x1C
 			LoadActorRecordFloat(serde, &Data.target_scale, RecordVersion, 1, 1.0f);        //0x10
@@ -144,12 +144,12 @@ namespace GTS {
 			LoadActorRecordFloat(serde, &Data.anim_speed, RecordVersion, 3, 1.0f);          //0x1C
 
 			//V4
-			DummyReadFloat(serde);                                                          //0x20
+			DummyRead32(serde);                                                             //0x20 - PAD
 
 			//V5
-			DummyReadFloat(serde);                                                          //0x24
-			DummyReadFloat(serde);                                                          //0x28
-			DummyReadFloat(serde);                                                          //0x2C
+			DummyRead32(serde);                                                             //0x24 - PAD
+			DummyRead32(serde);                                                             //0x28 - PAD
+			DummyRead32(serde);                                                             //0x2C - PAD
 
 			//V6
 			LoadActorRecordFloat(serde, &Data.smt_run_speed, RecordVersion, 6, 0.0f);       //0x30
@@ -157,15 +157,18 @@ namespace GTS {
 			LoadActorRecordFloat(serde, &Data.SprintDamage, RecordVersion, 6, 1.0f);        //0x38
 			LoadActorRecordFloat(serde, &Data.FallDamage, RecordVersion, 6, 1.0f);          //0x3C
 			LoadActorRecordFloat(serde, &Data.HHDamage, RecordVersion, 6, 1.0f);            //0x40
-			DummyReadFloat(serde);                                                          //0x44
-			DummyReadFloat(serde);                                                          //0x48
+			DummyRead32(serde);                                                             //0x44 - PAD
+			DummyRead32(serde);                                                             //0x48 - PAD
 			LoadActorRecordFloat(serde, &Data.SizeReserve, RecordVersion, 6, 0.0f);         //0x4C
 
 			//V7
 			LoadActorRecordFloat(serde, &Data.target_scale_v, RecordVersion, 7, 0.0f);      //0x50
 
 			//V8
-			DummyReadFloat(serde);                                                          //0x54
+			LoadActorRecordBool(serde, &Data.ShowSizebarInUI, RecordVersion, 8, false);     //0x54
+			DummyRead8(serde);                                                              //0x55 - PAD
+			DummyRead8(serde);                                                              //0x56 - PAD
+			DummyRead8(serde);                                                              //0x57 - PAD
 			LoadActorRecordFloat(serde, &Data.stolen_attributes, RecordVersion, 8, 0.0f);   //0x58
 			LoadActorRecordFloat(serde, &Data.stolen_health, RecordVersion, 8, 0.0f);       //0x5C
 			LoadActorRecordFloat(serde, &Data.stolen_magick, RecordVersion, 8, 0.0f);       //0x60
@@ -209,9 +212,25 @@ namespace GTS {
 
 	}
 
-	void Persistent::DummyReadFloat(SKSE::SerializationInterface* serde) {
-		float Dummy;
-		serde->ReadRecordData(&Dummy, sizeof(float));
+	void Persistent::LoadActorRecordBool(SKSE::SerializationInterface* serde, bool* a_Data, uint32_t RecordVersion, uint32_t MinVersion, bool DefaultValue) {
+
+		if (RecordVersion >= MinVersion) {
+			serde->ReadRecordData(a_Data, sizeof(bool));
+		}
+		else {
+			*a_Data = DefaultValue;
+		}
+	}
+
+	void Persistent::DummyRead32(SKSE::SerializationInterface* serde) {
+		uint32_t Dummy;
+		serde->ReadRecordData(&Dummy, sizeof(uint32_t));
+	}
+
+
+	void Persistent::DummyRead8(SKSE::SerializationInterface* serde) {
+		uint8_t Dummy;
+		serde->ReadRecordData(&Dummy, sizeof(uint8_t));
 	}
 
 	//-----------------
@@ -233,7 +252,7 @@ namespace GTS {
 
 			//V1
 			WriteActorRecordFormID(serde, &ActorFormID);                    //0x00 - FORMID
-			DummyWriteFloat(serde);                                         //0x04 - PAD
+			DummyWrite32(serde);                                            //0x04 - PAD
 			WriteActorRecordFloat(serde, &Data.visual_scale);               //0x08
 			WriteActorRecordFloat(serde, &Data.visual_scale_v);             //0x1C
 			WriteActorRecordFloat(serde, &Data.target_scale);               //0x10
@@ -246,12 +265,12 @@ namespace GTS {
 			WriteActorRecordFloat(serde, &Data.anim_speed);                 //0x1C
 
 			//V4
-			DummyWriteFloat(serde);                                         //0x20 - PAD
+			DummyWrite32(serde);                                            //0x20 - PAD
 
 			//V5
-			DummyWriteFloat(serde);                                         //0x24 - PAD
-			DummyWriteFloat(serde);                                         //0x28 - PAD
-			DummyWriteFloat(serde);                                         //0x2C - PAD
+			DummyWrite32(serde);                                            //0x24 - PAD
+			DummyWrite32(serde);                                            //0x28 - PAD
+			DummyWrite32(serde);                                            //0x2C - PAD
 
 			//V6
 			WriteActorRecordFloat(serde, &Data.smt_run_speed);              //0x30
@@ -259,15 +278,18 @@ namespace GTS {
 			WriteActorRecordFloat(serde, &Data.SprintDamage);               //0x38
 			WriteActorRecordFloat(serde, &Data.FallDamage);                 //0x3C
 			WriteActorRecordFloat(serde, &Data.HHDamage);                   //0x40
-			DummyWriteFloat(serde);                                         //0x44 - PAD
-			DummyWriteFloat(serde);                                         //0x48 - PAD
+			DummyWrite32(serde);                                            //0x44 - PAD
+			DummyWrite32(serde);                                            //0x48 - PAD
 			WriteActorRecordFloat(serde, &Data.SizeReserve);                //0x4C
 
 			//V7
 			WriteActorRecordFloat(serde, &Data.target_scale_v);             //0x50
 
 			//V8
-			DummyWriteFloat(serde);                                         //0x54 - PAD
+			WriteActorRecordBool(serde, &Data.ShowSizebarInUI);             //0x54
+			DummyWrite8(serde);                                             //0x55
+			DummyWrite8(serde);                                             //0x56
+			DummyWrite8(serde);                                             //0x57
 			WriteActorRecordFloat(serde, &Data.stolen_attributes);          //0x58
 			WriteActorRecordFloat(serde, &Data.stolen_health);              //0x5C
 			WriteActorRecordFloat(serde, &Data.stolen_magick);              //0x60
@@ -281,13 +303,22 @@ namespace GTS {
 		serde->WriteRecordData(Data, sizeof(float));
 	}
 
+	void Persistent::WriteActorRecordBool(SKSE::SerializationInterface* serde, const bool* Data) {
+		serde->WriteRecordData(Data, sizeof(bool));
+	}
+
 	void Persistent::WriteActorRecordFormID(SKSE::SerializationInterface* serde, const FormID* Id) {
 		serde->WriteRecordData(Id, sizeof(FormID));
 	}
 
-	void Persistent::DummyWriteFloat(SKSE::SerializationInterface* serde) {
-		constexpr float Dummy = 0.0f;
-		serde->WriteRecordData(&Dummy, sizeof(Dummy));
+	void Persistent::DummyWrite32(SKSE::SerializationInterface* serde) {
+		constexpr uint32_t Dummy = 0;
+		serde->WriteRecordData(&Dummy, sizeof(uint32_t));
+	}
+
+	void Persistent::DummyWrite8(SKSE::SerializationInterface* serde) {
+		constexpr uint8_t Dummy = 0;
+		serde->WriteRecordData(&Dummy, sizeof(uint8_t));
 	}
 
 	//-----------------
@@ -374,7 +405,10 @@ namespace GTS {
 			data->PAD_40 = 0.0f;
 			data->PAD_44 = 0.0f;
 			data->SizeReserve = 0.0f;
-			data->PAD_50 = 0.0f;
+			data->ShowSizebarInUI = false;
+			data->PAD_51 = false;
+			data->PAD_52 = false;
+			data->PAD_53 = false;
 			data->stolen_attributes = 0.0f;
 			data->stolen_health = 0.0f;
 			data->stolen_magick = 0.0f;
@@ -432,7 +466,7 @@ namespace GTS {
 		serde->ReadRecordData(&RecordSize, sizeof(uint32_t));
 
 		//Killcount data must be as big or larger than the value stored in the cosave otherwise we'll write out of struct bounds and corrupt adjacent memory
-		if (sizeof(KillCountData) + sizeof(FormID) < RecordSize || RecordSize == 0) {
+		if (sizeof(KillCountData) < RecordSize || RecordSize == 0) {
 			ReportAndExit("KillCountData structure size missmatch, proceeding will lead to broken save data.\nThe Game will now close.");
 		}
 
@@ -442,7 +476,7 @@ namespace GTS {
 			RE::FormID ReadFormID;
 
 			serde->ReadRecordData(&ReadFormID, sizeof(FormID));        //FormID Offset 0x00 (Size 4)
-			serde->ReadRecordData(&Data, RecordSize - sizeof(FormID)); //Struct Offset 0x04 (Size 76 As of V1)
+			serde->ReadRecordData(&Data, RecordSize);                  //Struct Offset 0x04 (Size 76 As of V1)
 
 			//Do this last. If we continue early we'll have shifted the read pointer by 4 bytes for the next  read
 			//Corrupting any future deserialization
@@ -474,21 +508,21 @@ namespace GTS {
 	void Persistent::WriteKillCountData(SKSE::SerializationInterface* serde, const uint8_t Version) {
 
 		const size_t NumOfActorRecords = GetSingleton().KillCountDataMap.size();
-		constexpr uint32_t SizeOfDataToWrite = sizeof(KillCountData) + sizeof(FormID);
+		constexpr uint32_t SizeOfStructDataToWrite = sizeof(KillCountData);
 
 		if (!serde->OpenRecord(KillCountDataRecord, Version)) {
 			log::critical("Unable to open KillCountDataRecord in CoSave. Something is really wrong, your save is probably broken!");
 			return;
 		}
 
-		serde->WriteRecordData(&NumOfActorRecords, sizeof(size_t));
-		serde->WriteRecordData(&SizeOfDataToWrite, sizeof(uint32_t));
+		serde->WriteRecordData(&NumOfActorRecords, sizeof(size_t));         //0x00 - NumOfRecords
+		serde->WriteRecordData(&SizeOfStructDataToWrite, sizeof(uint32_t)); //0x08 - Struct Size
 
 		for (auto const& [ActorFormID, Data] : GetSingleton().KillCountDataMap) {
 
 			//V1
 			WriteActorRecordFormID(serde, &ActorFormID);                    //0x00 - FORMID
-			serde->WriteRecordData(&Data, SizeOfDataToWrite);
+			serde->WriteRecordData(&Data, SizeOfStructDataToWrite);         //0x04 - Struct
 
 			log::trace("Persistent KillCountData serialized for Actor FormID {:08X}", ActorFormID);
 		}

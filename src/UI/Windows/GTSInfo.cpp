@@ -16,24 +16,102 @@ namespace {
 
 namespace GTS {
 
-    void DrawGTSInfo(const GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor) {
+    void DrawGTSSizeBar(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
+
+        if (!a_IsWidget) {
+            a_featureFlags = static_cast<GTSInfoFeatures>(UINT32_MAX);
+        }
+
+        if (!CheckOK(a_Actor)) {
+            return;
+        }
+
+        const auto& Settings = Config::GetUI().StatusWindow;
+
+        const auto& ActorTransient = Transient::GetSingleton().GetData(a_Actor);
+        const auto& ActorPersistent = Persistent::GetSingleton().GetData(a_Actor);
+        if (!ActorTransient || !ActorPersistent) {
+            ImUtil::TextShadow("Actor Invalid!");
+            return;
+        }
+
+
+        const float CurrentScale = get_visual_scale(a_Actor);
+        const float MaxScale = get_max_scale(a_Actor);
+        const float VisualProgress = MaxScale < 250.0f ? CurrentScale / MaxScale : 0.0f;
+
+        //--------- Formatted display strings
+        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format("({:.2f}x)", CurrentScale) : "";
+        const std::string StringReal = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitReal) ? GTS::GetFormatedHeight(a_Actor).c_str() : "";
+        const std::string ResultingText = fmt::format("{} {}", StringReal, StringScale);
+
+        const ImVec2 ProgressBarSize = { hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 0.0f : Settings.fFixedWidth , 0.0f };
+        const float ProgressBarHeight = hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 1.1f : Settings.fSizeBarHeightMult;
+
+        ImVec4 ColorAVec{ Settings.f3ColorA[0], Settings.f3ColorA[1], Settings.f3ColorA[2] ,1.0f };
+        ImVec4 ColorBVec{ Settings.f3ColorB[0], Settings.f3ColorB[1], Settings.f3ColorB[2] ,1.0f };
+        const ImU32 ColorA32 = ImGui::ColorConvertFloat4ToU32(ColorAVec);
+        const ImU32 ColorB32 = ImGui::ColorConvertFloat4ToU32(ColorBVec);
+        const float BorderCol = Settings.fBorderLightness;
+        const float BorderAlpha = Settings.fBorderAlpha;
+
+    	ImGui::PushStyleColor(ImGuiCol_Border, { BorderCol, BorderCol, BorderCol, BorderAlpha });
+
+        // Visual Scale (Progress) Bar Player
+        ImUtil::CenteredProgress(
+            VisualProgress,
+            ProgressBarSize,
+            ResultingText.c_str(),
+            ProgressBarHeight,
+            Settings.fBorderThickness,
+            Settings.bUseGradient,
+            Settings.fNormalGradientDarkMult,
+            Settings.fNormalGradientLightMult,
+            Settings.bEnableRounding,
+            Settings.bUseCustomGradientColors,
+            ColorA32,
+            ColorB32,
+            Settings.bFlipGradientDirection
+        );
+
+        if (!a_IsWidget) {
+            if (a_Actor->formID != 0x14) {
+                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
+                ImGui::SameLine(0.0f, 8.0f);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
+                const char* const TFolTT = "Show this follower's current size as an extra bar in the player widget.";
+                const void* ActPtrUID = (reinterpret_cast<void*>(a_Actor));
+                ImGui::PushID(ActPtrUID);
+                ImUtil::CheckBox("Widget", &ActorPersistent->ShowSizebarInUI, TFolTT);
+                ImGui::PopID();
+            }
+        }
+
+        ImGui::PopStyleColor();
+    }
+
+    void DrawGTSInfo(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
+
+        if (!a_IsWidget) {
+            a_featureFlags = static_cast<GTSInfoFeatures>(UINT32_MAX);
+        }
 
         std::ignore = Profilers::Profile("UI: DrawGTSInfo");
 
         if (!CheckOK(a_Actor)) {
-            ImGui::Text("Actor Invalid!");
+            ImUtil::TextShadow("Actor Invalid!");
             return;
         }
 
         const auto& ActorTransient = Transient::GetSingleton().GetData(a_Actor);
         const auto& ActorPersistent = Persistent::GetSingleton().GetData(a_Actor);
         if (!ActorTransient || !ActorPersistent) {
-            ImGui::Text("Actor Invalid!");
+            ImUtil::TextShadow("Actor Invalid!");
             return;
         }
 
         const auto& AttributeManager = AttributeManager::GetSingleton();
-        const auto& Settings = Config::GetUI().StatusWindow;
+
 
         float CarryWeight;
         // When in god mode carry weight gets 100x'ed for some reason
@@ -53,13 +131,13 @@ namespace GTS {
 
         //---------- Persistent Data
         const float SizeReserve = ActorPersistent->SizeReserve;
-        const float SizeEssense = Persistent::GetSingleton().GTSExtraPotionSize.value;
+    	const float SizeEssense = Persistent::GetSingleton().PlayerExtraPotionSize.value;
 
         //---------- Other
         const bool MassMode = Config::GetBalance().sSizeMode == "kMassBased";
         const float shrinkResist_PreCalc = 1.0f * Potion_GetShrinkResistance(a_Actor) * Perk_GetSprintShrinkReduction(a_Actor); // to make ShrinkResistance below shorter
 
-        const float CurrentScale = get_visual_scale(a_Actor);
+
         const float MaxScale = get_max_scale(a_Actor);
         const float AspectOfGTS = Ench_Aspect_GetPower(a_Actor) * 100.0f;
         const float DamageResist = (1.0f - AttributeManager.GetAttributeBonus(a_Actor, ActorValue::kHealth)) * 100.f;
@@ -69,12 +147,8 @@ namespace GTS {
         const float ShrinkResistance = (1.0f - shrinkResist_PreCalc) * 100.f;
         const float OnTheEdge = (GetPerkBonus_OnTheEdge(a_Actor, 0.01f) - 1.0f) * 100.f;
         const float BonusHHDamage = (GetHighHeelsBonusDamage(a_Actor, true) - 1.0f) * 100.0f;
-        const float VisualProgress = MaxScale < 250.0f ? CurrentScale / MaxScale : 0.0f;
 
-        //--------- Formatted display strings
-        const std::string StringScale = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitScale) ? fmt::format("({:.2f}x)", CurrentScale) : "";
-        const std::string StringReal = hasFlag(a_featureFlags, GTSInfoFeatures::kUnitReal) ? GTS::GetFormatedHeight(a_Actor).c_str() : "";
-        const std::string ResultingText = fmt::format("{} {}", StringReal, StringScale);
+
 
         //---------Total Max Size Calculation and Text Formating
         const float BonusSize_EssenceAndDragons = SizeEssense;
@@ -179,38 +253,7 @@ namespace GTS {
                                     "Absorbed Attributes are permanent Health/Magicka/Stamina attribute boosts of your character\n"
                                     "They're coming from 'Size Conversion' and 'Full Assimilation' perks";
 
-
-
-        const ImVec2 ProgressBarSize = { hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 0.0f : Settings.fFixedWidth , 0.0f };
-        const float ProgressBarHeight = hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 1.1f : Settings.fSizeBarHeightMult;
-
-    	const ImVec4 ColorAVec{ Settings.f3ColorA[0], Settings.f3ColorA[1], Settings.f3ColorA[2] ,1.0f };
-        const ImVec4 ColorBVec{ Settings.f3ColorB[0], Settings.f3ColorB[1], Settings.f3ColorB[2] ,1.0f };
-    	const ImU32 ColorA32 = ImGui::ColorConvertFloat4ToU32(ColorAVec);
-        const ImU32 ColorB32 = ImGui::ColorConvertFloat4ToU32(ColorBVec);
-        const float BorderCol = Settings.fBorderLightness;
-        const float BorderAlpha = Settings.fBorderAlpha;
-
-        ImGui::PushStyleColor(ImGuiCol_Border, { BorderCol, BorderCol, BorderCol, BorderAlpha });
-
-        // Visual Scale (Progress) Bar
-        ImUtil::CenteredProgress(
-            VisualProgress,
-            ProgressBarSize,
-            ResultingText.c_str(),
-            ProgressBarHeight,
-            Settings.fBorderThickness,
-            Settings.bUseGradient,
-            Settings.fNormalGradientDarkMult,
-            Settings.fNormalGradientLightMult,
-            Settings.bEnableRounding,
-            Settings.bUseCustomGradientColors,
-            ColorA32,
-            ColorB32,
-            Settings.bFlipGradientDirection
-        );
-
-        ImGui::PopStyleColor();
+        DrawGTSSizeBar(a_featureFlags, a_Actor, a_IsWidget);
 
         // Set up the table with 2 columns: Stat name and value
         if (ImGui::BeginTable("GTSInfoTable", 2, ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Hideable)) {
@@ -219,13 +262,13 @@ namespace GTS {
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kMaxSize)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Max Scale:");
+                ImUtil::TextShadow("Max Scale:");
                 ImGui::TableSetColumnIndex(1);
                 if (MaxScale > 250.0f) {
-                    ImGui::TextUnformatted("Infinite");
+                    ImUtil::TextShadow("Infinite");
                 }
                 else {
-                    ImGui::Text("%.2fx", MaxScale);
+                    ImUtil::TextShadow("%.2fx", MaxScale);
                 }
             }
 
@@ -233,10 +276,10 @@ namespace GTS {
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kBonusSize)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Bonus Size:");
+                ImUtil::TextShadow("Bonus Size:");
                 ImUtil::Tooltip(TBonusSize, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.0f%% + %.2Fx", (BonusSize * 100.0f) + AspectOfGTS, 
+                ImUtil::TextShadow("%.0f%% + %.2Fx", (BonusSize * 100.0f) + AspectOfGTS, 
                     MassMode ? SizeEssense * MassMode_ElixirPowerMultiplier : SizeEssense * 1.0f
                 );
             }
@@ -248,30 +291,30 @@ namespace GTS {
                 if (hasFlag(a_featureFlags, GTSInfoFeatures::kShrinkResist)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("Shrink Resist:");
+                    ImUtil::TextShadow("Shrink Resist:");
                     ImUtil::Tooltip(TShrinkResist, true);
                     ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("%.1f%%", ShrinkResistance);
+                    ImUtil::TextShadow("%.1f%%", ShrinkResistance);
                 }
 
                 // On The Edge
                 if (Runtime::HasPerk(a_Actor, "GTSPerkOnTheEdge") && hasFlag(a_featureFlags, GTSInfoFeatures::kOnTheEdge)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("On The Edge:");
+                    ImUtil::TextShadow("On The Edge:");
                     ImUtil::Tooltip(TOnTheEdge, true);
                     ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("%.1f%%", OnTheEdge);
+                    ImUtil::TextShadow("%.1f%%", OnTheEdge);
                 }
 
                 // Size Reserve
                 if (Runtime::HasPerk(a_Actor, "GTSPerkSizeReserve") && hasFlag(a_featureFlags, GTSInfoFeatures::kSizeReserve)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("Size Reserve:");
+                    ImUtil::TextShadow("Size Reserve:");
                     ImUtil::Tooltip(TSizeReserve, true);
                     ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("%.2fx", SizeReserve);
+                    ImUtil::TextShadow("%.2fx", SizeReserve);
                 }
             }
 
@@ -279,19 +322,19 @@ namespace GTS {
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kWeight)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Weight:");
+                ImUtil::TextShadow("Weight:");
                 ImGui::TableSetColumnIndex(1);
-                ImGui::TextUnformatted(GTS::GetFormatedWeight(a_Actor).c_str());
+                ImUtil::TextShadow(GTS::GetFormatedWeight(a_Actor).c_str());
             }
 
             // Aspect of GTS
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kAspect)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Aspect of GTS:");
+                ImUtil::TextShadow("Aspect of GTS:");
                 ImUtil::Tooltip(TAspectOfGTS, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.0f%%", AspectOfGTS);
+                ImUtil::TextShadow("%.0f%%", AspectOfGTS);
                 
             }
 
@@ -299,67 +342,67 @@ namespace GTS {
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kDamageResist)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Damage Reduction:");
+                ImUtil::TextShadow("Damage Reduction:");
                 ImUtil::Tooltip(TDamageResist, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.1f%%", DamageResist);
+                ImUtil::TextShadow("%.1f%%", DamageResist);
             }
 
             // High Heel Damage
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kHeelsBonusDamage) && BonusHHDamage > 0.0f) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("High Heel Damage:");
+                ImUtil::TextShadow("High Heel Damage:");
                 ImUtil::Tooltip(THHDamage, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("+%.0f%%", BonusHHDamage);
+                ImUtil::TextShadow("+%.0f%%", BonusHHDamage);
             }
 
             // Damage Multiplier
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kDamageMultiplier)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Bonus Damage:");
+                ImUtil::TextShadow("Bonus Damage:");
                 ImUtil::Tooltip(TDamageBonus, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.1f%%", Damage);
+                ImUtil::TextShadow("%.1f%%", Damage);
             }
 
             // Carry Weight
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kCarryWeight)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Bonus Carry Weight:");
+                ImUtil::TextShadow("Bonus Carry Weight:");
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.1f", CarryWeight);
+                ImUtil::TextShadow("%.1f", CarryWeight);
             }
 
             // Speed Multiplier
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kSpeedMultiplier)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Bonus Speed:");
+                ImUtil::TextShadow("Bonus Speed:");
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.1f%%", Speed);
+                ImUtil::TextShadow("%.1f%%", Speed);
             }
 
             // Jump Multiplier
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kJumpMultiplier)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Bonus Jump Height:");
+                ImUtil::TextShadow("Bonus Jump Height:");
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.1f%%", JumpHeight);
+                ImUtil::TextShadow("%.1f%%", JumpHeight);
             }
 
             // Stolen Attributes for Size Conversion perk
             if (Runtime::HasPerk(a_Actor, "GTSPerkSizeConversion") && hasFlag(a_featureFlags, GTSInfoFeatures::kStolenAttributes)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Stored Attributes:");
+                ImUtil::TextShadow("Stored Attributes:");
                 ImUtil::Tooltip(TStoredAttributes, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("+%.2f", StolenAttributes);
+                ImUtil::TextShadow("+%.2f", StolenAttributes);
             }
 
             // Soul Vore perk data
@@ -368,10 +411,10 @@ namespace GTS {
                 if (hasFlag(a_featureFlags, GTSInfoFeatures::kAbsorbedAttributes)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted("Absorbed Attributes:");
+                    ImUtil::TextShadow("Absorbed Attributes:");
                     ImUtil::Tooltip(TAbsorbedAttributes, true);
                     ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("HP: +%.2f, MP: +%.2f, SP: +%.2f", StolenHealth, StolenMagicka, StolenStamina);
+                    ImUtil::TextShadow("HP: +%.2f, MP: +%.2f, SP: +%.2f", StolenHealth, StolenMagicka, StolenStamina);
                 }
             }
 
@@ -379,14 +422,17 @@ namespace GTS {
             if (hasFlag(a_featureFlags, GTSInfoFeatures::kKillCounter)) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted("Kills Made:");
+                ImUtil::TextShadow("Kills Made:");
                 ImUtil::Tooltip(TKillsMade, true);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%d", GetKillCount(a_Actor, SizeKillType::kTotalKills)
-                );
+                ImUtil::TextShadow("%u", GetKillCount(a_Actor, SizeKillType::kTotalKills));
             }
 
             ImGui::EndTable();
         }
+
+        
+
+
     }
 }

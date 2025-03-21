@@ -2937,7 +2937,7 @@ namespace GTS {
 			return;
 		}
 
-		auto& BonusSize = Persistent::GetSingleton().GTSExtraPotionSize;  // Gts_ExtraPotionSize
+		auto& BonusSize = Persistent::GetSingleton().PlayerExtraPotionSize;  // Gts_ExtraPotionSize
 
 		ModSizeExperience(player, 0.45f);
 

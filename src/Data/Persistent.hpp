@@ -8,6 +8,8 @@ namespace GTS {
 	//AS OF Version 8 actor data is 100 bytes (0x64) + 4 to store the formid
 	//Each actordata cosave entry is thus 104 bytes.
 
+	#pragma pack(push, 1)
+
 	struct ActorData {
 
 		/// --------- V1
@@ -45,7 +47,10 @@ namespace GTS {
 		float target_scale_v = 0.0f;
 
 		/// --------- V8
-		float PAD_50 = 0.0f;
+		bool ShowSizebarInUI = false;
+		bool PAD_51 = false;
+		bool PAD_52 = false;
+		bool PAD_53 = false;
 		float stolen_attributes = 0.0f;
 		float stolen_health = 0.0f;
 		float stolen_magick = 0.0f;
@@ -58,6 +63,10 @@ namespace GTS {
 		ActorData() = default;
 		explicit ActorData(RE::Actor* actor) {}
 	};
+
+	#pragma pack(pop)
+
+	static_assert(sizeof(ActorData) == 0x64);
 
 	#pragma pack(push, 1)
 
@@ -103,6 +112,8 @@ namespace GTS {
 	};
 
 	#pragma pack(pop)
+
+	static_assert(sizeof(KillCountData) == 0x4C);
 
 	class Persistent : public EventListener {
 
@@ -174,9 +185,9 @@ namespace GTS {
 			BasicRecord<bool, 'ECFL'> EnableCrawlFollower = false;
 
 			//----- Max Size Related
-			BasicRecord<float, 'GBPS'> GTSExtraPotionSize = 0.0f;
-			BasicRecord<float, 'GTSL'> GTSGlobalSizeLimit = 1.0f;
-			BasicRecord<float, 'GMBS'> GTSMassBasedSizeLimit = 0.0f;
+			BasicRecord<float, 'GBPS'> PlayerExtraPotionSize = 0.0f;     //Exists here for compatibilty. TODO Deprecate this in favor of ActorData.
+			BasicRecord<float, 'GTSL'> GlobalSizeLimit = 1.0f;
+			BasicRecord<float, 'GMBS'> GlobalMassBasedSizeLimit = 0.0f;
 
 			// ---- Quest Progression
 			BasicRecord<float, 'QHSR'> HugStealCount = 0.0f;
@@ -208,14 +219,19 @@ namespace GTS {
 			//Actor Data Load
 			static void LoadActorData(SKSE::SerializationInterface* serde, const uint32_t RecordType, const uint32_t RecordVersion);
 			static void LoadActorRecordFloat(SKSE::SerializationInterface* serde, float* a_Data, uint32_t RecordVersion, uint32_t MinVersion, float DefaultValue);
-			static void DummyReadFloat(SKSE::SerializationInterface* serde);
+			static void LoadActorRecordBool(SKSE::SerializationInterface* serde, bool* a_Data, uint32_t RecordVersion,
+			                                uint32_t MinVersion,
+			                                bool DefaultValue);
+			static void DummyRead32(SKSE::SerializationInterface* serde);
+			static void DummyRead8(SKSE::SerializationInterface* serde);
 
 			//Actor Data Save
 			static void WriteActorData(SKSE::SerializationInterface* serde, uint8_t Version);
 			static void WriteKillCountData(SKSE::SerializationInterface* serde, uint8_t Version);
 			static void WriteActorRecordFloat(SKSE::SerializationInterface* serde, const float* Data);
+			static void WriteActorRecordBool(SKSE::SerializationInterface* serde, const bool* Data);
 			static void WriteActorRecordFormID(SKSE::SerializationInterface* serde, const FormID* Id);
-			static void DummyWriteFloat(SKSE::SerializationInterface* serde);
-
+			static void DummyWrite32(SKSE::SerializationInterface* serde);
+			static void DummyWrite8(SKSE::SerializationInterface* serde);
 	};
 }

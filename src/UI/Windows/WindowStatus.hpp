@@ -8,10 +8,21 @@ namespace GTS {
     class WindowStatus : public ImWindow {
 
         public:
-	    void CheckFade(RE::Actor* a_actor);
+
+        struct LastShownData {
+            float Scale = 0.0f;
+            float MaxScale = 0.0f;
+            float Aspect = 0.0f;
+            double LastWorldTime = 0.0;
+            float FadeAlpha = 1.0f;  // Add per-actor fade alpha
+            std::string FadeTaskID;  // Store the task ID for this actor's fade
+        };
+
+        WindowStatus::LastShownData* GetLastData(RE::Actor* a_actor);
+        bool CheckFade(RE::Actor* a_actor);
 	    void Show();
-	    void ShowImmediate();
-	    void StartFade();
+	    void ShowImmediate(RE::Actor* a_actor);
+	    void StartFade(RE::Actor* a_actor);
 	    WindowStatus();
 
         void Draw() override;
@@ -32,19 +43,13 @@ namespace GTS {
         float AutoFadeAlpha = 1.0f;
 	    bool Fading;
 
-	    struct PlayerLastData {
-            float Scale;
-            float MaxScale;
-            float Aspect;
-            float Essence;
-            double LastWorldTime;
-        };
 
-        std::string_view FadeTask = "StatsWindowFadeTask";
-        std::string_view ShowTask = "StatsShowTask";
+        std::string FadeTask = "StatsWindowFadeTask";
+        std::string ShowTask = "StatsShowTask";
+        volatile bool Busy = false;
 
+        std::unordered_map<FormID, LastShownData> LastData = {};
 
-        PlayerLastData LastData = {};
 
         Config& Settings = Config::GetSingleton();
         const SettingsHidden& sHidden = Config::GetHidden();

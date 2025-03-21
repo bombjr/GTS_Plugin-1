@@ -393,7 +393,7 @@ namespace {
 	//Ported From Papyrus
 	float GetExpectedMaxSize(RE::Actor* a_Actor) {
 		const float LevelBonus = 1.0f + GetGtsSkillLevel(a_Actor) * 0.006f;
-		const float Essence = Persistent::GetSingleton().GTSExtraPotionSize.value;
+		const float Essence = Persistent::GetSingleton().PlayerExtraPotionSize.value;
 
 		const auto Quest = Runtime::GetQuest("GTSQuestProgression");
 		if (!Quest) {
@@ -428,7 +428,7 @@ namespace {
 	//Ported From Papyrus
 	void UpdateGlobalSizeLimit() {
 		if (const auto Player = PlayerCharacter::GetSingleton()) {
-			Persistent::GetSingleton().GTSGlobalSizeLimit.value = GetExpectedMaxSize(Player);
+			Persistent::GetSingleton().GlobalSizeLimit.value = GetExpectedMaxSize(Player);
 		}
 	}
 

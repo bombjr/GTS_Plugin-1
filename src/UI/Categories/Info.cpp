@@ -39,7 +39,7 @@ namespace GTS {
                 ImGui::PopFont();
 
                 ImGui::PushFont(ImFontManager::GetFont("widgetbody"));
-                DrawGTSInfo(static_cast<GTSInfoFeatures>(UINT32_MAX), RE::PlayerCharacter::GetSingleton());
+                DrawGTSInfo(0, RE::PlayerCharacter::GetSingleton(), false);
 
                 ImGui::Spacing();
                 ImGui::PopFont();
@@ -71,7 +71,7 @@ namespace GTS {
             const std::string Name = Follower->GetName();
 
             //Derive a unique Id From the actors pointer
-			ImGuiID ActPtrUID = reinterpret_cast<std::uintptr_t>(Follower);
+            const ImGuiID ActPtrUID = static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(Follower));
 
             ImUtil::SeperatorV();
 
@@ -88,7 +88,7 @@ namespace GTS {
             ImGui::PopFont();
             ImGui::PushFont(ImFontManager::GetFont("widgetbody"));
 
-            DrawGTSInfo(static_cast<GTSInfoFeatures>(UINT32_MAX), Follower);
+            DrawGTSInfo(0, Follower, false);
             ImGui::Spacing();
 
             ImGui::PopFont();

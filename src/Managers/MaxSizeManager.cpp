@@ -31,11 +31,14 @@ namespace {
 
         if (low_limit <= 0.0f) {
 
-            low_limit = Persistent::GetSingleton().GTSGlobalSizeLimit.value; // Cap max size through normal size rules
+            low_limit = Persistent::GetSingleton().GlobalSizeLimit.value; // Cap max size through normal size rules
             // Else max possible size is unlimited
         }
-        float PotionSize = Persistent::GetSingleton().GTSExtraPotionSize.value;
-        float size_calc = NaturalScale + Persistent::GetSingleton().GTSMassBasedSizeLimit.value * NaturalScale;
+
+
+    	const float PotionSize = Persistent::GetSingleton().PlayerExtraPotionSize.value;
+
+        float size_calc = NaturalScale + Persistent::GetSingleton().GlobalMassBasedSizeLimit.value * NaturalScale;
         
         MassMode ? size_calc += (PotionSize * MassMode_ElixirPowerMultiplier) : size_calc += PotionSize; // less effective in mass mode
 
@@ -75,7 +78,7 @@ namespace GTS {
 
             const float NaturalScale = get_natural_scale(actor, true);
             const float QuestStage = Runtime::GetStage("GTSQuestProgression");
-            const float BaseLimit = Persistent::GetSingleton().GTSGlobalSizeLimit.value;
+            const float BaseLimit = Persistent::GetSingleton().GlobalSizeLimit.value;
             const float NPCLimit = Config::GetBalance().fMaxOtherSize;
 			const bool IsMassBased = Config::GetBalance().sSizeMode == "kMassBased"; // Should DLL use mass based formula for Player?
             const float FollowerLimit = Config::GetBalance().fMaxFollowerSize;

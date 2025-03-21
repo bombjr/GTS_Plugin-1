@@ -83,7 +83,6 @@ namespace GTS {
             if (Window->ShouldDraw()) {
                 Window->Show();
             }
-        	
         }
 
         if (auto Window = dynamic_cast<WindowUnderstomp*>(GTS::ImWindowManager::GetSingleton().GetWindowByName("UnderstompAngle"))) {

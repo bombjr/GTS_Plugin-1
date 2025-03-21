@@ -44,7 +44,16 @@ namespace GTS {
         return (value & flag) == flag;
     }
 
-    void DrawGTSInfo(const GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor);
+    void DrawGTSSizeBar(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget);
+    inline void DrawGTSSizeBar(uint32_t a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
+        DrawGTSSizeBar(static_cast<GTSInfoFeatures>(a_featureFlags), a_Actor, a_IsWidget);
+    }
+
+
+    void DrawGTSInfo(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget);
+    inline void DrawGTSInfo(uint32_t a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
+        DrawGTSInfo(static_cast<GTSInfoFeatures>(a_featureFlags), a_Actor, a_IsWidget);
+    }
 }
 
 template <>
