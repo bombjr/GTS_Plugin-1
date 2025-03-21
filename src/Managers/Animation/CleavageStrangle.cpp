@@ -35,7 +35,7 @@ namespace {
         static Timer HeartTimer = Timer(1.75f);
 
         //AnimationManager::StartAnim("Cleavage_Absorb_Tiny", tiny);
-        AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tiny);
+        //AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tiny);
 
         TaskManager::Run(task_name, [=](auto& progressData) {
             if (!gianthandle) {
@@ -61,7 +61,7 @@ namespace {
             }*/
 
             if (!IsGtsBusy(tinyref)) { // If for some reason Tiny isn't in expected anim
-                AnimationManager::StartAnim("Cleavage_EnterState_Tiny", tinyref);
+                AnimationManager::StartAnim("Cleavage_DOT_Start_Tiny", tinyref);
             }
             
             if (HeartTimer.ShouldRunFrame()) {
@@ -129,6 +129,7 @@ namespace {
                 if (data) {
                     if (data->ImmuneToBreastOneShot) {
                         AnimationManager::StartAnim("Cleavage_DOT_Stop", giantref); // Spare tiny, return to idle breast loop
+                        AnimationManager::StartAnim("Cleavage_DOT_Stop_Tiny", tinyref);
                         SpawnHearts(giantref, tinyref, 35.0f, 0.6f, false);
                         ThresholdReachedRumbling(giantref);
 
@@ -137,6 +138,7 @@ namespace {
                     }
                     else if (!data->ImmuneToBreastOneShot && tiny_health - (damage * damage_Setting * 2.0f) <= 2.5f || tinyref->IsDead()) {
                         AnimationManager::StartAnim("Cleavage_DOT_Kill", giantref); // play finisher
+                        AnimationManager::StartAnim("Cleavage_DOT_Kill_Tiny", tinyref);
                         return false;
                     }
                 }
@@ -170,6 +172,7 @@ namespace {
         Actor* giant = &data.giant;
         if (tiny) {
             std::string_view name = std::format("Suffo_DOT_{}_{}", giant->formID, tiny->formID);
+            AnimationManager::StartAnim("Cleavage_DOT_Leave_Tiny", tiny);
             TaskManager::Cancel(name);
         }
         ResetAnimationData(data);
@@ -199,5 +202,11 @@ namespace GTS {
         AnimationManager::RegisterTrigger("Cleavage_DOT_Start", "Cleavage", "GTSBEH_Boobs_Crush_Dot");
         AnimationManager::RegisterTrigger("Cleavage_DOT_Stop", "Cleavage", "GTSBEH_Boobs_Crush_Dot_Stop");
         AnimationManager::RegisterTrigger("Cleavage_DOT_Kill", "Cleavage", "GTSBEH_Boobs_Crush_Kill");
+
+        AnimationManager::RegisterTrigger("Cleavage_DOT_Start_Tiny", "Cleavage", "GTSBEH_T_Boobs_Crush_Dot");
+        AnimationManager::RegisterTrigger("Cleavage_DOT_Stop_Tiny", "Cleavage", "GTSBEH_T_Boobs_Crush_Dot_Stop");
+        AnimationManager::RegisterTrigger("Cleavage_DOT_Kill_Tiny", "Cleavage", "GTSBEH_T_Boobs_Crush_Kill");
+
+        AnimationManager::RegisterTrigger("Cleavage_DOT_Leave_Tiny", "Cleavage", "GTSBEH_T_BS_DOT_Leave");
     }
 }

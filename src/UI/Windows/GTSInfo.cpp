@@ -180,7 +180,7 @@ namespace GTS {
                 "Other Sources: {:d}\n"
                 "- Other Sources are: Tiny Calamity Collision\n"
                 "- Using Tiny as Shield when grabbing tiny\n"
-                "- Exceassive Overkill Weapon Damage when large\n"
+                "- Overkill Weapon Damage when large\n"
                 
             ),
             GetKillCount(a_Actor, SizeKillType::kErasedFromExistence),
