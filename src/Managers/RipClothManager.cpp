@@ -77,6 +77,9 @@ namespace GTS {
 			const auto& [count, entry] = invData;
 			if (count > 0) {
 				if (item->As<RE::TESObjectARMO>()) {
+					if (!entry->extraLists) {
+						return;
+					}
 					for (const auto& xList : *entry->extraLists) {
 						RE::ActorEquipManager::GetSingleton()->EquipObject(a_actor, item, xList, 1, nullptr, false, false, false);
 					}

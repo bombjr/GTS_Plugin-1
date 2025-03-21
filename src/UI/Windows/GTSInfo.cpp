@@ -2,6 +2,8 @@
 #include "UI/ImGui/ImUtil.hpp"
 #include "UI/DearImGui/imgui.h"
 #include "Managers/Attributes.hpp"
+#include "Managers/SpectatorManager.hpp"
+
 #include "Utils/UnitConverter.hpp"
 #include "Utils/KillDataUtils.hpp"
 
@@ -34,7 +36,6 @@ namespace GTS {
             ImUtil::TextShadow("Actor Invalid!");
             return;
         }
-
 
         const float CurrentScale = get_visual_scale(a_Actor);
         const float MaxScale = get_max_scale(a_Actor);
@@ -75,6 +76,23 @@ namespace GTS {
         );
 
         if (!a_IsWidget) {
+
+            if (a_Actor->formID != 0x14) {
+                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
+                ImGui::SameLine(0.0f, 8.0f);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
+                const bool IsSpectating = !SpectatorManager::IsCameraTargetPlayer();
+                const char* Msg = IsSpectating ? "Cancel" : "Spectate";
+                if (ImUtil::Button(Msg)) {
+                    if (IsSpectating) {
+                        SpectatorManager::GetSingleton().Reset();
+                    }
+                    else {
+                        SpectatorManager::SetCameraTarget(a_Actor, false);
+                    }
+                }
+            }
+
             if (a_Actor->formID != 0x14) {
                 float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
                 ImGui::SameLine(0.0f, 8.0f);
@@ -86,7 +104,6 @@ namespace GTS {
                 ImGui::PopID();
             }
         }
-
         ImGui::PopStyleColor();
     }
 
@@ -147,7 +164,6 @@ namespace GTS {
         const float ShrinkResistance = (1.0f - shrinkResist_PreCalc) * 100.f;
         const float OnTheEdge = (GetPerkBonus_OnTheEdge(a_Actor, 0.01f) - 1.0f) * 100.f;
         const float BonusHHDamage = (GetHighHeelsBonusDamage(a_Actor, true) - 1.0f) * 100.0f;
-
 
 
         //---------Total Max Size Calculation and Text Formating
@@ -430,9 +446,5 @@ namespace GTS {
 
             ImGui::EndTable();
         }
-
-        
-
-
     }
 }

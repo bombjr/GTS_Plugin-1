@@ -38,6 +38,7 @@ namespace GTS {
 			ActorHandle giant;
 			// Vore is done is sets with multiple actors if the giant is big
 			// enough
+			mutable std::mutex _lock;
 			std::unordered_map<FormID, ActorHandle> tinies = {};
 
 			// If true the mouth kill zone is on and we shrink nodes entering the mouth
@@ -85,8 +86,29 @@ namespace GTS {
 
 			void AllowMessage(bool allow);
 
+			[[nodiscard]] inline bool IsTinyInDataList(Actor* aTiny) {
+
+				std::unique_lock lock(_lock);
+
+				if (!aTiny) {
+					return false;
+				}
+
+				for (auto& val : data | views::values) {
+					for (const auto& Tiny : val.GetVories()) {
+						if (Tiny) {
+							if (Tiny->formID == aTiny->formID) {
+								return true;
+							}
+						}
+					}
+				}
+				return false;
+			}
+
 		private:
 			std::unordered_map<FormID, VoreData> data;
+			mutable std::mutex _lock;
 			bool allow_message = false;
 	};
 }

@@ -23,6 +23,7 @@ namespace GTS {
 	VoreData::VoreData(Actor* giant) : giant(giant? giant->CreateRefHandle() : ActorHandle()) {}
 
 	void VoreData::AddTiny(Actor* tiny) {
+		std::unique_lock lock(_lock);
 		this->tinies.try_emplace(tiny->formID, tiny->CreateRefHandle());
 	}
 
@@ -31,6 +32,7 @@ namespace GTS {
 	}
 
 	void VoreData::Swallow() {
+		std::unique_lock lock(_lock);
 		for (auto& [key, tinyref]: this->tinies) {
 			auto tiny = tinyref.get().get();
 			auto giant = this->giant.get().get();
@@ -52,7 +54,7 @@ namespace GTS {
 		}
 	}
 	void VoreData::KillAll() {
-
+		std::unique_lock lock(_lock);
 		if (!AllowDevourment()) {
 
 			for (auto& tinyref : this->tinies | views::values) {
@@ -106,6 +108,7 @@ namespace GTS {
 	}
 
 	void VoreData::AllowToBeVored(bool allow) {
+		std::unique_lock lock(_lock);
 		for (auto& [key, tinyref]: this->tinies) {
 			auto tiny = tinyref.get().get();
 			auto transient = Transient::GetSingleton().GetData(tiny);
@@ -128,8 +131,9 @@ namespace GTS {
 	}
 
 	std::vector<Actor*> VoreData::GetVories() {
+		std::unique_lock lock(_lock);
 		std::vector<Actor*> result;
-		for (auto& [key, actorref]: this->tinies) {
+		for (auto& actorref : this->tinies | views::values) {
 			auto actor = actorref.get().get();
 			result.push_back(actor);
 		}
@@ -168,6 +172,7 @@ namespace GTS {
 	}
 
 	void VoreController::Update() {
+		std::unique_lock lock(_lock);
 		for (auto& voreData : this->data | views::values) {
 			voreData.Update();
 		}
@@ -336,10 +341,12 @@ namespace GTS {
 	}
 
 	void VoreController::Reset() {
+		std::unique_lock lock(_lock);
 		this->data.clear();
 	}
 
 	void VoreController::ResetActor(Actor* actor) {
+		std::unique_lock lock(_lock);
 		this->data.erase(actor->formID);
 	}
 
@@ -450,6 +457,7 @@ namespace GTS {
 
 	// Gets the current vore data of a giant
 	VoreData& VoreController::GetVoreData(Actor* giant) {
+		std::unique_lock lock(_lock);
 		// Create it now if not there yet
 		this->data.try_emplace(giant->formID, giant);
 

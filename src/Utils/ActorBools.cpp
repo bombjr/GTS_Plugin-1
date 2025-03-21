@@ -87,6 +87,13 @@ namespace GTS {
 		return Human;
 	}
 
+	bool IsVisible(Actor* giant) {
+		if (giant) {
+			return giant->GetAlpha() > 0.1f;
+		}
+		return false;
+	}
+
 
    /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;

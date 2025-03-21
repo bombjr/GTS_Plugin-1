@@ -425,6 +425,10 @@ namespace GTS {
 			return;
 		}
 
+		if (!IsVisible(actor)) {
+			return;
+		}
+
 		float BaseGrowhtRate = 0.0f;
 		float BaseShrinkRate = 0.0f;
 		float BonusShrink = 7.4f;
