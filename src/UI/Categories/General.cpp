@@ -281,7 +281,12 @@ namespace GTS {
 					// ----- If You need to do something when settings reset add it here.
 
 					if (!Settings.bTrackBonesDuringAnim) {
-						ResetCameraTracking();
+						auto actors = find_actors();
+						for (auto actor : actors) {
+							if (actor) {
+								ResetCameraTracking(actor);
+							}
+						}
 					}
 
 					if (!Settings.bHighheelsFurniture) {

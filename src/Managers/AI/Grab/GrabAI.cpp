@@ -4,6 +4,7 @@
 #include "Managers/Animation/AnimationManager.hpp"
 #include "Managers/Animation/Grab.hpp"
 #include "Managers/Animation/Utils/AnimationUtils.hpp"
+#include "Managers/Animation/CleavageState.hpp"
 
 using namespace GTS;
 
@@ -12,6 +13,18 @@ namespace {
 	constexpr float MINIMUM_GRAB_DISTANCE = 85.0f;
 	constexpr float GRAB_ANGLE = 70;
 	constexpr float PI = std::numbers::pi_v<float>;
+
+	bool ShouldAbortGrab(Actor* giantref, Actor* tinyref, bool CanCancel, bool Dead, bool ValidPrey) {
+        if (CanCancel || !ValidPrey) {
+			bool ShouldCancel = (Dead || (!IsBetweenBreasts(tinyref) && GetAV(giantref, ActorValue::kStamina) < 2.0f));
+            if (!ValidPrey || ShouldCancel) {
+                //PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
+                // For debugging
+                return true;
+            }
+        }
+        return false;
+    }
 
 	void PreventCombat(Actor* a_actor) {
 
@@ -168,9 +181,9 @@ namespace {
 			}
 
 			TransientData->ActionTimer.UpdateDelta(Config::GetAI().Grab.fInterval);
-			const bool IsDead = PreyActor->IsDead() || PerformerActor->IsDead();
+			const bool IsDead = PreyActor->IsDead() || GetAV(PreyActor, ActorValue::kHealth) <= 0.0f || PerformerActor->IsDead();
 			const bool IsBusy = IsGrabAttacking(PerformerActor) || IsTransitioning(PerformerActor);
-			const bool ValidPrey = Grab::GetHeldActor(PerformerActor) != nullptr || IsInsideCleavage(PreyActor) ;
+			const bool ValidPrey = Grab::GetHeldActor(PerformerActor) != nullptr;
 
 			if (!IsDead && !IsBusy) {
 
@@ -236,6 +249,7 @@ namespace {
 						if (RandomBool(3.333f)) {
 							// Spare tiny, return to idle breast loop
 							AnimationManager::StartAnim("Cleavage_DOT_Stop", PerformerActor);
+							AnimationManager::StartAnim("Cleavage_DOT_Stop_Tiny", PreyActor);
 						}
 					}
 					//IsGtsBusy(PerformerActor) is true when in this state
@@ -285,6 +299,7 @@ namespace {
 							//Strangle
 							case 4: {
 								AnimationManager::StartAnim("Cleavage_DOT_Start", PerformerActor);
+								Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_DOT_Start_Tiny", PerformerActor);
 								break;
 							}
 							//Stop
@@ -301,19 +316,23 @@ namespace {
 				}
 			}
 
-			bool Attacking = false;
-			PerformerActor->GetGraphVariableBool("GTS_IsGrabAttacking", Attacking);
+			bool Attacking = IsGrabAttacking(PerformerActor);
 			bool CanCancel = (IsDead || !IsVoring(PerformerActor)) && (!Attacking || IsBeingEaten(PreyActor));
-			if (CanCancel) {
-				if (IsDead || !ValidPrey && (!IsGtsBusy(PerformerActor) && !IsTransitioning(PerformerActor))) {
-					logger::info("GrabAI: Prey Dead or Invalid");
-					Grab::CancelGrab(PerformerActor, PreyActor);
-					Utils_UpdateHighHeelBlend(PerformerActor, false);
-					ResetCombat(PerformerActor);
-					return false;
-				}
-			}
+			if (ShouldAbortGrab(PerformerActor, PreyActor, CanCancel, IsDead, ValidPrey)) {
+				logger::info("GrabAI: Prey Dead or Invalid");
+				Utils_UpdateHighHeelBlend(PerformerActor, false);
 
+				if (ValidPrey) { // We don't want to push/cancel grab on Null actor
+					PushActorAway(PerformerActor, PreyActor, 1.0f);
+					Grab::CancelGrab(PerformerActor, PreyActor);
+				} else {
+					Grab::FailSafeReset(PerformerActor);
+				}
+
+				ResetCombat(PerformerActor);
+				return false;
+			}
+			
 			return true;
 		});
 	}

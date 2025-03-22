@@ -321,7 +321,7 @@ namespace ImUtil {
     }
 
     void TextShadowImpl(const char* text, const char* textend, ImU32 text_color, ImU32 shadow_color, float shadow_offset) {
-        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2 pos = ImGui::GetCursorScreenPos(); // Get the absolute screen position
 
         // Draw shadow text

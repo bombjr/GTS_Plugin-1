@@ -17,6 +17,26 @@ namespace {
 		);
 		return disable;
 	}
+	bool DisableOnFurniture(Actor* actor) {
+		const auto ActorState = actor->AsActorState()->GetSitSleepState();
+		bool Config = Config::GetGeneral().bHighheelsFurniture;
+		bool Sleeping = false;
+		bool Sitting = false;
+		
+		switch (ActorState) {
+			case SIT_SLEEP_STATE::kIsSitting:
+				Sitting = true;
+			break;
+			case SIT_SLEEP_STATE::kIsSleeping:
+			case SIT_SLEEP_STATE::kWaitingForSleepAnim:
+			case SIT_SLEEP_STATE::kWantToWake:
+				Sleeping = true;
+			break;
+		}
+		
+		bool ShouldBeDisabled = (!Config && Sitting) || (Sleeping);
+		return ShouldBeDisabled;
+	}
 }
 
 namespace GTS {
@@ -86,11 +106,6 @@ namespace GTS {
 			}
 
 			if (actor->Is3DLoaded()) {
-
-				if (Config::GetGeneral().bHighheelsFurniture == false && actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kIsSitting) {
-					return;
-				}
-
 				this->data.try_emplace(actor);
 				auto& hhData = this->data[actor];
 				float speedup = 1.0f;
@@ -101,14 +116,14 @@ namespace GTS {
 					speedup = 3.0f;
 				}
 
-				hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
-
-				if (DisableHighHeels(actor)) {
+				if (DisableHighHeels(actor) || DisableOnFurniture(actor)) {
 					hhData.multiplier.target = 0.0f;
-				}
-				else {
+					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
+				} else {
 					hhData.multiplier.target = 1.0f;
-					hhData.multiplier.halflife = 0.0f;
+					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * 1.0f * speedup);
+					// Some GTS animations use smooth transitions between enabling/disabling HH and it looks ugly with halflife 0
+					// Don't make halflife 0
 				}
 
 				if (!Config::GetGeneral().bEnableHighHeels) {

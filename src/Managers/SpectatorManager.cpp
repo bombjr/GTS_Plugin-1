@@ -11,6 +11,16 @@ namespace {
 
 namespace GTS {
 
+	Actor* SpectatorManager::GetCameraTarget() {
+		Actor* player = PlayerCharacter::GetSingleton();
+		Actor* Target_Actor = TESForm::LookupByID<Actor>(Target);
+		if (Target_Actor) {
+			return Target_Actor;
+		} else {
+			return player;
+		}
+	}
+
 	void SpectatorManager::SetCameraTarget(RE::Actor* a_Actor, bool aTemporary) {
 		if (!a_Actor) {
 			return;

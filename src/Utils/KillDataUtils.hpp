@@ -10,26 +10,27 @@ namespace GTS {
 
 		kBreastAbsorbed = 3,
 		kBreastCrushed = 4,
+		kBreastSuffocated = 5,
 
-		kHugCrushed = 5,
-		kGrabCrushed = 6,
-		kButtCrushed = 7,
+		kHugCrushed = 6,
+		kGrabCrushed = 7,
+		kButtCrushed = 8,
 
-		kThighCrushed = 8,
-		kThighSuffocated = 9,
-		kThighSandwiched = 10,
-		kThighGrinded = 11,
+		kThighCrushed = 9,
+		kThighSuffocated = 10,
+		kThighSandwiched = 11,
+		kThighGrinded = 12,
 
-		kFingerCrushed = 12,
+		kFingerCrushed = 13,
 
-		kErasedFromExistence = 13,
+		kErasedFromExistence = 14,
 
-		kAbsorbed = 14,
-		kCrushed = 15,
-		kKicked = 16,
-		kEaten = 17,
+		kAbsorbed = 15,
+		kCrushed = 16,
+		kKicked = 17,
+		kEaten = 18,
 
-		kGrinded = 18,
+		kGrinded = 19,
 	};
 
     void IncrementKillCount(Actor* giant, SizeKillType Type);

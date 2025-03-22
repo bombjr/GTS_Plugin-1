@@ -17,7 +17,53 @@ namespace {
 }
 
 namespace GTS {
+    void DrawSpectateAndWidget(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
+        if (!CheckOK(a_Actor)) {
+            return;
+        }
 
+        const auto& Settings = Config::GetUI().StatusWindow;
+
+        const ImVec2 ProgressBarSize = { hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 0.0f : Settings.fFixedWidth , 0.0f };
+        const float ProgressBarHeight = hasFlag(a_featureFlags, GTSInfoFeatures::kAutoSize) ? 1.1f : Settings.fSizeBarHeightMult;
+
+        const auto& ActorTransient = Transient::GetSingleton().GetData(a_Actor);
+        const auto& ActorPersistent = Persistent::GetSingleton().GetData(a_Actor);
+        if (!ActorTransient || !ActorPersistent) {
+            ImUtil::TextShadow("Actor Invalid!");
+            return;
+        }
+
+        if (!a_IsWidget) {
+
+            if (a_Actor->formID != 0x14) {
+                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
+                ImGui::SameLine(0.0f, 8.0f);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
+                const bool IsSpectating = !SpectatorManager::IsCameraTargetPlayer();
+                const char* Msg = IsSpectating ? "Cancel" : "Spectate";
+                if (ImUtil::Button(Msg)) {
+                    if (IsSpectating) {
+                        SpectatorManager::GetSingleton().Reset();
+                    }
+                    else {
+                        SpectatorManager::SetCameraTarget(a_Actor, false);
+                    }
+                }
+            }
+
+            if (a_Actor->formID != 0x14) {
+                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
+                ImGui::SameLine(0.0f, 8.0f);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
+                const char* const TFolTT = "Show this follower's current size as an extra bar in the player widget.";
+                const void* ActPtrUID = (reinterpret_cast<void*>(a_Actor));
+                ImGui::PushID(ActPtrUID);
+                ImUtil::CheckBox("Widget", &ActorPersistent->ShowSizebarInUI, TFolTT);
+                ImGui::PopID();
+            }
+        }
+    }
     void DrawGTSSizeBar(GTSInfoFeatures a_featureFlags, RE::Actor* a_Actor, const bool a_IsWidget) {
 
         if (!a_IsWidget) {
@@ -75,35 +121,7 @@ namespace GTS {
             Settings.bFlipGradientDirection
         );
 
-        if (!a_IsWidget) {
-
-            if (a_Actor->formID != 0x14) {
-                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
-                ImGui::SameLine(0.0f, 8.0f);
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
-                const bool IsSpectating = !SpectatorManager::IsCameraTargetPlayer();
-                const char* Msg = IsSpectating ? "Cancel" : "Spectate";
-                if (ImUtil::Button(Msg)) {
-                    if (IsSpectating) {
-                        SpectatorManager::GetSingleton().Reset();
-                    }
-                    else {
-                        SpectatorManager::SetCameraTarget(a_Actor, false);
-                    }
-                }
-            }
-
-            if (a_Actor->formID != 0x14) {
-                float verticalOffset = (ImGui::GetFrameHeight() * ProgressBarHeight - ImGui::GetFrameHeight()) * 0.5f;
-                ImGui::SameLine(0.0f, 8.0f);
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
-                const char* const TFolTT = "Show this follower's current size as an extra bar in the player widget.";
-                const void* ActPtrUID = (reinterpret_cast<void*>(a_Actor));
-                ImGui::PushID(ActPtrUID);
-                ImUtil::CheckBox("Widget", &ActorPersistent->ShowSizebarInUI, TFolTT);
-                ImGui::PopID();
-            }
-        }
+        DrawSpectateAndWidget(a_featureFlags, a_Actor, a_IsWidget);
         ImGui::PopStyleColor();
     }
 
@@ -137,6 +155,9 @@ namespace GTS {
         }
         else [[likely]] {
             CarryWeight = ActorTransient->CarryWeightBoost;
+            // Note: AlterGetAv(kCarryWeight) doesn't seem to be called each frame on NPC's
+            // So sometimes it might take a while to update Carry Weight boost on NPC
+            // Weight update seems to happen when NPC picks up items/player gives items to them
         }
 
     	//--------- Transient Data
@@ -176,6 +197,7 @@ namespace GTS {
                 "- Dead actors do not count\n"
                 "Erased From Existence: {:d}\n"
                 "Shrunk To Nothing: {:d}\n"
+                "Breast Suffocated: {:d}\n"
                 "Breast Absorbed: {:d}\n"
                 "Breast Crushed: {:d}\n"
                 "---\n"
@@ -201,6 +223,7 @@ namespace GTS {
             ),
             GetKillCount(a_Actor, SizeKillType::kErasedFromExistence),
             GetKillCount(a_Actor, SizeKillType::kShrunkToNothing),
+            GetKillCount(a_Actor, SizeKillType::kBreastSuffocated),
             GetKillCount(a_Actor, SizeKillType::kBreastAbsorbed),
             GetKillCount(a_Actor, SizeKillType::kBreastCrushed),
             GetKillCount(a_Actor, SizeKillType::kThighSuffocated),

@@ -3,6 +3,8 @@
 #include "Managers/GtsSizeManager.hpp"
 #include "Config/Config.hpp"
 
+#include "Managers/SpectatorManager.hpp"
+
 namespace GTS {
 
 	auto& CamSettings = Config::GetCamera().OffsetsAlt;
@@ -48,7 +50,7 @@ namespace GTS {
 	}
 
 	BoneTarget Alt::GetBoneTarget() {
-		auto player = PlayerCharacter::GetSingleton();
+		auto player = SpectatorManager::GetCameraTarget();
 		auto& sizemanager = SizeManager::GetSingleton();
 
 		CameraTracking Camera_Anim = sizemanager.GetTrackedBone(player);

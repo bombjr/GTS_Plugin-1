@@ -19,6 +19,7 @@ namespace GTS {
 		virtual void DataReady() override {
 
 		}
+		static Actor* GetCameraTarget();
 
 		static void SetCameraTarget(RE::Actor* a_Actor, bool aTemporary);
 		virtual void Update() override;

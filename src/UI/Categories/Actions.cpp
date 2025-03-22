@@ -18,7 +18,12 @@ namespace GTS {
 				ImUtil::CheckBox("Enable FOV Edits", &SGeneral.bEnableFOVEdits, T0);
 				if (ImUtil::CheckBox("Track Bones During Actions", &SGeneral.bTrackBonesDuringAnim, T1)) {
 					if (!SGeneral.bTrackBonesDuringAnim) {
-						ResetCameraTracking();
+						auto actors = find_actors();
+						for (auto actor : actors) {
+							if (actor) {
+								ResetCameraTracking(actor);
+							}
+						}
 					}
 				}
 			}

@@ -234,9 +234,7 @@ namespace {
 
 	void GTSBEH_Exit(AnimationEventData& data) {
 		auto giant = &data.giant;
-		if (giant->formID == 0x14) {
-			ResetCameraTracking();
-		}
+		ResetCameraTracking(giant);
 
 		Rumbling::Stop("StompR", &data.giant);
 	}

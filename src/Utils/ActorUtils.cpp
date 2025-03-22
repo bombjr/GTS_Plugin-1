@@ -1908,11 +1908,10 @@ namespace GTS {
 		return Runtime::HasKeyword(actor, "GTSKeywordCountAsFollower");
 	}
 
-	void ResetCameraTracking() {
-		auto player = PlayerCharacter::GetSingleton();
-		if (player) {
-			auto& sizemanager = SizeManager::GetSingleton();
-			sizemanager.SetTrackedBone(player, false, CameraTracking::None);
+	void ResetCameraTracking(Actor* actor) {
+		auto& sizemanager = SizeManager::GetSingleton();
+		if (actor->Is3DLoaded()) {
+			sizemanager.SetTrackedBone(actor, false, CameraTracking::None);
 		}
 	}
 
@@ -3147,8 +3146,6 @@ namespace GTS {
 	void FixAnimationsAndCamera() { // Fixes Animations for GTS Grab Actions and resets the bone tracking on camera
 		auto profiler = Profilers::Profile("ActorUtils: FixAnimationsAndCamera");
 
-		ResetCameraTracking(); // fix the camera tracking if loading previous save while voring/thigh crushing for example
-
 		for (auto giant: find_actors()) {
 			if (!giant) {
 				continue;
@@ -3158,6 +3155,7 @@ namespace GTS {
 
 			giant->GetGraphVariableInt("currentDefaultState", StateID);
 			giant->GetGraphVariableInt("GTS_Def_State", GTSStateID);
+			ResetCameraTracking(giant); // fix the camera tracking if loading previous save while voring/thigh crushing for example
 
 			ResetGrab(giant);
 			if (GTSStateID != StateID) {

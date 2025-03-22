@@ -84,6 +84,7 @@ namespace GTS {
 		//Breast data
 		uint32_t iBreastAbsorbed = 0;
 		uint32_t iBreastCrushed = 0;
+		uint32_t iBreastSuffocated = 0;
 		// Hug Data
 		uint32_t iHugCrushed = 0;
 		// Grab Data
@@ -113,7 +114,7 @@ namespace GTS {
 
 	#pragma pack(pop)
 
-	static_assert(sizeof(KillCountData) == 0x4C);
+	static_assert(sizeof(KillCountData) == 0x50);
 
 	class Persistent : public EventListener {
 

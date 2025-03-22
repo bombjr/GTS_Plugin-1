@@ -2,6 +2,8 @@
 #include "Managers/Animation/Utils/CooldownManager.hpp"
 #include "Managers/Animation/Utils/AttachPoint.hpp"
 
+#include "Managers/SpectatorManager.hpp"
+
 #include "Managers/Animation/Controllers/ThighSandwichController.hpp"
 #include "Managers/Animation/Controllers/GrabAnimationController.hpp"
 #include "Managers/Animation/Controllers/ButtCrushController.hpp"
@@ -462,11 +464,9 @@ namespace GTS {
 	}
 
 	void ManageCamera(Actor* giant, bool enable, CameraTracking type) {
-		if (giant->formID == 0x14) {
-			if (AllowCameraTracking()) {
-				auto& sizemanager = SizeManager::GetSingleton();
-				sizemanager.SetTrackedBone(giant, enable, type);
-			}
+		if (AllowCameraTracking()) {
+			auto& sizemanager = SizeManager::GetSingleton();
+			sizemanager.SetTrackedBone(giant, enable, type);
 		}
 	}
 

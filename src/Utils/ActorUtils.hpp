@@ -219,7 +219,7 @@ namespace GTS {
 
     bool IsGtsTeammate(Actor* actor);
 
-	void ResetCameraTracking();
+	void ResetCameraTracking(Actor* actor);
 	void CallDevourment(Actor* a_Pred, Actor* a_Prey);
 	void GainWeight(Actor* giant, float value);
 	void CallVampire();

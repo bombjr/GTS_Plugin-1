@@ -70,21 +70,15 @@ namespace {
         return hp_reduction;
     }
 
-    void AttemptBreastActionOnTiny(const std::string& pass_anim) {
+    bool AttemptBreastAction(const std::string& pass_anim, CooldownSource Source, std::string cooldown_msg, const std::string& perk, bool ignore_checks = false) {
         Actor* player = GetPlayerOrControlled();
         if (IsInCleavageState(player)) {
             auto tiny = Grab::GetHeldActor(player);
             if (tiny) {
-                AnimationManager::StartAnim(pass_anim, tiny);
-            }
-        }
-    }
-
-    bool AttemptBreastAction(const std::string& pass_anim, CooldownSource Source, std::string cooldown_msg, const std::string& perk) {
-        Actor* player = GetPlayerOrControlled();
-        if (IsInCleavageState(player)) {
-            auto tiny = Grab::GetHeldActor(player);
-            if (tiny) {
+                if (ignore_checks) {
+                    AnimationManager::StartAnim(pass_anim, player);
+                    return true;
+                }
                 bool OnCooldown = IsActionOnCooldown(player, Source);
                 if (!OnCooldown) {
                     if (Runtime::HasPerkTeam(player, perk)) {
@@ -138,7 +132,7 @@ namespace {
         Actor* giant = GetPlayerOrControlled();
         Utils_UpdateHighHeelBlend(giant, false);
         PassAnimation("Cleavage_EnterState", false);
-        AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
+        Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_EnterState_Tiny");
 
         if (giant->formID == 0x14 && Runtime::HasPerkTeam(giant, "GTSPerkBreastsIntro") && Grab::GetHeldActor(giant)) {
             auto Camera = PlayerCamera::GetSingleton();
@@ -155,38 +149,50 @@ namespace {
     }
     void CleavageLightAttackEvent(const ManagedInputEvent& data) {
         if (PassAnimation("Cleavage_LightAttack", true)) {
-            AttemptBreastActionOnTiny("Cleavage_LightAttack_Tiny");
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_LightAttack_Tiny");
         }
     }
     void CleavageHeavyAttackEvent(const ManagedInputEvent& data) {
         if (PassAnimation("Cleavage_HeavyAttack", true)) {
-            AttemptBreastActionOnTiny("Cleavage_HeavyAttack_Tiny");
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_HeavyAttack_Tiny");
         }
     }
     void CleavageSuffocateEvent(const ManagedInputEvent& data) {
         if (AttemptBreastAction("Cleavage_Suffocate", CooldownSource::Action_Breasts_Suffocate, "Suffocation", "GTSPerkBreastsSuffocation")) {
-            AttemptBreastActionOnTiny("Cleavage_Suffocate_Tiny");
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_Suffocate_Tiny");
         }
     }
     void CleavageAbsorbEvent(const ManagedInputEvent& data) {
         if (AttemptBreastAction("Cleavage_Absorb", CooldownSource::Action_Breasts_Absorb, "Absorption", "GTSPerkBreastsAbsorb")) {
-            AttemptBreastActionOnTiny("Cleavage_Absorb_Tiny");
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_Absorb_Tiny");
         }
     }
     void CleavageVoreEvent(const ManagedInputEvent& data) {
         if (AttemptBreastAction("Cleavage_Vore", CooldownSource::Action_Breasts_Vore, "Vore", "GTSPerkBreastsVore")) {
-            AttemptBreastActionOnTiny("Cleavage_Vore_Tiny");
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_Vore_Tiny");
         }
     }
 
     void CleavageDOTEvent(const ManagedInputEvent& data) {
-        PassAnimation("Cleavage_DOT_Start", true);
-        AttemptBreastActionOnTiny("Cleavage_DOT_Start_Tiny");
+        if (AttemptBreastAction("Cleavage_DOT_Start", CooldownSource::Action_Breasts_Vore, "Breast Strangle", "GTSPerkBreastsStrangle", true)) {
+            // Because of True at the end, we ignore all checks in this case. only check is IsInCleavageState
+            Animation_Cleavage::AttemptBreastActionOnTiny("Cleavage_DOT_Start_Tiny");
+        }
     }
 }
 
 namespace GTS
-{
+{   
+    void Animation_Cleavage::AttemptBreastActionOnTiny(const std::string& pass_anim, Actor* giant) {
+        if (giant) {
+            if (IsInCleavageState(giant)) {
+                auto tiny = Grab::GetHeldActor(giant);
+                if (tiny) {
+                    AnimationManager::StartAnim(pass_anim, tiny);
+                }
+            }
+        }
+    }
     void Animation_Cleavage::LaunchCooldownFor(Actor* giant, CooldownSource Source) {
         std::string name = std::format("CDWatcher_{}_{}", giant->formID, Time::WorldTimeElapsed());
         ActorHandle gianthandle = giant->CreateRefHandle();

@@ -1,6 +1,7 @@
 #include "UI/Categories/AI.hpp"
 #include "UI/DearImGui/imgui.h"
 #include "UI/ImGui/ImUtil.hpp"
+#include "UI/Windows/GTSInfo.hpp"
 
 namespace GTS {
 
@@ -197,6 +198,16 @@ namespace GTS {
         //---- HUGS
 
         ImUtil_Unique{
+            
+            std::string HugsInfo = fmt::format(
+                fmt::runtime("Hugs have following conditions to occur:\n"
+                "- Size Difference must be greater than x{:.2f}\n"
+                "- Size Difference must be less than x2.5\n\n"
+                "AI Hugs can happen only if these two conditions are met.\n"
+                "Maximal Size Difference can be increased by Hug perks."
+                ),
+                Action_Hug
+            );
 
             const char* T0 = "Enable hug actions.";
             const char* T1 = "Set the chance for a hug action to be started.";
@@ -206,10 +217,15 @@ namespace GTS {
             const char* T6 = "Set the chance to perform a hug heal action.";
             const char* T7 = "Set the chance to perform a hug crush action.";
             const char* T8 = "Set the chance to perform a hug shrink action.";
-            const char* T9 = "Set the chance to perform a hug shrink action on a follower/teammate";
+            const char* T9 = "Set the chance to perform a hug shrink action on a follower/teammate/player";
             const char* T10 = "Should the hugged actor be let go if they can't be shrunk any further.\nApplies only to Followers/Player. Others will be always let go.";
-
+            const char* T11 = HugsInfo.c_str();
+            
             if (ImGui::CollapsingHeader("Hugs")) {
+                ImGui::TextColored(ImUtil::ColorSubscript,"Why hugs aren't starting (?)");
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip(T11);
+                }
 
                 ImUtil::CheckBox("Enable Hugs", &Settings.Hugs.bEnableAction, T0);
                 {
