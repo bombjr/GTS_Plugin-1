@@ -1,5 +1,7 @@
 #include "Managers/Register.hpp"
 
+#include "SpectatorManager.hpp"
+
 #include "AI/AIManager.hpp"
 
 #include "Managers/Animation/AnimationManager.hpp"
@@ -8,6 +10,7 @@
 
 #include "Managers/Gamemode/GameModeManager.hpp"
 #include "Managers/Animation/Controllers/ThighSandwichController.hpp"
+#include "Managers/Animation/Controllers/VoreController.hpp"
 #include "Managers/ShrinkToNothingManager.hpp"
 #include "Managers/Perks/PerkHandler.hpp"
 #include "Managers/Damage/CollisionDamage.hpp"
@@ -29,7 +32,7 @@
 #include "Managers/Camera.hpp"
 #include "Managers/Tremor.hpp"
 #include "Managers/Rumble.hpp"
-#include "Managers/Animation/Controllers/VoreController.hpp"
+
 
 #include "Utils/DynamicScale.hpp"
 #include "Magic/Magic.hpp"
@@ -65,7 +68,7 @@ namespace GTS {
 		EventDispatcher::AddListener(&AnimationBoobCrush::GetSingleton());
 		EventDispatcher::AddListener(&AIManager::GetSingleton()); //AI controller for GTS-actions
 		EventDispatcher::AddListener(&Headtracking::GetSingleton()); // Headtracking fixes
-		//EventDispatcher::AddListener(&ColliderManager::GetSingleton()); // Manage FootIK
+		EventDispatcher::AddListener(&SpectatorManager::GetSingleton()); // Manage Camera Targets
 		EventDispatcher::AddListener(&ContactManager::GetSingleton()); // Manages collisions
 		EventDispatcher::AddListener(&DynamicScale::GetSingleton()); // Handles room heights
 		log::info("Managers Registered");

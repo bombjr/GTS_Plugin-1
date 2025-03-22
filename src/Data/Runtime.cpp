@@ -70,7 +70,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().sounds.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("sond", tag)) {
 				//PrintMessageBox("Sound: {} not found", tag);
@@ -217,7 +217,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().spellEffects.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			if (!Runtime::Logged("mgef", tag)) {
 				//PrintMessageBox("MagicEffect: {} not found", tag);
 				log::warn("MagicEffect: {} not found", tag);
@@ -250,7 +250,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().spells.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			if (!Runtime::Logged("spel", tag)) {
 				//PrintMessageBox("Spell: {} not found", tag);
 				log::warn("Spell: {} not found", tag);
@@ -304,7 +304,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().perks.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("perk", tag)) {
 				//PrintMessageBox("Perk: {} not found", tag);
@@ -351,7 +351,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().explosions.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("expl", tag)) {
 				//("Explosion: {} not found", tag);
@@ -409,7 +409,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().globals.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("glob", tag)) {
 				//PrintMessageBox("Global: {} not found", tag);
@@ -493,7 +493,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().quests.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("qust", tag)) {
 				//PrintMessageBox("Quest: {} not found", tag);
@@ -523,8 +523,8 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().factions.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
-			//PrintMessageBox("Quest: {} not found", tag);
+		catch (const std::out_of_range&) {
+			//PrintMessageBox("Faction: {} not found", tag);
 			data = nullptr;
 		}
 		return data;
@@ -551,7 +551,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().impacts.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("impc", tag)) {
 				//PrintMessageBox("ImpactEffect: {} not found", tag);
@@ -574,7 +574,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().races.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("impc", tag)) {
 				//PrintMessageBox("Race: {} not found", tag);
@@ -599,7 +599,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().keywords.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("kywd", tag)) {
 				log::warn("Keyword: {} not found", tag);
@@ -623,7 +623,7 @@ namespace GTS {
 		try {
 			data = Runtime::GetSingleton().levelitems.at(std::string(tag)).data;
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::out_of_range&) {
 			data = nullptr;
 			if (!Runtime::Logged("cont", tag)) {
 				//PrintMessageBox("Item: {} not found", tag);

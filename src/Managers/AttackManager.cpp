@@ -6,11 +6,6 @@ using namespace GTS;
 
 namespace {
 
-	bool IsHumanoid(Actor* giant) {
-		const bool Human = Runtime::HasKeyword(giant, "ActorTypeNPC");
-		return Human;
-	}
-
 	void DisableAttacks_Melee(Actor* a_Giant, float a_SizeDiff, float a_Threshold, bool a_Reset) {
 
 		if (a_Reset) {

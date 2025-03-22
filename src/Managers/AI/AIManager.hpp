@@ -18,10 +18,10 @@ namespace GTS {
 		Timer BeginNewActionTimer = Timer(3.0f);
 
 		void Update() override;
-		void TryStartAction(Actor* a_Performer) const;
+		bool TryStartAction(Actor* a_Performer) const;
 
 		SettingsAI& AISettings = Config::GetAI();
-
+		SettingsAdvanced& AdvancedSettings = Config::GetAdvanced();
 	};
 }
 

@@ -37,6 +37,24 @@ namespace GTS {
 			// Same as `GetHeldObj` but with a conversion to actor if possible
 			static Actor* GetHuggiesActor(Actor* giant);
 
+			[[nodiscard]] inline bool IsTinyInDataList(Actor* aTiny) {
+				std::unique_lock lock(_lock);
+				if (!aTiny) {
+					return false;
+				}
+
+				for (auto& val : data | views::values) {
+					if (val.tiny) {
+						if (val.tiny->formID == aTiny->formID) {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+
+			private:
+			mutable std::mutex _lock;
 			std::unordered_map<Actor*, HugShrinkData> data;
 	};
 }

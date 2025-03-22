@@ -15,7 +15,7 @@ namespace {
 		Transform,
 	};
 
-	constexpr CameraDataMode currentMode = CameraDataMode::Transform;
+	constexpr CameraDataMode currentMode = CameraDataMode::State;
 
 	const BoneTarget GetBoneTarget_Anim(CameraTracking Camera_Anim) {
 
@@ -348,8 +348,8 @@ namespace GTS {
 		auto niCamera = GetNiCamera();
 		if (niCamera) {
 			niCamera->world.translate = camLoc;
-			update_node(niCamera);
 			UpdateWorld2ScreetMat(niCamera);
+			update_node(niCamera);
 		}
 	}
 
@@ -624,18 +624,27 @@ namespace GTS {
 					NiPoint3 WorldShifted = CameraWorldTransform * CameraAdjustments * NiPoint3();
 					NiNode* CameraRootParent = CameraRoot->parent;
 					NiTransform InvertedRootTransform = CameraRootParent->world.Invert();
-					NiPoint3 LocalSpacePosition = InvertedRootTransform * WorldShifted;
+
+					const NiPoint3 LocalSpacePosition = InvertedRootTransform * WorldShifted;
+					NiPoint3 RayCastHitPosition = LocalSpacePosition;
 
 					// Collision handling
-					NiPoint3 rayStart = GetAggregateBoneTarget(CameraTargetActor);
-					if (rayStart != NiPoint3()) {
-						LocalSpacePosition = ComputeRaycast(rayStart, LocalSpacePosition);
+					NiPoint3 RayStart = GetAggregateBoneTarget(CameraTargetActor);
+					if (RayStart != NiPoint3()) {
+						RayCastHitPosition = ComputeRaycast(RayStart, LocalSpacePosition);
+
+						//If less than frustrum it means the camera is stuck to the raycast origin bone.
+						//"Revert" the colision position if this happens. Effectively disabling camera colision in this case.
+						if (abs(RayCastHitPosition.GetDistance(RayStart)) <= GetFrustrumNearDistance() + std::numeric_limits<float>::epsilon()) {
+							RayCastHitPosition = LocalSpacePosition;
+						}
+
 					}
 
 					// Apply final transformations
 					ComputeFrustrumNearDistance(a_ActorScale);
-					UpdatePlayerCamera(LocalSpacePosition);
-					UpdateNiCamera(LocalSpacePosition);
+					UpdatePlayerCamera(RayCastHitPosition);
+					UpdateNiCamera(RayCastHitPosition);
 
 				}
 			}

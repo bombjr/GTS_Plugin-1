@@ -19,6 +19,11 @@ namespace GTS {
 		TempActorData* result;
 
 		try {
+
+			if (!this->TempActorDataMap.contains(ActorKey)) {
+				return nullptr;
+			}
+
 			result = &this->TempActorDataMap.at(ActorKey);
 		}
 		catch (const std::exception&) {
@@ -29,34 +34,35 @@ namespace GTS {
 	}
 
 	TempActorData* Transient::GetActorData(Actor* actor) {
-
 		std::unique_lock lock(this->TransientLock);
 
 		if (!actor) {
 			return nullptr;
 		}
-
 		auto ActorKey = actor->formID;
 
-		try {
-			return &this->TempActorDataMap.at(ActorKey);
-		}
-		catch (const std::out_of_range&) {
-
-			// Try to add
-			if (!actor) {
-				return nullptr;
-			}
+		auto tryAdd = [&]() -> TempActorData* {
+			// (Re)check any conditions before adding.
 			if (get_scale(actor) < 0.0f) {
 				return nullptr;
 			}
-
-			TempActorData NewTempActorData = TempActorData(actor);
-			auto [iter, inserted] = this->TempActorDataMap.try_emplace(ActorKey, NewTempActorData);
+			// Create and emplace the new data.
+			auto [iter, inserted] = this->TempActorDataMap.try_emplace(ActorKey, TempActorData(actor));
 			return &(iter->second);
+		};
+
+		try {
+			if (!this->TempActorDataMap.contains(ActorKey)) {
+				return tryAdd();
+			}
+			return &this->TempActorDataMap.at(ActorKey);
 		}
-		catch (const exception& e) {
-			logger::warn("Transient Exeption GetActorData {}", e.what());
+		catch (const std::out_of_range&) {
+			// If out_of_range is thrown, try to add the data.
+			return tryAdd();
+		}
+		catch (const std::exception& e) {
+			logger::warn("Transient Exception GetActorData {}", e.what());
 			return nullptr;
 		}
 	}
@@ -78,32 +84,30 @@ namespace GTS {
 
 	void Transient::ActorLoaded(RE::Actor* actor) {
 		std::unique_lock lock(this->TransientLock);
-
 		if (!actor) {
 			return;
 		}
-		try {
-			//Try accessing the element if it doesnt exist. Create it.
-			const FormID ActorID = actor->formID;
-			std::ignore = this->TempActorDataMap.at(ActorID);
-		}
-		catch (const std::out_of_range&) {
+		const FormID ActorID = actor->formID;
 
-			// Try to add
-			if (!actor) {
-				return;
-			}
-
+		auto tryAdd = [&] {
 			if (get_scale(actor) < 0.0f) {
 				return;
 			}
+			this->TempActorDataMap.try_emplace(ActorID, TempActorData(actor));
+		};
 
-			const FormID ActorKey = actor->formID;
-			TempActorData NewTempActorData = TempActorData(actor);
-			this->TempActorDataMap.try_emplace(ActorKey, NewTempActorData);
+		try {
+			// If the actor data is not already in the map, try to add it.
+			if (!this->TempActorDataMap.contains(ActorID)) {
+				tryAdd();
+			}
 		}
-		catch (const exception& e) {
-			logger::warn("Transient Exeption ActorLoaded {}",e.what());
+		catch (const std::out_of_range&) {
+			// If an out_of_range exception occurs, try adding again.
+			tryAdd();
+		}
+		catch (const std::exception& e) {
+			logger::warn("Transient Exception ActorLoaded {}", e.what());
 		}
 	}
 

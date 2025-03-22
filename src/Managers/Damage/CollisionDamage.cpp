@@ -225,6 +225,7 @@ namespace GTS {
 										TinyCalamity_SeekForShrink(actor, otherActor, damage, maxFootDistance * Calamity, Cause, Right, ApplyCooldown, ignore_rotation);
 									}
 								}
+
 								if (nodeCollisions > 0) {
 									if (ApplyCooldown) { // Needed to fix Thigh Crush stuff
 										auto& sizemanager = SizeManager::GetSingleton();
@@ -234,7 +235,8 @@ namespace GTS {
 											CollisionDamage.DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, DoDamage);
 											ApplyActionCooldown(otherActor, CooldownSource::Damage_Thigh);
 										}
-									} else {
+									}
+									else {
 										Utils_PushCheck(actor, otherActor, Get_Bone_Movement_Speed(actor, Cause)); // pass original un-altered force
 										CollisionDamage.DoSizeDamage(actor, otherActor, damage, bbmult, crush_threshold, random, Cause, DoDamage);
 									}
@@ -247,7 +249,7 @@ namespace GTS {
 		}
 	}
 
-	void CollisionDamage::DoSizeDamage(Actor* giant, Actor* tiny, float damage, float bbmult, float crush_threshold, int random, DamageSource Cause, bool apply_damage) const { // Applies damage and crushing
+	void CollisionDamage::DoSizeDamage(Actor* giant, Actor* tiny, float damage, float bbmult, float crush_threshold, int random, DamageSource Cause, bool apply_damage) { // Applies damage and crushing
 		auto profiler = Profilers::Profile("CollisionDamage: DoSizeDamage");
 		if (!giant) {
 			return;
@@ -280,7 +282,7 @@ namespace GTS {
 				float damagebonus = HighHeels_PerkDamage(giant, Cause); // 15% bonus HH damage if we have perk
 
 				float vulnerability = 1.0f + sizemanager.GetSizeVulnerability(tiny); // Get size damage debuff from enemy
-				float normaldamage = std::clamp(sizemanager.GetSizeAttribute(giant, SizeAttribute::Normal) * 0.30f, 0.30f, 1000000.0f);
+				float normaldamage = std::clamp(SizeManager::GetSizeAttribute(giant, SizeAttribute::Normal) * 0.30f, 0.30f, 1000000.0f);
 
 				float highheelsdamage = 1.0f;
 				if (ApplyHighHeelBonus(giant, Cause)) {
@@ -291,7 +293,7 @@ namespace GTS {
 				float weightdamage = 1.0f + (giant->GetWeight()*0.01f);
 
 				if (giant->AsActorState()->IsSprinting()) {
-					sprintdamage = 1.5f * sizemanager.GetSizeAttribute(giant, SizeAttribute::Sprint);
+					sprintdamage = 1.5f * SizeManager::GetSizeAttribute(giant, SizeAttribute::Sprint);
 					damage *= 1.5f;
 				}
 
@@ -316,19 +318,19 @@ namespace GTS {
 				if (tiny->formID == 0x14 && GetAV(tiny, ActorValue::kStamina) > 2.0f) {
 					DamageAV(tiny, ActorValue::kStamina, damage_result * 2.0f);
 					damage_result -= GetAV(tiny, ActorValue::kStamina); // Reduce damage by stamina amount
-					if (damage_result < 0) {
-						damage_result = 0; // just to be safe and to not restore attributes
-					}
+
+					damage_result = std::max<float>(damage_result, 0);
+
 					if (damage_result < GetAV(tiny, ActorValue::kStamina)) {
 						return; // Fully protect against size-related damage
 					}
 				}
 				if (apply_damage) {
-					SizeHitEffects::GetSingleton().PerformInjuryDebuff(giant, tiny, damage_result * bbmult, random);
+					SizeHitEffects::PerformInjuryDebuff(giant, tiny, damage_result * bbmult, random);
 
 					ModVulnerability(giant, tiny, damage_result);
 					InflictSizeDamage(giant, tiny, damage_result);
-					this->CrushCheck(giant, tiny, size_difference, crush_threshold, Cause);
+					CrushCheck(giant, tiny, size_difference, crush_threshold, Cause);
 				}
 			}
 		}
@@ -367,7 +369,7 @@ namespace GTS {
 				SetBetweenBreasts(tiny, false);
 				SetBeingHeld(tiny, false);
 
-				CrushManager::GetSingleton().Crush(giant, tiny);
+				CrushManager::Crush(giant, tiny);
 			}
 		}
 	}

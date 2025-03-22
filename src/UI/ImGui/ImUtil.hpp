@@ -209,9 +209,10 @@ namespace ImUtil {
         }
     }
 
-
-
     [[nodiscard]] bool ContainsString(const std::string& a1, const std::string& a2);
+
+    void TextShadow(const char* fmt, ...);
+    void TextShadowImpl(const char* text, const char* textend, ImU32 text_color = IM_COL32(255, 255, 255, 255), ImU32 shadow_color = IM_COL32(0, 0, 0, 192 * ImGui::GetStyle().Alpha), float shadow_offset = 2.0f);
 
 }
 

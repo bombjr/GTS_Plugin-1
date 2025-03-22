@@ -113,7 +113,7 @@ namespace GTS {
 	            constexpr float Min = 0.0;
 
                 const bool IsMassBased = Settings.sSizeMode == "kMassBased";
-                const float MassLimit = get_natural_scale(PlayerCharacter::GetSingleton()) + Persistent::GetSingleton().GTSMassBasedSizeLimit.value;
+                const float MassLimit = get_natural_scale(PlayerCharacter::GetSingleton()) + Persistent::GetSingleton().GlobalMassBasedSizeLimit.value;
 
                 {   //Player Size
                     float* Scale = &Settings.fMaxPlayerSizeOverride;
@@ -134,7 +134,7 @@ namespace GTS {
                     }
                     else if (ShouldBeAuto) {
                       
-                        const float SkillBasedLimit = Persistent::GetSingleton().GTSGlobalSizeLimit.value;
+                        const float SkillBasedLimit = Persistent::GetSingleton().GlobalSizeLimit.value;
 
                         if (IsMassBased) {
                             _Frmt = fmt::format("Mass Based [{:.2f}x] Max [{:.2f}x]", MassLimit, SkillBasedLimit);
@@ -182,7 +182,7 @@ namespace GTS {
                     }
                     else if (ShouldBeAuto) {
 
-                        const float PlayersLimit = Persistent::GetSingleton().GTSGlobalSizeLimit.value;
+                        const float PlayersLimit = Persistent::GetSingleton().GlobalSizeLimit.value;
 
                         if (PlayersLimit >= 250.01f) {
                             _Frmt = fmt::format("Based on Player [Infinite]", PlayersLimit);
@@ -223,7 +223,7 @@ namespace GTS {
                     }
                     else if (ShouldBeAuto) {
 
-                        const float NPCsLimit = Persistent::GetSingleton().GTSGlobalSizeLimit.value;
+                        const float NPCsLimit = Persistent::GetSingleton().GlobalSizeLimit.value;
 
                         if (NPCsLimit >= 250.01f) {
                             _Frmt = fmt::format("Based on Player [Infinite]", NPCsLimit);

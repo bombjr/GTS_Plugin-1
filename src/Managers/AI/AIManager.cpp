@@ -6,11 +6,14 @@
 
 #include "Managers/AttackManager.hpp"
 #include "Managers/AI/Vore/VoreAI.hpp"
+#include "Managers/AI/Vore/DevourmentAI.hpp"
 #include "Managers/AI/Thigh/ThighCrushAI.hpp"
 #include "Managers/AI/ButtCrush/ButtCrushAI.hpp"
 #include "Managers/AI/Thigh/ThighSandwichAI.hpp"
 #include "Managers/AI/StompKick/StompKickSwipeAI.hpp"
 #include "Managers/Animation/Grab.hpp"
+#include "Managers/Animation/HugShrink.hpp"
+#include "Managers/Animation/Controllers/VoreController.hpp"
 
 using namespace GTS;
 
@@ -18,6 +21,7 @@ namespace {
 
 	enum class ActionType : uint8_t {
 		kVore,
+		kDevourment,
 		kStomps,
 		kKicks,
 		kThighS,
@@ -86,7 +90,6 @@ namespace {
 		if (IsFemale(a_Actor, true)) {
 
 			const bool HasHP = GetAV(a_Actor, ActorValue::kHealth) > 0;
-			const bool IsVisible = a_Actor->GetAlpha() > 0.0f; //For devourment
 			const bool IsInNormalState = a_Actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kNormal;
 			const bool IsHoldingSomeone = Grab::GetHeldActor(a_Actor) != nullptr || IsInCleavageState(a_Actor);
 			const bool IsInCombat = (a_Actor->IsInCombat()) || (a_Actor->GetActorRuntimeData().currentCombatTarget.get().get() != nullptr);
@@ -94,7 +97,7 @@ namespace {
 			const bool IsPlayer = a_Actor->formID == 0x14 && Config::GetAdvanced().bPlayerAI;
 
 			//Is In combat or do we allow ai outside of combat?
-			if ((IsInCombat || !a_CombatOnly) && !IsGtsBusy(a_Actor) && HasHP && IsVisible && IsInNormalState && !IsHoldingSomeone) {
+			if ((IsInCombat || !a_CombatOnly) && !IsGtsBusy(a_Actor) && HasHP && IsVisible(a_Actor) && IsInNormalState && !IsHoldingSomeone) {
 
 				//Follower Check
 				if (IsTeammate(a_Actor) || IsPlayer) {
@@ -129,13 +132,23 @@ namespace {
 			return false;
 		}
 
-		if (!IsGtsBusy(a_Prey) && a_Prey->GetAlpha() > 0.0f) {
+
+
+		if (!IsGtsBusy(a_Prey) && IsVisible(a_Prey)) {
 
 			//If not a teammate and they are essential but we allow essentials
 			if (a_Prey->formID == 0x14) {
 				if (a_AllowPlayer) {
 					return true;
 				}
+				return false;
+			}
+
+			if (VoreController::GetSingleton().IsTinyInDataList(a_Prey)) {
+				return false;
+			}
+
+			if (HugShrink::GetSingleton().IsTinyInDataList(a_Prey)) {
 				return false;
 			}
 
@@ -266,19 +279,22 @@ namespace GTS {
 				//Actor* Performer = PerformerList.at(idx);
 
 				for (const auto& Performer : PerformerList) {
-					TryStartAction(Performer);
+					if (TryStartAction(Performer)) {
+						return;
+					}
 				}
 			}
 		}
 	}
 
 
-	void AIManager::TryStartAction(Actor* a_Performer) const {
+	bool AIManager::TryStartAction(Actor* a_Performer) const {
 
-		if (!a_Performer) return;
+		if (!a_Performer) return false;
 
 		//Actor* container from each filter result.
 		std::vector<Actor*> CanVore = {};
+		std::vector<Actor*> CanDVVore = {};
 		std::vector<Actor*> CanStompKickSwipe = {};
 		std::vector<Actor*> CanThighSandwich = {};
 		std::vector<Actor*> CanThighCrush = {};
@@ -291,7 +307,7 @@ namespace GTS {
 
 		const auto& PreyList = FindValidPrey(a_Performer);
 		if (PreyList.empty()) {
-			return;
+			return false;
 		}
 
 		//----------- VORE
@@ -300,6 +316,15 @@ namespace GTS {
 			CanVore = VoreAI_FilterList(a_Performer, PreyList);
 			if (!CanVore.empty()) {
 				StartableActions.emplace(ActionType::kVore, static_cast<int>(AISettings.Vore.fProbability));
+			}
+		}
+
+		//----------- DEVOURMENT "AI"
+
+		if (AdvancedSettings.bEnableExperimentalDevourmentAI) {
+			CanDVVore = DevourmentAI_FilterList(a_Performer, PreyList);
+			if (!CanDVVore.empty()) {
+				StartableActions.emplace(ActionType::kDevourment, static_cast<int>(AdvancedSettings.fExperimentalDevourmentAIProb));
 			}
 		}
 
@@ -406,7 +431,16 @@ namespace GTS {
 					VoreAI_StartVore(a_Performer, CanVore);
 				}
 
-				return;
+				return true;
+			}
+			case ActionType::kDevourment:{
+
+				logger::trace("AI Starting kDevourment Action");
+
+				if (!CanDVVore.empty()) {
+					DevourmentAI_Start(a_Performer, CanDVVore);
+				}
+				return true;
 			}
 			case ActionType::kStomps: {
 
@@ -416,7 +450,7 @@ namespace GTS {
 					StompAI_Start(a_Performer, CanStompKickSwipe.front());
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kKicks: {
 
@@ -426,7 +460,7 @@ namespace GTS {
 					KickSwipeAI_Start(a_Performer);
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kThighS: {
 
@@ -436,7 +470,7 @@ namespace GTS {
 					ThighSandwichAI_Start(a_Performer, CanThighSandwich);
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kThighC: {
 
@@ -446,7 +480,7 @@ namespace GTS {
 					ThighCrushAI_Start(a_Performer);
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kButt: {
 
@@ -456,7 +490,7 @@ namespace GTS {
 					ButtCrushAI_Start(a_Performer, CanButtCrush.front());
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kHug: {
 
@@ -466,7 +500,7 @@ namespace GTS {
 					HugAI_Start(a_Performer, CanHug.front());
 				}
 
-				return;
+				return true;
 			}
 			case ActionType::kGrab: {
 
@@ -476,9 +510,11 @@ namespace GTS {
 					GrabAI_Start(a_Performer, CanGrab.front());
 				}
 
-				return;
+				return true;
 			}
 			default:{}
 		}
+
+		return false;
 	}
 }

@@ -81,6 +81,10 @@ namespace GTS {
 		auto profiler = Profilers::Profile("HHMgr: ApplyHH");
 		if (actor) {
 
+			if (!IsHumanoid(actor)) {
+				return;
+			}
+
 			if (actor->Is3DLoaded()) {
 
 				if (Config::GetGeneral().bHighheelsFurniture == false && actor->AsActorState()->GetSitSleepState() == SIT_SLEEP_STATE::kIsSitting) {
@@ -97,17 +101,14 @@ namespace GTS {
 					speedup = 3.0f;
 				}
 
-				// Should HH be disabled?
-				bool disableHH = DisableHighHeels(actor);
+				hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
 
-				if (disableHH) {
+				if (DisableHighHeels(actor)) {
 					hhData.multiplier.target = 0.0f;
-					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * AnimationManager::GetHighHeelSpeed(actor) * speedup);
-				} else {
+				}
+				else {
 					hhData.multiplier.target = 1.0f;
 					hhData.multiplier.halflife = 0.0f;
-					//AnimationManager::GetHighHeelSpeed(actor) throws an exception that returns 1 if we aren't wearing heels. So instead of spamming the exception handler just put a 1.0 in its place
-					hhData.multiplier.halflife = 1 / (AnimationManager::GetAnimSpeed(actor) * 1.0f * speedup);
 				}
 
 				if (!Config::GetGeneral().bEnableHighHeels) {

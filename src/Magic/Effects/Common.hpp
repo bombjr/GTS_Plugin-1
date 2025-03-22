@@ -218,20 +218,20 @@ namespace GTS {
 					.s = 0.54f,
 				};
 
-				const float MassBasedSize = Persistent::GetSingleton().GTSMassBasedSizeLimit.value;
+				const float MassBasedSize = Persistent::GetSingleton().GlobalMassBasedSizeLimit.value;
 
 				float modifier = soft_core(MassBasedSize, mod);
 				modifier = std::max(modifier, 0.10f);
 				value *= 10.0f * modifier;
 
-				auto GlobalSizeLimit = Persistent::GetSingleton().GTSGlobalSizeLimit.value;
+				auto GlobalSizeLimit = Persistent::GetSingleton().GlobalSizeLimit.value;
 
 				if (Runtime::HasPerk(caster, "GTSPerkColossalGrowth")) {
 					GlobalSizeLimit = 1000000.0f;
 				}
 
 				if (MassBasedSize + get_natural_scale(caster) < GlobalSizeLimit) {
-					Persistent::GetSingleton().GTSMassBasedSizeLimit.value = MassBasedSize + value * progressionMultiplier * TimeScale();
+					Persistent::GetSingleton().GlobalMassBasedSizeLimit.value = MassBasedSize + value * progressionMultiplier * TimeScale();
 				}
 			}
 		}

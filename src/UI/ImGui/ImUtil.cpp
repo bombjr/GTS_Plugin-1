@@ -167,12 +167,12 @@ namespace ImUtil {
         ImU32 gradientEndColor,
         bool flipGradientDirection) {
 
-        ImGuiWindow* window = ImGui::GetCurrentWindow();
+        const ImGuiWindow* window = ImGui::GetCurrentWindow();
 
         if (window->SkipItems) {
             return;
         }
-        ImGuiContext& g = *GImGui;
+        const ImGuiContext& g = *GImGui;
         const ImGuiStyle& style = g.Style;
 
         // Calculate progress bar dimensions
@@ -180,10 +180,10 @@ namespace ImUtil {
         const auto TextSize = ImGui::CalcTextSize(overlay);
         const auto ItemWidth = ImGui::CalcItemWidth();
         const float Width = ItemWidth > TextSize.x ? ItemWidth : TextSize.x;
-        ImVec2 ResultSize = { Width, TextSize.y };
-        ImVec2 size = ImGui::CalcItemSize(size_arg, ResultSize.x, ResultSize.y + style.FramePadding.y * 2.0f * heightmult);
-        ImVec2 possize = { pos.x + size.x, pos.y + size.y };
-        ImRect bb(pos, possize);
+        const ImVec2 ResultSize = { Width, TextSize.y };
+        const ImVec2 size = ImGui::CalcItemSize(size_arg, ResultSize.x, ResultSize.y + style.FramePadding.y * 2.0f * heightmult);
+        const ImVec2 possize = { pos.x + size.x, pos.y + size.y };
+        const ImRect bb(pos, possize);
 
         // Register the item and handle clipping
         ImGui::ItemSize(size, style.FramePadding.y);
@@ -192,10 +192,10 @@ namespace ImUtil {
         }
 
         // Get the colors
-        ImU32 border_color = ImGui::GetColorU32(ImGuiCol_Border);
-        ImU32 bg_color = ImGui::GetColorU32(ImGuiCol_FrameBg);
-        //ImU32 fill_color = ImGui::GetColorU32(ImGuiCol_PlotHistogram);
+        const ImU32 border_color = ImGui::GetColorU32(ImGuiCol_Border);
+        const ImU32 bg_color = ImGui::GetColorU32(ImGuiCol_FrameBg);
         ImU32 fill_color = gradientStartColor;
+
         float frame_rounding = useRounding ? style.FrameRounding : 0.0f;
 
         // Create inner rectangle accounting for border thickness
@@ -214,24 +214,31 @@ namespace ImUtil {
 
         // Render filled portion with adjusted size for border
         if (fraction > 0.0f) {
-            float fill_width = ImMax((inner_bb.Max.x - inner_bb.Min.x) * fraction, 2.0f);
+            const float fill_width = ImMax((inner_bb.Max.x - inner_bb.Min.x) * fraction, 2.0f);
             ImRect fill_bb(
                 inner_bb.Min,
                 ImVec2(inner_bb.Min.x + fill_width, inner_bb.Max.y)
             );
 
             if (useGradient) {
-                ImU32 startColor, endColor;
+            	ImU32 startColor, endColor;
 
                 if (useCustomGradientColors) {
-                    // Use the custom colors provided
-                    startColor = gradientStartColor;
-                    endColor = gradientEndColor;
+                    // Apply global alpha to custom colors
+                    ImVec4 startColorVec4 = ImGui::ColorConvertU32ToFloat4(gradientStartColor);
+                    ImVec4 endColorVec4 = ImGui::ColorConvertU32ToFloat4(gradientEndColor);
+
+                    // Modify the alpha component while preserving the original RGB
+                    startColorVec4.w *= style.Alpha;
+                    endColorVec4.w *= style.Alpha;
+
+                    // Convert back to ImU32
+                    startColor = ImGui::ColorConvertFloat4ToU32(startColorVec4);
+                    endColor = ImGui::ColorConvertFloat4ToU32(endColorVec4);
                 }
                 else {
-
                     ImVec4 baseColor = ImGui::ColorConvertU32ToFloat4(fill_color);
-
+                    baseColor.w *= style.Alpha;
 
                     ImVec4 darkColor = ImVec4(
                         ImClamp(baseColor.x * gradientDarkFactor, 0.0f, 1.0f),
@@ -247,14 +254,12 @@ namespace ImUtil {
                         baseColor.w
                     );
 
-
                     startColor = ImGui::ColorConvertFloat4ToU32(darkColor);
                     endColor = ImGui::ColorConvertFloat4ToU32(lightColor);
                 }
 
-
                 if (flipGradientDirection) {
-                    ImU32 temp = startColor;
+                    const ImU32 temp = startColor;
                     startColor = endColor;
                     endColor = temp;
                 }
@@ -304,6 +309,31 @@ namespace ImUtil {
         return result.begin() != a1_view.end();
     }
 
+
+    void TextShadow(const char* fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        const char* text, * text_end;
+        ImFormatStringToTempBufferV(&text, &text_end, fmt, args);
+        va_end(args);
+        TextShadowImpl(text, text_end);
+
+    }
+
+    void TextShadowImpl(const char* text, const char* textend, ImU32 text_color, ImU32 shadow_color, float shadow_offset) {
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        ImVec2 pos = ImGui::GetCursorScreenPos(); // Get the absolute screen position
+
+        // Draw shadow text
+        draw_list->AddText(ImVec2(pos.x + shadow_offset, pos.y + shadow_offset), shadow_color, text, textend);
+        // Draw main text
+        draw_list->AddText(pos, text_color, text, textend);
+
+        // Calculate the text size
+        ImVec2 textSize = ImGui::CalcTextSize(text, textend, false, 0.0f);
+        // Move the cursor by adding an invisible dummy widget of the same size as the text
+        ImGui::Dummy(textSize);
+    }
 
 	/*
 	 * This function assumes the existence of an active Dear ImGui window

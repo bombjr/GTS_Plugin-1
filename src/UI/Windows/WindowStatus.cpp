@@ -5,111 +5,180 @@
 #include "UI/ImGui/ImFontManager.hpp"
 #include "UI/ImGui/ImWindowManager.hpp"
 
-namespace  {
-	bool AreEqual(float a, float b, float epsilon = std::numeric_limits<float>::epsilon()) {
+
+namespace {
+    bool AreEqual(float a, float b, float epsilon = std::numeric_limits<float>::epsilon()) {
         return (fabs(a - b) <= epsilon * std::max(fabs(a), fabs(b)));
     }
 }
 
 namespace GTS {
 
-    void WindowStatus::CheckFade(RE::Actor* a_actor) {
+    WindowStatus::LastShownData* WindowStatus::GetLastData(RE::Actor* a_actor) {
+        if (!a_actor) {
+            return nullptr;
+        }
 
+        try {
+            // If the actor isn't in our map, add a new entry
+            if (!LastData.contains(a_actor->formID)) {
+                LastData.insert_or_assign(a_actor->formID, LastShownData());
+            }
+
+            // Return a pointer to the data in the map
+            auto& data = LastData.at(a_actor->formID);
+            return &data;
+        }
+        catch (const std::exception&) {
+            return nullptr;
+        }
+    }
+
+    bool WindowStatus::CheckFade(RE::Actor* a_actor) {
         if (auto Window = dynamic_cast<WindowSettings*>(ImWindowManager::GetSingleton().GetWindowByName("Settings"))) {
             if (Window->Show) {
-                ShowImmediate();
-                return;
+                ShowImmediate(a_actor);
+                return true;
             }
         }
 
-        const auto& Settings = Config::GetUI().StatusWindow;
-
-        if (!Settings.bEnableFade) {
-            ShowImmediate();
-            return;
+        if (!sUI.bEnableFade) {
+            ShowImmediate(a_actor);
+            return true;
         }
 
         if (a_actor) {
+            const GTSInfoFeatures flags = static_cast<GTSInfoFeatures>(sUI.iFlags);
+            const auto Data = GetLastData(a_actor);
 
-            const GTSInfoFeatures flags = static_cast<GTSInfoFeatures>(Settings.iFlags);
+            if (!Data) return false;
 
             const float Scale = get_visual_scale(a_actor);
-            if (!AreEqual(LastData.Scale, Scale, Settings.fFadeDelta)) {
-                LastData.Scale = Scale;
+            if (!AreEqual(Data->Scale, Scale, sUI.fFadeDelta)) {
+                Data->Scale = Scale;
+                Data->LastWorldTime = Time::WorldTimeElapsed(); // Update this actor's time
                 Show();
-                return;
+                return true;
             }
 
             const float MaxScale = get_max_scale(a_actor);
-            if (!AreEqual(LastData.MaxScale, MaxScale, 0.1f) && hasFlag(flags, GTSInfoFeatures::kMaxSize)) {
-                LastData.MaxScale = MaxScale;
+            if (!AreEqual(Data->MaxScale, MaxScale, 0.1f) && hasFlag(flags, GTSInfoFeatures::kMaxSize)) {
+                Data->MaxScale = MaxScale;
+                Data->LastWorldTime = Time::WorldTimeElapsed(); // Update this actor's time
                 Show();
-                return;
+                return true;
             }
 
             const float Ench = Ench_Aspect_GetPower(a_actor);
-            if (!AreEqual(LastData.Aspect, Ench) && hasFlag(flags, GTSInfoFeatures::kAspect)) {
-                LastData.Aspect = Ench;
+            if (!AreEqual(Data->Aspect, Ench) && hasFlag(flags, GTSInfoFeatures::kAspect)) {
+                Data->Aspect = Ench;
+                Data->LastWorldTime = Time::WorldTimeElapsed(); // Update this actor's time
                 Show();
-                return;
+                return true;
             }
 
-            if (AreEqual(AutoFadeAlpha,0.0f)) {
-                return;
+            // Check if should start fade
+            if (AreEqual(AutoFadeAlpha, 0.0f)) {
+                return false;
             }
 
-            if (Time::WorldTimeElapsed() - LastData.LastWorldTime > Config::GetUI().StatusWindow.fFadeAfter) {
-                StartFade();
+            if (Time::WorldTimeElapsed() - Data->LastWorldTime > Config::GetUI().StatusWindow.fFadeAfter) {
+                StartFade(a_actor);
             }
+
+            return false;
         }
+
+        return false;
     }
 
-    void WindowStatus::ShowImmediate() {
-        LastData.LastWorldTime = Time::WorldTimeElapsed();
-        AutoFadeAlpha = 1.0;
+    void WindowStatus::ShowImmediate(RE::Actor* a_actor) {
+        const double currentTime = Time::WorldTimeElapsed();
+
+        if (a_actor) {
+            // Update the specific actor's time if provided
+            const auto Data = GetLastData(a_actor);
+            if (Data) {
+                Data->LastWorldTime = currentTime;
+            }
+        }
+        else {
+            // Update all entries in the map
+            for (auto& data : LastData | views::values) {
+                data.LastWorldTime = currentTime;
+            }
+        }
+
+        // Show the window immediately
+        AutoFadeAlpha = 1.0f;
     }
 
     void WindowStatus::Show() {
-
-        LastData.LastWorldTime = Time::WorldTimeElapsed();
+        // Update all entries in the map with current time
+        const double currentTime = Time::WorldTimeElapsed();
+        for (auto& data : LastData | views::values) {
+            data.LastWorldTime = currentTime;
+        }
 
         if (AreEqual(AutoFadeAlpha, 1.0f)) {
             return;
         }
 
-        //Disable Fade
-        TaskManager::RunFor(ShowTask, 0.2f, [this](auto& progressData) {
-            AutoFadeAlpha = progressData.progress;
-            return true;
-        });
+        // Cancel any existing fade task
+        if (!Busy) {
+            // Cancel any existing task
+            TaskManager::Cancel(FadeTask);
 
+            // Use the global task for showing
+            Busy = true;
+            TaskManager::RunFor(ShowTask, 0.2f, [this](auto& progressData) {
+                AutoFadeAlpha = static_cast<float>(progressData.progress);
+                if (progressData.progress >= 1.0f) {
+                    Busy = false;
+                }
+                return true;
+                });
+        }
     }
 
-    void WindowStatus::StartFade() {
-        constexpr float Duration = 0.6f;
+    void WindowStatus::StartFade(RE::Actor* a_actor) {
+        // Check if any actor should keep the window visible
+        bool anyVisible = false;
+        const double currentTime = Time::WorldTimeElapsed();
+        const float fadeThreshold = Config::GetUI().StatusWindow.fFadeAfter;
 
-        if (AreEqual(AutoFadeAlpha, 0.0f)) {
-            return;
+        for (auto& actorData : LastData | views::values) {
+            if (currentTime - actorData.LastWorldTime <= fadeThreshold) {
+                anyVisible = true;
+                break;
+            }
         }
 
-        TaskManager::RunFor(FadeTask, Duration, [this](auto& progressData) {
-        	AutoFadeAlpha = 1.0f - progressData.progress;
-			return true;
-        });
+        // Only start the fade if no actors need to be visible
+        if (!anyVisible && !AreEqual(AutoFadeAlpha, 0.0f) && !Busy) {
+            constexpr float Duration = 0.6f;
 
+            Busy = true;
+            TaskManager::RunFor(FadeTask, Duration, [this](auto& progressData) {
+                AutoFadeAlpha = 1.0f - static_cast<float>(progressData.progress);
+                if (progressData.progress >= 1.0f) {
+                    Busy = false;
+                }
+                return true;
+                });
+        }
     }
 
     WindowStatus::WindowStatus() {
-
         Title = "Player Info";
         Name = "Status";
         this->flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoFocusOnAppearing;
         AnchorPos = ImWindow::WindowAnchor::kTopRight;
         ConsumeInput = false;
+        Fading = false;
     }
 
     void WindowStatus::Draw() {
-
         flags = (sUI.bLock ? (flags | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove) : (flags & ~ImGuiWindowFlags_NoResize & ~ImGuiWindowFlags_NoMove));
 
         //Handle Fixed Position and Size
@@ -117,23 +186,29 @@ namespace GTS {
             //X,Y
             const ImVec2 Offset{ sUI.f2Offset[0], sUI.f2Offset[1] };
             ImGui::SetWindowPos(GetAnchorPos(StringToEnum<ImWindow::WindowAnchor>(sUI.sAnchor), Offset, true));
-
         }
 
         {
-
             if (auto Player = RE::PlayerCharacter::GetSingleton()) {
                 //Get Actor ptr.
                 ImGui::PushFont(ImFontManager::GetFont("widgetbody"));
+
+                for (const auto Teamate : FindTeammates()) {
+                    if (const auto ActorData = Persistent::GetSingleton().GetData(Teamate)) {
+                        if (ActorData->ShowSizebarInUI) {
+                            CheckFade(Teamate);
+                            DrawGTSSizeBar(Config::GetUI().StatusWindow.iFlags, Teamate, true);
+                        }
+                    }
+                }
+
                 CheckFade(Player);
-                DrawGTSInfo(static_cast<GTSInfoFeatures>(Config::GetUI().StatusWindow.iFlags), Player);
+                DrawGTSInfo(Config::GetUI().StatusWindow.iFlags, Player, true);
+
                 ImGui::PopFont();
             }
-
         }
 
         ImGui::SetWindowSize({ 0.0f,0.0f });
     }
 }
-
-

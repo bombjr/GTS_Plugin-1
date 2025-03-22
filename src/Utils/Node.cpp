@@ -1,29 +1,34 @@
 
 #include "Utils/Node.hpp"
 
-namespace GTS {
+using namespace RE;
 
-	constexpr int loop_threshold = 256;
+namespace {
 
 	void loop_message(NiAVObject* root, std::string_view message) {
 		auto owner_data = root->GetUserData();
 		if (owner_data) {
 			auto name = owner_data->GetDisplayFullName();
-			log::error("{} : Possible Endless Loop on {}", message, name);
+			logger::error("{} : Possible Endless Loop on {}", message, name);
 		}
 	}
 
 	void loop_message(TESObjectREFR* object, std::string_view message) {
 		if (object) {
-			log::error("{} : Possible Endless Loop on {}", message, object->GetDisplayFullName());
+			logger::error("{} : Possible Endless Loop on {}", message, object->GetDisplayFullName());
 		}
 	}
 
 	void loop_message(Actor* actor, std::string_view message) {
 		if (actor) {
-			log::error("{} : Possible Endless Loop on {}", message, actor->GetDisplayFullName());
+			logger::error("{} : Possible Endless Loop on {}", message, actor->GetDisplayFullName());
 		}
 	}
+}
+
+namespace GTS {
+
+	constexpr int loop_threshold = 256;
 
 	std::vector<NiAVObject*> GetAllNodes(Actor* actor) {
 		if (!actor->Is3DLoaded()) {
@@ -57,7 +62,8 @@ namespace GTS {
 					}
 					// Do smth
 					log::trace("Node {}", currentnode->name);
-				} else if (counter > loop_threshold) {
+				}
+				else if (counter > loop_threshold) {
 					queue.clear();
 				}
 			}
@@ -85,9 +91,8 @@ namespace GTS {
 		if (!actor->Is3DLoaded()) {
 			return;
 		}
-		auto model = actor->Get3D();
-		auto &name = model->name;
 
+		auto model = actor->Get3D();
 		std::deque<NiAVObject*> queue;
 		queue.push_back(model);
 
@@ -176,7 +181,9 @@ namespace GTS {
 					if (currentnode->name.c_str() == node_name) {
 						log::info("Found bone: {}", node_name);
 						return currentnode;
-					} else if (counter > loop_threshold) {
+					}
+
+					if (counter > loop_threshold) {
 						//log::info("Counter {} on {} is > than size {}", counter, actor->GetDisplayFullName(), queue.size());
 						queue.clear();
 						return nullptr;
@@ -307,10 +314,13 @@ namespace GTS {
 							//queue.push_front(child.get());
 						}
 					}
+
 					// Do smth
 					if (std::regex_match(currentnode->name.c_str(), the_regex)) {
 						return currentnode;
-					} else if (counter > loop_threshold) {
+					}
+
+					if (counter > loop_threshold) {
 						queue.clear();
 						return nullptr;
 					}
@@ -405,7 +415,7 @@ namespace GTS {
 									if (shape) {
 										log::trace("Shape found: {} for {}", typeid(*shape).name(), currentnode->name.c_str());
 										if (shape->type == hkpShapeType::kCapsule) {
-											const hkpCapsuleShape* orig_capsule = static_cast<const hkpCapsuleShape*>(shape);
+											const hkpCapsuleShape* orig_capsule = skyrim_cast<const hkpCapsuleShape*>(shape);
 											hkTransform identity;
 											identity.rotation.col0 = hkVector4(1.0f,0.0f,0.0f,0.0f);
 											identity.rotation.col1 = hkVector4(0.0f,1.0f,0.0f,0.0f);
@@ -479,7 +489,7 @@ namespace GTS {
 		if (model) {
 			auto extra_bbx = model->GetExtraData("BBX");
 			if (extra_bbx) {
-				BSBound* bbx = static_cast<BSBound*>(extra_bbx);
+				BSBound* bbx = skyrim_cast<BSBound*>(extra_bbx);
 				model->RemoveExtraData("BBX");
 				auto new_extra_bbx = NiExtraData::Create<BSBound>();
 				new_extra_bbx->name = bbx->name;
@@ -578,7 +588,7 @@ namespace GTS {
 		return result;
 	}
 
-	void VisitNodes(NiAVObject* root, std::function<bool(NiAVObject& a_obj)> a_visitor) {
+	void VisitNodes(NiAVObject* root, const std::function<bool(NiAVObject& a_obj)>& a_visitor) {
 		std::deque<NiAVObject*> queue;
 		queue.push_back(root);
 

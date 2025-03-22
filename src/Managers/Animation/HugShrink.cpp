@@ -611,6 +611,7 @@ namespace GTS {
 
 
 	void HugShrink::HugActor_Actor(Actor* giant, TESObjectREFR* tiny, float strength) {
+		std::unique_lock lock(GetSingleton()._lock);
 		HugShrink::GetSingleton().data.try_emplace(giant, tiny, strength);
 	}
 	void HugShrink::HugActor(Actor* giant, TESObjectREFR* tiny) {
@@ -620,14 +621,17 @@ namespace GTS {
 	}
 
 	void HugShrink::Reset() {
+		std::unique_lock lock(_lock);
 		this->data.clear();
 	}
 
 	void HugShrink::ResetActor(Actor* actor) {
+		std::unique_lock lock(_lock);
 		this->data.erase(actor);
 	}
 
 	void HugShrink::Release(Actor* giant) {
+		std::unique_lock lock(GetSingleton()._lock);
 		HugShrink::GetSingleton().data.erase(giant);
 	}
 
@@ -648,9 +652,16 @@ namespace GTS {
 
 	TESObjectREFR* HugShrink::GetHuggiesObj(Actor* giant) {
 		try {
+			std::unique_lock lock(GetSingleton()._lock);
 			auto& me = HugShrink::GetSingleton();
+
+			if (me.data.empty() || !me.data.contains(giant)) {
+				return nullptr;
+			}
+
 			return me.data.at(giant).tiny;
-		} catch (std::out_of_range e) {
+		}
+		catch (const std::out_of_range&) {
 			return nullptr;
 		}
 

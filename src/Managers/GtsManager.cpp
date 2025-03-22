@@ -63,25 +63,23 @@ namespace {
 
 	void Foot_PerformIdleEffects_Main(Actor* actor) {
 		if (actor) {
-			auto& CollisionDamage = CollisionDamage::GetSingleton();
 			if (GetBusyFoot(actor) != BusyFoot::RightFoot) { // These are needed to get rid of annoying pushing away during stomps
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+				CollisionDamage::DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
 			} 
 			if (GetBusyFoot(actor) != BusyFoot::LeftFoot) {
-				CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+				CollisionDamage::DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
 			}
 		}
 	}
 
 	void Foot_PerformIdle_Headtracking_Effects_Others(Actor* actor) {
 		if (actor && Config::GetGeneral().bAllActorSizeEffects) {
-			auto& CollisionDamage = CollisionDamage::GetSingleton();
 			if (actor->formID != 0x14 && !IsTeammate(actor)) {
 				if (GetBusyFoot(actor) != BusyFoot::RightFoot) {
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
+					CollisionDamage::DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleR, true, false, false, false);
 				}
 				if (GetBusyFoot(actor) != BusyFoot::LeftFoot) {
-					CollisionDamage.DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
+					CollisionDamage::DoFootCollision(actor, Damage_Default_Underfoot * TimeScale(), Radius_Default_Idle, 0, 0.0f, Minimum_Actor_Crush_Scale_Idle, DamageSource::FootIdleL, false, false, false, false);
 				}
 			}
 		}
@@ -395,7 +393,7 @@ namespace {
 	//Ported From Papyrus
 	float GetExpectedMaxSize(RE::Actor* a_Actor) {
 		const float LevelBonus = 1.0f + GetGtsSkillLevel(a_Actor) * 0.006f;
-		const float Essence = Persistent::GetSingleton().GTSExtraPotionSize.value;
+		const float Essence = Persistent::GetSingleton().PlayerExtraPotionSize.value;
 
 		const auto Quest = Runtime::GetQuest("GTSQuestProgression");
 		if (!Quest) {
@@ -430,7 +428,7 @@ namespace {
 	//Ported From Papyrus
 	void UpdateGlobalSizeLimit() {
 		if (const auto Player = PlayerCharacter::GetSingleton()) {
-			Persistent::GetSingleton().GTSGlobalSizeLimit.value = GetExpectedMaxSize(Player);
+			Persistent::GetSingleton().GlobalSizeLimit.value = GetExpectedMaxSize(Player);
 		}
 	}
 
