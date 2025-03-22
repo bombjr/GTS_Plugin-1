@@ -19,7 +19,7 @@ namespace {
 	}
 	bool DisableOnFurniture(Actor* actor) {
 		const auto ActorState = actor->AsActorState()->GetSitSleepState();
-		bool Config = Config::GetGeneral().bHighheelsFurniture;
+		bool DisableFurniture = Config::GetGeneral().bHighheelsFurniture;
 		bool Sleeping = false;
 		bool Sitting = false;
 		
@@ -34,7 +34,7 @@ namespace {
 			break;
 		}
 		
-		bool ShouldBeDisabled = (!Config && Sitting) || (Sleeping);
+		bool ShouldBeDisabled = (DisableFurniture && Sitting) || (Sleeping);
 		return ShouldBeDisabled;
 	}
 }
