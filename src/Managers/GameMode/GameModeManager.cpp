@@ -243,7 +243,7 @@ namespace {
 			if (a_CurrentTargetScale >= CurseTargetScale) {
 				return;
 			}
-			const float ScaleMult = (a_CurrentTargetScale - CurseTargetScale) + 1.0f;
+			const float ScaleMult = abs(a_CurrentTargetScale - CurseTargetScale + 1.0f);
 			float ModAmmount = (PowerMult * (RandomFloat(1, 4.5) * ScaleMult));
 			//const float GrowthPower = std::clamp(RandomFloatGauss(0.30f, 0.1f), 0.1f, 0.5f);
 
@@ -308,7 +308,7 @@ namespace {
 			return;
 		}
 
-		const float ScaleMult = (a_CurrentTargetScale - CurseTargetScale) + 1.0f;
+		const float ScaleMult = abs(a_CurrentTargetScale - CurseTargetScale + 1.0f);
 
 		if (IntervalTimer->ShouldRunFrame()) {
 
