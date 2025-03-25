@@ -68,6 +68,9 @@ namespace GTS {
 	// Fired when a actor animation event occurs
 	void EventListener::ActorAnimEvent(Actor* actor, const std::string_view& tag, const std::string_view& payload) {}
 
+	// Fired when actor uses furniture
+	void EventListener::FurnitureEvent(RE::Actor* user, TESObjectREFR* object, bool enter) {}
+
 	void EventDispatcher::AddListener(EventListener* listener) {
 		if (listener) {
 			EventDispatcher::GetSingleton().listeners.push_back(listener);
@@ -226,6 +229,21 @@ namespace GTS {
 		for (auto listener: EventDispatcher::GetSingleton().listeners) {
 			auto profiler = Profilers::Profile(listener->DebugName());
 			listener->ActorAnimEvent(actor, tag, payload);
+		}
+	}
+
+	void EventDispatcher::DoFurnitureEvent(const TESFurnitureEvent* a_event) {
+		Actor* actor = skyrim_cast<Actor*>(a_event->actor.get());
+		TESObjectREFR* object = a_event->targetFurniture.get();
+		log::info("Furniture Event Seen");
+		log::info("Actor: {}", static_cast<bool>(actor != nullptr));
+		log::info("Object: {}", static_cast<bool>(object != nullptr));
+		if (actor && object) {
+			log::info("Both are true");
+			for (auto listener: EventDispatcher::GetSingleton().listeners) {
+				auto profiler = Profilers::Profile(listener->DebugName());
+				listener->FurnitureEvent(actor, object, a_event->type == RE::TESFurnitureEvent::FurnitureEventType::kEnter);
+			}
 		}
 	}
 

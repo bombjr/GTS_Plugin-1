@@ -36,6 +36,7 @@ namespace GTS {
 		bool TemporaryDamageImmunity = false;
 		float ShrinkUntil = 0.0f;
 		float BreastSizeBuff = 0.0f;
+		float FurnitureScale = 1.0f;
 
 		int PerkLifeForceStacks = 0;
 		int CrushedTinies = 0;
@@ -63,6 +64,8 @@ namespace GTS {
 		bool EmotionPhonemeBusy = false;
 		bool ImmuneToBreastOneShot = true;
 		bool IsSlowGrowing = false;
+
+		bool UsingFurniture = false;
 
 		bool ReattachingTiny = false;
 

@@ -155,6 +155,12 @@ namespace {
 
 		const auto& Settings = Config::GetGeneral();
 		const bool DoRayCast = (actor->formID == 0x14) ? Settings.bDynamicSizePlayer : Settings.bDynamicSizeFollowers;
+		/*auto data = Transient::GetSingleton().GetActorData(actor);
+		if (data->UsingFurniture) { 
+			target_scale = data->FurnitureScale;
+			return;
+		}*/ 
+		// ^ To Arial: Uncommend it when you'll be experimenting with furniture, this part scales actors down
 
 		if (DoRayCast && !actor->IsDead() && target_scale > 1.025f) {
 
@@ -196,7 +202,7 @@ namespace {
 		const float max_scale = persi_actor_data->max_scale / natural_scale;
 
 		// Smooth target_scale towards max_scale if target_scale > max_scale
-		if (target_scale > max_scale) {
+		if (target_scale > max_scale && get_target_scale(actor) > get_natural_scale(actor, true)) {
 			constexpr float minimum_scale_delta = 0.000005f;
 
 			if (fabs(target_scale - max_scale) < minimum_scale_delta) {
@@ -210,7 +216,7 @@ namespace {
 					max_scale,
 					persi_actor_data->half_life*1.5f,
 					Time::WorldTimeDelta()
-					);
+				);
 			}
 		}
 		else {
@@ -551,6 +557,16 @@ void GtsManager::Update() {
 
 void GtsManager::DragonSoulAbsorption() {
 	DragonAbsorptionBonuses(); 
+}
+
+void GtsManager::FurnitureEvent(RE::Actor* activator, TESObjectREFR* object, bool enter) {
+	if (activator&& object) {
+		auto data = Transient::GetSingleton().GetActorData(activator);
+		if (data) {
+			data->FurnitureScale = object->GetScale() / get_natural_scale(activator, true);
+			data->UsingFurniture = enter;
+		}
+	}
 }
 
 void GtsManager::reapply(bool force) {

@@ -105,7 +105,10 @@ namespace GTS {
         }
 
         ImUtil_Unique{
-
+            const char* Thelp = "Maximal Size isn't always determined only by these sliders\n"
+                                "It is further affected by:\n"
+                                "- Game Scale (SetScale)\n"
+                                "- Natural Size";
         	bool HasPerk = Runtime::HasPerk(PlayerCharacter::GetSingleton(), CollossalGrowthPerk);
 			const std::string HeaderHelpText = Settings.bBalanceMode ? "Balance Mode Active" : "Requires \"Colossal Growth\" Perk";
             if (ImUtil::ConditionalHeader("Size Limits", HeaderHelpText, HasPerk && !Settings.bBalanceMode)) {
@@ -114,6 +117,11 @@ namespace GTS {
 
                 const bool IsMassBased = Settings.sSizeMode == "kMassBased";
                 const float MassLimit = get_natural_scale(PlayerCharacter::GetSingleton()) + Persistent::GetSingleton().GlobalMassBasedSizeLimit.value;
+
+                ImGui::TextColored(ImUtil::ColorSubscript,"How is Max Size Determined (?)");
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip(Thelp);
+                }
 
                 {   //Player Size
                     float* Scale = &Settings.fMaxPlayerSizeOverride;

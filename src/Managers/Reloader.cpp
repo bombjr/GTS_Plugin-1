@@ -13,6 +13,8 @@ namespace GTS {
 			event_sources->AddEventSink<TESEquipEvent>(this);
 			event_sources->AddEventSink<TESTrackedStatsEvent>(this);
 			event_sources->AddEventSink<TESResetEvent>(this);
+			//event_sources->AddEventSink<TESFurnitureEvent>(this); // Uncomment it to enable this event!
+			// Also don't forget to uncomment data->UsingFurniture inside PerformRoofRaycastAdjustments
 		}
 
 
@@ -93,6 +95,14 @@ namespace GTS {
 			EventDispatcher::DoMenuChange(a_event);
 		}
 
+		return RE::BSEventNotifyControl::kContinue;
+	}
+
+	BSEventNotifyControl ReloadManager::ProcessEvent(const TESFurnitureEvent* a_event, BSTEventSource<TESFurnitureEvent>* a_eventSource) 
+	{
+		if (a_event) {
+			EventDispatcher::DoFurnitureEvent(a_event);
+		}
 		return RE::BSEventNotifyControl::kContinue;
 	}
 

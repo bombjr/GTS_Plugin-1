@@ -331,6 +331,9 @@ namespace GTS {
 
 			// Fired when a actor animation event occurs
 			virtual void ActorAnimEvent(RE::Actor* actor, const std::string_view& tag, const std::string_view& payload);
+
+			// Fired when actor uses furniture
+			virtual void FurnitureEvent(RE::Actor* user, TESObjectREFR* object, bool enter);
 	};
 
 	class EventDispatcher {
@@ -363,6 +366,7 @@ namespace GTS {
 			static void DoRemovePerk(const RemovePerkEvent& evt);
 			static void DoMenuChange(const RE::MenuOpenCloseEvent* menu_event);
 			static void DoActorAnimEvent(RE::Actor* actor, const RE::BSFixedString& a_tag, const RE::BSFixedString& a_payload);
+			static void DoFurnitureEvent(const TESFurnitureEvent* a_event);
 		private:
 			[[nodiscard]] static EventDispatcher& GetSingleton();
 			std::vector<EventListener*> listeners;

@@ -139,7 +139,7 @@ namespace GTS {
 	                     "(eg. If an action requires ALT+E to activate and you're also holding W while trying to trigger it with this flag set, nothing will happen unless you stop pressing W.)";
 
 	    const char* T2 = "The action trigger type modifies the activation behavior for an action.\n\n"
-	                     "- Once: Trigger an action once uppon pressing its key combo.\n"
+	                     "- Once: Trigger an action once upon pressing its key combo.\n"
 	                     "- Release: The action will only trigger when you release its keys after pressing them.\n"
 	                     "- Continuous: As long as you are holding down the key combination the action event will be fired every game frame.";
 	    

@@ -1507,7 +1507,7 @@ namespace GTS {
 			return false;
 		}
 		bool dead = giant->IsDead();
-		bool everyone = Config::GetGeneral().bAllActorSizeEffects;
+		bool everyone = Config::GetGeneral().bAllActorSizeEffects || CountAsGiantess(giant);
 		if (!dead && everyone) {
 			return true;
 		} else {

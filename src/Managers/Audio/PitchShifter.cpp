@@ -19,7 +19,7 @@ namespace GTS {
 							auto Audio_1 = high->soundHandles[0];
 							auto Audio_2 = high->soundHandles[1];
 
-							float scale = get_visual_scale(tiny) / get_natural_scale(tiny, false) / game_getactorscale(tiny);
+							float scale = get_visual_scale(tiny);
 							float volume = std::clamp(scale + 0.5f, 0.35f, 1.0f);
 							float size = (scale * 0.20f) + 0.8f;
 							float frequence = (1.0f / size) / (1.0f * size);

@@ -391,6 +391,7 @@ CreatureKeyword = "Skyrim.esm|013795"
 DarkSouls = "Skyrim.esm|0C1E8F"
 SummonUndead = "Skyrim.esm|02482B"
 ActorTypeNPC = "Skyrim.esm|013794"
+EnforceGiantessKeyword = "GTS.esp|8C614E"
 
 # Container ----------------------------------------------------------------------------
 [CONT] 

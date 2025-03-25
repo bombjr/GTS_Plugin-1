@@ -38,7 +38,7 @@ namespace {
 		const int BalanceModeMult = BalancedMode ? 2 : 1;
 
 		float MultiplySlider = Config::GetGameplay().GamemodePlayer.fRandomGrowthDelay;
-		if (IsTeammate(actor)) {
+		if (IsTeammate(actor) || CountAsGiantess(actor)) {
 			MultiplySlider = Config::GetGameplay().GamemodeFollower.fRandomGrowthDelay;
 		}
 
@@ -96,7 +96,7 @@ namespace GTS {
 		if (GrowthTimer.ShouldRunFrame()) {
 			for (auto actor: find_actors()) {
 				if (actor && actor->Is3DLoaded() && IsVisible(actor)) {
-					if (actor->formID == 0x14 || IsTeammate(actor)) {
+					if (actor->formID == 0x14 || IsTeammate(actor) || CountAsGiantess(actor)) {
 						if (ShouldGrow(actor)) {
 							if (get_target_scale(actor) < get_max_scale(actor)) {
 								float scale = get_visual_scale(actor);

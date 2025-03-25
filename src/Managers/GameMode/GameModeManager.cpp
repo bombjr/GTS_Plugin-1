@@ -515,7 +515,7 @@ namespace GTS {
 		BaseShrinkRate *= Perk_GetSprintShrinkReduction(actor); // up to 20% reduction
 
 		if (DoQuestShrink) {
-			QuestShrink(actor, BaseShrinkRate, get_target_scale(actor), get_natural_scale(actor));
+			QuestShrink(actor, BaseShrinkRate, get_target_scale(actor), get_natural_scale(actor, true));
 			return;
 		}
 

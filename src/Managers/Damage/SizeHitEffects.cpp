@@ -37,11 +37,11 @@ namespace {
 	bool Hit_ShouldGrow(Actor* receiver) {
 		bool GrowthEnabled = Config::GetGameplay().bEnableGrowthOnHit;
 		bool HasPerk = Runtime::HasPerkTeam(receiver, "GTSPerkHitGrowth");
-		bool Teammate = IsTeammate(receiver) && IsFemale(receiver, true);
+		bool Teammate = (IsTeammate(receiver) || CountAsGiantess(receiver)) && IsFemale(receiver, true);
 		bool IsPlayer = receiver->formID == 0x14;
 		
 		if (IsPlayer || Teammate) {
-			if (GrowthEnabled && HasPerk){
+			if (IsHuman(receiver) && GrowthEnabled && HasPerk){
 				return true;
 			}
 		}

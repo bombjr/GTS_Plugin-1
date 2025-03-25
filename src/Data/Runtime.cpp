@@ -756,7 +756,7 @@ namespace GTS {
 			return true;
 		}
 
-		if (IsTeammate(actor)) {
+		if (IsTeammate(actor) || CountAsGiantess(actor)) {
 			auto player = PlayerCharacter::GetSingleton();
 			return Runtime::HasPerkOr(player, tag, default_value);
 		}

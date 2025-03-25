@@ -87,11 +87,40 @@ namespace GTS {
 		return Human;
 	}
 
+	bool CountAsGiantess(Actor* giant) {
+		const bool Giantess = Runtime::HasKeyword(giant, "EnforceGiantessKeyword");
+		return Giantess;
+	}
+
 	bool IsVisible(Actor* giant) {
 		if (giant) {
 			return giant->GetAlpha() > 0.1f;
 		}
 		return false;
+	}
+
+	bool HasHeadTrackingTarget(Actor* giant) {
+		auto process = giant->GetActorRuntimeData().currentProcess;
+		if (process) {
+			auto high = process->high;
+			if (high) {
+				if (process->GetHeadtrackTarget()) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool KnockedDown(Actor* giant) {
+		return static_cast<int>(giant->AsActorState()->GetKnockState()) != 0; // Another way of checking ragdoll just in case
+	}
+
+	bool IsinRagdollState(Actor* giant) {
+		bool ragdolled = IsRagdolled(giant) || KnockedDown(giant);
+		return ragdolled;
 	}
 
 
