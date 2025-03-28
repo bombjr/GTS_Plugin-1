@@ -25,7 +25,7 @@ namespace {
 	constexpr VolumeParams Footstep_24_Params = {.a = 16.0f, .k = 0.36f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/bh4fhfrji6
 	constexpr VolumeParams Footstep_48_Params = {.a = 36.0f, .k = 0.20f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/3q4qgkrker
 	constexpr VolumeParams Footstep_96_Params = {.a = 80.0f, .k = 0.66f, .n = 0.90f, .s = 0.1f};  // https://www.desmos.com/calculator/ufdbieymdi
-	constexpr VolumeParams Footstep_128_Params = {.a = 118.0f, .k = 0.19f, .n = 1.5f, .s = 0.1f}; // https://www.desmos.com/calculator/pvrge5dejz
+	constexpr VolumeParams Footstep_128_Params = {.a = 124.0f, .k = 1.0f, .n = 1.15f, .s = 1.0f}; //{.a = 118.0f, .k = 0.19f, .n = 1.5f, .s = 0.1f}; // https://www.desmos.com/calculator/pvrge5dejz
 	// Params end
 
 	constexpr float limitless = 0.0f;
@@ -37,7 +37,7 @@ namespace {
 	constexpr float limit_x24 = 24.0f;
 	constexpr float limit_x48 = 48.0f;
 	constexpr float limit_x96 = 96.0f;
-	constexpr float limit_mega = 106.0f;
+	constexpr float limit_mega = 128.0f;
 
 	std::string GetFootstepName(Actor* giant, bool right) {
 		std::string tag;
@@ -177,9 +177,9 @@ namespace GTS {
 		// ^ Stops at ~x44
 		BSSoundHandle Footstep_48 = get_sound(modifier, foot, scale, limit_x96, get_footstep_highheel(foot_kind, 48), Footstep_48_Params, Footstep_96_Params, "x48 Footstep", 8.0f, true);
 		// ^ Stops at ~x88
-		BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Params_Empty, "x96 Footstep", 12.0f, false);
-		// ^ Stops at X126 (when Mega will be added)
-		//BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "Mega Footstep", 18.0f, false);
+		BSSoundHandle Footstep_96 = get_sound(modifier, foot, scale, limit_mega, get_footstep_highheel(foot_kind, 96), Footstep_96_Params, Footstep_128_Params, "x96 Footstep", 12.0f, true);
+		// ^ Stops at X126
+		BSSoundHandle Footstep_128 = get_sound(modifier, foot, scale, limitless, get_footstep_highheel(foot_kind, 128), Footstep_128_Params, Params_Empty, "Mega Footstep", 18.0f, false);
 
 		if (xlFootstep.soundID != BSSoundHandle::kInvalidID) { 
 			// 271EF4: Sound\fx\GTS\Foot\Effects  (Stone sounds)
@@ -220,6 +220,9 @@ namespace GTS {
 		}
 		if (Footstep_96.soundID != BSSoundHandle::kInvalidID) { // x96 Custom audio
 			Footstep_96.Play();
+		}
+		if (Footstep_128.soundID != BSSoundHandle::kInvalidID) { // Mega sounds custom audio
+			Footstep_128.Play();
 		}
 	}
 

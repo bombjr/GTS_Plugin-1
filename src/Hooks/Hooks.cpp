@@ -1,5 +1,5 @@
 #include "Hooks/Hooks.hpp"
-
+#include "Hooks/Skyrim/HeadTracking_Graph.hpp"
 #include "Hooks/Skyrim/PreventAnimations.hpp"
 #include "Hooks/Skyrim/ActorEquipManager.hpp"
 #include "Hooks/Skyrim/hkbBehaviorGraph.hpp"
@@ -86,6 +86,7 @@ namespace Hooks
 		Hook_Stealth::Hook(SKSETrampoline);
 		Hook_Movement::Hook(SKSETrampoline);
 		Hook_HeadTracking::Hook(SKSETrampoline);
+		Hook_HeadTrackingGraph::Hook(SKSETrampoline);
 		Hook_PreventAnimations::Hook(SKSETrampoline);
 		Hook_RaceMenu::Hook(SKSETrampoline);
 		Hook_Console::Hook(SKSETrampoline);

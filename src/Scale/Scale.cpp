@@ -136,15 +136,7 @@ namespace GTS {
 	float get_natural_scale(Actor& actor, bool game_scale) {
 		auto actor_data = Transient::GetSingleton().GetData(&actor);
 		if (actor_data) {
-			//static Timer timer = Timer(5.0);
 		    float initialScale = GetInitialScale(&actor);
-			/*if (actor.formID == 0x14 && timer.ShouldRunFrame()) {
-				log::info("Initial Scale: {}", initialScale);
-				log::info("Other Scales: {}", actor_data->otherScales);
-				log::info("gamescale: {}", game_getactorscale(&actor));
-				log::info("npcparentnode: {}", get_npcparentnode_scale(&actor));
-				log::info("GetScale: {}", actor.GetScale());
-			}*/
 			float result = actor_data->OtherScales * initialScale;
 			if (game_scale) {
 				result *= game_getactorscale(&actor);
@@ -190,4 +182,11 @@ namespace GTS {
 		return 1.0f;
 	}
 
+	float get_raw_scale(Actor* actor) {
+		auto actor_data = Persistent::GetSingleton().GetData(actor);
+		if (actor_data) {
+			return actor_data->visual_scale;
+		}
+		return 1.0f;
+	}
 }

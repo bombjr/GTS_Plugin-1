@@ -1,41 +1,11 @@
 #include "Hooks/Skyrim/HeadTracking.hpp"
-#include "Utils/ActorBools.hpp"
+#include "Config/Config.hpp"
 
 using namespace GTS;
 
 namespace {
-
-	static auto ptrOffset = REL::Module::get().version().compare(SKSE::RUNTIME_SSE_1_6_629) == std::strong_ordering::less ? -0xB8 : -0xC0;
-	// Credits to ERSH
-
-	void Headtracking_ManageSpineToggle(Actor* actor) {
-		if (actor && actor->Is3DLoaded()) { // Player is handled inside HeadTracking.cpp -> SetGraphVariableBool hook
-			std::string taskname = std::format("SpineBool_{}", actor->formID);
-			ActorHandle giantHandle = actor->CreateRefHandle();
-
-			double Start = Time::WorldTimeElapsed();
-
-			TaskManager::RunFor(taskname, 1.0f, [=](auto& progressData){
-				if (!giantHandle) {
-					return false;
-				}
-
-				double Finish = Time::WorldTimeElapsed();
-
-				double timepassed = Finish - Start;
-				if (timepassed > 0.10) {
-					auto giant = giantHandle.get().get();
-					bool Disable = !(IsCrawling(giant) || IsProning(giant) || IsHandStomping_L(actor) || IsHandStomping_H(actor));
-					giant->SetGraphVariableBool("bHeadTrackSpine", Disable);
-					//log::info("Setting {} for {}", Disable, giant->GetDisplayFullName());
-					return false;
-				}
-				return true;
-			});
-		}
-	}
-
 	void ForceLookAtCleavage(Actor* actor, NiPoint3& target) { // Forces someone to look at breasts
+		// Experimental function just for fun, it even works if enabled
 		if (actor->formID != 0x14) {
 			auto process = actor->GetActorRuntimeData().currentProcess;
 			if (process) {
@@ -45,13 +15,19 @@ namespace {
 					if (target_actor) {
 						auto true_target_ref = target_actor.get().get();
 						if (true_target_ref && true_target_ref->formID == 0x14) {
+							
 							auto true_target = skyrim_cast<Actor*>(true_target_ref);
 							if (true_target) {
-								auto breast_1 = find_node(true_target, "R Breast02");
-								auto breast_2 = find_node(true_target, "L Breast02");
-								if (breast_1 && breast_2) {
-									NiPoint3 breast_pos = (breast_1->world.translate + breast_2->world.translate) / 2;
-									target = breast_pos;
+								NiPoint3 dist_A = actor->GetPosition();
+								NiPoint3 dist_B = true_target->GetPosition();
+								float distance = (dist_A - dist_B).Length();
+								if (distance <= 256 * get_visual_scale(true_target)) {
+									auto breast_1 = find_node(true_target, "R Breast02");
+									auto breast_2 = find_node(true_target, "L Breast02");
+									if (breast_1 && breast_2) {
+										NiPoint3 breast_pos = (breast_1->world.translate + breast_2->world.translate) / 2;
+										target = breast_pos;
+									}
 								}
 							}
 						}
@@ -61,37 +37,97 @@ namespace {
 		}
 	}
 
-	float affect_by_scale(TESObjectREFR* ref, float original) {
+	float GetRacemenuScale(Actor* giant) { // Used only on NPC's since we don't want to apply Natural Scale to them
+		auto actor_data = Transient::GetSingleton().GetData(giant);
+		if (actor_data) {
+			return actor_data->OtherScales;
+		}
+		return 1.0f;
+	}
+
+	float Headtracking_CalculateNewHT(Actor* giant, const float original) {
+		bool Player = giant->formID == 0x14;
+
+		if (!Player) { 	// NPC
+			return original * get_raw_scale(giant) * GetRacemenuScale(giant); // Old Pre 3.0.0 method 
+			// No need to bother with Race (not Racemenu!) Scale and SetScale: game already does it by default in NPC case
+		} else {		// Player
+			return get_visual_scale(giant);
+		}
+		return 1.0f;
+	}
+
+	float ScaleTargetedHeadtracking(TESObjectREFR* ref, const float original) { // Player exclusive headtracking
+		// We could apply it to NPC's as well, but for some reason it introduces funny leg bug: leg slightly twitches when it's on
 		Actor* giant = skyrim_cast<Actor*>(ref);
 		if (giant) {
 			if (giant->Is3DLoaded()) {
-				//if (HasHeadTrackingTarget(giant)) { // Apply it ONLY when targeting someone (when locking on Enemy with TDM for example)
-					//|| giant->formID != 0x14 && !HasHeadTrackingTarget(giant)) { 
-					// ^ needs to be enabled if experimenting with ForceLookAtCleavage() function, else they double-apply
-					if (IsinRagdollState(giant) || IsDragon(giant)) {  // Dragons seem to behave funny if we edit them...sigh...
-						// For some Bethesda™ reason - it breaks tiny ragdoll (their skeleton stretches :/) when they're small, so they fly into the sky.
-						return 1.0f;      // We really want to prevent that, so we return original value in this case.
+				if (giant->formID == 0x14) {
+					const bool ApplyScaling = !(IsinRagdollState(giant) || IsDragon(giant));
+					// If in ragdoll / is dragon = do nothing, else bones will stretch and npc/player will cosplay slenderman
+					if (ApplyScaling) {
+						float fix = Headtracking_CalculateNewHT(giant, original);
+						return fix; // Apply scale
 					}
-					float fix = 1.0f * get_visual_scale(giant); // Default Headtracking scale seems to be 1.0f
-					// GetScale() is already used in this hook by vanilla game, so we compensate it
-					/*if (IsTeammate(giant)) {
-						log::info("Has Target: {}, original value: {}", HasHeadTrackingTarget(giant), original);
-					}*/
-					return fix;
 				}
-			//}
+			}
 		}
+		// If it fails: either actor not loaded or in ragdoll / is dragon, just return original value in that case
 		return original;
+	}
+
+	void UpdateHeadtrackingPOS_Impl(Actor* actor, NiPoint3& target) { // NPC Exclusive
+		if (actor) {
+			if (actor->Is3DLoaded()) {
+				if (actor->formID != 0x14) {
+					const bool ApplyScaling = !(IsinRagdollState(actor) || IsDragon(actor)); 
+					if (ApplyScaling) {
+						auto headPos = actor->GetLookingAtLocation();
+						auto model = actor->Get3D();
+						if (model) {
+							auto trans = model->world;
+							auto transInv = trans.Invert();
+							auto scale = Headtracking_CalculateNewHT(actor, 1.0f);
+
+							auto unscaledHeadPos = trans * (transInv*headPos * (1.0f/scale));
+
+							//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
+
+							auto direction = target - headPos;
+							target = unscaledHeadPos + direction;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void PrintDebugInformation(Actor* giant, float fix, float original) {
+		static Timer PrintTimer = Timer(2.0);
+		if (PrintTimer.ShouldRunFrame()) {
+			log::info("==============={}===================", giant->GetDisplayFullName());
+			log::info("Value is {}, original: {}", fix, original);
+			log::info("Visual Scale: {}, raw_scale: {}", get_visual_scale(giant), get_raw_scale(giant));
+			log::info("Natural + GameScale: {}, raw Natural Scale: {}", get_natural_scale(giant, true), get_natural_scale(giant, false));
+			log::info("Game Scale: {}, npc node scale: {}", game_getactorscale(giant), get_npcnode_scale(giant));
+
+			auto actor_data = Transient::GetSingleton().GetData(giant);
+			if (actor_data) {
+				log::info("Initial Scale: {}, Other Scale: {}", actor_data->OtherScales, GetInitialScale(giant));
+				log::info("Racemenu Scale: {}", GetRacemenuScale(giant));
+			}
+			log::info("====================================");
+		}
 	}
 }
 
 namespace Hooks {
 
 	void Hook_HeadTracking::Hook(Trampoline& trampoline) {
-		static CallHook<float(TESObjectREFR* param_1)>Alter_Headtracking( 
+		static CallHook<float(TESObjectREFR* param_1)>AlterHeadtracking_Player( 
 			REL::RelocationID(37129, 37364), REL::Relocate(0x24, 0x5E),
 			[](auto* param_1) {
-				// Applied always
+				// Applied to player only because it adds minor bug to NPC's: foot funnily twitches
 				// ----------------- SE:
 				// FUN_140615030 : 37129
 				// 0x140615054 - 0x140615030 = 0x24
@@ -100,55 +136,21 @@ namespace Hooks {
 				// FUN_1405ffc50: 37364
 				// 0x1405ffcae - 0x1405ffc50 = 0x5E
   
-				float result = Alter_Headtracking(param_1);
-				float alter = affect_by_scale(param_1, result); 
+				float result = AlterHeadtracking_Player(param_1);
+				float alter = ScaleTargetedHeadtracking(param_1, result); 
 
 				return alter;
             }
         );
 
-		static FunctionHook<bool(IAnimationGraphManagerHolder* graph, const BSFixedString& a_variableName, const bool a_in)> SetGraphVariableBool(
-            REL::RelocationID(32141, 32885),
-            [](IAnimationGraphManagerHolder* graph, const BSFixedString& a_variableName, const bool a_in){
-                //log::info("SetGraph hooked");
-                if (a_variableName == "bHeadTrackSpine") { // Disable weird spine rotation during crawl/prone
-				    // Done through hook since TDM seems to adjust it constantly
-                    auto actor = skyrim_cast<Actor*>(graph);
-                    if (actor) {
-                        //log::info("Holder found: {}", actor->GetDisplayFullName());
-                        bool Disable = !(IsCrawling(actor) || IsProning(actor) || IsHandStomping_L(actor) || IsHandStomping_H(actor));
-                        return SetGraphVariableBool(graph, a_variableName, Disable);
-                    }
-                }
-            	return SetGraphVariableBool(graph, a_variableName, a_in);
-            }
-        );
-
-		static CallHook<bool(RE::ActorState* a_this, int16_t a_flag)>Sneak_AddMovementFlags( // Mostly from DynamicCollisionAdjustment
-			REL::RelocationID(36926, 37951), REL::Relocate(0xE4, 0xA0),
-			[](RE::ActorState* a_this, int16_t a_flag) {
-				auto actor = SKSE::stl::adjust_pointer<RE::Actor>(a_this, ptrOffset); // Some black magic from Ersh
-				if (actor) {
-					Headtracking_ManageSpineToggle(actor); // Toggle spine HT on/off based on GTS state
-				}
-
-				return Sneak_AddMovementFlags(a_this, a_flag);
-            }
-        );
-
-		static CallHook<bool(RE::ActorState* a_this, int16_t a_flag)>Sneak_RemoveMovementFlags( // Mostly from DynamicCollisionAdjustment
-			REL::RelocationID(36926, 37951), REL::Relocate(0xEB, 0xB2),
-			[](RE::ActorState* a_this, int16_t a_flag) {
-				auto actor = SKSE::stl::adjust_pointer<RE::Actor>(a_this, ptrOffset); // Some black magic from Ersh
-				if (actor) {
-					Headtracking_ManageSpineToggle(actor); // Toggle spine HT on/off based on GTS state
-				}
-
-				return Sneak_RemoveMovementFlags(a_this, a_flag);
-            }
-        );
+		static FunctionHook<void(AIProcess* a_this, Actor* a_owner, NiPoint3& a_targetPosition)> 
+			AlterHeadtracking_NPC(RELOCATION_ID(38850, 39887),
+				[](auto* a_this, auto* a_owner, auto& a_targetPosition) {
+				// Applied to NPC's only
+				UpdateHeadtrackingPOS_Impl(a_owner, a_targetPosition);
+				AlterHeadtracking_NPC(a_this, a_owner, a_targetPosition);
+				return;
+			}
+		);
 	}
-
-
 }
-

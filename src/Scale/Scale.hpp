@@ -29,4 +29,6 @@ namespace GTS {
 
 	float get_giantess_scale(Actor& actor);
 	float get_giantess_scale(Actor* actor);
+
+	float get_raw_scale(Actor* actor);
 }

@@ -191,10 +191,12 @@ namespace GTS {
 					.a = 0.0f, //Default is 0
 				};
 
-				float MS_mult = soft_core(scale, MS_adjustment);
+				float gts_speed = get_giantess_scale(actor);
+
+				float MS_mult = soft_core(gts_speed, MS_adjustment);
 				float MS_mult_limit = std::clamp(MS_mult, 0.750f, 1.0f);
 				float Multy = std::clamp(MS_mult, 0.70f, 1.0f);
-				float speed_mult_walk = soft_core(scale, this->speed_adjustment_walk);
+				float speed_mult_walk = soft_core(gts_speed, this->speed_adjustment_walk);
 				float bonusspeed = std::clamp(speed_mult_walk, 0.90f, 1.0f);
 				
 				auto actorData = Persistent::GetSingleton().GetData(actor);
@@ -207,11 +209,11 @@ namespace GTS {
 				}
 
 				float power = 1.0f * Slowdown * (Bonus/2.0f + 1.0f)/MS_mult/MS_mult_limit/Multy/bonusspeed;
-				if (scale > 1.0f) {
+				if (gts_speed > 1.0f) {
 					return power;
 				}
 				else {
-					return scale * Slowdown * (Bonus/2.0f + 1.0f);
+					return gts_speed * Slowdown * (Bonus/2.0f + 1.0f);
 				}
 			}
 
