@@ -52,17 +52,18 @@ namespace {
 			return original * get_raw_scale(giant) * GetRacemenuScale(giant); // Old Pre 3.0.0 method 
 			// No need to bother with Race (not Racemenu!) Scale and SetScale: game already does it by default in NPC case
 		} else {		// Player
-			return get_visual_scale(giant);
+			return get_visual_scale(giant) / game_getactorscale(giant); // fix double-applying game-scale. Game already applies it by default.
 		}
 		return 1.0f;
 	}
 
-	float ScaleTargetedHeadtracking(TESObjectREFR* ref, const float original) { // Player exclusive headtracking
-		// We could apply it to NPC's as well, but for some reason it introduces funny leg bug: leg slightly twitches when it's on
+	float HT_ScaleTargeted_Player(TESObjectREFR* ref, const float original) { // Player exclusive headtracking
+		// In fact it is used only to fix TDM target-lock bug that breaks character models.
+		// It should be used on Player only because of funny twitching foot bug (that happens even on player)
 		Actor* giant = skyrim_cast<Actor*>(ref);
 		if (giant) {
 			if (giant->Is3DLoaded()) {
-				if (giant->formID == 0x14) {
+				if (giant->formID == 0x14 && IsHeadtracking(giant)) { // Apply with TDM lock enabled
 					const bool ApplyScaling = !(IsinRagdollState(giant) || IsDragon(giant));
 					// If in ragdoll / is dragon = do nothing, else bones will stretch and npc/player will cosplay slenderman
 					if (ApplyScaling) {
@@ -76,10 +77,11 @@ namespace {
 		return original;
 	}
 
-	void UpdateHeadtrackingPOS_Impl(Actor* actor, NiPoint3& target) { // NPC Exclusive
+	void HT_ScaleNontargeted_Impl(Actor* actor, NiPoint3& target) { // NPC's always use this one, Player also uses this one when in non-tdm tracking mode
 		if (actor) {
 			if (actor->Is3DLoaded()) {
-				if (actor->formID != 0x14) {
+				if (actor->formID != 0x14 || (actor->formID == 0x14 && !IsHeadtracking(actor))) {
+					// We don't want to apply it when TDM lock is enabled
 					const bool ApplyScaling = !(IsinRagdollState(actor) || IsDragon(actor)); 
 					if (ApplyScaling) {
 						auto headPos = actor->GetLookingAtLocation();
@@ -88,8 +90,9 @@ namespace {
 							auto trans = model->world;
 							auto transInv = trans.Invert();
 							auto scale = Headtracking_CalculateNewHT(actor, 1.0f);
+							const float natural_size = 1.0f;
 
-							auto unscaledHeadPos = trans * (transInv*headPos * (1.0f/scale));
+							auto unscaledHeadPos = trans * (transInv*headPos * (natural_size/scale));
 
 							//ForceLookAtCleavage(actor, target); // If enabled, need to make sure that only one hook is affecting NPC's 
 
@@ -127,7 +130,7 @@ namespace Hooks {
 		static CallHook<float(TESObjectREFR* param_1)>AlterHeadtracking_Player( 
 			REL::RelocationID(37129, 37364), REL::Relocate(0x24, 0x5E),
 			[](auto* param_1) {
-				// Applied to player only because it adds minor bug to NPC's: foot funnily twitches
+				// This hook is applied to player only because it adds minor bug to NPC's: foot funnily twitches (and even on player too)
 				// ----------------- SE:
 				// FUN_140615030 : 37129
 				// 0x140615054 - 0x140615030 = 0x24
@@ -137,7 +140,7 @@ namespace Hooks {
 				// 0x1405ffcae - 0x1405ffc50 = 0x5E
   
 				float result = AlterHeadtracking_Player(param_1);
-				float alter = ScaleTargetedHeadtracking(param_1, result); 
+				float alter = HT_ScaleTargeted_Player(param_1, result); 
 
 				return alter;
             }
@@ -146,8 +149,8 @@ namespace Hooks {
 		static FunctionHook<void(AIProcess* a_this, Actor* a_owner, NiPoint3& a_targetPosition)> 
 			AlterHeadtracking_NPC(RELOCATION_ID(38850, 39887),
 				[](auto* a_this, auto* a_owner, auto& a_targetPosition) {
-				// Applied to NPC's only
-				UpdateHeadtrackingPOS_Impl(a_owner, a_targetPosition);
+				// Applied to NPC's + player when needed
+				HT_ScaleNontargeted_Impl(a_owner, a_targetPosition);
 				AlterHeadtracking_NPC(a_this, a_owner, a_targetPosition);
 				return;
 			}

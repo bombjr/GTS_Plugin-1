@@ -303,10 +303,10 @@ namespace Hooks {
 						
 						bool ShouldBeKilled = DontAlterDamage(a_this, dmg, AddToDamage);
 						// ^ Attempt to fix being unkillable below 5% hp, the bug seems to be player exclusive
-						if (a_this->formID == 0x14) {
+						/*if (a_this->formID == 0x14) {
 							log::info("Damage Pre: {}", dmg);
 							log::info("Should be killed: {}", ShouldBeKilled);
-						}
+						}*/
 						if (!ShouldBeKilled) {
 							dmg *= GetTotalDamageResistance(a_this, aggressor); 
 							// ^ This function applies damage resistance from being large
@@ -327,9 +327,9 @@ namespace Hooks {
 				//    - then we further affect said 5 damage by damage resistance
 				//    - which in some cases may make player unkillable since health never reaches 0...
 
-				if (a_this->formID == 0x14) {
+				/*if (a_this->formID == 0x14) {
 					log::info("Damage Post: {}", dmg);
-				}
+				}*/
 
 				return SkyrimTakeDamage(a_this, dmg, aggressor, maybe_hitdata, damageSrc);
 			}

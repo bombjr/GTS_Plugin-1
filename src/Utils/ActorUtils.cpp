@@ -601,7 +601,6 @@ namespace GTS {
 	bool IsHeadtracking(Actor* giant) { // Used to report True when we lock onto something, should be Player Exclusive.
 		//Currently used to fix TDM mesh issues when we lock on someone.
 		bool tracking = false;
-		bool headtracking = false;
 		if (giant->formID == 0x14) {
 			giant->GetGraphVariableBool("TDM_TargetLock", tracking); // get HT value, requires newest versions of TDM to work properly
 		} //else {
