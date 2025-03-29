@@ -80,7 +80,17 @@ namespace GTS {
 		Cprint("Git Commit Date: {}", git_CommitDate());
 	}
 
-
+	void ConsoleManager::CMD_Unlimited() {
+		auto Player = PlayerCharacter::GetSingleton();
+		if (Player) {
+			if (Runtime::HasPerk(Player, "GTSPerkColossalGrowth")) {
+				Persistent::GetSingleton().UnlockMaxSizeSliders.value = !Persistent::GetSingleton().UnlockMaxSizeSliders.value;
+				Cprint("Max Size Sliders unlocked: {}", Persistent::GetSingleton().UnlockMaxSizeSliders.value);
+			} else {
+				Cprint("You need to obtain Colossal Growth perk to use this command");
+			}
+		}
+	}
 }
 
 

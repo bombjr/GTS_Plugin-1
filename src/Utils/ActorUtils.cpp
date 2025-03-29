@@ -2928,11 +2928,17 @@ namespace GTS {
 	void DragonAbsorptionBonuses() { // The function is ugly but im a bit lazy to make it look pretty
 		int rng = RandomInt(0, 6);
 		int dur_rng = RandomInt(0, 3);
+		float size_increase = 0.12f / Characters_AssumedCharSize; // +12 cm;
+		float size_boost = 1.0f;
 
 		Actor* player = PlayerCharacter::GetSingleton();
 
 		if (!Runtime::HasPerk(player, "GTSPerkMightOfDragons")) {
 			return;
+		}
+
+		if (Runtime::HasPerk(player, "GTSPerkColossalGrowth")) {
+			size_boost = 1.2f;
 		}
 
 		auto& BonusSize = Persistent::GetSingleton().PlayerExtraPotionSize;  // Gts_ExtraPotionSize
@@ -2941,7 +2947,7 @@ namespace GTS {
 
 		
 		Notify("You feel like something is filling you");
-		BonusSize.value += 0.0659f; // +12 cm
+		BonusSize.value += size_increase * size_boost;
 
 		if (rng <= 1) {
 			PlayMoanSound(player, 1.0f);
@@ -3060,6 +3066,81 @@ namespace GTS {
 				}
 			}
 		}
+	}
+
+	//Ported From Papyrus
+	void ApplyTalkToActor() {
+		static Timer ApplyTalkTimer = Timer(1.0f);
+
+		if (ApplyTalkTimer.ShouldRun()) {
+
+			if (const auto& UtilEnableDialogue = Runtime::GetGlobal("GTSUtilEnableDialogue")) {
+
+				const auto& PlayerCharacter = PlayerCharacter::GetSingleton();
+
+				if (get_visual_scale(PlayerCharacter) < 1.2f) {
+					UtilEnableDialogue->value = 0.0f;
+					return;
+				}
+
+				if (PlayerCharacter->IsSneaking() && UtilEnableDialogue->value < 1.0f) {
+					Runtime::GetFloat("GTSUtilEnableDialogue");
+					UtilEnableDialogue->value = 1.0f;
+				}
+				else if (!PlayerCharacter->IsSneaking() && UtilEnableDialogue->value >= 1.0f) {
+					UtilEnableDialogue->value = 0.0f;
+				}
+			}
+		}
+	}
+
+	//Ported From Papyrus
+	void CheckTalkPerk() {
+		static Timer PerkCheckTimer = Timer(30.0f);
+		if (PerkCheckTimer.ShouldRun()) {
+
+			const auto& PlayerCharacter = PlayerCharacter::GetSingleton();
+
+			if (!Runtime::HasPerk(PlayerCharacter, "GTSUtilTalkToActor")) {
+				Runtime::AddPerk(PlayerCharacter, "GTSUtilTalkToActor");
+			}
+		}
+	}
+
+	void UpdateCrawlState(Actor* actor) {
+
+		if (!actor) {
+			return;
+		}
+
+		auto& Persi = Persistent::GetSingleton();
+
+		bool CrawlState = (actor->formID == 0x14) ? Persi.EnableCrawlPlayer.value : Persi.EnableCrawlFollower.value;
+
+		//SetCrawlAnimation Returns true if the state has changed
+		if (SetCrawlAnimation(actor, CrawlState)) {
+			UpdateCrawlAnimations(actor, CrawlState);
+		}
+	}
+
+	void UpdateFootStompType(RE::Actor* a_actor) {
+		if (!a_actor) {
+			return;
+		}
+
+		auto& ActionS = Config::GetGameplay().ActionSettings;
+		bool StompState = (a_actor->formID == 0x14) ? ActionS.bStompAlternative : ActionS.bStomAlternativeOther;
+		SetAltFootStompAnimation(a_actor, StompState);
+	}
+
+	void UpdateSneakTransition(RE::Actor* a_actor) {
+		if (!a_actor) {
+			return;
+		}
+
+		auto& ActionS = Config::GetGameplay().ActionSettings;
+		bool SneaktState = (a_actor->formID == 0x14) ? ActionS.bSneakTransitions : ActionS.bSneakTransitionsOther;
+		SetEnableSneakTransition(a_actor, !SneaktState);
 	}
 
 	void SpringGrow(Actor* actor, float amt, float halfLife, std::string_view naming, bool drain) {

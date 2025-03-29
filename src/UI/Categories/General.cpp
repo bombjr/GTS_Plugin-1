@@ -142,7 +142,7 @@ namespace GTS {
 			const char* T2 = "Reduce the amount of gore in some sound and visual effects.";
 
 
-	        if (ImGui::CollapsingHeader("Miscellaneous"), ImUtil::HeaderFlagsDefaultOpen) {
+	        if (ImGui::CollapsingHeader("Miscellaneous", ImUtil::HeaderFlagsDefaultOpen)) {
 	            ImUtil::CheckBox("Dynamic Size Player", &Settings.bDynamicSizePlayer, T0);
 				ImGui::SameLine();
 	            ImUtil::CheckBox("Dynamic Size Followers", &Settings.bDynamicSizeFollowers, T0);
@@ -160,7 +160,7 @@ namespace GTS {
 	        const char* T0 = "Enable height adjustment/correction for actors wearing high heels.";
 	        const char* T1 = "Disable HH height adjustments when using furniture to allow other mods to handle it.";
 
-	        if (ImGui::CollapsingHeader("High-Heels"), ImUtil::HeaderFlagsDefaultOpen) {
+	        if (ImGui::CollapsingHeader("High-Heels", ImUtil::HeaderFlagsDefaultOpen)) {
 
 	            ImUtil::CheckBox("Enable Height Adjustment", &Settings.bEnableHighHeels, T0);
 
@@ -198,7 +198,7 @@ namespace GTS {
 	                         "should spawn loot piles containing the dead actors' inventory.\n"
 	                         "If disabled, the inventory will be automatically transferred to the killer upon death.";
 
-	        if (ImGui::CollapsingHeader("Looting"), ImUtil::HeaderFlagsDefaultOpen) {
+	        if (ImGui::CollapsingHeader("Looting", ImUtil::HeaderFlagsDefaultOpen)) {
 	            ImUtil::CheckBox("Player: Spawn Loot Piles",&Settings.bPlayerLootpiles, T0);
 				ImGui::SameLine();
 	            ImUtil::CheckBox("Followers: Spawn Loot Piles",&Settings.bFollowerLootpiles, T0);

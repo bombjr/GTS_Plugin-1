@@ -287,6 +287,13 @@ namespace GTS {
 	void DisableCollisions(Actor* actor, TESObjectREFR* otherActor);
 	void EnableCollisions(Actor* actor);
 
+	void ApplyTalkToActor();
+	void CheckTalkPerk();
+
+	void UpdateCrawlState(Actor* actor);
+	void UpdateFootStompType(RE::Actor* a_actor);
+	void UpdateSneakTransition(RE::Actor* a_actor);
+
 	void SpringGrow(Actor* actor, float amt, float halfLife, std::string_view naming, bool drain);
 	void SpringShrink(Actor* actor, float amt, float halfLife, std::string_view naming);
 

@@ -8,10 +8,29 @@ namespace {
 
     constexpr float DEFAULT_MAX = 1000000.0f;
 
+    //Ported From Papyrus
+	float GetSizeFromPerks(RE::Actor* a_Actor) {
+		float BonusSize = 0.0f;
+
+		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation3")) { //SizeManipulation 3
+			BonusSize += static_cast<float>(a_Actor->GetLevel()) * 0.0330f;
+		}
+
+		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation2")) { //SizeManipulation 2
+			BonusSize += Runtime::GetFloat("GTSSkillLevel") * 0.0165f;
+		}
+
+		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation1")) { //SizeManipulation 1
+			BonusSize += 0.135f;
+		}
+
+		return BonusSize;
+	}
+
     float get_endless_height(Actor* actor) {
 		float endless = 0.0f;
 
-		if (Runtime::HasPerk(actor, "GTSPerkColossalGrowth")) {
+		if (Runtime::HasPerk(actor, "GTSPerkColossalGrowth") && Persistent::GetSingleton().UnlockMaxSizeSliders.value) {
 			endless = DEFAULT_MAX;
 		}
 
@@ -105,4 +124,54 @@ namespace GTS {
 			}
 		}
     }
+
+    //Ported From Papyrus
+	float GetExpectedMaxSize(RE::Actor* a_Actor) {
+		const float LevelBonus = 1.0f + GetGtsSkillLevel(a_Actor) * 0.006f;
+		const float Essence = Persistent::GetSingleton().PlayerExtraPotionSize.value;
+		float Colossal_kills = 0.0f;
+		float Colossal_lvl = 1.0f;
+
+		const auto Quest = Runtime::GetQuest("GTSQuestProgression");
+		if (!Quest) {
+			return 1.0f;
+		}
+
+		const auto Stage = Quest->GetCurrentStageID();
+		if (Stage < 20) {
+			return 1.0f;
+		}
+
+		//Each stage after 20 adds 0.04f in steps of 10 stages
+		//Base value + Current Stage - 20 / 10
+		float QuestMult = 0.10f + static_cast<float>(Stage - 20) / 10.f * 0.04f;
+		if (Stage >= 80) QuestMult = 0.60f;
+
+		if (Runtime::HasPerk(a_Actor,"GTSPerkColossalGrowth")) { //Total Size Control Perk
+			auto Persistent = Persistent::GetSingleton().GetKillCountData(a_Actor);
+			if (Persistent) {
+				Colossal_kills = static_cast<float>(Persistent->iTotalKills) * (0.02f / Characters_AssumedCharSize);
+			}
+			Colossal_lvl = 1.15f;
+			
+			if (!Config::GetBalance().bBalanceMode && Persistent::GetSingleton().UnlockMaxSizeSliders.value) {
+				const float SizeOverride = Config::GetBalance().fMaxPlayerSizeOverride;
+				if (SizeOverride > 0.05f) {
+					Colossal_kills = 0.0f;
+					Colossal_lvl = 1.0f;
+					return SizeOverride;
+				}
+			}
+		}
+
+		const float MaxAllowedSize = 1.0f + (QuestMult + GetSizeFromPerks(a_Actor)) * LevelBonus;
+		return (MaxAllowedSize + Essence + Colossal_kills) * Colossal_lvl;
+	}
+
+    //Ported From Papyrus
+	void UpdateGlobalSizeLimit() {
+		if (const auto Player = PlayerCharacter::GetSingleton()) {
+			Persistent::GetSingleton().GlobalSizeLimit.value = GetExpectedMaxSize(Player);
+		}
+	}
 }

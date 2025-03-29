@@ -65,6 +65,8 @@ namespace GTS {
 			Persistent.MSGSeenGrowthSpurt.Load(serde, RecordType, RecordVersion, RecordSize);
 			Persistent.MSGSeenAspectOfGTS.Load(serde, RecordType, RecordVersion, RecordSize);
 
+			// ---- Unlimited Size slider unlocker
+			Persistent.UnlockMaxSizeSliders.Load(serde, RecordType, RecordVersion, RecordSize);
 		}
 
 	}
@@ -103,6 +105,9 @@ namespace GTS {
 		Persistent.MSGSeenTinyCamity.Save(serde);
 		Persistent.MSGSeenGrowthSpurt.Save(serde);
 		Persistent.MSGSeenAspectOfGTS.Save(serde);
+
+		// ---- Unlimited Size slider unlocker
+		Persistent.UnlockMaxSizeSliders.Save(serde);
 	}
 	
 	//-----------------

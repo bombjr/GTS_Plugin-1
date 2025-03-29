@@ -339,146 +339,6 @@ namespace {
 		apply_height(actor, saved_data, temp_data, force);
 		apply_speed(actor, saved_data, temp_data, force);
 	}
-
-	void UpdateCrawlState(Actor* actor) {
-
-		if (!actor) {
-			return;
-		}
-
-		auto& Persi = Persistent::GetSingleton();
-
-		bool CrawlState = (actor->formID == 0x14) ? Persi.EnableCrawlPlayer.value : Persi.EnableCrawlFollower.value;
-
-		//SetCrawlAnimation Returns true if the state has changed
-		if (SetCrawlAnimation(actor, CrawlState)) {
-			UpdateCrawlAnimations(actor, CrawlState);
-		}
-
-	}
-
-	void UpdateFootStompType(RE::Actor* a_actor) {
-		if (!a_actor) {
-			return;
-		}
-
-		auto& ActionS = Config::GetGameplay().ActionSettings;
-		bool StompState = (a_actor->formID == 0x14) ? ActionS.bStompAlternative : ActionS.bStomAlternativeOther;
-		SetAltFootStompAnimation(a_actor, StompState);
-	}
-
-	void UpdateSneakTransition(RE::Actor* a_actor) {
-		if (!a_actor) {
-			return;
-		}
-
-		auto& ActionS = Config::GetGameplay().ActionSettings;
-		bool SneaktState = (a_actor->formID == 0x14) ? ActionS.bSneakTransitions : ActionS.bSneakTransitionsOther;
-		SetEnableSneakTransition(a_actor, !SneaktState);
-	}
-
-	//Ported From Papyrus
-	float GetSizeFromPerks(RE::Actor* a_Actor) {
-		float BonusSize = 0.0f;
-
-		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation3")) { //SizeManipulation 3
-			BonusSize += static_cast<float>(a_Actor->GetLevel()) * 0.0330f;
-		}
-
-		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation2")) { //SizeManipulation 2
-			BonusSize += Runtime::GetFloat("GTSSkillLevel") * 0.0165f;
-		}
-
-		if (Runtime::HasPerk(a_Actor,"GTSPerkSizeManipulation1")) { //SizeManipulation 1
-			BonusSize += 0.135f;
-		}
-
-		return BonusSize;
-	}
-
-	//Ported From Papyrus
-	float GetExpectedMaxSize(RE::Actor* a_Actor) {
-		const float LevelBonus = 1.0f + GetGtsSkillLevel(a_Actor) * 0.006f;
-		const float Essence = Persistent::GetSingleton().PlayerExtraPotionSize.value;
-
-		const auto Quest = Runtime::GetQuest("GTSQuestProgression");
-		if (!Quest) {
-			return 1.0f;
-		}
-
-		const auto Stage = Quest->GetCurrentStageID();
-		if (Stage < 20) {
-			return 1.0f;
-		}
-
-		//Each stage after 20 adds 0.04f in steps of 10 stages
-		//Base value + Current Stage - 20 / 10
-		float QuestMult = 0.10f + static_cast<float>(Stage - 20) / 10.f * 0.04f;
-		if (Stage >= 80) QuestMult = 0.60f;
-
-		if (Runtime::HasPerk(a_Actor,"GTSPerkColossalGrowth")) { //Total Size Control Perk
-
-			if (!Config::GetBalance().bBalanceMode) {
-				const float SizeOverride = Config::GetBalance().fMaxPlayerSizeOverride;
-				if (SizeOverride > 0.05f) {
-					return SizeOverride;
-				}
-			}
-		}
-
-		const float MaxAllowedSize = 1.0f + (QuestMult + GetSizeFromPerks(a_Actor)) * LevelBonus;
-		return MaxAllowedSize + Essence;
-
-	}
-
-	//Ported From Papyrus
-	void UpdateGlobalSizeLimit() {
-		if (const auto Player = PlayerCharacter::GetSingleton()) {
-			Persistent::GetSingleton().GlobalSizeLimit.value = GetExpectedMaxSize(Player);
-		}
-	}
-
-	//Ported From Papyrus
-	void ApplyTalkToActor() {
-
-		static Timer ApplyTalkTimer = Timer(1.0f);
-
-		if (ApplyTalkTimer.ShouldRun()) {
-
-			if (const auto& UtilEnableDialogue = Runtime::GetGlobal("GTSUtilEnableDialogue")) {
-
-				const auto& PlayerCharacter = PlayerCharacter::GetSingleton();
-
-				if (get_visual_scale(PlayerCharacter) < 1.2f) {
-					UtilEnableDialogue->value = 0.0f;
-					return;
-				}
-
-				if (PlayerCharacter->IsSneaking() && UtilEnableDialogue->value < 1.0f) {
-					Runtime::GetFloat("GTSUtilEnableDialogue");
-					UtilEnableDialogue->value = 1.0f;
-				}
-				else if (!PlayerCharacter->IsSneaking() && UtilEnableDialogue->value >= 1.0f) {
-					UtilEnableDialogue->value = 0.0f;
-				}
-			}
-		}
-	}
-
-	//Ported From Papyrus
-	void CheckTalkPerk() {
-
-		static Timer PerkCheckTimer = Timer(30.0f);
-		if (PerkCheckTimer.ShouldRun()) {
-
-			const auto& PlayerCharacter = PlayerCharacter::GetSingleton();
-
-			if (!Runtime::HasPerk(PlayerCharacter, "GTSUtilTalkToActor")) {
-				Runtime::AddPerk(PlayerCharacter, "GTSUtilTalkToActor");
-			}
-		}
-
-	}
 }
 
 GtsManager& GtsManager::GetSingleton() noexcept {
@@ -513,9 +373,9 @@ void GtsManager::Update() {
 	UpdateCameraINIs();
 	ApplyTalkToActor();
 	UpdateMaxScale(); // Update max scale of each actor in the scene
-	UpdateFalling();
+	UpdateFalling(); // Update player size damage when falling down
 	CheckTalkPerk();
-	FixActorFade();
+	FixActorFade(); // Self explanatory
 
 	const auto& ActorList = find_actors();
 

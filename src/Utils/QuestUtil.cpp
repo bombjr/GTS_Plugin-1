@@ -135,6 +135,13 @@ namespace GTS {
 			Runtime::AddPerk(Player, Perk);
 		}
 
+		auto GtsSkillLevel = Runtime::GetGlobal("GTSSkillLevel");
+		auto GtsSkillRatio = Runtime::GetGlobal("GTSSkillRatio");
+		if (GtsSkillLevel && GtsSkillRatio) {
+			GtsSkillLevel->value = 100.0f;
+			GtsSkillRatio->value = 0.0f;
+		}
+
 		Notify("All perks have been given.");
 	}
 

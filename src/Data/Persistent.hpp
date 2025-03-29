@@ -203,6 +203,8 @@ namespace GTS {
 			BasicRecord<bool, 'MSTC'> MSGSeenTinyCamity = false;
 			BasicRecord<bool, 'MSGS'> MSGSeenGrowthSpurt = false;
 			BasicRecord<bool, 'MSAG'> MSGSeenAspectOfGTS = false;
+			// ---- Unlimited Size slider unlocker
+			BasicRecord<bool, 'USSD'> UnlockMaxSizeSliders = false;
 
 
 		private:
