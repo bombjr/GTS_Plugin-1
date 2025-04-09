@@ -272,20 +272,12 @@ namespace GTS {
 
 		switch (av) {
 			case ActorValue::kHealth: { // 27.03.2024: Health boost is still applied, but for Player only and only if having matching perks
-				float bonus = 1.0f;
 				auto& attributes = AttributeManager::GetSingleton();
 				float scale = get_giantess_scale(actor);
 				if (scale <= 0) {
 					scale = 1.0f;
 				}
 
-				if (scale > 1.0f) {
-					bonus = attributes.GetAttributeBonus(actor, av);
-				} else {
-					//Linearly decrease such that:
-					//at zero scale health=0.0
-					bonus = scale;
-				}
 				float perkbonus = GetStolenAttributes_Values(actor, ActorValue::kHealth); // calc health from the perk bonuses
 				finalValue = originalValue + perkbonus; // add flat health on top
 				auto transient = Transient::GetSingleton().GetData(actor);

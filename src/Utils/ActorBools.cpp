@@ -64,6 +64,12 @@ namespace GTS {
 		return undertrampling;
 	}
 
+	bool IsInGrabPlayState(Actor* giant) { // Returns true when we enter Play State from Grab (Grab state where we play with tiny)
+		bool InPlayState = false;
+		giant->GetGraphVariableBool("GTS_IsInGrabPlayState", InPlayState);
+		return InPlayState;
+	}
+
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2) {
 		if (Runtime::GetFaction("SexLabAnimatingFaction")) {
 			if (Runtime::InFaction(actor_1, "SexLabAnimatingFaction") && Runtime::InFaction(actor_2, "SexLabAnimatingFaction")) {
@@ -122,7 +128,6 @@ namespace GTS {
 		bool ragdolled = IsRagdolled(giant) || KnockedDown(giant);
 		return ragdolled;
 	}
-
 
    /*bool BehaviorGraph_DisableHH(Actor* actor) { // should .dll disable HH if Behavior Graph has HH Disable data?
 		bool disable = false;

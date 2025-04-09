@@ -11,6 +11,7 @@ namespace GTS {
 	bool IsExitingStrangle(Actor* giant);
 	bool IsUnderGrinding(Actor* giant);
 	bool IsUnderTrampling(Actor* giant);
+	bool IsInGrabPlayState(Actor* giant);
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2);
 	bool DontAlterDamage(Actor* a_this, float dmg, float Health_Reduction);
 	bool IsHumanoid(Actor* giant);

@@ -55,6 +55,7 @@ namespace GTS {
 		ObjectA,
 		ObjectB,
 		ObjectL,
+		ObjectR,
 	};
 
 	enum class ShrinkSource {

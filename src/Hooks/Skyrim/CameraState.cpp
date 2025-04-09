@@ -17,7 +17,7 @@ namespace Hooks {
 		Hook_FurnitureState::Hook();
 		Hook_IronSightState::Hook();
 		Hook_VanityState::Hook();
-		Hook_TweenState::Hook();
+		//Hook_TweenState::Hook();
 	};
 
 	// Base

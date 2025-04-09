@@ -29,6 +29,38 @@ namespace {
         return false;
     }
 
+    bool ManageGrabPlayAttachment(Actor* giantref, Actor* tinyref) {
+        auto TargetBone = Attachment_GetTargetNode(giantref);
+        NiAVObject* Object = nullptr;
+        
+        switch (TargetBone) {
+            case AttachToNode::ObjectL: {
+                Object = find_node(giantref, "AnimObjectL");            break;
+            }
+            case AttachToNode::ObjectR: {
+                Object = find_node(giantref, "AnimObjectR");            break;
+            }
+            case AttachToNode::ObjectA: {
+                Object = find_node(giantref, "AnimObjectA");            break;
+            }
+            case AttachToNode::ObjectB: {
+                Object = find_node(giantref, "AnimObjectB");            break;
+            }
+        }
+
+        if (Object) {
+            NiPoint3 coords = Object->world.translate;
+
+            if (!AttachTo(giantref, tinyref, coords)) {
+                Grab::CancelGrab(giantref, tinyref);
+                return false;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
     void SetReattachingState(Actor* giant, bool Reattach) {
         auto data = Transient::GetSingleton().GetActorData(giant);
         if (data) {
@@ -112,6 +144,10 @@ namespace GTS {
 
         if (ShouldAbortGrab(giantref, tinyref, CanCancel, Dead, small_size)) {
             return false;
+        }
+
+        if (IsInGrabPlayState(giantref)) {
+            return ManageGrabPlayAttachment(giantref, tinyref);
         }
 
         if (IsBeingEaten(tinyref) && !IsBetweenBreasts(tinyref) && !IsInCleavageState(giantref)) {

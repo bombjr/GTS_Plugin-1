@@ -178,6 +178,12 @@ namespace {
 		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Right);
 		DoLaunch(&data.giant, 0.90f, 1.35f, FootEvent::Left);
 	}
+
+	void GTS_ToLeft(AnimationEventData& data) {Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectL);}
+	void GTS_ToRight(AnimationEventData& data) {Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectR);}
+
+	void GTS_ToAnimB(AnimationEventData& data) {Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectB);}
+	void GTS_ToAnimA(AnimationEventData& data) {Attachment_SetTargetNode(&data.giant, AttachToNode::ObjectA);}
 }
 
 namespace GTS
@@ -204,6 +210,11 @@ namespace GTS
 		AnimationManager::RegisterEvent("GTS_FootSwipe_L_OFF", "Compat", GTS_FootSwipe_L_OFF);
 		AnimationManager::RegisterEvent("GTS_FootSwipe_R_ON", "Compat", GTS_FootSwipe_R_ON);
 		AnimationManager::RegisterEvent("GTS_FootSwipe_R_OFF", "Compat", GTS_FootSwipe_R_OFF);
+
+		AnimationManager::RegisterEvent("GTS_ToLeft", "Compat", GTS_ToLeft);
+		AnimationManager::RegisterEvent("GTS_ToRight", "Compat", GTS_ToRight);
+		AnimationManager::RegisterEvent("GTS_ToAnimA", "Compat", GTS_ToAnimA);
+		AnimationManager::RegisterEvent("GTS_ToAnimB", "Compat", GTS_ToAnimB);
 	}
 
 	void AnimationCompat::RegisterTriggers() {
