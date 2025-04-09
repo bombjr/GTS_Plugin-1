@@ -10,17 +10,45 @@ namespace GTS {
 	//-----------------
 
 	void Persistent::OnGameLoaded(SerializationInterface* serde) {
-		std::unique_lock lock(GetSingleton()._lock);
+		//logger::info("Persistent OnGameLoaded Start");
+		std::unique_lock lock(GetSingleton()._Lock);
 		SizeManager::GetSingleton().Reset();
 		DistributeChestItems();
 		FixAnimationsAndCamera(); // Call it from ActorUtils, needed to fix Grab anim on save-reload
 		LoadPersistent(serde);
+		//logger::info("Persistent OnGameLoaded OK");
 	}
 
-
 	void Persistent::OnGameSaved(SerializationInterface* serde) {
-		std::unique_lock lock(GetSingleton()._lock);
+		//logger::info("Persistent OnGameSaved Start");
+		std::unique_lock lock(GetSingleton()._Lock);
 		SavePersistent(serde);
+		//logger::info("Persistent OnGameSaved OK");
+	}
+
+	void Persistent::ClearData() {
+		std::unique_lock lock(this->_Lock);
+		ActorDataMap.clear();
+		KillCountDataMap.clear();
+
+		TrackedCameraState = 0;
+		EnableCrawlPlayer = false;
+		EnableCrawlFollower = false;
+		PlayerExtraPotionSize = 0.0f;
+		GlobalSizeLimit = 1.0f;
+		GlobalMassBasedSizeLimit = 0.0f;
+		HugStealCount = 0.0f;
+		StolenSize = 0.0f;
+		CrushCount = 0.0f;
+		STNCount = 0.0f;
+		HandCrushed = 0.0f;
+		VoreCount = 0.0f;
+		GiantCount = 0.0f;
+		MSGSeenTinyCamity = false;
+		MSGSeenGrowthSpurt = false;
+		MSGSeenAspectOfGTS = false;
+		UnlockMaxSizeSliders = false;
+
 	}
 
 	void Persistent::LoadPersistent(SerializationInterface* serde) {
@@ -338,7 +366,7 @@ namespace GTS {
 	}
 
 	ActorData* Persistent::GetActorData(Actor& actor) {
-		std::unique_lock lock(this->_lock);
+		std::unique_lock lock(this->_Lock);
 		auto key = actor.formID;
 
 		// Lambda to add new ActorData if conditions are met
@@ -385,6 +413,23 @@ namespace GTS {
 		
 	}
 
+	void Persistent::Reset(){
+
+		ClearData();
+
+		// Ensure we reset them back to inital scales
+		// if they are loaded into game memory
+		// since skyrim only lazy loads actors
+		// that are already in memory it won't reload
+		// their nif scales otherwise
+		for (auto actor : find_actors()) {
+			ResetToInitScale(actor);
+		}
+
+		logger::info("Persistent: Reset Event");
+
+	}
+
 	void Persistent::ResetActor(Actor* actor) {
 		// Fired after a TESReset event
 		// This event should be when the game attempts to reset their
@@ -422,8 +467,17 @@ namespace GTS {
 		ResetToInitScale(actor);
 	}
 
+	// The Revert Callback Fires when we exit to the main menu and when a game is loaded.
+	void Persistent::OnRevert(SerializationInterface*) {
+		logger::info("Persistent::OnRevert");
+
+		Persistent::GetSingleton().Reset();
+		Transient::GetSingleton().Reset();
+	
+	}
+
 	void Persistent::EraseUnloadedPersistentData() {
-		std::unique_lock lock(_lock);
+		std::unique_lock lock(_Lock);
 		// Create a set to hold the whitelisted FormIDs.
 		std::unordered_set<FormID> allowedFormIDs;
 
@@ -472,7 +526,8 @@ namespace GTS {
 
 		//Killcount data must be as big or larger than the value stored in the cosave otherwise we'll write out of struct bounds and corrupt adjacent memory
 		if (sizeof(KillCountData) < RecordSize || RecordSize == 0) {
-			ReportAndExit("KillCountData structure size missmatch, proceeding will lead to broken save data.\nThe Game will now close.");
+			ReportInfo("KillCountData structure size missmatch, proceeding will corrupt memory. Kill Count Data Will not be loaded from save.");
+			return;
 		}
 
 		for (; RecordCount > 0; --RecordCount) {
@@ -538,7 +593,7 @@ namespace GTS {
 	//----------------------
 
 	KillCountData* Persistent::GetKillCountData(Actor& actor) {
-		std::unique_lock lock(this->_lock);
+		std::unique_lock lock(this->_Lock);
 		auto key = actor.formID;
 		auto it = this->KillCountDataMap.find(key);
 

@@ -120,20 +120,7 @@ namespace GTS {
 
 		public:
 
-			virtual void Reset() override {
-
-				std::unique_lock lock(this->_lock);
-				this->ActorDataMap.clear();
-
-				// Ensure we reset them back to inital scales
-				// if they are loaded into game memory
-				// since skyrim only lazy loads actors
-				// that are already in memory it won't reload
-				// their nif scales otherwise
-				for (auto actor : find_actors()) {
-					ResetToInitScale(actor);
-				}
-			}
+			virtual void Reset() override;
 
 			virtual void ResetActor(Actor* actor) override;
 
@@ -141,9 +128,7 @@ namespace GTS {
 				return "::Persistent";
 			}
 
-			static void OnRevert(SerializationInterface*) {
-				GetSingleton().Reset();
-			}
+			static void OnRevert(SerializationInterface*);
 
 			[[nodiscard]] inline static Persistent& GetSingleton() noexcept {
 				static Persistent Instance;
@@ -155,7 +140,6 @@ namespace GTS {
 			static void OnGameLoaded(SKSE::SerializationInterface* serde);
 
 			void EraseUnloadedPersistentData();
-
 
 			KillCountData* GetKillCountData(Actor& actor);
 			KillCountData* GetKillCountData(Actor* actor);
@@ -181,12 +165,12 @@ namespace GTS {
 			//----- Camera
 			BasicRecord<int, 'TCST'> TrackedCameraState = 0;
 
-			//----- Crawk/Sneak State
+			//----- Crawl/Sneak State
 			BasicRecord<bool, 'ECPL'> EnableCrawlPlayer = false;
 			BasicRecord<bool, 'ECFL'> EnableCrawlFollower = false;
 
 			//----- Max Size Related
-			BasicRecord<float, 'GBPS'> PlayerExtraPotionSize = 0.0f;     //Exists here for compatibilty. TODO Deprecate this in favor of ActorData.
+			BasicRecord<float, 'GBPS'> PlayerExtraPotionSize = 0.0f;
 			BasicRecord<float, 'GTSL'> GlobalSizeLimit = 1.0f;
 			BasicRecord<float, 'GMBS'> GlobalMassBasedSizeLimit = 0.0f;
 
@@ -203,17 +187,19 @@ namespace GTS {
 			BasicRecord<bool, 'MSTC'> MSGSeenTinyCamity = false;
 			BasicRecord<bool, 'MSGS'> MSGSeenGrowthSpurt = false;
 			BasicRecord<bool, 'MSAG'> MSGSeenAspectOfGTS = false;
+
 			// ---- Unlimited Size slider unlocker
 			BasicRecord<bool, 'USSD'> UnlockMaxSizeSliders = false;
-
 
 		private:
 
 			Persistent() = default;
-			mutable std::mutex _lock;
+			mutable std::mutex _Lock;
 
 			std::unordered_map<FormID, ActorData> ActorDataMap;
 			std::unordered_map<FormID, KillCountData> KillCountDataMap;
+
+			void ClearData();
 
 			static void LoadPersistent(SerializationInterface* serde);
 			static void SavePersistent(SerializationInterface* serde);
@@ -222,9 +208,7 @@ namespace GTS {
 			//Actor Data Load
 			static void LoadActorData(SKSE::SerializationInterface* serde, const uint32_t RecordType, const uint32_t RecordVersion);
 			static void LoadActorRecordFloat(SKSE::SerializationInterface* serde, float* a_Data, uint32_t RecordVersion, uint32_t MinVersion, float DefaultValue);
-			static void LoadActorRecordBool(SKSE::SerializationInterface* serde, bool* a_Data, uint32_t RecordVersion,
-			                                uint32_t MinVersion,
-			                                bool DefaultValue);
+			static void LoadActorRecordBool(SKSE::SerializationInterface* serde, bool* a_Data, uint32_t RecordVersion, uint32_t MinVersion, bool DefaultValue);
 			static void DummyRead32(SKSE::SerializationInterface* serde);
 			static void DummyRead8(SKSE::SerializationInterface* serde);
 

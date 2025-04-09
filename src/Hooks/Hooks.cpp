@@ -100,8 +100,8 @@ namespace Hooks
 		//}
 
 		//Hook_MagicTarget::Hook();
-		//Hook_ActorRotation::Hook(trampoline);
-		//Hook_Experiments::Hook(trampoline);
+		//Hook_ActorRotation::Hook(SKSETrampoline);
+		//Hook_Experiments::Hook(SKSETrampoline);
 
 		log::info("Finished applying hooks");
 		log::info("Default Trampoline Used: {}/{} Bytes", SKSETrampoline.allocated_size(), SKSETrampoline.capacity());

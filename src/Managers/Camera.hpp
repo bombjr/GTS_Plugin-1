@@ -33,29 +33,28 @@ namespace GTS {
 			void AdjustLeftRight(float amt);
 			void ResetLeftRight();
 
+			void Reset() override;
+
 		private:
 			CameraState* GetCameraStateTP();
 			CameraState* GetCameraStateFP();
 
-			CameraState scaledVanillaState;  // Like vanilla only scaled
+			CameraState CamStateVanillaScaled;  // Like vanilla only scaled
 
-			Normal normalState;
-			Alt altState;
-			Foot footState;
-			FootR footRState;
-			FootL footLState;
+			Normal CamStateNormal;
+			Alt CamStateAlt;
+			Foot CamStateFoot;
+			FootR CamStateFootR;
+			FootL CamStateFootL;
 
-			FirstPerson fpState;
+			FirstPerson CamStateFP;
 
-			NiPoint3 manualEdit;
+			NiPoint3 ManualEditOffsets = {0,0,0};
 
-			Timer initimer = Timer(3.00);
+			Spring SpringSmoothScale = Spring(0.3f, 0.5f);
+			Spring3 SpringSmoothOffset = Spring3(NiPoint3(0.3f, 0.3f, 0.3f), 0.5f);
 
-			Spring smoothScale = Spring(0.30f, 0.50f);
-			Spring3 smoothOffset = Spring3(NiPoint3(0.30f, 0.30f, 0.30f), 0.50f);
-			float CameraDelay = 0.0f;
-
-			CameraState* currentState = nullptr;
-			std::unique_ptr<TransState> transitionState = std::unique_ptr<TransState>(nullptr);
+			CameraState* TrackedState = nullptr;
+			std::unique_ptr<TransState> TransitionState = std::unique_ptr<TransState>(nullptr);
 	};
 }

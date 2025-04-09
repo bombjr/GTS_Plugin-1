@@ -110,12 +110,13 @@ namespace GTS {
 			virtual std::string DebugName() override;
 			virtual void ActorLoaded(RE::Actor* actor) override;
 			virtual void Reset() override;
+
 			virtual void ResetActor(Actor* actor) override;
 			void EraseUnloadedTransientData();
 
 		private:
 
-			mutable std::mutex TransientLock;
+			mutable std::mutex _Lock;
 			std::unordered_map<FormID, TempActorData> TempActorDataMap;
 	};
 }

@@ -99,13 +99,13 @@ namespace GTS {
 	void CameraManager::CameraUpdate() {
 
 		auto profiler = Profilers::Profile("CameraManager: CameraUpdate");
-		CameraState* currentState = this->GetCameraState();
+		CameraState* CurrentState = this->GetCameraState();
 
 		if (SmoothCam::Enabled()) {
 			if (auto TPState = reinterpret_cast<ThirdPersonCameraState*>(GetCameraStateTP())) {
-				if ((TPState == &this->footLState ||
-					TPState == &this->footRState  ||
-					TPState == &this->footState   ||
+				if ((TPState == &this->CamStateFootL ||
+					TPState == &this->CamStateFootR  ||
+					TPState == &this->CamStateFoot   ||
 					!TPState->GetBoneTarget().boneNames.empty())) { //Checks for Valid states when using Normal or Alt Cam
 					//Take control from SC so we can do our own thing if one of these conditions match
 					SmoothCam::RequestConrol();
@@ -118,52 +118,58 @@ namespace GTS {
 			}
 		}
 
-		if (currentState != this->currentState) {
-			if (this->currentState) {
-				this->currentState->ExitState();
+		if (CurrentState != this->TrackedState) {
+			if (this->TrackedState) {
+				this->TrackedState->ExitState();
 			}
-			if (currentState) {
-				currentState->EnterState();
+			if (CurrentState) {
+				CurrentState->EnterState();
 			}
-			auto prevState = this->currentState;
-			this->currentState = currentState;
-			if (prevState) {
-				if (currentState) {
-					if (currentState->PermitTransition() && prevState->PermitTransition()) {
-						this->transitionState.reset(new TransState(prevState, currentState));
-						currentState = this->transitionState.get();
-					} else {
-						this->transitionState.reset(nullptr);
+			CameraState* PreviousState = this->TrackedState;
+			this->TrackedState = CurrentState;
+			if (PreviousState) {
+				if (CurrentState) {
+					if (CurrentState->PermitTransition() && PreviousState->PermitTransition()) {
+						this->TransitionState.reset(new TransState(PreviousState, CurrentState));
+						CurrentState = this->TransitionState.get();
 					}
-				} else {
-					this->transitionState.reset(nullptr);
+					else {
+						this->TransitionState.reset(nullptr);
+					}
 				}
-			} else {
-				this->transitionState.reset(nullptr);
+				else {
+					this->TransitionState.reset(nullptr);
+				}
 			}
-		} else {
-			if (this->transitionState) {
-				if (!this->transitionState->IsDone()) {
-					currentState = this->transitionState.get();
-				} else {
-					this->transitionState.reset(nullptr);
+			else {
+				this->TransitionState.reset(nullptr);
+			}
+		}
+		else {
+			if (this->TransitionState) {
+				if (!this->TransitionState->IsDone()) {
+					CurrentState = this->TransitionState.get();
+				}
+				else {
+					this->TransitionState.reset(nullptr);
 				}
 			}
 		}
 
 		// Handles updating the camera
-		if (currentState) {
+		if (CurrentState) {
 
 			auto player = PlayerCharacter::GetSingleton();
 			bool IsCurrentlyCrawling = IsCrawling(player);
 			if (IsGtsBusy(player) && IsCrawling(player) && GetCameraOverride(player)) {
 				IsCurrentlyCrawling = false;
-			} else if (IsProning(player)) {
+			}
+			else if (IsProning(player)) {
 				IsCurrentlyCrawling = true;
 			}
 
 			// Get scale based on camera state
-			float scale = currentState->GetScale();
+			float scale = CurrentState->GetScale();
 
 			// Get current camera position in player space
 			auto cameraPosLocal = GetCameraPosLocal();
@@ -171,25 +177,24 @@ namespace GTS {
 			// Get either normal or combat offset
 			NiPoint3 offset;
 			if (player != nullptr && player->AsActorState()->IsWeaponDrawn()) {
-				offset = currentState->GetCombatOffset(cameraPosLocal, IsCurrentlyCrawling);
-			} else {
-				offset = currentState->GetOffset(cameraPosLocal, IsCurrentlyCrawling);
+				offset = CurrentState->GetCombatOffset(cameraPosLocal, IsCurrentlyCrawling);
+			}
+			else {
+				offset = CurrentState->GetOffset(cameraPosLocal, IsCurrentlyCrawling);
 			}
 
-			NiPoint3 playerLocalOffset = currentState->GetPlayerLocalOffset(cameraPosLocal, IsCurrentlyCrawling);
+			NiPoint3 playerLocalOffset = CurrentState->GetPlayerLocalOffset(cameraPosLocal, IsCurrentlyCrawling);
 
-			//offset.z += HighHeelOffset();
-
-			if (currentState->PermitManualEdit()) {
-				this->smoothOffset.target = this->manualEdit;
+			if (CurrentState->PermitManualEdit()) {
+				this->SpringSmoothOffset.target = this->ManualEditOffsets;
 			}
 
-			offset += this->smoothOffset.value;
-			this->smoothScale.target = scale;
+			offset += this->SpringSmoothOffset.value;
+			this->SpringSmoothScale.target = scale;
 
 			// Apply camera scale and offset
-			if (currentState->PermitCameraTransforms()) {
-				UpdateCamera(this->smoothScale.value, offset, playerLocalOffset);
+			if (CurrentState->PermitCameraTransforms()) {
+				UpdateCamera(this->SpringSmoothScale.value, offset, playerLocalOffset);
 			}
 		}
 	}
@@ -201,23 +206,23 @@ namespace GTS {
 		switch (Mode) {
 
 			case CameraModeTP::kNormal: {
-				return &this->normalState;
+				return &this->CamStateNormal;
 			}
 
 			case CameraModeTP::kAlternative: {
-				return &this->altState;
+				return &this->CamStateAlt;
 			}
 
 			case CameraModeTP::kFeetCenter: {
-				return &this->footState;
+				return &this->CamStateFoot;
 			}
 
 			case CameraModeTP::kFootLeft: {
-				return &this->footLState;
+				return &this->CamStateFootL;
 			}
 
 			case CameraModeTP::kFootRight: {
-				return &this->footRState;
+				return &this->CamStateFootR;
 			}
 
 			default: {
@@ -228,7 +233,7 @@ namespace GTS {
 
 	CameraState* CameraManager::GetCameraStateFP() {
 		//Other states are now deprecated
-		return &this->fpState;
+		return &this->CamStateFP;
 	}
 
 	// Decide which camera state to use
@@ -286,7 +291,7 @@ namespace GTS {
 			case RE::CameraState::kFree:
 			case RE::CameraState::kPCTransition:
 			case RE::CameraState::kIronSights: {
-				return &this->scaledVanillaState;
+				return &this->CamStateVanillaScaled;
 			}
 			// These should not be touched at all
 			case RE::CameraState::kTween:
@@ -301,16 +306,44 @@ namespace GTS {
 	}
 
 	void CameraManager::AdjustUpDown(float amt) {
-		this->manualEdit.z += amt;
+		this->ManualEditOffsets.z += amt;
 	}
 	void CameraManager::ResetUpDown() {
-		this->manualEdit.z = 0.0f;
+		this->ManualEditOffsets.z = 0.0f;
 	}
 
 	void CameraManager::AdjustLeftRight(float amt) {
-		this->manualEdit.x += amt;
+		this->ManualEditOffsets.x += amt;
 	}
 	void CameraManager::ResetLeftRight() {
-		this->manualEdit.x = 0.0f;
+		this->ManualEditOffsets.x = 0.0f;
+	}
+
+	void CameraManager::Reset() {
+
+		SpringSmoothScale = Spring(0.3f, 0.5f);
+		SpringSmoothOffset = Spring3(NiPoint3(0.30f, 0.30f, 0.30f), 0.50f);
+
+		CamStateNormal.SpringSmoothScale = Spring(1.0f, 0.5f);
+		CamStateNormal.SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
+		CamStateAlt.SpringSmoothScale = Spring(1.0f, 0.5f);
+		CamStateAlt.SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
+		CamStateFoot.SpringSmoothScale = Spring(1.0f, 0.5f);
+		CamStateFoot.SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
+		CamStateFootR.SpringSmoothScale = Spring(1.0f, 0.5f);
+		CamStateFootR.SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
+		CamStateFootL.SpringSmoothScale = Spring(1.0f, 0.5f);
+		CamStateFootL.SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
+		ManualEditOffsets = { 0,0,0 };
+
+		TrackedState = nullptr;
+		TransitionState.reset(nullptr);
+
+		logger::info("CameraManager Reset");
 	}
 }
