@@ -9,7 +9,7 @@ namespace GTS {
 
 	TempActorData* Transient::GetData(TESObjectREFR* a_Object) {
 
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 
 		if (!a_Object) {
 			return nullptr;
@@ -34,7 +34,7 @@ namespace GTS {
 	}
 
 	TempActorData* Transient::GetActorData(Actor* actor) {
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 
 		if (!actor) {
 			return nullptr;
@@ -68,7 +68,7 @@ namespace GTS {
 	}
 
 	std::vector<FormID> Transient::GetForms() const {
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 		std::vector<FormID> keys;
 		keys.reserve(this->TempActorDataMap.size());
 		for(const auto data : this->TempActorDataMap | views::keys) {
@@ -83,7 +83,7 @@ namespace GTS {
 	}
 
 	void Transient::ActorLoaded(RE::Actor* actor) {
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 		if (!actor) {
 			return;
 		}
@@ -112,13 +112,13 @@ namespace GTS {
 	}
 
 	void Transient::Reset() {
-		std::unique_lock lock(this->TransientLock);
-		log::info("Transient was reset");
+		std::unique_lock lock(this->_Lock);
 		this->TempActorDataMap.clear();
+		log::info("Transient was reset");
 	}
 
 	void Transient::ResetActor(Actor* actor) {
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 		if (actor) {
 			auto key = actor->formID;
 			this->TempActorDataMap.erase(key);
@@ -126,7 +126,7 @@ namespace GTS {
 	}
 
 	void Transient::EraseUnloadedTransientData() {
-		std::unique_lock lock(this->TransientLock);
+		std::unique_lock lock(this->_Lock);
 
 		// Create a set to hold the whitelisted FormIDs.
 		std::unordered_set<FormID> allowedFormIDs;

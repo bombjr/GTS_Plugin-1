@@ -37,10 +37,10 @@ namespace GTS {
 						auto transform = playerTrans.Invert();
 						NiPoint3 lookAt = ComputeLookAt(boneTarget.zoomScale);
 						NiPoint3 localLookAt = transform*lookAt;
-						this->smoothScale.halflife = Modify_HalfLife();
-						this->smoothedBonePos.halflife = Modify_HalfLife();
-						this->smoothScale.target = scale;
-						pos += localLookAt * -1 * this->smoothScale.value;
+						this->SpringSmoothScale.halflife = Modify_HalfLife();
+						this->SpringSmoothedBonePos.halflife = Modify_HalfLife();
+						this->SpringSmoothScale.target = scale;
+						pos += localLookAt * -1 * this->SpringSmoothScale.value;
 
 						std::vector<NiAVObject*> bones = {};
 						for (auto bone_name: boneTarget.boneNames) {
@@ -66,8 +66,8 @@ namespace GTS {
 						if (IsDebugEnabled()) {
 							DebugAPI::DrawSphere(glm::vec3(worldBonePos.x, worldBonePos.y, worldBonePos.z), 1.0f, 10, {0.0f, 1.0f, 0.0f, 1.0f});
 						}
-						smoothedBonePos.target = bonePos;
-						pos += smoothedBonePos.value;
+						SpringSmoothedBonePos.target = bonePos;
+						pos += SpringSmoothedBonePos.value;
 					}
 				}
 			}

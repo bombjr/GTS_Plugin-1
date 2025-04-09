@@ -5,8 +5,8 @@ using namespace GTS;
 namespace {
 
 	struct InitialScales {
-        float model;
-        float npc;
+        float model = 1.0f;
+        float npc = 1.0f;
 
         InitialScales() {
             throw std::exception("Cannot init a InitialScales without an actor");
@@ -51,7 +51,7 @@ namespace {
 
             return initScales.at(id);
         }
-        catch (const std::exception& e) {
+        catch (const exception& e) {
             log::error("GetActorInitialScales Failed {}", e.what());
 
             // Return a static default InitialScales
@@ -67,7 +67,7 @@ namespace {
 	void UpdateInitScale(Actor* actor) {
 		try {
 			GetActorInitialScales(actor); // It's enough just to call this
-		} catch (exception e){
+		} catch (const exception& e){
 			log::error("UpdateInitScale Failed {}",e.what());
 		}
 		
@@ -122,10 +122,11 @@ namespace GTS {
 					auto& initScale = GetActorInitialScales(actor);
 					set_model_scale(actor, initScale.model);
 					set_npcnode_scale(actor, initScale.npc);
+					logger::trace("Actor: {:08} ResetToInitScale", actor->formID);
 				}
 			}
 		}
-		catch (exception& e) {
+		catch (const exception& e) {
 			log::error("ResetToInitScale Failed {}", e.what());
 		}
 	}
@@ -137,7 +138,7 @@ namespace GTS {
 			auto& initScale = GetActorInitialScales(actor);
 			return initScale.model;
 		}
-		catch (exception& e) {
+		catch (const exception& e) {
 			log::error("GetInitialScale Failed {}", e.what());
 			return 1.0f;
 		}

@@ -11,8 +11,8 @@ namespace GTS {
 			virtual BoneTarget GetBoneTarget();
 			virtual NiPoint3 CrawlAdjustment(const NiPoint3& cameraPos);
 
-		private:
-			Spring smoothScale = Spring(1.0f, 0.5f);
-			Spring3 smoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+			Spring SpringSmoothScale = Spring(1.0f, 0.5f);
+			Spring3 SpringSmoothedBonePos = Spring3(NiPoint3(0.0f, 0.0f, 0.0f), 0.5f);
+
 	};
 }
