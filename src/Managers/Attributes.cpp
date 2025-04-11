@@ -272,7 +272,6 @@ namespace GTS {
 
 		switch (av) {
 			case ActorValue::kHealth: { // 27.03.2024: Health boost is still applied, but for Player only and only if having matching perks
-				auto& attributes = AttributeManager::GetSingleton();
 				float scale = get_giantess_scale(actor);
 				if (scale <= 0) {
 					scale = 1.0f;

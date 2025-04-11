@@ -23,6 +23,8 @@
 #include "Managers/GtsSizeManager.hpp"
 #include "Managers/HighHeel.hpp"
 
+#include "Managers/Audio/AudioObtainer.hpp"
+
 #include "Config/Config.hpp"
 #include "UI/DebugAPI.hpp"
 
@@ -331,7 +333,8 @@ namespace GTS {
 	void PlayMoanSound(Actor* actor, float volume) {
 		if (IsFemale(actor) && IsHuman(actor)) {
 			float falloff = 0.125f * get_visual_scale(actor);
-			Runtime::PlaySoundAtNode_FallOff("GTSSoundMoan", actor, volume, 1.0f, "NPC Head [Head]", falloff);
+			std::string_view MoanSoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundMoan");
+			Runtime::PlaySoundAtNode_FallOff(MoanSoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
 		}
 	}
 
@@ -339,9 +342,11 @@ namespace GTS {
 		float falloff = 0.125f * get_visual_scale(actor);
 		if (IsFemale(actor) && IsHuman(actor)) {
 			if (type == 2) {
-				Runtime::PlaySoundAtNode_FallOff("GTSSoundLaugh2", actor, volume, 1.0f, "NPC Head [Head]", falloff);
+				std::string_view Laugh2SoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh2");
+				Runtime::PlaySoundAtNode_FallOff(Laugh2SoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			} else {
-				Runtime::PlaySoundAtNode_FallOff("GTSSoundLaugh1", actor, volume, 1.0f, "NPC Head [Head]", falloff);
+				std::string_view Laugh1SoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh1");
+				Runtime::PlaySoundAtNode_FallOff(Laugh1SoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			}
 		}
 	}

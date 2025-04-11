@@ -10,10 +10,17 @@ namespace GTS {
 
 	        const char* T0 = "Enable footstep sounds when player size meets or exceeds a certain threshold.";
 	        const char* T1 = "Enable moaning sounds during spells like Slow Growth.";
+			const char* T2 = "Enables size variance for moans/laughs similar to footsteps, but without blendings\n"
+							 "If disabled, it will always use normal size sounds.\n"
+							 "Else picks matching sound category based on current size range:\n"
+							 "normal/x2/x4/x8/x12/x24/x48/x96\n\n"
+							 "- If you have no custom Moan/Laugh sounds, it does nothing.\n"
+							 "- Sounds location: Data\\Sound\\fx\\GTS\\Moans_Laughs. Folders are empty by default.\n"
+							 "- Possible usage: put edited variants of sounds with reverb/echo/etc in matching size folders";
 
 			const char* THelp = "Note: Moan/Laugh sounds are not included in the mod.\n"
 			"You can add sounds by adding your own .wav files in the following folder:\n"
-	    	"(Your Skyrim Folder)\\Data\\Sound\\fx\\GTS\\Others";
+	    	"(Your Skyrim Folder)\\Data\\Sound\\fx\\GTS\\Moans_Laughs";
 	        
 	        if(ImGui::CollapsingHeader("Sounds",ImUtil::HeaderFlagsDefaultOpen)){
 				ImGui::TextColored(ImUtil::ColorSubscript, "A Note On Sounds (?)");
@@ -21,6 +28,7 @@ namespace GTS {
 
 	            ImUtil::CheckBox("Footstep Sounds",&Settings.bFootstepSounds,T0);
 	            ImUtil::CheckBox("Moans On Slow Growth",&Settings.bSlowGrowMoans, T1);
+				ImUtil::CheckBox("Moan/Laugh Size Variance", &Settings.bMoanLaughSizeVariants, T2);
 	            ImGui::Spacing();
 	        }
 	    }

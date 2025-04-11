@@ -1,4 +1,7 @@
 #include "Managers/Audio/AudioObtainer.hpp"
+#include "Config/Config.hpp"
+
+using namespace GTS;
 
 namespace GTS {
 
@@ -15,6 +18,28 @@ namespace GTS {
     float frequency_function(float scale, const VolumeParams& params) {
         float a = params.a;
         return soft_core(scale, 0.01f, 1.0f, 1.0f, a, 0.0f)*0.5f+0.5f;
+    }
+
+    std::string ObtainMoanLaughSound(float scale, std::string Construct) {
+        std::string SoundResult = Construct;
+        std::string size_range = "_x2";
+        if (scale < 2.0f || !Config::GetAudio().bMoanLaughSizeVariants) {
+            return Construct; // We're at 'normal' size
+        }
+
+        // Else construct matching size audio for moan/laughs
+        
+        else if (scale >= 96.0f)    {size_range = "_x96";}
+        else if (scale >= 48.0f)    {size_range = "_x48";}
+        else if (scale >= 24.0f)    {size_range = "_x24";}
+        else if (scale >= 12.0f)    {size_range = "_x12";}
+        else if (scale >= 8.0f)     {size_range = "_x8";}
+        else if (scale >= 4.0f)     {size_range = "_x4";}
+        else if (scale >= 2.0f)     {size_range = "_x2";}
+
+        SoundResult += size_range;
+        log::info("Sound Result: {}", SoundResult); 
+        return SoundResult;
     }
 
     BSISoundDescriptor* get_lFootstep_sounddesc(const FootEvent& foot_kind) {

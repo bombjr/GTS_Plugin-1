@@ -142,25 +142,4 @@ namespace Hooks {
 		return _NPCAnimEvents(a_this, a_event, a_src);
 	}
 
-	NiPoint3 Hook_Character::GetBoundMax(Character* a_this) {
-		auto bound = _GetBoundMax(a_this);
-		if (a_this) {
-			float scale = get_giantess_scale(a_this);
-			if (scale > 1e-4) {
-				bound = bound * scale;
-			}
-		}
-		return bound;
-	}
-
-	NiPoint3 Hook_Character::GetBoundMin(Character* a_this) {
-		auto bound = _GetBoundMin(a_this);
-		if (a_this) {
-			float scale = get_giantess_scale(a_this);
-			if (scale > 1e-4) {
-				bound = bound * scale;
-			}
-		}
-		return bound;
-	}
 }

@@ -2,6 +2,7 @@
 #include "Managers/Animation/Grab.hpp"
 
 #include "Managers/Animation/Utils/AnimationUtils.hpp"
+#include "Managers/Animation/Utils/TurnTowards.hpp"
 #include "Managers/Animation/AnimationManager.hpp"
 
 #include "Magic/Effects/Common.hpp"
@@ -31,25 +32,34 @@ namespace {
 
     bool ManageGrabPlayAttachment(Actor* giantref, Actor* tinyref) {
         auto TargetBone = Attachment_GetTargetNode(giantref);
-        NiAVObject* Object = nullptr;
+        std::string_view node_lookup = "none";
+        
         
         switch (TargetBone) {
             case AttachToNode::ObjectL: {
-                Object = find_node(giantref, "AnimObjectL");            break;
+                node_lookup = "AnimObjectL";            break;
             }
             case AttachToNode::ObjectR: {
-                Object = find_node(giantref, "AnimObjectR");            break;
+                node_lookup = "AnimObjectR";            break;
             }
             case AttachToNode::ObjectA: {
-                Object = find_node(giantref, "AnimObjectA");            break;
+                node_lookup = "AnimObjectA";            break;
             }
             case AttachToNode::ObjectB: {
-                Object = find_node(giantref, "AnimObjectB");            break;
+                node_lookup = "AnimObjectB";            break;
+            }
+            case AttachToNode::None: {
+                node_lookup = "none";
             }
         }
 
+        NiAVObject* Object = find_node(giantref, node_lookup);
+        log::info("Giantess: {}, Tiny: {}", giantref->GetDisplayFullName(), tinyref->GetDisplayFullName());
+        log::info("Attaching to node: {}", node_lookup);
+        log::info("Node Found: {}", Object != nullptr);
         if (Object) {
             NiPoint3 coords = Object->world.translate;
+            FaceSame(giantref, tinyref);
 
             if (!AttachTo(giantref, tinyref, coords)) {
                 Grab::CancelGrab(giantref, tinyref);

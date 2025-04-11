@@ -30,17 +30,7 @@ namespace Hooks {
 			static void Move(PlayerCharacter* a_this, float a_arg2, const NiPoint3& a_position);
 			static inline REL::Relocation<decltype(Move)> _Move;
 
-			static void ProcessTracking(PlayerCharacter* a_this, float a_delta, NiAVObject* a_obj3D);
-			static inline REL::Relocation<decltype(ProcessTracking)> _ProcessTracking;
-
 			static void PCAnimEvents(BSTEventSink<BSAnimationGraphEvent>* a_this, BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_src);
 			static inline REL::Relocation<decltype(PCAnimEvents)> _PCAnimEvents;
-
-			static NiPoint3 GetBoundMin(PlayerCharacter* a_this);
-			static inline REL::Relocation<decltype(GetBoundMin)> _GetBoundMin;
-
-			static NiPoint3 GetBoundMax(PlayerCharacter* a_this);
-			static inline REL::Relocation<decltype(GetBoundMax)> _GetBoundMax;
-
 	};
 }
