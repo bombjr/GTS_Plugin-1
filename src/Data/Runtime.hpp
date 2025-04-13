@@ -57,7 +57,6 @@ namespace GTS {
 		TESLevItem* data;
 	};
 
-
 	class Runtime : public EventListener {
 		public:
 			[[nodiscard]] static Runtime& GetSingleton() noexcept;
@@ -67,6 +66,7 @@ namespace GTS {
 			static BSISoundDescriptor* GetSound(const std::string_view& tag);
 			static void PlaySound(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency);
 			static void PlaySound(const std::string_view& tag, TESObjectREFR* ref, const float& volume, const float& frequency);
+			static void CheckSoftDependencies();
 
 			static void PlaySoundAtNode_FallOff(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency, const std::string_view& node, float Falloff);
 			static void PlaySoundAtNode_FallOff(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency, NiAVObject* node, float Falloff);
@@ -161,5 +161,15 @@ namespace GTS {
 			std::unordered_map<std::string, LeveledItemsData> levelitems;
 
 			std::unordered_set<std::string> logged;
+
+			//Dependency Checks
+			[[nodiscard]] __forceinline static inline const bool IsSexlabInstalled() {
+				return SoftDep_SL_Found;
+			}
+
+
+			private:
+			//"Dependency" Checks
+			static inline bool SoftDep_SL_Found = false;
 	};
 }

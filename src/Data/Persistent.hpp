@@ -48,7 +48,7 @@ namespace GTS {
 
 		/// --------- V8
 		bool ShowSizebarInUI = false;
-		bool PAD_51 = false;
+		uint8_t MoanSoundDescriptorIndex = 0;
 		bool PAD_52 = false;
 		bool PAD_53 = false;
 		float stolen_attributes = 0.0f;
@@ -209,6 +209,7 @@ namespace GTS {
 			static void LoadActorData(SKSE::SerializationInterface* serde, const uint32_t RecordType, const uint32_t RecordVersion);
 			static void LoadActorRecordFloat(SKSE::SerializationInterface* serde, float* a_Data, uint32_t RecordVersion, uint32_t MinVersion, float DefaultValue);
 			static void LoadActorRecordBool(SKSE::SerializationInterface* serde, bool* a_Data, uint32_t RecordVersion, uint32_t MinVersion, bool DefaultValue);
+			static void LoadActorRecordU8(SKSE::SerializationInterface* serde, uint8_t* a_Data, uint32_t RecordVersion, uint32_t MinVersion, uint8_t DefaultValue);
 			static void DummyRead32(SKSE::SerializationInterface* serde);
 			static void DummyRead8(SKSE::SerializationInterface* serde);
 
@@ -217,6 +218,7 @@ namespace GTS {
 			static void WriteKillCountData(SKSE::SerializationInterface* serde, uint8_t Version);
 			static void WriteActorRecordFloat(SKSE::SerializationInterface* serde, const float* Data);
 			static void WriteActorRecordBool(SKSE::SerializationInterface* serde, const bool* Data);
+			static void WriteActorRecordU8(SKSE::SerializationInterface* serde, const uint8_t* Data);
 			static void WriteActorRecordFormID(SKSE::SerializationInterface* serde, const FormID* Id);
 			static void DummyWrite32(SKSE::SerializationInterface* serde);
 			static void DummyWrite8(SKSE::SerializationInterface* serde);

@@ -331,21 +331,41 @@ namespace GTS {
 	}
 
 	void PlayMoanSound(Actor* actor, float volume) {
-		if (IsFemale(actor) && IsHuman(actor)) {
-			float falloff = 0.125f * get_visual_scale(actor);
-			std::string_view MoanSoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundMoan");
-			Runtime::PlaySoundAtNode_FallOff(MoanSoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
+
+		const auto SLInstalled = Runtime::IsSexlabInstalled();
+
+		if (IsHuman(actor) && IsFemale(actor, SLInstalled)) {
+
+			std::string MoanSoundToPlay;
+			const float FallOff = 0.125f * get_visual_scale(actor);
+			const auto ActorData = Persistent::GetSingleton().GetData(actor);
+			int CustomSoundIndex = 0;
+
+			if (SLInstalled && ActorData) {
+				CustomSoundIndex = ActorData->MoanSoundDescriptorIndex;
+			}
+
+			if (CustomSoundIndex == 0) {
+				MoanSoundToPlay = ObtainGTSMoanLaughSound(get_visual_scale(actor), "GTSSoundMoan");
+			}
+			else {
+				MoanSoundToPlay = ObtainIndexedMoanSound(CustomSoundIndex, actor);
+			}
+
+			Runtime::PlaySoundAtNode_FallOff(MoanSoundToPlay, actor, volume, 1.0f, "NPC Head [Head]", FallOff);
+
 		}
+
 	}
 
 	void PlayLaughSound(Actor* actor, float volume, int type) {
 		float falloff = 0.125f * get_visual_scale(actor);
 		if (IsFemale(actor) && IsHuman(actor)) {
 			if (type == 2) {
-				std::string_view Laugh2SoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh2");
+				std::string Laugh2SoundFinder = ObtainGTSMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh2");
 				Runtime::PlaySoundAtNode_FallOff(Laugh2SoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			} else {
-				std::string_view Laugh1SoundFinder = ObtainMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh1");
+				std::string Laugh1SoundFinder = ObtainGTSMoanLaughSound(get_visual_scale(actor), "GTSSoundLaugh1");
 				Runtime::PlaySoundAtNode_FallOff(Laugh1SoundFinder, actor, volume, 1.0f, "NPC Head [Head]", falloff);
 			}
 		}
