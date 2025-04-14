@@ -22,4 +22,6 @@ namespace GTS {
 	//
 	// But not the player themselves
 	vector<Actor*> FindTeammates();
+
+	vector<Actor*> FindFemaleTeammates();
 }

@@ -332,27 +332,28 @@ namespace GTS {
 
 	void PlayMoanSound(Actor* actor, float volume) {
 
-		const auto SLInstalled = Runtime::IsSexlabInstalled();
-
-		if (IsHuman(actor) && IsFemale(actor, SLInstalled)) {
+		if (IsHuman(actor) && IsFemale(actor)) {
 
 			std::string MoanSoundToPlay;
 			const float FallOff = 0.125f * get_visual_scale(actor);
 			const auto ActorData = Persistent::GetSingleton().GetData(actor);
-			int CustomSoundIndex = 0;
+			uint8_t CustomSoundIndex = 0;
 
-			if (SLInstalled && ActorData) {
+			if (Runtime::IsSexlabInstalled() && ActorData) {
 				CustomSoundIndex = ActorData->MoanSoundDescriptorIndex;
 			}
 
+			//0 Refer's to the built in one effectively disabling the feature
 			if (CustomSoundIndex == 0) {
 				MoanSoundToPlay = ObtainGTSMoanLaughSound(get_visual_scale(actor), "GTSSoundMoan");
 			}
 			else {
-				MoanSoundToPlay = ObtainIndexedMoanSound(CustomSoundIndex, actor);
+				MoanSoundToPlay = ObtainSLMoanSound(CustomSoundIndex);
 			}
 
-			Runtime::PlaySoundAtNode_FallOff(MoanSoundToPlay, actor, volume, 1.0f, "NPC Head [Head]", FallOff);
+			if (!MoanSoundToPlay.empty()) {
+				Runtime::PlaySoundAtNode_FallOff(MoanSoundToPlay, actor, volume, 1.0f, "NPC Head [Head]", FallOff);
+			}
 
 		}
 

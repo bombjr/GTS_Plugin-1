@@ -162,6 +162,7 @@ namespace GTS {
 
 	void Runtime::CheckSoftDependencies() {
 		CheckModLoaded(&SoftDep_SL_Found,"SexLab.esm");
+		CheckModLoaded(&SoftDep_SurvMode_Found, "ccQDRSSE001-SurvivalMode.esl");
 	}
 
 

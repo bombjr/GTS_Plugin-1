@@ -153,26 +153,6 @@ SLVoiceF8Mil = "Sexlab.esm|067539"
 SLVoiceF8Mid = "Sexlab.esm|067538"
 SLVoiceF8Hot = "Sexlab.esm|067537"
 
-# -- SL Voices Male
-
-SLVoiceM1Mil = "Sexlab.esm|067560" # Mild
-SLVoiceM1Mid = "Sexlab.esm|06755F" # Middle
-SLVoiceM1Hot = "Sexlab.esm|06755E" # Hot
-
-SLVoiceM2Mil = "Sexlab.esm|067563"
-SLVoiceM2Mid = "Sexlab.esm|067562"
-SLVoiceM2Hot = "Sexlab.esm|067561"
-
-SLVoiceM3Mil = "Sexlab.esm|067566"
-SLVoiceM3Mid = "Sexlab.esm|067565"
-SLVoiceM3Hot = "Sexlab.esm|067564"
-
-SLVoiceM4Mil = "Sexlab.esm|067569"
-SLVoiceM4Mid = "Sexlab.esm|067568"
-SLVoiceM4Hot = "Sexlab.esm|067567"
-
-
-
 # Magic Effects -------------------------------------------------------------
 [MGEF] 
 GTSEffectTinyCalamity = "GTS.esp|1A2568"

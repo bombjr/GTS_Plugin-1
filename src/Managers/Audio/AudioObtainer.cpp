@@ -17,28 +17,28 @@ namespace GTS {
         return soft_core(scale, 0.01f, 1.0f, 1.0f, a, 0.0f) * 0.5f + 0.5f;
     }
 
-
-
-
 	// Function that builds the string based on the given index and a random suffix.
-    std::string ObtainIndexedMoanSound(int index, Actor* actor) {
+    std::string ObtainSLMoanSound(uint8_t index) {
 
-        const std::string ActorSex = IsFemale(actor) ? "F" : "M";
-        const std::string Base = "SLVoice" + ActorSex + std::to_string(index);
+        //TODO Unhardcode this later
+        constexpr int OuterBoundF = 8;
+
+        if (index > OuterBoundF) {
+            logger::warn("ObtainIndexedMoanSound Out Of Bounds: {}", index);
+            return "";
+        }
+
+        const std::string Base = "SLVoiceF" + std::to_string(index);
 
         logger::trace("Constructed SLVoice Base String: {}", Base);
 
-        // Pick one of the three suffixes using RandomInt(0,2)
-        const int randomValue = RandomInt(0, 2);
+        // Pick one of the three suffixes
         std::string Suffix;
-        if (randomValue == 0) {
-            Suffix = "Mil";
-        }
-        else if (randomValue == 1) {
-            Suffix = "Mid";
-        }
-        else {
-            Suffix = "Hot";
+        switch (RandomIntWeighted(10, 8, 6)) {
+            default:
+            case 0: Suffix = "Mil"; break;
+	        case 1: Suffix = "Mid"; break;
+	        case 2: Suffix = "Hot"; break;
         }
 
         const auto Res = Base + Suffix;

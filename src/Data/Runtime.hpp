@@ -162,14 +162,18 @@ namespace GTS {
 
 			std::unordered_set<std::string> logged;
 
+
 			//Dependency Checks
 			[[nodiscard]] __forceinline static inline const bool IsSexlabInstalled() {
 				return SoftDep_SL_Found;
 			}
 
+			[[nodiscard]] __forceinline static inline const bool IsSurvivalModeInstalled() {
+				return SoftDep_SurvMode_Found;
+			}
 
 			private:
-			//"Dependency" Checks
 			static inline bool SoftDep_SL_Found = false;
+			static inline bool SoftDep_SurvMode_Found = false;
 	};
 }

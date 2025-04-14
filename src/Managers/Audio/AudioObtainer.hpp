@@ -14,7 +14,7 @@ namespace GTS {
     float frequency_function(float scale, const VolumeParams& params);
 
     std::string ObtainGTSMoanLaughSound(float scale, const std::string& basestring);
-    std::string ObtainIndexedMoanSound(int index, Actor* actor);
+    std::string ObtainSLMoanSound(uint8_t index);
 
     BSISoundDescriptor* get_lFootstep_sounddesc(const FootEvent& foot_kind);
     BSISoundDescriptor* get_lJumpLand_sounddesc(const FootEvent& foot_kind);
