@@ -85,6 +85,7 @@ namespace {
 					InputManager::GetSingleton().Init();
 					ConsoleManager::Init();
 					SmoothCam::Register();
+					Runtime::CheckSoftDependencies();
 
 					CPrintPluginInfo();
 					break;

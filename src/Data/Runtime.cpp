@@ -51,6 +51,22 @@ namespace {
 
 		}
 	};
+
+	void CheckModLoaded(bool* a_res, const std::string_view& a_name) {
+		logger::info("SoftDependency Checker: Checking for {}", a_name);
+		if (a_res) {
+			if (const auto DataHandler = RE::TESDataHandler::GetSingleton()) {
+				const auto ModFile = DataHandler->LookupModByName(a_name);
+				if (ModFile && ModFile->compileIndex != 0xFF) {
+					logger::info("SoftDependency Checker: {} was Found.", a_name);
+					*a_res = true;
+					return;
+				}
+			}
+		}
+		*a_res = false;
+	}
+
 }
 
 namespace GTS {
@@ -143,6 +159,12 @@ namespace GTS {
 			log::error("Could not build sound");
 		}
 	}
+
+	void Runtime::CheckSoftDependencies() {
+		CheckModLoaded(&SoftDep_SL_Found,"SexLab.esm");
+		CheckModLoaded(&SoftDep_SurvMode_Found, "ccQDRSSE001-SurvivalMode.esl");
+	}
+
 
 	void Runtime::PlaySoundAtNode_FallOff(const std::string_view& tag, Actor* actor, const float& volume, const float& frequency, const std::string_view& node, float Falloff) {
 		Runtime::PlaySoundAtNode_FallOff(tag, actor, volume, frequency, find_node(actor, node), Falloff);

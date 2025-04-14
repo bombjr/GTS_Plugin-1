@@ -316,11 +316,16 @@ namespace {
 			return;
 		}
 
-		// Copy player speed onto the actor
-		if (IsInSexlabAnim(actor, PlayerCharacter::GetSingleton())) {
-			persi_actor_data->anim_speed = GetAnimationSlowdown(PlayerCharacter::GetSingleton());
-			return;
-		}  
+		if (Runtime::IsSexlabInstalled()) {
+
+			const auto Player = PlayerCharacter::GetSingleton();
+
+			// Copy player speed onto the actor
+			if (IsInSexlabAnim(actor, Player)) {
+				persi_actor_data->anim_speed = GetAnimationSlowdown(Player);
+				return;
+			}
+		}
 		
 		persi_actor_data->anim_speed = GetAnimationSlowdown(actor); // else behave as usual
 	}

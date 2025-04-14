@@ -71,11 +71,11 @@ namespace GTS {
 	}
 
 	bool IsInSexlabAnim(Actor* actor_1, Actor* actor_2) {
-		if (Runtime::GetFaction("SexLabAnimatingFaction")) {
+		//if (Runtime::GetFaction("SexLabAnimatingFaction")) {
 			if (Runtime::InFaction(actor_1, "SexLabAnimatingFaction") && Runtime::InFaction(actor_2, "SexLabAnimatingFaction")) {
 				return true;
 			}
-		}
+		//}
 		return false;
 	}
 

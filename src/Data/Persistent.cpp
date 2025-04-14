@@ -199,7 +199,7 @@ namespace GTS {
 
 			//V8
 			LoadActorRecordBool(serde, &Data.ShowSizebarInUI, RecordVersion, 8, false);     //0x54
-			DummyRead8(serde);                                                              //0x55 - PAD
+			LoadActorRecordU8(serde, &Data.MoanSoundDescriptorIndex, RecordVersion, 8,0);   //0x55
 			DummyRead8(serde);                                                              //0x56 - PAD
 			DummyRead8(serde);                                                              //0x57 - PAD
 			LoadActorRecordFloat(serde, &Data.stolen_attributes, RecordVersion, 8, 0.0f);   //0x58
@@ -249,6 +249,16 @@ namespace GTS {
 
 		if (RecordVersion >= MinVersion) {
 			serde->ReadRecordData(a_Data, sizeof(bool));
+		}
+		else {
+			*a_Data = DefaultValue;
+		}
+	}
+
+	void Persistent::LoadActorRecordU8(SKSE::SerializationInterface* serde, uint8_t* a_Data, uint32_t RecordVersion, uint32_t MinVersion, uint8_t DefaultValue) {
+
+		if (RecordVersion >= MinVersion) {
+			serde->ReadRecordData(a_Data, sizeof(uint8_t));
 		}
 		else {
 			*a_Data = DefaultValue;
@@ -320,9 +330,9 @@ namespace GTS {
 
 			//V8
 			WriteActorRecordBool(serde, &Data.ShowSizebarInUI);             //0x54
-			DummyWrite8(serde);                                             //0x55
-			DummyWrite8(serde);                                             //0x56
-			DummyWrite8(serde);                                             //0x57
+			WriteActorRecordU8(serde, &Data.MoanSoundDescriptorIndex);      //0x55
+			DummyWrite8(serde);                                             //0x56 - PAD
+			DummyWrite8(serde);                                             //0x57 - PAD
 			WriteActorRecordFloat(serde, &Data.stolen_attributes);          //0x58
 			WriteActorRecordFloat(serde, &Data.stolen_health);              //0x5C
 			WriteActorRecordFloat(serde, &Data.stolen_magick);              //0x60
@@ -338,6 +348,10 @@ namespace GTS {
 
 	void Persistent::WriteActorRecordBool(SKSE::SerializationInterface* serde, const bool* Data) {
 		serde->WriteRecordData(Data, sizeof(bool));
+	}
+
+	void Persistent::WriteActorRecordU8(SKSE::SerializationInterface* serde, const uint8_t* Data) {
+		serde->WriteRecordData(Data, sizeof(uint8_t));
 	}
 
 	void Persistent::WriteActorRecordFormID(SKSE::SerializationInterface* serde, const FormID* Id) {
@@ -456,7 +470,7 @@ namespace GTS {
 			data->PAD_44 = 0.0f;
 			data->SizeReserve = 0.0f;
 			data->ShowSizebarInUI = false;
-			data->PAD_51 = false;
+			data->MoanSoundDescriptorIndex = 0;
 			data->PAD_52 = false;
 			data->PAD_53 = false;
 			data->stolen_attributes = 0.0f;
