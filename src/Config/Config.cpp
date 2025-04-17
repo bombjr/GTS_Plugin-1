@@ -83,16 +83,16 @@ namespace GTS {
                 return true;
             }
 
-            logger::error("Could not open the settings for writing. Settings not saved!");
+            logger::error("SaveTOMLToFile() -> Could not open the settings for writing. Settings not saved!");
             return false;
 
         }
         catch (toml::exception& e) {
-            logger::error("Could not parse the toml table when trying to save: {}", e.what());
+            logger::error("SaveTOMLToFile() ->Could not parse the toml table when trying to save: {}", e.what());
             return false;
         }
         catch (const std::ios_base::failure& e) {
-            logger::error("Could not parse the toml table when trying to save: {}", e.what());
+            logger::error("SaveTOMLToFile() -> Could not parse the toml table when trying to save: {}", e.what());
             return false;
         }
         catch (const std::exception& e) {
@@ -101,6 +101,33 @@ namespace GTS {
         }
         catch (...) {
             logger::error("SaveTOMLToFile() -> Unknown Exception");
+            return false;
+        }
+    }
+
+    /// @brief 
+    /// @param a_toml TOML data.
+    /// @return true on success, false on failure.
+    bool Config::SaveTOMLToString(const auto& a_toml) {
+
+        auto& Settings = Persistent::GetSingleton().ModSettings;
+
+        try {
+            std::lock_guard<std::mutex> lock(_ReadWriteLock);
+            Settings.value = toml::format(a_toml);
+            return true;
+
+        }
+        catch (toml::exception& e) {
+            logger::error("SaveTOMLToString() -> Could not parse the toml table when trying to save: {}", e.what());
+            return false;
+        }
+        catch (const std::exception& e) {
+            logger::error("SaveTOMLToString() -> Misc Exception: {}", e.what());
+            return false;
+        }
+        catch (...) {
+            logger::error("SaveTOMLToString() -> Unknown Exception");
             return false;
         }
     }
@@ -119,8 +146,74 @@ namespace GTS {
         TomlData = toml::ordered_table();
     }
 
-
     bool Config::LoadSettings() {
+        const auto LocalSave = Persistent::GetSingleton().LocalSettingsEnable.value;
+
+        if (LocalSave) {
+            return LoadSettingsFromString();
+        }
+        else {
+            return LoadSettingsFromFile();
+        }
+
+
+    }
+
+    bool Config::LoadSettingsFromString() {
+
+        auto& Settings = Persistent::GetSingleton().ModSettings;
+
+        try {
+            TomlData = toml::parse_str<toml::ordered_type_config>(Settings.value);
+        }
+        catch (const toml::exception& e) {
+            //Set TomlData to a clean table. So any loaded settings can still be saved propperly if needed.
+            TomlData = toml::ordered_table();
+            Settings.value.clear();
+            logger::error("Could not Parse Persistent Mod Settings: {}", e.what());
+            return false;
+
+        }
+        catch (...) {
+            logger::error("LoadSettingsFromString() -> TOML::Parse Exception Outside of TOML11's Scope");
+            return false;
+        }
+
+        try {
+            bool LoadRes = true;
+            //LoadRes &= LoadStructFromTOML(TomlData, Save); The global config denotes whether we should use persistent saves
+            LoadRes &= LoadStructFromTOML(TomlData, General);
+            LoadRes &= LoadStructFromTOML(TomlData, Gameplay);
+            LoadRes &= LoadStructFromTOML(TomlData, Balance);
+            LoadRes &= LoadStructFromTOML(TomlData, Audio);
+            LoadRes &= LoadStructFromTOML(TomlData, AI);
+            LoadRes &= LoadStructFromTOML(TomlData, Camera);
+            LoadRes &= LoadStructFromTOML(TomlData, GtsUI);
+            LoadRes &= LoadStructFromTOML(TomlData, Hidden);
+
+            if (!LoadRes) {
+                logger::error("One or more structs could not be deserialized with the fallback init failing too...");
+                //This is where we halt and catch fire as this is a litteral imposibility
+                //A bad deserialization should ALWAYS result in a clean struct instance. If this fails something really bad happened.
+            }
+            return LoadRes;
+        }
+        catch (const toml::exception& e) {
+            logger::error("Could not parse Persistent Mod Settings: {}", e.what());
+            return false;
+        }
+        catch (const std::exception& e) {
+            logger::error("Could not parse Persistent Mod Settings:{}", e.what());
+            return false;
+        }
+        catch (...) {
+            logger::error("LoadSettingsFromString() -> Unknown Exception");
+            return false;
+        }
+
+    }
+
+    bool Config::LoadSettingsFromFile() {
 
         if (!CheckFile(ConfigFile)) {
             return false;
@@ -187,17 +280,52 @@ namespace GTS {
 
     }
 
-    bool Config::SaveSettings() {
+    bool Config::SaveSettingsToString() {
 
+        try {
+
+            bool UpdateRes = true;
+            if (Hidden.IKnowWhatImDoing) {
+                UpdateRes &= UpdateTOMLFromStruct(TomlData, Advanced);
+            }
+
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, General);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, Gameplay);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, Balance);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, Audio);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, AI);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, Camera);
+            UpdateRes &= UpdateTOMLFromStruct(TomlData, GtsUI);
+
+            if (!UpdateRes) {
+                logger::error("One or more structs could not be serialized to TOML, Skipping Write");
+                return false;
+            }
+
+            bool SaveRes = SaveTOMLToString(TomlData);
+            if (!SaveRes) {
+                logger::error("Something went wrong when trying to save the TOML data... Settings are probably not saved...");
+            }
+
+            return SaveRes;
+        }
+        catch (const toml::exception& e) {
+            logger::error("TOML Exception: Could not update one or more structs: {}", _ConfigFile, e.what());
+            return false;
+        }
+        catch (...) {
+            logger::error("SaveSettingsToString() -> Unknown Exception");
+            return false;
+        }
+    }
+
+    bool Config::SaveSettingsToFile() {
         if (!CheckFile(ConfigFile)) {
             return false;
         }
 
         try {
-
             bool UpdateRes = true;
-
-            //If Enabled Allow Saving Advanced Settings
             if (Hidden.IKnowWhatImDoing) {
                 UpdateRes &= UpdateTOMLFromStruct(TomlData, Hidden);
                 UpdateRes &= UpdateTOMLFromStruct(TomlData, Advanced);
@@ -212,14 +340,13 @@ namespace GTS {
             UpdateRes &= UpdateTOMLFromStruct(TomlData, GtsUI);
 
             if (!UpdateRes) {
-                logger::error("One or more structs could not be serialized to TOML, Skipping Disk Write");
+                logger::error("One or more structs could not be serialized to TOML, Skipping Write");
                 return false;
             }
 
-            const bool SaveRes = SaveTOMLToFile(TomlData, ConfigFile);
-
+            bool SaveRes = SaveTOMLToFile(TomlData, ConfigFile);;
             if (!SaveRes) {
-                logger::error("Something went wrong when trying to save the TOML to disk... Settings are probably not saved...");
+                logger::error("Something went wrong when trying to save the TOML data... Settings are probably not saved...");
             }
 
             return SaveRes;
@@ -229,8 +356,19 @@ namespace GTS {
             return false;
         }
         catch (...) {
-            logger::error("SaveSettings() -> Unknown Exception");
+            logger::error("SaveSettingsToFile() -> Unknown Exception");
             return false;
         }
+    }
+
+    bool Config::SaveSettings() {
+
+        const bool EnableLocalSaves = Persistent::GetSingleton().LocalSettingsEnable.value;
+
+        if (EnableLocalSaves) {
+            return SaveSettingsToString();
+        }
+
+        return SaveSettingsToFile();
     }
 }

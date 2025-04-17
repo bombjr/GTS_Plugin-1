@@ -1,6 +1,13 @@
 
 #include "Data/Persistent.hpp"
+
+#include "Config/Config.hpp"
+
 #include "Managers/GtsSizeManager.hpp"
+
+#include "UI/ImGUI/ImFontManager.hpp"
+#include "UI/ImGUI/ImStyleManager.hpp"
+
 #include "Utils/ItemDistributor.hpp"
 
 namespace GTS {
@@ -16,6 +23,8 @@ namespace GTS {
 		DistributeChestItems();
 		FixAnimationsAndCamera(); // Call it from ActorUtils, needed to fix Grab anim on save-reload
 		LoadPersistent(serde);
+		LoadModLocalModConfiguration();
+
 		//logger::info("Persistent OnGameLoaded OK");
 	}
 
@@ -49,6 +58,17 @@ namespace GTS {
 		MSGSeenAspectOfGTS = false;
 		UnlockMaxSizeSliders = false;
 
+	}
+
+	void Persistent::LoadModLocalModConfiguration() {
+
+		const auto& Persi = Persistent::GetSingleton();
+
+		if (Persi.LocalSettingsEnable.value) {
+			Config::GetSingleton().LoadSettingsFromString();
+			ImStyleManager::GetSingleton().LoadStyle();
+			ImFontManager::GetSingleton().RebuildFonts();
+		}
 	}
 
 	void Persistent::LoadPersistent(SerializationInterface* serde) {
@@ -95,6 +115,11 @@ namespace GTS {
 
 			// ---- Unlimited Size slider unlocker
 			Persistent.UnlockMaxSizeSliders.Load(serde, RecordType, RecordVersion, RecordSize);
+
+			// ---- Save Baked Settings
+			Persistent.LocalSettingsEnable.Load(serde, RecordType, RecordVersion, RecordSize);
+			Persistent.ModSettings.Load(serde, RecordType, RecordVersion, RecordSize);
+
 		}
 
 	}
@@ -136,6 +161,10 @@ namespace GTS {
 
 		// ---- Unlimited Size slider unlocker
 		Persistent.UnlockMaxSizeSliders.Save(serde);
+
+		// ---- Save Baked Settings
+		Persistent.LocalSettingsEnable.Save(serde);
+		Persistent.ModSettings.Save(serde);
 	}
 	
 	//-----------------

@@ -66,6 +66,7 @@ find_package(CommonLibSSE CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(toml11 CONFIG REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(lz4 CONFIG REQUIRED)
 find_path(GLUINO_INCLUDE_DIRS "gluino/gluino.h")
 find_path(CLIBUTIL_INCLUDE_DIRS "CLibUtil/string.hpp")
 
@@ -81,7 +82,7 @@ FetchContent_Declare(
   boost_ext_reflect
   GIT_REPOSITORY https://github.com/qlibs/reflect
   GIT_SHALLOW ON  # Download the branch without its history
-  GIT_TAG        v1.2.4
+  GIT_TAG        v1.2.5
 )
 FetchContent_MakeAvailable(boost_ext_reflect)
 
@@ -103,6 +104,7 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE
 	Boost::headers
 	toml11::toml11
+	lz4::lz4
 	nlohmann_json::nlohmann_json
 	cmake_git_version_tracking
 )
