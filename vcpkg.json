@@ -7,14 +7,15 @@
     "plugin": {
       "description": "Build the plugin.",
       "dependencies": [
-		    "clib-util",
+        "clib-util",
         "commonlibsse-ng",
         "glm",
         "toml11",
         "nlohmann-json",
-		    "gluino",
+        "gluino",
         "magic-enum",
-        "boost-pfr"
+        "boost-pfr",
+        "lz4"
       ]
     }
   },

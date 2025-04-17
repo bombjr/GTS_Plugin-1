@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/BasicRecord.hpp"
+#include "Data/CompressedRecord.hpp"
 
 // Module that holds data that is persistent across saves
 
@@ -191,6 +192,10 @@ namespace GTS {
 			// ---- Unlimited Size slider unlocker
 			BasicRecord<bool, 'USSD'> UnlockMaxSizeSliders = false;
 
+			// ---- Save Baked Settings
+			BasicRecord<bool, 'LSEN'> LocalSettingsEnable = false;
+			CompressedStringRecord<'CONF'> ModSettings{""};
+
 		private:
 
 			Persistent() = default;
@@ -200,6 +205,7 @@ namespace GTS {
 			std::unordered_map<FormID, KillCountData> KillCountDataMap;
 
 			void ClearData();
+			static void LoadModLocalModConfiguration();
 
 			static void LoadPersistent(SerializationInterface* serde);
 			static void SavePersistent(SerializationInterface* serde);

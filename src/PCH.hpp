@@ -127,6 +127,7 @@ static_assert(sizeof(double) == 8, "Assumed sizeof double is incorrect. This wil
 #include <reflect>                      //https://github.com/qlibs/reflect
 #include <toml.hpp>                     //https://github.com/ToruNiina/toml11
 #include <magic_enum/magic_enum.hpp>    //https://github.com/Neargye/magic_enum
+#include <lz4.h>
 
 // Compatible declarations with other sample projects.
 #define DLLEXPORT __declspec(dllexport)
@@ -136,7 +137,7 @@ using namespace REL::literals;
 
 namespace reflect {
 	//Fix ambiguity in reflects' usage of the detail namespace
-	using namespace reflect::v1_2_4::detail;
+	using namespace reflect::v1_2_5::detail;
 }
 
 namespace GTS {
