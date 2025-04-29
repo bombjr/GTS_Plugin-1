@@ -17,6 +17,8 @@ namespace GTS {
 							 "- If you have no custom Moan/Laugh sounds, it does nothing.\n"
 							 "- Sounds location: Data\\Sound\\fx\\GTS\\Moans_Laughs. Folders are empty by default.\n"
 							 "- Possible usage: put edited variants of sounds with reverb/echo/etc in matching size folders";
+			const char* T3 = "Replaces custom High Heel Size Sounds past x2 size with different sound sets\n"
+			                 "When not wearing High Heels - plays old sounds";
 
 			const char* THelp = "Note: Moan/Laugh sounds are not included in the mod.\n"
 			"You can add sounds by adding your own .wav files in the following folder:\n"
@@ -29,6 +31,7 @@ namespace GTS {
 	            ImUtil::CheckBox("Footstep Sounds",&Settings.bFootstepSounds,T0);
 	            ImUtil::CheckBox("Moans On Slow Growth",&Settings.bSlowGrowMoans, T1);
 				ImUtil::CheckBox("Moan/Laugh Size Variance", &Settings.bMoanLaughSizeVariants, T2);
+				ImUtil::CheckBox("USe Different High Heel Size Sounds", &Settings.bUseOtherHighHeelSet, T3);
 	            ImGui::Spacing();
 	        }
 	    }

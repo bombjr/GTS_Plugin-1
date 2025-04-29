@@ -462,6 +462,93 @@ namespace GTS {
                 .Duration = 0.50f,
             },
 
+            //========================================================
+            //========================= G R A B  P L A Y
+            //======================================================== 
+            {
+                .Event = "GrabPlay_Start",
+                .Keys = {"LSHIFT", "H"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Exit",
+                .Keys = {"LSHIFT","H"},
+                .Trigger = "Continuous",
+                .Duration = 0.5f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_CrushHeavy",
+                .Keys = {"LMB"},
+                .Trigger = "Continuous",
+                .Duration = 0.5f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Vore",
+                .Keys = {"V"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_KissVore",
+                .Keys = {"V"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Kiss",
+                .Keys = {"E"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Poke",
+                .Keys = {"LMB"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Flick",
+                .Keys = {"RMB"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_Sandwich",
+                .Keys = {"S"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_GrindStart",
+                .Keys = {"W"},
+                .Trigger = "Continous",
+                .Duration = 0.5f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_GrindStop",
+                .Keys = {"W"},
+                .Trigger = "Release",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
+            {
+                .Event = "GrabPlay_ToBoobs",
+                .Keys = {"LSHIFT","B"},
+                .Trigger = "Once",
+                .Duration = 0.0f,
+                .BlockInput = "Never"
+            },
 
             //========================================================
             //========================= C A M E R A

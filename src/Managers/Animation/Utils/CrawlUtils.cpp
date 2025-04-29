@@ -48,16 +48,8 @@ namespace GTS {
 				float movement = FootStepManager::Volume_Multiply_Function(actor, foot_kind);
 				scale *= 0.75f;
 
-				if (Config::GetAudio().bFootstepSounds) {
-					FootStepManager::PlayLegacySounds(movement, node, foot_kind, scale);
-					return; // New Sounds are disabled for now
-					if (!LegacySounds) {       // Play normal sounds
-						FootStepManager::PlayNormalSounds(movement, node, foot_kind, scale);
-						return;
-					} else if (LegacySounds) { // Play old sounds
-						FootStepManager::PlayLegacySounds(movement, node, foot_kind, scale);
-						return;
-					}
+				if (node && Config::GetAudio().bFootstepSounds) {
+					FootStepManager::PlayHighHeelSounds(movement, node, foot_kind, scale, false); // We have only HH sounds for now
 				}
 			}
 		}

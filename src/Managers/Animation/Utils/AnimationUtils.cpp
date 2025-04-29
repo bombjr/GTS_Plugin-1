@@ -316,7 +316,6 @@ namespace GTS {
 		AddSMTDuration(giant, 5.0f);
 		ApplyShakeAtNode(tiny, 3, "NPC Root [Root]");
 
-		//bool = Silent; True = mute death, false = no mute
 		const auto& MuteHugCrush = Config::GetAudio().bMuteHugCrushDeathScreams;
 
 		DecreaseShoutCooldown(giant);

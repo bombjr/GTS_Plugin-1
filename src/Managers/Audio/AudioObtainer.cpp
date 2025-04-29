@@ -193,6 +193,53 @@ namespace GTS {
         }
         return nullptr;
     }
+
+    BSISoundDescriptor* GetHHSound_NormalAlt(const int scale) {
+        switch (scale) {
+            case 2: 
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_2x_Alt");
+            case 4:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_4x_Alt");
+            case 8:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_8x_Alt");
+            case 12:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_12x_Alt");
+            case 24:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_24x_Alt");
+            case 48:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_48x_Alt");
+            case 96:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_96x_Alt");
+            case 128:
+                return Runtime::GetSound("GTSSoundFootstepHighHeels_Mega_Alt");
+            break;
+        }
+        return nullptr;
+    }
+
+    BSISoundDescriptor* GetHHSound_JumpAlt(const int scale) {
+        switch (scale) {
+            case 2: 
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_2x");
+            case 4:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_4x");
+            case 8:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_8x");
+            case 12:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_12x");
+            case 24:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_24x");
+            case 48:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_48x");
+            case 96:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_96x");
+            case 128:
+                return Runtime::GetSound("GTSSoundFootstepLandHighHeels_Mega");
+            break;
+        }
+        return nullptr;
+    }
+
     BSISoundDescriptor* GetHHSound_Jump(const int scale) {
         switch (scale) {
             case 2: 
@@ -216,14 +263,17 @@ namespace GTS {
         return nullptr;
     }
 
-    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale) {
+    BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale, const bool alt) {
         switch (foot_kind) {
             case FootEvent::Left:
             case FootEvent::Front:
-                return GetHHSound_Normal(scale);
             case FootEvent::Right:
             case FootEvent::Back:
-                return GetHHSound_Normal(scale);
+                if (!alt) {
+                    return GetHHSound_Normal(scale);
+                } else {
+                    return GetHHSound_NormalAlt(scale);
+                }
             case FootEvent::JumpLand:
                 return GetHHSound_Jump(scale);
             break;

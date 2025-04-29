@@ -10,9 +10,8 @@ namespace GTS {
 
 			virtual std::string DebugName() override;
 			virtual void OnImpact(const Impact& impact) override;
-			static void PlayLegacySounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale);
-			static void PlayHighHeelSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale);
-			static void PlayNormalSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale);
+			static void PlayHighHeelSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale, bool UseOtherHeelSet);
+			static void PlayNormalSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale, bool UseOtherHeelSet);
 
 			static float Volume_Multiply_Function(Actor* actor, FootEvent Kind);
 

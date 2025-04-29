@@ -411,6 +411,34 @@ namespace GTS {
 
 
 	//------------------------------
+	// Grab Play
+	//------------------------------
+
+	static bool GrabPlayStartCondition() {
+		auto target = GetPlayerOrControlled();
+
+		if (Grab::GetHeldActor(target)) {
+			if (!IsHumanoid(Grab::GetHeldActor(target))) {
+				if (target->formID == 0x14) {
+					std::string_view message = std::format("You don't want to play with {}", Grab::GetHeldActor(target)->GetDisplayFullName());
+					NotifyWithSound(target, message);
+				}
+				return false;
+			}
+			return true;
+		}
+		return true;
+	}
+
+	static bool GrabPlayActionCondition() {
+		auto target = GetPlayerOrControlled();
+		if (!IsInGrabPlayState(target)) {
+			return false;
+		}
+		return true;
+	}
+
+	//------------------------------
 	// Follower Specific Ones
 	//------------------------------
 

@@ -414,7 +414,6 @@ namespace {
             AdjustMassLimit(0.0095f, giant);
 
             DecreaseShoutCooldown(giant);
-            //bool = Silent; True = mute death, false = no mute
 		    const auto& MuteAbsorptionScreams = Config::GetAudio().bMuteBreastAbsorptionDeathScreams;
 
             KillActor(giant, tiny, MuteAbsorptionScreams);
