@@ -2,6 +2,46 @@
 #include "UI/DearImGui/imgui.h"
 #include "UI/ImGui/ImUtil.hpp"
 
+
+using namespace GTS;
+
+namespace {
+
+	//TODO Unhardcode this
+	void SelectVoiceBank(RE::Actor* a_actor) {
+
+		if (!a_actor) return;
+
+		const char* const EntriesFemale = "Default\0"
+										"SL F Voice 1\0"
+										"SL F Voice 2\0"
+										"SL F Voice 3\0"
+										"SL F Voice 4\0"
+										"SL F Voice 5\0"
+										"SL F Voice 6\0"
+										"SL F Voice 7\0"
+										"SL F Voice 8\0";
+
+		if (auto ActorData = Persistent::GetSingleton().GetData(a_actor)) {
+
+			const std::string ActorName = a_actor->GetName();
+			ImGui::PushID(a_actor);
+
+			//idk how ComboBoxes internally work so casting to a larger type may be unsafe
+			//best to just use a middleman value instead.
+			int Out = ActorData->MoanSoundDescriptorIndex;
+
+			ImGui::Combo(ActorName.c_str(), &Out, EntriesFemale);
+			ActorData->MoanSoundDescriptorIndex = static_cast<uint8_t>(Out);
+
+			ImGui::PopID();
+
+		}
+
+	}
+
+}
+
 namespace GTS {
 
 	void CategoryAudio::DrawLeft(){
@@ -35,6 +75,40 @@ namespace GTS {
 	            ImGui::Spacing();
 	        }
 	    }
+
+		if (Runtime::IsSexlabInstalled()) {
+
+			ImUtil_Unique{
+
+				const char* THelp = "Sexlab has been detected.\n"
+									"This mod can now use it's voice files as a substitute in case "
+									"you don't have any files that you can add.\n"
+									"This also allows you to select a different voice per actor for some variety.\n\n"
+									"Note: Only The Player/Current Followers will be listed as to not clutter this menu.\n"
+									"If this menu is empty it means none of the currently loaded npc's are elidgible for this feature.";
+
+				if (ImGui::CollapsingHeader("Moan Voice Select",ImUtil::HeaderFlagsDefaultOpen)) {
+					ImGui::TextColored(ImUtil::ColorSubscript, "What is this (?)");
+					ImUtil::Tooltip(THelp, true);
+
+					const auto Player = PlayerCharacter::GetSingleton();
+
+					if (IsFemale(Player)){
+						SelectVoiceBank(Player);
+					}
+
+					const auto ActiveTeammates = FindFemaleTeammates();
+
+					if (!ActiveTeammates.empty()) {
+						for (const auto Teammate : ActiveTeammates) {
+							SelectVoiceBank(Teammate);
+						}
+					}
+
+					ImGui::Spacing();
+				}
+			}
+		}
 	}
 
 	void CategoryAudio::DrawRight() {

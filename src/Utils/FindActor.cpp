@@ -192,4 +192,14 @@ namespace GTS {
 		}
 		return finalActors;
 	}
+
+	vector<Actor*> FindFemaleTeammates() {
+		vector<Actor*> finalActors;
+		for (auto actor : find_actors()) {
+			if (IsTeammate(actor) && IsFemale(actor)) {
+				finalActors.push_back(actor);
+			}
+		}
+		return finalActors;
+	}
 }

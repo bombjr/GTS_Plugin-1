@@ -118,10 +118,16 @@ namespace GTS {
 			const char* T2 = "Enable or disable dynamic alteration of fActivatePickLength and fActivatePickRadius ini\n"
 			                 "It will be altered from 180 and 18 (default) to 180 and 18 * Player Scale";
 
+			const char* T3 = "Should the mod settings be saved globaly or on a per save basis like older versions of the mod?\n"
+							 "Effectively this mimicks the behavior you'd experience when using a MCM menu.\n"
+							 "Note: This feature is still experimental.";
+
 	        if (ImGui::CollapsingHeader("Experimental", ImUtil::HeaderFlagsDefaultOpen)) {
 	            ImUtil::CheckBox("Allow Male Actors", &Settings.bEnableMales, T0);
 				ImUtil::CheckBox("Apply Size Effects to all Actors", &Settings.bAllActorSizeEffects, T1);
 				ImUtil::CheckBox("Override Item/NPC Interaction Range", &Settings.bOverrideInteractionDist, T2);
+				ImUtil::CheckBox("Save Specific Settings", &Persistent::GetSingleton().LocalSettingsEnable.value, T3);
+
 	        	ImGui::Spacing();
 	        }
 	    }

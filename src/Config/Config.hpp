@@ -32,15 +32,15 @@ namespace GTS {
 		}
 
         //Too much effort to make a parser for it, So Define the names here.
-        REGISTER_STRUCT_NAME(SettingsGeneral, "General");
-        REGISTER_STRUCT_NAME(SettingsAdvanced, "Advanced");
-        REGISTER_STRUCT_NAME(SettingsAI, "AI");
-        REGISTER_STRUCT_NAME(SettingsAudio, "Audio");
-        REGISTER_STRUCT_NAME(SettingsBalance, "Balance");
-        REGISTER_STRUCT_NAME(SettingsCamera, "Camera");
-        REGISTER_STRUCT_NAME(SettingsGameplay, "Gameplay");
-        REGISTER_STRUCT_NAME(SettingsUI, "UI");
-        REGISTER_STRUCT_NAME(SettingsHidden, "Hidden");
+        REGISTER_STRUCT_NAME(SettingsGeneral, "General")
+        REGISTER_STRUCT_NAME(SettingsAdvanced, "Advanced")
+        REGISTER_STRUCT_NAME(SettingsAI, "AI")
+        REGISTER_STRUCT_NAME(SettingsAudio, "Audio")
+        REGISTER_STRUCT_NAME(SettingsBalance, "Balance")
+        REGISTER_STRUCT_NAME(SettingsCamera, "Camera")
+        REGISTER_STRUCT_NAME(SettingsGameplay, "Gameplay")
+        REGISTER_STRUCT_NAME(SettingsUI, "UI")
+        REGISTER_STRUCT_NAME(SettingsHidden, "Hidden")
 
         const std::string _Subfolder = R"(Data\SKSE\Plugins\GTSPlugin)";
         const std::string _ConfigFile = "Settings.toml";
@@ -49,6 +49,8 @@ namespace GTS {
         const std::filesystem::path ConfigFile = std::filesystem::current_path() / _Subfolder / _ConfigFile;
 
         toml::basic_value<toml::ordered_type_config> TomlData;
+        toml::basic_value<toml::ordered_type_config> TomlDataGlobal;
+
         std::mutex _ReadWriteLock;
 
         Config() = default;
@@ -63,8 +65,10 @@ namespace GTS {
 
         [[nodiscard]] bool SaveTOMLToFile(const auto& a_toml, const std::filesystem::path& a_file);
 
+        [[nodiscard]] bool SaveTOMLToString(const auto& a_toml);
 
-        public:
+
+    public:
 
         //Static Accessors (Helpers)
         //They're wrapped this way to ensure that the singleton has run first.
@@ -115,7 +119,7 @@ namespace GTS {
             if (!Initialized.exchange(true)) {
                 logger::info("Loading TOML Settings in .ctor...");
 
-                if (!Instance.LoadSettings()) {
+                if (!Instance.LoadSettingsFromFile()) {
                     ReportInfo("Settings.toml is either invalid or corrupted.\n"
 							   "Click OK to clear out the settings file.\n"
 							   "This will reset the mod's settings."
@@ -161,11 +165,14 @@ namespace GTS {
             return Instance;
         }
 
-        [[nodiscard]] bool LoadSettings();
+        [[nodiscard]] bool LoadSettingsFromFile();
+        bool SaveSettingsToString();
+        bool SaveSettingsToFile();
 
         [[nodiscard]] bool SaveSettings();
 
         void ResetToDefaults();
-
+        bool LoadSettings();
+        bool LoadSettingsFromString();
     };
 }

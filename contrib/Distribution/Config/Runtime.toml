@@ -128,6 +128,40 @@ GTSSoundTinyCalamity_SpawnRune = "GTS.esp|7B9BE4"
 
 SKSoundBloodGush = "Skyrim.esm|10F78C"
 
+# -- SL Voices Fem
+
+SLVoiceF1Mil = "Sexlab.esm|066FC0" # Mild
+SLVoiceF1Mid = "Sexlab.esm|067523" # Middle
+SLVoiceF1Hot = "Sexlab.esm|067524" # Hot
+
+SLVoiceF2Mil = "Sexlab.esm|067525"
+SLVoiceF2Mid = "Sexlab.esm|067527"
+SLVoiceF2Hot = "Sexlab.esm|067526"
+
+SLVoiceF3Mil = "Sexlab.esm|06752A"
+SLVoiceF3Mid = "Sexlab.esm|067529"
+SLVoiceF3Hot = "Sexlab.esm|067528"
+
+SLVoiceF4Mil = "Sexlab.esm|06752D"
+SLVoiceF4Mid = "Sexlab.esm|06752C"
+SLVoiceF4Hot = "Sexlab.esm|06752B"
+
+SLVoiceF5Mil = "Sexlab.esm|067530"
+SLVoiceF5Mid = "Sexlab.esm|06752F"
+SLVoiceF5Hot = "Sexlab.esm|06752E"
+
+SLVoiceF6Mil = "Sexlab.esm|067533"
+SLVoiceF6Mid = "Sexlab.esm|067532"
+SLVoiceF6Hot = "Sexlab.esm|067531"
+
+SLVoiceF7Mil = "Sexlab.esm|067536"
+SLVoiceF7Mid = "Sexlab.esm|067535"
+SLVoiceF7Hot = "Sexlab.esm|067534"
+
+SLVoiceF8Mil = "Sexlab.esm|067539"
+SLVoiceF8Mid = "Sexlab.esm|067538"
+SLVoiceF8Hot = "Sexlab.esm|067537"
+
 # Magic Effects -------------------------------------------------------------
 [MGEF] 
 GTSEffectTinyCalamity = "GTS.esp|1A2568"
