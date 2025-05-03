@@ -23,6 +23,8 @@ namespace GTS {
 
 	//-----------------------------------------Default Damage Values
 
+    constexpr float Damage_Grab_Play_Light = 2.8f;
+    constexpr float Damage_Grab_Play_Heavy = 6.2f;
 	constexpr float Damage_Grab_Attack = 4.8f;
 	constexpr float Damage_Breast_Squish = 2.2f;
 	constexpr float Damage_Breast_Strangle = 0.00980f;
@@ -364,6 +366,7 @@ namespace GTS {
 
     constexpr float ZoomIn_ObjectA = 1.0f;
     constexpr float ZoomIn_ObjectB = 1.0f;
+    constexpr float ZoomIn_ObjectL = 0.8f;
 
     //////////////////
     constexpr float ZoomIn_Cam_Spine = 1.0f;

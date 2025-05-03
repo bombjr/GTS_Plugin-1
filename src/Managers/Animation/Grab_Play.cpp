@@ -63,11 +63,6 @@ namespace Triggers {
 }
 
 namespace GTS {
-	void Animation_GrabPlay::RegisterEvents() {
-		//AnimationManager::RegisterEvent("GtsGrowth_Moan", "Growth", GtsGrowth_Moan);
-
-	}
-
 	void Animation_GrabPlay::RegisterTriggers() {
 		AnimationManager::RegisterTrigger("GrabPlay_Enter", "GrabPlay", "GTSBEH_Hand_Enter");
 		AnimationManager::RegisterTrigger("GrabPlay_Enter_T", "GrabPlay", "GTSBEH_T_Hand_Enter");
@@ -123,7 +118,6 @@ namespace GTS {
 		InputManager::RegisterInputEvent("GrabPlay_GrindStop", Triggers::GrabPlay_GrindStopEvent, GrabPlayActionCondition);
 
 		InputManager::RegisterInputEvent("GrabPlay_ToBoobs", Triggers::GrabPlay_ToBoobsEvent, GrabPlayActionCondition);
-
 	}
 }
 
@@ -156,61 +150,5 @@ namespace GTS {
             GTSBEH_T_Hand_Grind_Start
             GTSBEH_T_Hand_Grind_Stop
             GTSBEH_T_Hand_To_Boobs
-
-*/
-
-/* EVENTS
-GTS_HS_Exit_NoTiny - Triggered when we want to exit an anim after the Tiny is dead
-##Facial Anims
-GTS_HS_SmileOn - Makes the GTS smile
-GTS_HS_SmileOff - Stops the GTS Smiling
-
-###SFX/Cam Stuff
-GTS_HS_CamOn - Triggered when we enter the Hand state to change the camera
-GTS_HS_CamOff - Triggered when we exit the Hand state to change the camera
-GTS_HS_TossTiny - Intro Anim when we throw the tiny upwards
-GTS_HS_TinyLand - Intro Anim when the tiny lands
-
-###Poke -- No damage
-GTS_HS_Poke_WindUp - When the GTS pulls her arm back to poke
-GTS_HS_Poke_Contact - When the poke conects with the tiny
-GTS_HS_Poke_TinyLand - When the Tiny falls down in the gts hand
-
-###Flick -- Launched the Tiny out of the GTS's hand
-GTS_HS_Flick_Launch - Triggered when the GTS flicks the tiny
-GTS_HS_Flick_Ragdoll - Triggered when the tiny is meant to ragdoll after being flicked
-
-###Sandwich  - Used as a Light crush Does Damage
-GTS_HS_Sand_WindUp - Triggered when the GTS Raise's her hand
-GTS_HS_Sand_Lower - Triggered when the GTS lower the hand to crush
-GTS_HS_Sand_Hit - Triggered when the GTS Hits the Tiny
-GTS_HS_Sand_Release - Triggered when the GTS lifts her hand from the Tiny
-
-###Fist Crush -- Does Damage, Heavy Crush attack
-GTS_HS_Fist_WindUp - Triggered when the GTS Raise's her hand
-GTS_HS_Fist_Lower - Triggered when the GTS lower the hand to crush
-GTS_HS_Fist_Hit - Triggered when the GTS Hits the Tiny
-GTS_HS_Fist_Release - Triggered when the GTS lifts her hand from the Tiny   
- 
-###Kiss
-GTS_HS_Kiss_Start - Used to trigger the Facial anims for kissing
-GTS_HS_Kiss_Stop - Used to end the kissing facial anims
-GTS_HS_KissSound_Play - Plays the Kiss Sound
-GTS_HS_KissSound_Stop - Stops the Kiss Sound - Unused
-GTS_HS_K_Vore_OpenMouth - Used to open the GTS's mouth
-GTS_HS_K_Vore_CloseMouth - Used to close the GTS's mouth
-GTS_HS_K_Vore_TinyYell - ideally makes the tiny yell frightenedly
-GTS_HS_K_Vore_TinyMuffle - ideally muffles the tiny's voice when yelling
-GTS_HS_K_Vore_SlurpTiny - ideally used to play a sound when slurping the Tiny up
-GTS_HS_K_Vore_SlurpTiny_End - ideally used to play a sound  when the gts finishes slurping the tiny
-GTS_HS_K_Vore_TinyInMouth - Triggered when the Tiny is fully in the GTS mouth
-GTS_HS_K_Vore_SwallowTiny - Triggered when the GTS swallows the tiny
-
-###Vore -- NOT the Kiss Vore
-GTS_HS_Vore_OpenMouth - Used to open the GTS's mouth
-GTS_HS_Vore_CloseMouth - Used to close the GTS's mouth
-GTS_HS_Vore_TinyInMouth - Triggered when the Tiny is fully in the GTS mouth
-GTS_HS_Vore_SwallowTiny - Triggered when the GTS swallows the tiny
-
 
 */

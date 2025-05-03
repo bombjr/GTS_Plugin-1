@@ -119,6 +119,12 @@ namespace {
 					.zoomScale = ZoomIn_ObjectB,
 				};
 			}
+			case CameraTracking::ObjectL: {
+				return BoneTarget {
+					.boneNames = {"AnimObjectL",},
+					.zoomScale = ZoomIn_ObjectL,
+				};
+			}
 		}
 		return BoneTarget();
 	}

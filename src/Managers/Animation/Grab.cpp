@@ -569,8 +569,10 @@ namespace GTS {
 			ReattachTiny(giantref, tinyref);
 			
 			if (tinyref && (tinyref->Is3DLoaded() || IsCurrentlyReattaching(giantref))) {
+				log::info("Attaching Tiny");
 				return HandleGrabLogic(giantref, tinyref, gianthandle, tinyhandle);
 			} else { // Else if Tiny is null or isn't 3d loaded
+				log::info("failsafe abort triggered");
 				return FailSafeAbort(giantref, tinyref);
 			}
 
@@ -638,8 +640,8 @@ namespace GTS {
 			giantref->SetGraphVariableInt("GTS_Grab_State", 0);
 			giantref->SetGraphVariableInt("GTS_Storing_Tiny", 0);
 			DrainStamina(giantref, "GrabAttack", "GTSPerkDestructionBasics", false, 0.75f);
-			Grab::ExitGrabState(giantref);
 			ManageCamera(giantref, false, CameraTracking::Grab_Left); // Disable any camera edits
+			Grab::ExitGrabState(giantref);
 			Grab::DetachActorTask(giantref);
 		}
 	}
@@ -675,7 +677,6 @@ namespace GTS {
 		AnimationManager::RegisterTrigger("Breasts_Idle_Unwilling", "Grabbing", "GTSBEH_T_Storage_Enemy");
 		AnimationManager::RegisterTrigger("Breasts_Idle_Willing", "Grabbing", "GTSBEH_T_Storage_Ally");
 		AnimationManager::RegisterTrigger("Breasts_FreeOther", "Grabbing", "GTSBEH_T_Remove");
-
 	}
 
 	void StartRHandRumble(std::string_view tag, Actor& actor, float power, float halflife) {

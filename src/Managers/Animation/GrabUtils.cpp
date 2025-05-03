@@ -10,6 +10,8 @@
 #include "Utils/AttachPoint.hpp"
 
 using namespace GTS;
+using namespace std;
+
 
 namespace {
     bool ShouldAbortGrab(Actor* giantref, Actor* tinyref, bool CanCancel, bool Dead, bool small_size) {
@@ -19,11 +21,12 @@ namespace {
                 || (!IsBetweenBreasts(tinyref) 
                 && GetAV(giantref, ActorValue::kStamina) < 2.0f)) {
 
-                //PrintCancelReason(giantref, tinyref, sizedifference, Action_Grab);
+                log::info("grab task cancelled");
                 // For debugging
 
                 PushActorAway(giantref, tinyref, 1.0f);
                 Grab::CancelGrab(giantref, tinyref);
+
                 return true;
             }
         }
@@ -33,8 +36,7 @@ namespace {
     bool ManageGrabPlayAttachment(Actor* giantref, Actor* tinyref) {
         auto TargetBone = Attachment_GetTargetNode(giantref);
         std::string_view node_lookup = "none";
-        
-        
+
         switch (TargetBone) {
             case AttachToNode::ObjectL: {
                 node_lookup = "AnimObjectL";            break;
@@ -54,15 +56,16 @@ namespace {
         }
 
         NiAVObject* Object = find_node(giantref, node_lookup);
-        log::info("Giantess: {}, Tiny: {}", giantref->GetDisplayFullName(), tinyref->GetDisplayFullName());
-        log::info("Attaching to node: {}", node_lookup);
-        log::info("Node Found: {}", Object != nullptr);
+
         if (Object) {
             NiPoint3 coords = Object->world.translate;
             FaceSame(giantref, tinyref);
 
             if (!AttachTo(giantref, tinyref, coords)) {
+                log::info("Trying to cancel Grab Play state");
+                //GrabPlayFixes::Task_QueueGrabAbortTask(giantref);
                 Grab::CancelGrab(giantref, tinyref);
+                //AnimationManager::StartAnim("GTS_HS_Exit_NoTiny", giantref); Doesn;t work
                 return false;
             }
             return true;
@@ -127,6 +130,27 @@ namespace {
 }
 
 namespace GTS {
+    void Task_QueueGrabAbortTask(Actor* giant, std::string_view name) {
+        std::string task_name = std::format("{}_{}", name, giant->formID);
+		ActorHandle gianthandle = giant->CreateRefHandle();
+		double Start = Time::WorldTimeElapsed();
+
+		TaskManager::Run(task_name, [=](auto& progressData) {
+			if (!gianthandle) {
+				return false;
+			}
+			Actor* giantref = gianthandle.get().get();
+			double Finish = Time::WorldTimeElapsed();
+
+			if (Finish - Start > 0.0 && !IsInGrabPlayState(giantref)) {
+                log::info("Reset Fired");
+                Grab::ExitGrabState(giantref);
+				return false;
+			}
+			return true;
+		});
+    }
+
     bool IsCurrentlyReattaching(Actor* giant) { // Sometimes Tiny is still grabbed and we need to update Tiny pos so Tiny becomes visible
         // Works in such cases like Changing locations/going between loading screens with Tiny grabbed
         bool Attaching = false;
@@ -155,7 +179,7 @@ namespace GTS {
         if (ShouldAbortGrab(giantref, tinyref, CanCancel, Dead, small_size)) {
             return false;
         }
-
+        // Switch to always using Grab Play logic in that case, we need it since it doesn't cancel properly without it
         if (IsInGrabPlayState(giantref)) {
             return ManageGrabPlayAttachment(giantref, tinyref);
         }

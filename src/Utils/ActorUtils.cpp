@@ -3421,12 +3421,17 @@ namespace GTS {
 		Persistent.GiantCount.value = 0.0f;
 	}
 
-	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs) {
+	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs, NiPoint3 CustomPos) {
 
 		bool Allow = Config::GetGeneral().bShowHearts;
 
 		if (Allow) {
-			NiPoint3 Position = GetHeartPosition(giant, tiny, hugs);
+			NiPoint3 Position = NiPoint3(0,0,0);
+			if (CustomPos.Length() < 0.01f) {
+				Position = GetHeartPosition(giant, tiny, hugs);
+			} else {
+				Position = CustomPos;
+			}
 
 			if (Z > 0) {
 				Position.z -= Z * get_visual_scale(giant);

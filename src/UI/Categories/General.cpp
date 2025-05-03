@@ -168,11 +168,11 @@ namespace GTS {
 
 	        if (ImGui::CollapsingHeader("High-Heels", ImUtil::HeaderFlagsDefaultOpen)) {
 
-	            ImUtil::CheckBox("Enable Height Adjustment", &Settings.bEnableHighHeels, T0);
+	            ImUtil::CheckBox("High Heels: Enable Height Adjustment", &Settings.bEnableHighHeels, T0);
 
 				ImGui::SameLine();
 
-	        	if (ImUtil::CheckBox("Disable When Using Furniture", &Settings.bHighheelsFurniture, T1, !Settings.bEnableHighHeels)){
+	        	if (ImUtil::CheckBox("High Heels: Disable When Using Furniture", &Settings.bHighheelsFurniture, T1, !Settings.bEnableHighHeels)){
 	            	if (!Settings.bHighheelsFurniture) {
 
 						auto actors = find_actors();

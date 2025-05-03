@@ -6,6 +6,11 @@ namespace GTS {
 		std::vector<std::string> boneNames = {};
 		float zoomScale = 1.0f;
 	};
+	enum class GrabBranch {
+		None,
+		Grab,
+		GrabPlay,
+	};
 
 	enum class BusyFoot {
 		None,
@@ -104,6 +109,7 @@ namespace GTS {
 		Finger_Left,
 		ObjectA,
 		ObjectB,
+		ObjectL,
 	};
 
 	enum class NodeMovementType {

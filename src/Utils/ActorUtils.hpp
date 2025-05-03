@@ -305,7 +305,7 @@ namespace GTS {
 	float GetQuestProgression(int stage);
 	void ResetQuest();
 
-	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs);
+	void SpawnHearts(Actor* giant, Actor* tiny, float Z, float scale, bool hugs, NiPoint3 CustomPos = NiPoint3(0,0,0));
 	void SpawnCustomParticle(Actor* actor, ParticleType Type, NiPoint3 spawn_at_point, std::string_view spawn_at_node, float scale_mult);
 
 	void InflictSizeDamage(Actor* attacker, Actor* receiver, float value);

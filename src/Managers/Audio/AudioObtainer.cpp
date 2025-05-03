@@ -328,16 +328,11 @@ namespace GTS {
 
     BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale, const bool alt) {
         switch (foot_kind) {
-
             case FootEvent::Left:
             case FootEvent::Front:
             case FootEvent::Right:
             case FootEvent::Back:
-                if (!alt) {
-                    return GetHHSound_Normal(scale);
-                } else {
-                    return GetHHSound_NormalAlt(scale);
-                }
+                return alt ? GetHHSound_NormalAlt(scale) : GetHHSound_Normal(scale);
             case FootEvent::JumpLand:
                 return GetHHSound_Jump(scale);
         }

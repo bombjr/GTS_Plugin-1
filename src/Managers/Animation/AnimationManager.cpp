@@ -26,6 +26,7 @@
 #include "Managers/Animation/Grab_Attack.hpp"
 
 #include "Managers/Animation/Grab_Throw.hpp"
+#include "Managers/Animation/Grab_Play_Events.hpp"
 #include "Managers/Animation/Grab_Play.hpp"
 #include "Managers/Animation/Sneak_Slam.hpp"
 #include "Managers/Animation/Vore_Sneak.hpp"
@@ -137,7 +138,7 @@ namespace GTS {
 		Animation_GrabVore::RegisterEvents();
 		Animation_GrabThrow::RegisterEvents();
 		Animation_GrabAttack::RegisterEvents();
-		Animation_GrabPlay::RegisterEvents();
+		Animation_GrabPlay_Events::RegisterEvents();
 		Animation_GrabPlay::RegisterTriggers();
 		
 		Animation_RandomGrowth::RegisterEvents();
