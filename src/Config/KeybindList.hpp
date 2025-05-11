@@ -475,8 +475,8 @@ namespace GTS {
             {
                 .Event = "GrabPlay_Exit",
                 .Keys = {"LSHIFT","H"},
-                .Trigger = "Continuous",
-                .Duration = 0.5f,
+                .Trigger = "Once",
+                .Duration = 0.0f,
                 .BlockInput = "Never"
             },
             {

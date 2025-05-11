@@ -3,90 +3,11 @@
 #include "Config/Config.hpp"
 
 #include "Managers/Audio/AudioObtainer.hpp"
+#include "Managers/Audio/AudioParams.hpp"
 #include "Managers/Highheel.hpp"
 
 using namespace GTS;
 
-namespace {
-
-	// Params
-	constexpr VolumeParams Params_Empty = {.a = 0.0f, .k = 0.0f, .n = 0.0f, .s = 0.0f};
-
-	constexpr VolumeParams xlFootstep_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
-	constexpr VolumeParams xxlFootstep_Params = {.a = 20.0f, .k = 0.50f,  .n = 0.5f, .s = 1.0f};
-	constexpr VolumeParams lJumpLand_Params = {.a = 1.2f, .k = 0.65f,  .n = 0.7f, .s = 1.0f};
-
-	constexpr VolumeParams xlRumble_Params = {.a = 12.0f, .k = 0.50f, .n = 0.5f, .s = 1.0f};
-
-	constexpr VolumeParams Footstep_2_Params = {.a = 1.35f, .k = 1.0f, .n = 0.75f, .s = 1.0f};    // https://www.desmos.com/calculator/6yzmmrg3oi
-	constexpr VolumeParams Footstep_4_Params = {.a = 3.0f, .k = 1.0f, .n = 1.15f, .s = 1.0f};     // https://www.desmos.com/calculator/ighurmlanl
-	constexpr VolumeParams Footstep_8_Params = {.a = 6.0f, .k = 0.26f, .n = 1.94f, .s = 1.0f};    // https://www.desmos.com/calculator/d3gsgj6ocs
-	constexpr VolumeParams Footstep_12_Params = {.a = 12.0f, .k = 0.27f, .n = 1.9f, .s = 1.0f};   // https://www.desmos.com/calculator/akoyl4cxch
-	constexpr VolumeParams Footstep_24_Params = {.a = 16.0f, .k = 0.36f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/bh4fhfrji6
-	constexpr VolumeParams Footstep_48_Params = {.a = 36.0f, .k = 0.20f, .n = 1.5f, .s = 0.25f};  // https://www.desmos.com/calculator/3q4qgkrker
-	constexpr VolumeParams Footstep_96_Params = {.a = 80.0f, .k = 0.66f, .n = 0.90f, .s = 0.1f};  // https://www.desmos.com/calculator/ufdbieymdi
-	constexpr VolumeParams Footstep_128_Params = {.a = 124.0f, .k = 1.0f, .n = 1.15f, .s = 1.0f}; //{.a = 118.0f, .k = 0.19f, .n = 1.5f, .s = 0.1f}; // https://www.desmos.com/calculator/pvrge5dejz
-	// Params end
-
-	constexpr float limitless = 0.0f;
-	constexpr float limit_x4 = 4.0f;
-	constexpr float limit_x8 = 8.0f;
-	constexpr float limit_x14 = 14.0f;
-	constexpr float limit_x24 = 24.0f;
-	constexpr float limit_x48 = 48.0f;
-	constexpr float limit_x96 = 96.0f;
-	constexpr float limit_mega = 128.0f;
-
-	std::string GetFootstepName(Actor* giant, bool right) {
-		std::string tag;
-		if (!giant->AsActorState()->IsSneaking()) {
-			right ? tag = "FootScuffRight" : tag = "FootScuffLeft";
-		} else {
-			right ? tag = "FootRight" : tag = "FootLeft";
-		}
-		return tag;
-	}
-
-	BSSoundHandle get_sound(float movement_mod, NiAVObject* foot, const float& scale, const float& scale_limit, BSISoundDescriptor* sound_descriptor, const VolumeParams& params, const VolumeParams& blend_with, std::string_view tag, float mult, bool blend) {
-		BSSoundHandle result = BSSoundHandle::BSSoundHandle();
-		auto audio_manager = BSAudioManager::GetSingleton();
-		if (foot) {
-			if (sound_descriptor && audio_manager) {
-				float volume = volume_function(scale, params);
-				float frequency = frequency_function(scale, params);
-				float falloff = Sound_GetFallOff(foot, mult);
-				float intensity = volume * falloff * movement_mod;
-				if (scale_limit > 0.02f && scale > scale_limit) {
-					return result; // Return empty sound in that case
-				}
-
-				intensity = std::clamp(intensity, 0.0f, 1.0f);
-				
-				if (blend) {
-					float exceeded = volume_function(scale, blend_with);
-					if (exceeded > 0.02f) {
-						intensity -= exceeded;
-					}
-				}
-
-				if (intensity > 0.05f) {
-
-					// log::trace("  - Playing {} with volume: {}, falloff: {}, intensity: {}", tag, volume, falloff, intensity);
-					audio_manager->BuildSoundDataFromDescriptor(result, sound_descriptor);
-					result.SetVolume(intensity);
-					result.SetFrequency(frequency);
-					NiPoint3 pos;
-					pos.x = 0;
-					pos.y = 0;
-					pos.z = 0;
-					result.SetPosition(pos);
-					result.SetObjectToFollow(foot);
-				}
-			}
-		}
-		return result;
-	}
-}
 namespace GTS {
 	FootStepManager& FootStepManager::GetSingleton() noexcept {
 		static FootStepManager instance;
@@ -266,21 +187,24 @@ namespace GTS {
 	}
 
 	void FootStepManager::DoStrongSounds(Actor* giant, float animspeed, std::string_view feet) {
-		float scale = get_visual_scale(giant);
-		float bonus = 1.0f;
-		
+		const bool UseOtherHeelSet = Config::GetAudio().bUseOtherHighHeelSet;
+		if (!UseOtherHeelSet) {
+			float scale = get_visual_scale(giant);
+			float bonus = 1.0f;
+			
 
-		if (HasSMT(giant)) {
-			bonus = 8.0f;
-			scale += 0.6f;
-		}
+			if (HasSMT(giant)) {
+				bonus = 8.0f;
+				scale += 0.6f;
+			}
 
-		if (scale > 1.25f) {
-			float volume = 0.14f * bonus * (scale - 1.10f) * animspeed;
-			if (volume > 0.05f) {
-				Runtime::PlaySoundAtNode("GTSSoundHeavyStomp", giant, volume, 1.0f, feet);
-				Runtime::PlaySoundAtNode("GTSSoundFootstep_XL", giant, volume, 1.0f, feet);
-				Runtime::PlaySoundAtNode("GTSSoundRumble", giant, volume, 1.0f, feet);
+			if (scale > 1.25f) {
+				float volume = 0.14f * bonus * (scale - 1.10f) * animspeed;
+				if (volume > 0.05f) {
+					Runtime::PlaySoundAtNode("GTSSoundHeavyStomp", giant, volume, 1.0f, feet);
+					Runtime::PlaySoundAtNode("GTSSoundFootstep_XL", giant, volume, 1.0f, feet);
+					Runtime::PlaySoundAtNode("GTSSoundRumble", giant, volume, 1.0f, feet);
+				}
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 #include "Managers/Animation/Utils/AnimationUtils.hpp"
 
 #include "Managers/Audio/Footstep.hpp"
+#include "Managers/Audio/Stomps.hpp"
 #include "Managers/Explosion.hpp"
 #include "Managers/Rumble.hpp"
 
@@ -111,7 +112,7 @@ namespace {
 	void Footgrind_DoImpact(Actor* giant, bool right, FootEvent Event, DamageSource Source, std::string_view Node, std::string_view rumble) {
 		float perk = GetPerkBonus_Basics(giant);
 		ApplyDustRing(giant, Event, Node, 1.05f);
-		DoFootstepSound(giant, 1.0f, Event, Node);
+		StompManager::PlayNewOrOldStomps(giant, 1.0f, Event, Node, false);
 
 		DoDamageEffect(giant, Damage_Foot_Grind_Impact, Radius_Foot_Grind_Impact, 20, 0.15f, Event, 1.0f, Source);
 		LaunchTask(giant, 0.75f * perk, 1.35f * perk, Event);

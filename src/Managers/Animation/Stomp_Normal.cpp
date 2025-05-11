@@ -4,6 +4,7 @@
 
 #include "Managers/Animation/Utils/AnimationUtils.hpp"
 #include "Managers/Audio/Footstep.hpp"
+#include "Managers/Audio/Stomps.hpp"
 #include "Managers/Input/InputManager.hpp"
 #include "Managers/Rumble.hpp"
 
@@ -182,7 +183,7 @@ namespace {
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.10f);
 				DoDamageEffect(giantref, Damage_Stomp * perk, Radius_Stomp, 10, 0.25f, Event, 1.0f, Source);
 				DoDustExplosion(giantref, dust + (animSpeed * 0.05f), Event, Node);
-				DoFootstepSound(giantref, 1.0f, Event, Node);
+				StompManager::PlayNewOrOldStomps(giantref, 1.0f, Event, Node, false);
 				
 				DrainStamina(giantref, "StaminaDrain_Stomp", "GTSPerkDestructionBasics", false, 1.8f); // cancel stamina drain
 
@@ -230,7 +231,7 @@ namespace {
 				Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 0.0f);
 				DoDamageEffect(giant, Damage_Stomp * perk, Radius_Stomp, 25, 0.25f, Event, 1.0f, DamageSource::CrushedRight);
 				DoDustExplosion(giant, dust + (animSpeed * 0.05f), Event, Node);
-				DoFootstepSound(giant, 1.0f + animSpeed/14, Event, RNode);
+				StompManager::PlayNewOrOldStomps(giant, 1.0f + animSpeed/14, Event, RNode, false);
 
 				LaunchTask(giant, 0.90f * perk, 3.2f + animSpeed/2, Event);
 

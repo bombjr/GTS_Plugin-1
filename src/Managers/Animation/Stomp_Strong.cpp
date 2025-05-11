@@ -4,6 +4,7 @@
 
 #include "Managers/Animation/Utils/AnimationUtils.hpp"
 #include "Managers/Audio/Footstep.hpp"
+#include "Managers/Audio/Stomps.hpp"
 #include "Managers/Input/InputManager.hpp"
 #include "Managers/Rumble.hpp"
 
@@ -122,7 +123,7 @@ namespace {
 
 				DrainStamina(giantref, "StaminaDrain_StrongStomp", "GTSPerkDestructionBasics", false, 3.4f);
 
-				DoFootstepSound(giantref, SMT + (animSpeed/10), Event, Node);
+				StompManager::PlayNewOrOldStomps(giantref, SMT + (animSpeed/10), Event, Node, false);
 
 				LaunchTask(giantref, 1.05f * perk, 3.6f + animSpeed/2, Event);
 

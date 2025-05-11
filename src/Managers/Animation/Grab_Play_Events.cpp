@@ -26,22 +26,35 @@ using namespace GTS;
 using namespace std;
 
 namespace Grab_Fixes {
-
-	void GTSGrab_QueueSmashReset(Actor* giant) {
+	void ResetTinyAnimSpeed(Actor* giant) {
+		auto Tiny = Grab::GetHeldActor(giant);
+		if (Tiny) {
+			TaskManager::Cancel(std::format("CopyAnimSpeed_{}", Tiny->formID));
+			Anims_FixAnimationDesync(giant, Tiny, true);
+		}
+	}
+	void Task_CopyAnimationSpeed(Actor* giant, Actor* tiny) {
 		auto gianthandle = giant->CreateRefHandle();
-		std::string name = std::format("SmashReset_{}", giant->formID);
+		auto tinyhandle = tiny->CreateRefHandle();
+		if (tiny) {
+			std::string name = std::format("CopyAnimSpeed_{}", tiny->formID);
 
-		TaskManager::Run(name, [=](auto& update){
-			if (!gianthandle) {
-				return false;
-			}
-			Actor* giantref = gianthandle.get().get();
-			if (!IsGrabAttacking(giantref)) { // Exit Grab Play state as soon as attack bool is false
-				AnimationManager::StartAnim("GrabPlay_ToBoobs", giantref);
-				return false;
-			}
-			return true; // Else continue to wait for it
-		});
+			TaskManager::Run(name, [=](auto& update){
+				if (!gianthandle || !tinyhandle) {
+					return false;
+				}
+				Actor* giantref = gianthandle.get().get();
+				Actor* tinyref = tinyhandle.get().get();
+				if (!IsInGrabPlayState(giantref)) { // Exit Grab Play state as soon as attack bool is false
+					Anims_FixAnimationDesync(giantref, tinyref, true);
+					return false;
+				} else {
+					Anims_FixAnimationDesync(giantref, tinyref, false);
+					return true;
+				}
+				return true; // Else continue to wait for it
+			});
+		}
 	}
 
 	void GTSGrab_KickTiny(Actor* a_giant) {
@@ -96,9 +109,9 @@ namespace Grab_Fixes {
 
 					PushActorAway(giant, tiny, 1.0f);
 
-					const float Flick_Power = HasSMT(giant) ? 2.0f : 6.0f;
+					const float Flick_Power = HasSMT(giant) ? 9.0f : 4.5f;
 
-					Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, Flick_Power);
+					Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, Flick_Power, 35.0f);
 					
 					return false;
 				});
@@ -224,6 +237,10 @@ namespace {
 	// [ C A M E R A ]
 	void GTS_HS_CamOn(AnimationEventData& data) {
 		ManageCamera(&data.giant, true, CameraTracking::ObjectL);
+		auto tiny = Grab::GetHeldActor(&data.giant);
+		if (tiny) {
+			Grab_Fixes::Task_CopyAnimationSpeed(&data.giant, tiny);
+		}
 	}
 
 	void GTS_HS_CamOff(AnimationEventData& data) {
@@ -265,8 +282,9 @@ namespace {
 	void GTS_HS_Flick_Ragdoll(AnimationEventData& data) {
 		Rumbling::Once("FlichTiny_Land", &data.giant, 2.1f, 0.05f, "NPC L Hand [LHnd]", true);
 		Runtime::PlaySoundAtNode("GTSSoundSwingImpact", &data.giant, 0.75f, 1.0f, "NPC L Hand [LHnd]"); // play swing impact sound
-		Task_QueueGrabAbortTask(&data.giant, "FlickRagdoll");
+		//Task_QueueGrabAbortTask(&data.giant, "FlickRagdoll");
 		Grab_Fixes::GTSGrab_KickTiny(&data.giant);
+		Grab_Fixes::ResetTinyAnimSpeed(&data.giant);
 	}
 
 	// [ L I G H T  C R U S H ]

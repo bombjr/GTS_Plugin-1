@@ -186,8 +186,14 @@ namespace {
 				if (charcont) {
 					charcont->SetLinearVelocityImpl((0.0f, 0.0f, 0.0f, 0.0f)); // Stop actor moving in space, just in case
 				}
-				float throw_mult = HasSMT(giant) ? 3.0f : 1.5f;
-				Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, throw_mult);
+				float throw_mult = HasSMT(giant) ? 5.0f : 2.0f;
+				float Z = 35.0f;
+				if (IsCrawling(giant)) {
+					throw_mult *= 0.4f; // Else it is too strong lol, literally throws 70+ meters at normal size
+					Z = 12.5f;
+				}
+				
+				Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, throw_mult, Z);
 				
 				return false;
 				});

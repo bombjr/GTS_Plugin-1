@@ -1,4 +1,5 @@
 #include "Managers/Animation/FootTrample.hpp"
+#include "Managers/Audio/Stomps.hpp"
 
 #include "Stomp_Under.hpp"
 
@@ -76,7 +77,7 @@ namespace {
 				Rumbling::Once(rumble, GiantRef, shake_power, 0.0f, Node, 0.0f);
 				
 				DoDustExplosion(GiantRef, dust * smt, Event, Node);
-				DoFootstepSound(GiantRef, 1.0f, Event, Node);
+				StompManager::PlayNewOrOldStomps(GiantRef, 1.0f, Event, Node, false);
 
 				FootGrindCheck(GiantRef, Radius_Trample, right, FootActionType::Trample_NormalOrUnder);
 				DelayedLaunch(GiantRef, 0.65f * perk, 1.15f * perk, Event);
@@ -103,7 +104,7 @@ namespace {
 
 		Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.1f);
 		DoDamageEffect(giant, Damage_Trample_Repeat * perk, Radius_Trample_Repeat, 1, 0.12f, Event, 1.10f, Source);
-		DoFootstepSound(giant, 1.0f, Event, Node);
+		StompManager::PlayNewOrOldStomps(giant, 1.0f, Event, Node, false);
 		DoDustExplosion(giant, dust * smt, Event, Node);
 		DoLaunch(giant, 0.85f * perk, 1.85f * perk, Event);
 		DeplenishStamina(giant, 30.0f);
@@ -126,7 +127,7 @@ namespace {
 		Rumbling::Once(rumble, giant, shake_power, 0.0f, Node, 1.2f);
 		DoDamageEffect(giant, Damage_Trample_Finisher * perk, Radius_Trample_Finisher, 1, 0.25f, Event, 0.85f, Source);
 		DoLaunch(giant, 1.25f * perk, 4.20f * perk, Event);
-		DoFootstepSound(giant, 1.15f, Event, Node);
+		StompManager::PlayNewOrOldStomps(giant, 1.15f, Event, Node, true);
 		DoDustExplosion(giant, dust * smt, Event, Node);
 
 		DeplenishStamina(giant, 100.0f);

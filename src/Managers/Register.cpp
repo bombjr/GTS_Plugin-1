@@ -1,5 +1,7 @@
 #include "Managers/Register.hpp"
 
+#include "Managers/MaxSizeManager.hpp"
+
 #include "SpectatorManager.hpp"
 
 #include "AI/AIManager.hpp"

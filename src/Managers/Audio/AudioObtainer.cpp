@@ -1,4 +1,5 @@
 #include "Managers/Audio/AudioObtainer.hpp"
+#include "Managers/Audio/AudioParams.hpp"
 #include "Config/Config.hpp"
 
 namespace GTS {
@@ -357,4 +358,54 @@ namespace GTS {
         }
         return nullptr;
     }
+
+	BSSoundHandle get_sound(float movement_mod, NiAVObject* foot, const float& scale, const float& scale_limit, BSISoundDescriptor* sound_descriptor, const VolumeParams& params, const VolumeParams& blend_with, std::string_view tag, float mult, bool blend) {
+		BSSoundHandle result = BSSoundHandle::BSSoundHandle();
+		auto audio_manager = BSAudioManager::GetSingleton();
+		if (foot) {
+			if (sound_descriptor && audio_manager) {
+				float volume = volume_function(scale, params);
+				float frequency = frequency_function(scale, params);
+				float falloff = Sound_GetFallOff(foot, mult);
+				float intensity = volume * falloff * movement_mod;
+				if (scale_limit > 0.02f && scale > scale_limit) {
+					return result; // Return empty sound in that case
+				}
+
+				intensity = std::clamp(intensity, 0.0f, 1.0f);
+				
+				if (blend) {
+					float exceeded = volume_function(scale, blend_with);
+					if (exceeded > 0.02f) {
+						intensity -= exceeded;
+					}
+				}
+
+				if (intensity > 0.05f) {
+
+					// log::trace("  - Playing {} with volume: {}, falloff: {}, intensity: {}", tag, volume, falloff, intensity);
+					audio_manager->BuildSoundDataFromDescriptor(result, sound_descriptor);
+					result.SetVolume(intensity);
+					result.SetFrequency(frequency);
+					NiPoint3 pos;
+					pos.x = 0;
+					pos.y = 0;
+					pos.z = 0;
+					result.SetPosition(pos);
+					result.SetObjectToFollow(foot);
+				}
+			}
+		}
+		return result;
+	}
+
+    std::string GetFootstepName(Actor* giant, bool right) {
+		std::string tag;
+		if (!giant->AsActorState()->IsSneaking()) {
+			right ? tag = "FootScuffRight" : tag = "FootScuffLeft";
+		} else {
+			right ? tag = "FootRight" : tag = "FootLeft";
+		}
+		return tag;
+	}
 }

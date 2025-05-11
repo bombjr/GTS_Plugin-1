@@ -569,10 +569,8 @@ namespace GTS {
 			ReattachTiny(giantref, tinyref);
 			
 			if (tinyref && (tinyref->Is3DLoaded() || IsCurrentlyReattaching(giantref))) {
-				log::info("Attaching Tiny");
 				return HandleGrabLogic(giantref, tinyref, gianthandle, tinyhandle);
 			} else { // Else if Tiny is null or isn't 3d loaded
-				log::info("failsafe abort triggered");
 				return FailSafeAbort(giantref, tinyref);
 			}
 

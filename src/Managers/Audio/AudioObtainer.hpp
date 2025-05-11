@@ -1,15 +1,8 @@
+#include "Managers/Audio/AudioParams.hpp"
 #pragma once
 // Module that handles footsteps
 
 namespace GTS {
-
-    struct VolumeParams {
-        float a;
-        float k;
-        float n;
-        float s;
-    };
-    
     float volume_function(float scale, const VolumeParams& params);
     float frequency_function(float scale, const VolumeParams& params);
 
@@ -36,5 +29,8 @@ namespace GTS {
 
     BSISoundDescriptor* get_footstep_highheel(const FootEvent& foot_kind, const int scale, const bool alt);
     BSISoundDescriptor* get_footstep_normal(const FootEvent& foot_kind, float scale);
+
+    BSSoundHandle get_sound(float movement_mod, NiAVObject* foot, const float& scale, const float& scale_limit, BSISoundDescriptor* sound_descriptor, const VolumeParams& params, const VolumeParams& blend_with, std::string_view tag, float mult, bool blend);
+    std::string GetFootstepName(Actor* giant, bool right);
 
 }

@@ -201,8 +201,24 @@ namespace {
 		float target_scale = persi_actor_data->target_scale;
 		const float max_scale = persi_actor_data->max_scale / natural_scale;
 
+		
+
+		float ScaleMult = 1.0f;
+		if (Persistent::GetSingleton().UnlockMaxSizeSliders.value) {
+			bool Unlocked = Runtime::HasPerk(PlayerCharacter::GetSingleton(), "GTSPerkColossalGrowth") && actor->formID != 0x14;
+			if (Unlocked) {
+				const float NPCLimit = Config::GetBalance().fMaxOtherSize;
+				const float FollowerLimit = Config::GetBalance().fMaxFollowerSize;
+				if (IsTeammate(actor)) {
+					ScaleMult = std::clamp(FollowerLimit, 0.1f, 1.0f);
+				} else {
+					ScaleMult = std::clamp(NPCLimit, 0.1f, 1.0f);
+				}
+			}
+		}
+	
 		// Smooth target_scale towards max_scale if target_scale > max_scale
-		if (target_scale > max_scale && get_target_scale(actor) > get_natural_scale(actor, true)) {
+		if (target_scale > max_scale && get_target_scale(actor) > get_natural_scale(actor, true) * ScaleMult) {
 			constexpr float minimum_scale_delta = 0.000005f;
 
 			if (fabs(target_scale - max_scale) < minimum_scale_delta) {

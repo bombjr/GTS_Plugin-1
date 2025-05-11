@@ -17,6 +17,28 @@ GTSSoundCrushFootSingle8x = "GTS.esp|833433"
 
 GTSSoundFail = "GTS.esp|851A37"
 
+
+# Stomps ----------
+GTSSoundFootstep_Stomp_Light_x2 = "GTS.esp|8DA56D"
+GTSSoundFootstep_Stomp_Light_x4 = "GTS.esp|8DA56E"
+GTSSoundFootstep_Stomp_Light_x8 = "GTS.esp|8DA56F"
+GTSSoundFootstep_Stomp_Light_x12 = "GTS.esp|8DA570"
+GTSSoundFootstep_Stomp_Light_x24 = "GTS.esp|8DA571"
+GTSSoundFootstep_Stomp_Light_x48 = "GTS.esp|8DA572"
+GTSSoundFootstep_Stomp_Light_x96 = "GTS.esp|8DA573"
+GTSSoundFootstep_Stomp_Light_Mega = "GTS.esp|8DA574"
+
+
+GTSSoundFootstep_Stomp_Strong_x2  = "GTS.esp|8DA578"
+GTSSoundFootstep_Stomp_Strong_x4  = "GTS.esp|8DA57D"
+GTSSoundFootstep_Stomp_Strong_x8  = "GTS.esp|8DA57A"
+GTSSoundFootstep_Stomp_Strong_x12  = "GTS.esp|8DA577"
+GTSSoundFootstep_Stomp_Strong_x24  = "GTS.esp|8DA579"
+GTSSoundFootstep_Stomp_Strong_x48  = "GTS.esp|8DA57B"
+GTSSoundFootstep_Stomp_Strong_x96  = "GTS.esp|8DA57C"
+GTSSoundFootstep_Stomp_Strong_Mega  = "GTS.esp|8DA576"
+#
+
 GTSSoundFootstepNormal_2x = "GTS.esp|61587E"
 GTSSoundFootstepNormal_4x = "GTS.esp|61587F"
 GTSSoundFootstepNormal_8x = "GTS.esp|615880"

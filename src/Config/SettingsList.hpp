@@ -373,8 +373,8 @@ struct SettingsGeneral {
     bool bProtectFollowers = true;
 
     // Gameplay enhancements
-    bool bDynamicSizePlayer = true;
-    bool bDynamicSizeFollowers = true;
+    bool bDynamicSizePlayer = false;
+    bool bDynamicSizeFollowers = false;
     bool bDynamicAnimspeed = true;
     bool bEnableHighHeels = true;
     bool bHighheelsFurniture = true;

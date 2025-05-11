@@ -6,6 +6,7 @@
 #include "Managers/Animation/AnimationManager.hpp"
 #include "Managers/Cameras/CamUtil.hpp"
 #include "Managers/Audio/Footstep.hpp"
+#include "Managers/Audio/Stomps.hpp"
 #include "Managers/Rumble.hpp"
 
 using namespace GTS;
@@ -58,7 +59,7 @@ namespace {
 
         DrainStamina(giant, "StaminaDrain_Stomp", "GTSPerkDestructionBasics", false, 1.4f);
 
-        DoFootstepSound(giant, SMT, Event, Node);
+        StompManager::PlayNewOrOldStomps(giant, SMT, Event, Node, false);
 
         LaunchTask(giant, 0.825f * perk, 2.10f, Event);
 
