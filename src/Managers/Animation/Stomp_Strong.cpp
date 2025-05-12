@@ -123,7 +123,7 @@ namespace {
 
 				DrainStamina(giantref, "StaminaDrain_StrongStomp", "GTSPerkDestructionBasics", false, 3.4f);
 
-				StompManager::PlayNewOrOldStomps(giantref, SMT + (animSpeed/10), Event, Node, false);
+				StompManager::PlayNewOrOldStomps(giantref, SMT + (animSpeed/10), Event, Node, true);
 
 				LaunchTask(giantref, 1.05f * perk, 3.6f + animSpeed/2, Event);
 

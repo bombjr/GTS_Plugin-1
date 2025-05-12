@@ -109,9 +109,9 @@ namespace Grab_Fixes {
 
 					PushActorAway(giant, tiny, 1.0f);
 
-					const float Flick_Power = HasSMT(giant) ? 9.0f : 4.5f;
+					const float Flick_Power = HasSMT(giant) ? 9.0f : 4.0f;
 
-					Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, Flick_Power, 35.0f);
+					Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, Flick_Power, 20.0f);
 					
 					return false;
 				});
@@ -277,14 +277,15 @@ namespace {
 	void GTS_HS_Flick_Launch(AnimationEventData& data) {
 		Rumbling::Once("FlichTiny_Launch", &data.giant, 0.75f, 0.05f, "NPC L Hand [LHnd]", true);
 		Grab_Fixes::GTSGrab_SpawnHeartsAtHead(&data.giant, 5, 0.25f);
+		Grab_Fixes::GTSGrab_KickTiny(&data.giant);
+		Grab_Fixes::ResetTinyAnimSpeed(&data.giant);
 	}
 
 	void GTS_HS_Flick_Ragdoll(AnimationEventData& data) {
 		Rumbling::Once("FlichTiny_Land", &data.giant, 2.1f, 0.05f, "NPC L Hand [LHnd]", true);
 		Runtime::PlaySoundAtNode("GTSSoundSwingImpact", &data.giant, 0.75f, 1.0f, "NPC L Hand [LHnd]"); // play swing impact sound
 		//Task_QueueGrabAbortTask(&data.giant, "FlickRagdoll");
-		Grab_Fixes::GTSGrab_KickTiny(&data.giant);
-		Grab_Fixes::ResetTinyAnimSpeed(&data.giant);
+		
 	}
 
 	// [ L I G H T  C R U S H ]

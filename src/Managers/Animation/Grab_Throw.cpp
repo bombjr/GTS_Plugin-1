@@ -188,9 +188,11 @@ namespace {
 				}
 				float throw_mult = HasSMT(giant) ? 5.0f : 2.0f;
 				float Z = 35.0f;
-				if (IsCrawling(giant)) {
-					throw_mult *= 0.4f; // Else it is too strong lol, literally throws 70+ meters at normal size
-					Z = 12.5f;
+				if (giant->IsSneaking()) {
+					throw_mult *= 0.2f; // Else it is too strong, literally throws 70+ meters at normal size
+					if (IsCrawling(giant)) {
+						Z = 25.0f;
+					}
 				}
 				
 				Animation_GrabThrow::Throw_Actor(gianthandle, tinyhandle, startCoords, endCoords, pass_name, throw_mult, Z);
