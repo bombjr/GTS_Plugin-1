@@ -125,7 +125,7 @@ namespace {
 		auto& VoreData = VoreController::GetSingleton().GetVoreData(giant);
 
 		for (auto& tiny: VoreData.GetVories()) {
-			VoreController::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
+			VoreController::GetSingleton().ShrinkOverTime(giant, tiny);
 		}
 	}
 

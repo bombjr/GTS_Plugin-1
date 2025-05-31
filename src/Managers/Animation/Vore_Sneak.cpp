@@ -42,7 +42,7 @@ namespace {
 		Task_FacialEmotionTask_OpenMouth(giant, 0.6f, "SneakVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
-			VoreController::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
+			VoreController::GetSingleton().ShrinkOverTime(giant, tiny);
 		}
     }
     void GTS_Sneak_Vore_Swallow(AnimationEventData& data) {

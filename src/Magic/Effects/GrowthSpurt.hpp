@@ -26,6 +26,6 @@ namespace GTS {
 			Timer timer = Timer(2.33);
 			Timer timerSound = Timer(0.7);
 
-			const char* const GrowthSpurtMessage = "Growth Spurt slowly regenerates your health and increases your size until you won't reach maximum scale of growth spurt. Growth Spurt doubles amount of size that you can steal during hugs and Growth Spurt also provides huge resistance against natural shrink sources. Unlock Strong Spurt-related perks to increase Maximal Size of growth spurt";
+			const char* const GrowthSpurtMessage = "Growth Spurt slowly regenerates your health and increases your size until you reach maximum size.  Growth Spurt doubles the amount of size you can steal during hugs and provides huge resistance against natural shrink sources.  Unlock Strong Spurt-related perks to increase the maximum size of Growth Spurt.";
 	};
 }

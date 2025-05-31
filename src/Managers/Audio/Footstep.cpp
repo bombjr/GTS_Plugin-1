@@ -6,6 +6,9 @@
 #include "Managers/Audio/AudioParams.hpp"
 #include "Managers/Highheel.hpp"
 
+#include "Managers/Animation/Utils/CooldownManager.hpp"
+
+
 using namespace GTS;
 
 namespace GTS {
@@ -37,7 +40,7 @@ namespace GTS {
 				scale *= 2.5f; // Affect Sound threshold itself
 			}
 
-			const bool LegacySounds = Config::GetAudio().bUseOldSounds;  // Determine if we should play old pre 2.00 update sounds
+			//const bool LegacySounds = Config::GetAudio().bUseOldSounds;  // Determine if we should play old pre 2.00 update sounds
 			// ^ Currently forced to true: there's not a lot of sounds yet.
 			bool WearingHighHeels = HighHeelManager::IsWearingHH(actor);
 			if (scale > 1.2f && !actor->AsActorState()->IsSwimming()) {
@@ -46,22 +49,27 @@ namespace GTS {
 				FootEvent foot_kind = impact.kind;
 				
 				if (Config::GetAudio().bFootstepSounds) {
-
 					for (NiAVObject* foot: impact.nodes) {
 						const bool UseOtherHeelSet = Config::GetAudio().bUseOtherHighHeelSet;
 						if (foot) {
 							if (UseOtherHeelSet) {
-								//if (WearingHighHeels) {
-									FootStepManager::PlayHighHeelSounds(modifier, foot, foot_kind, scale, WearingHighHeels); // We have only HH sounds for now
-								//} else {
-									//FootStepManager::PlayNormalSounds(modifier, foot, foot_kind, scale, true);
-								//}
+								if (foot_kind != FootEvent::JumpLand) {
+									FootStepManager::PlayHighHeelSounds_Walk(modifier, foot, foot_kind, scale, WearingHighHeels); // We have only HH sounds for now
+								} else {
+									if (!IsActionOnCooldown(actor, CooldownSource::Footstep_JumpLand)) { // Protection against multiple jump-land sounds
+										FootStepManager::PlayHighHeelSounds_Jump(modifier, foot, foot_kind, scale, WearingHighHeels);
+										ApplyActionCooldown(actor, CooldownSource::Footstep_JumpLand);
+									}
+								}
 							} else {
-								//if (WearingHighHeels) {
-									FootStepManager::PlayHighHeelSounds(modifier, foot, foot_kind, scale, false); // We have only HH sounds for now
-								//} else {
-									//FootStepManager::PlayNormalSounds(modifier, foot, foot_kind, scale, false);
-								//}
+								if (foot_kind != FootEvent::JumpLand) {
+									FootStepManager::PlayHighHeelSounds_Walk(modifier, foot, foot_kind, scale, false); // We have only HH sounds for now
+								} else {
+									if (!IsActionOnCooldown(actor, CooldownSource::Footstep_JumpLand)) {  // Protection against multiple jump-land sounds
+										FootStepManager::PlayHighHeelSounds_Jump(modifier, foot, foot_kind, scale, false);
+										ApplyActionCooldown(actor, CooldownSource::Footstep_JumpLand);
+									}
+								}
 							}
 						}
 					}
@@ -70,14 +78,12 @@ namespace GTS {
 		}
 	}
 
-	void FootStepManager::PlayHighHeelSounds(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale, bool UseOtherHeelSet) {
+	void FootStepManager::PlayHighHeelSounds_Walk(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale, bool UseOtherHeelSet) {
 		//https://www.desmos.com/calculator/wh0vwgljfl
 		auto profiler = Profilers::Profile("FootStepManager: PlayHighHeelSounds");
 
 		BSSoundHandle xlFootstep   = get_sound(modifier, foot, scale, limit_x14, get_xlFootstep_sounddesc(foot_kind), xlFootstep_Params, Params_Empty, "XL: Footstep", 1.0f, false);
 		BSSoundHandle xxlFootstep = get_sound(modifier, foot, scale, limit_x14, get_xxlFootstep_sounddesc(foot_kind), xxlFootstep_Params, Params_Empty, "XXL Footstep", 1.0f, false);
-		// These stop to appear at x14
-		BSSoundHandle lJumpLand    = get_sound(modifier, foot, scale, limitless, get_lJumpLand_sounddesc(foot_kind), lJumpLand_Params, Params_Empty, "L Jump", 1.0f, false);
 
 		BSSoundHandle xlRumble     = get_sound(modifier, foot, scale, limitless, get_xlRumble_sounddesc(foot_kind), xlRumble_Params, Params_Empty, "XL Rumble", 1.0f, false);
 		//BSSoundHandle xlSprint     = get_sound(modifier, foot, scale, get_xlSprint_sounddesc(foot_kind),    VolumeParams { .a = start_xl,            .k = 0.50, .n = 0.5, .s = 1.0}, "XL Sprint", 1.0);
@@ -107,10 +113,6 @@ namespace GTS {
 			xxlFootstep.Play();
 		}
 
-		if (lJumpLand.soundID != BSSoundHandle::kInvalidID) { // Jump Land audio: 
-			// 183F43: Sound\fx\GTS\Effects\Footsteps\Original\Fall
-			lJumpLand.Play();
-		}
 		if (xlRumble.soundID != BSSoundHandle::kInvalidID) { // Rumble when walking at huge scale: 
 			// 36A06D: Sound\fx\GTS\Foot\Effects\Rumble1-4.wav
 			xlRumble.Play();
@@ -140,6 +142,53 @@ namespace GTS {
 		}
 		if (Footstep_128.soundID != BSSoundHandle::kInvalidID) { // Mega sounds custom audio
 			Footstep_128.Play();
+		}
+	}
+
+	void FootStepManager::PlayHighHeelSounds_Jump(float modifier, NiAVObject* foot, FootEvent foot_kind, float scale, bool UseOtherHeelSet) {
+		//https://www.desmos.com/calculator/wh0vwgljfl
+		auto profiler = Profilers::Profile("FootStepManager: PlayHighHeelSounds");
+		BSSoundHandle JumpLand_x2   = get_sound(modifier, foot, scale, limit_x4, GetJumpLandSounds(2, UseOtherHeelSet), Footstep_2_Params, Footstep_4_Params, "x2 Footstep", 1.0f, true);
+		// Stops at x4
+		BSSoundHandle JumpLand_x4  = get_sound(modifier, foot, scale, limit_x8,GetJumpLandSounds(4, UseOtherHeelSet), Footstep_4_Params, Footstep_8_Params, "x4 Footstep", 1.0f, true);
+		// ^ Stops at ~x12
+		BSSoundHandle JumpLand_x8  = get_sound(modifier, foot, scale, limit_x14, GetJumpLandSounds(8, UseOtherHeelSet), Footstep_8_Params, Footstep_12_Params, "x8 Footstep", 1.33f, true);
+		// ^ Stops at ~x14
+		BSSoundHandle JumpLand_x12 = get_sound(modifier, foot, scale, limit_x24, GetJumpLandSounds(12, UseOtherHeelSet), Footstep_12_Params, Footstep_24_Params, "x12 Footstep", 2.0f, true);
+		// ^ Stops at ~x24
+		BSSoundHandle JumpLand_x24 = get_sound(modifier, foot, scale, limit_x48, GetJumpLandSounds(24, UseOtherHeelSet), Footstep_24_Params, Footstep_48_Params, "x24 Footstep", 5.0f, true);
+		// ^ Stops at ~x44
+		BSSoundHandle JumpLand_x48 = get_sound(modifier, foot, scale, limit_x96, GetJumpLandSounds(48, UseOtherHeelSet), Footstep_48_Params, Footstep_96_Params, "x48 Footstep", 8.0f, true);
+		// ^ Stops at ~x88
+		BSSoundHandle JumpLand_x96 = get_sound(modifier, foot, scale, limit_mega, GetJumpLandSounds(96, UseOtherHeelSet), Footstep_96_Params, Footstep_128_Params, "x96 Footstep", 12.0f, true);
+		// ^ Stops at X126
+		BSSoundHandle JumpLand_x128 = get_sound(modifier, foot, scale, limitless, GetJumpLandSounds(128, UseOtherHeelSet), Footstep_128_Params, Params_Empty, "Mega Footstep", 18.0f, false);
+
+		//=================================== Custom Commissioned Sounds =========================================
+
+		if (JumpLand_x2.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x2.Play();
+		}
+		if (JumpLand_x4.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x4.Play();
+		}
+		if (JumpLand_x8.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x8.Play();
+		}
+		if (JumpLand_x12.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x12.Play();
+		}
+		if (JumpLand_x24.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x24.Play();
+		}
+		if (JumpLand_x48.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x48.Play();
+		}
+		if (JumpLand_x96.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x96.Play();
+		}
+		if (JumpLand_x128.soundID != BSSoundHandle::kInvalidID) {
+			JumpLand_x128.Play();
 		}
 	}
 

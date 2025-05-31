@@ -27,7 +27,19 @@ namespace Triggers {
 	}
 
 	void GrabPlay_StartEvent(const ManagedInputEvent& data) {
-		PassAnimation("GrabPlay_Enter", "GrabPlay_Enter_T");
+		// Don't allow NPC's to start it if they don't have weapon/magic sheathed too
+		auto player = PlayerCharacter::GetSingleton();
+		auto Camera = PlayerCamera::GetSingleton();
+        bool Sheathed = Camera->isWeapSheathed;
+		if (!Sheathed) {
+			std::string message = std::format("You need to sheathe weapon/magic first");
+			shake_camera(player, 0.45f, 0.30f);
+			NotifyWithSound(player, message);
+			return;
+		}
+		if (!IsGtsBusy(player) && !IsInCleavageState(player)) {
+			PassAnimation("GrabPlay_Enter", "GrabPlay_Enter_T");
+		}
 	}
 
 	void GrabPlay_ExitEvent(const ManagedInputEvent& data) {
@@ -69,10 +81,6 @@ namespace Triggers {
 	void GrabPlay_GrindStopEvent(const ManagedInputEvent& data) {
 		PassAnimation("GrabPlay_GrindStop", "GrabPlay_GrindStop_T");
 	}
-
-	void GrabPlay_ToBoobsEvent(const ManagedInputEvent& data) {
-		PassAnimation("GrabPlay_ToBoobs", "GrabPlay_ToBoobs_T");
-	}
 }
 
 namespace GTS {
@@ -111,9 +119,6 @@ namespace GTS {
 		AnimationManager::RegisterTrigger("GrabPlay_GrindStop", "GrabPlay", "GTSBEH_Hand_Grind_Stop");
 		AnimationManager::RegisterTrigger("GrabPlay_GrindStop_T", "GrabPlay", "GTSBEH_T_Hand_Grind_Stop");
 
-		AnimationManager::RegisterTrigger("GrabPlay_ToBoobs", "GrabPlay", "GTSBEH_Hand_To_Boobs");
-		AnimationManager::RegisterTrigger("GrabPlay_ToBoobs_T", "GrabPlay", "GTSBEH_T_Hand_To_Boobs");
-
 		InputManager::RegisterInputEvent("GrabPlay_Start", Triggers::GrabPlay_StartEvent, GrabPlayStartCondition);
 		InputManager::RegisterInputEvent("GrabPlay_Exit", Triggers::GrabPlay_ExitEvent, GrabPlayActionCondition);
 
@@ -130,8 +135,6 @@ namespace GTS {
 
 		InputManager::RegisterInputEvent("GrabPlay_GrindStart", Triggers::GrabPlay_GrindStartEvent, GrabPlayActionCondition);
 		InputManager::RegisterInputEvent("GrabPlay_GrindStop", Triggers::GrabPlay_GrindStopEvent, GrabPlayActionCondition);
-
-		InputManager::RegisterInputEvent("GrabPlay_ToBoobs", Triggers::GrabPlay_ToBoobsEvent, GrabPlayActionCondition);
 	}
 }
 

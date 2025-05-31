@@ -37,6 +37,8 @@ namespace {
         auto TargetBone = Attachment_GetTargetNode(giantref);
         std::string_view node_lookup = "none";
 
+        auto Transient = Transient::GetSingleton().GetActorData(giantref);
+
         switch (TargetBone) {
             case AttachToNode::ObjectL: {
                 node_lookup = "AnimObjectL";            break;
@@ -51,7 +53,7 @@ namespace {
                 node_lookup = "AnimObjectB";            break;
             }
             case AttachToNode::None: {
-                node_lookup = "none";
+                node_lookup = "AnimObjectL";
             }
         }
 
@@ -61,9 +63,15 @@ namespace {
             NiPoint3 coords = Object->world.translate;
             FaceSame(giantref, tinyref);
 
+            if (Transient) {
+                if (Transient->KissVoring) {
+                    coords.z += 1.5f * get_visual_scale(giantref);
+                    log::info("Applying kiss vore fix");
+                }
+            }
+
             if (!AttachTo(giantref, tinyref, coords)) {
                 log::info("Trying to cancel Grab Play state");
-                //GrabPlayFixes::Task_QueueGrabAbortTask(giantref);
                 Grab::CancelGrab(giantref, tinyref);
                 //AnimationManager::StartAnim("GTS_HS_Exit_NoTiny", giantref); Doesn;t work
                 return false;
@@ -130,27 +138,6 @@ namespace {
 }
 
 namespace GTS {
-    void Task_QueueGrabAbortTask(Actor* giant, std::string_view name) {
-        std::string task_name = std::format("{}_{}", name, giant->formID);
-		ActorHandle gianthandle = giant->CreateRefHandle();
-		double Start = Time::WorldTimeElapsed();
-
-		TaskManager::Run(task_name, [=](auto& progressData) {
-			if (!gianthandle) {
-				return false;
-			}
-			Actor* giantref = gianthandle.get().get();
-			double Finish = Time::WorldTimeElapsed();
-
-			if (Finish - Start > 0.0 && !IsInGrabPlayState(giantref)) {
-                log::info("Reset Fired");
-                Grab::ExitGrabState(giantref);
-				return false;
-			}
-			return true;
-		});
-    }
-
     bool IsCurrentlyReattaching(Actor* giant) { // Sometimes Tiny is still grabbed and we need to update Tiny pos so Tiny becomes visible
         // Works in such cases like Changing locations/going between loading screens with Tiny grabbed
         bool Attaching = false;

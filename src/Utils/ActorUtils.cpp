@@ -3530,10 +3530,11 @@ namespace GTS {
 
 			auto node = find_node(actor, spawn_at_node);
 			if (!node) {
+				log::info("!Node: {}", spawn_at_node);
 				return;
 			}
 			const char* particle_path = "None";
-			//log::info("Spawning particle");
+			log::info("Spawning particle");
 			switch (Type) {
 				case ParticleType::Red: 
 					particle_path = "GTS/Magic/Life_Drain.nif";
@@ -3556,11 +3557,14 @@ namespace GTS {
 			}
 			NiPoint3 pos = NiPoint3(); // Empty point 3
 
-			if (spawn_at_point.Length() > 0.01f) { // fill it up
+			if (spawn_at_point.Length() > 1.0f) {
 				pos = spawn_at_point;
 			} else {
 				pos = node->world.translate;
 			}
+			log::info("Spawn Pos: {}", Vector2Str(pos));
+			log::info("Particle Scale: {}", scale_mult);
+			log::info("Actor: {}", actor->GetDisplayFullName());
 
 			SpawnParticle(actor, 4.60f, particle_path, NiMatrix3(), pos, scale, 7, nullptr);
 		}

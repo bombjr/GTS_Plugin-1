@@ -197,7 +197,7 @@ namespace {
 		Task_FacialEmotionTask_OpenMouth(giant, 0.75f, "StandingVoreOpenMouth");
 
 		for (auto& tiny: VoreData.GetVories()) {
-			VoreController::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
+			VoreController::GetSingleton().ShrinkOverTime(giant, tiny);
 		}
 	}
 

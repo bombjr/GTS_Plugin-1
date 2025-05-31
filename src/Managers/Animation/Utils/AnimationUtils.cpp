@@ -1451,13 +1451,13 @@ namespace GTS {
 		});
 	}
 
-	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming, float duration_add) {
+	void Task_FacialEmotionTask_OpenMouth(Actor* giant, float duration, std::string_view naming, float duration_add, float speed_mult) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
 
 		double start = Time::WorldTimeElapsed();
 		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
 
-		float open_speed = duration/6.0f;
+		float open_speed = duration/6.0f * speed_mult;
 
 		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Phenome, open_speed, open_speed); // Start opening mouth
 		AdjustFacialExpression(giant, 1, 0.5f, CharEmotionType::Phenome, open_speed, open_speed); // Open it wider
@@ -1638,6 +1638,7 @@ namespace GTS {
 			return true;
 		});
 	}
+	
 
 	void Task_FacialEmotionTask_Anger(Actor* giant, float duration, std::string_view naming, float duration_add) {
 		ActorHandle giantHandle = giant->CreateRefHandle();
@@ -1678,6 +1679,61 @@ namespace GTS {
 				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Expression, true);
 				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, true);
 				
+				return false;
+			}
+			return true;
+		});
+	}
+
+	void Task_FacialEmotionTask_Kiss(Actor* giant, float duration, std::string_view naming, float duration_add) {
+		ActorHandle giantHandle = giant->CreateRefHandle();
+
+		double start = Time::WorldTimeElapsed();
+		std::string name = std::format("{}_Facial_{}", naming, giant->formID);
+
+		AdjustFacialExpression(giant, 1, 1.0f, CharEmotionType::Expression); // Brows up, a bit gentle expression
+
+		AdjustFacialExpression(giant, 0, 1.0f, CharEmotionType::Modifier); // blink L
+		AdjustFacialExpression(giant, 1, 1.0f, CharEmotionType::Modifier); // blink R
+
+		AdjustFacialExpression(giant, 3, 1.0f, CharEmotionType::Phenome); 
+		AdjustFacialExpression(giant, 7, 1.0f, CharEmotionType::Phenome); 
+		AdjustFacialExpression(giant, 12, 1.0f, CharEmotionType::Phenome); 
+		// 3 = ~100
+		// 7 = ~100
+		// 12 = 100
+
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Phenome, true);
+		EmotionManager::SetEmotionBusy(giant, CharEmotionType::Modifier, true);
+		
+		// Emotion guide:
+		// https://steamcommunity.com/sharedfiles/filedetails/?id=187155077
+
+		TaskManager::Run(name, [=](auto& progressData) {
+			if (!giantHandle) {
+				return false;
+			}
+			double finish = Time::WorldTimeElapsed();
+			auto giantref = giantHandle.get().get();
+
+			float timepassed = static_cast<float>(finish - start) * AnimationManager::GetAnimSpeed(giantref);
+			bool ShouldRevert = timepassed >= duration + duration_add;
+			
+			if (ShouldRevert) {
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, false);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, false);
+
+				AdjustFacialExpression(giantref, 0, 0.0f, CharEmotionType::Modifier, 0.32f, 0.075f); // blink L
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Modifier, 0.32f, 0.075f); // blink R
+
+				AdjustFacialExpression(giantref, 3, 0.0f, CharEmotionType::Phenome); 
+				AdjustFacialExpression(giantref, 7, 0.0f, CharEmotionType::Phenome); 
+				AdjustFacialExpression(giantref, 12, 0.0f, CharEmotionType::Phenome); 
+
+				AdjustFacialExpression(giantref, 1, 0.0f, CharEmotionType::Expression); 
+
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Phenome, true);
+				EmotionManager::SetEmotionBusy(giantref, CharEmotionType::Modifier, true);
 				return false;
 			}
 			return true;

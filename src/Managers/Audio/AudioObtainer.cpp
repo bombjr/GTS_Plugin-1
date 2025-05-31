@@ -207,30 +207,25 @@ namespace GTS {
         return nullptr;
     }
 
-    BSISoundDescriptor* GetNormalSound_Jump(float scale) {
-        if (scale == 2.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_2x");
-        }
-        else if (scale == 4.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_4x");
-        }
-        else if (scale == 8.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_8x");
-        }
-        else if (scale == 12.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_12x");
-        }
-        else if (scale == 24.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_24x");
-        }
-        else if (scale == 48.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_48x");
-        }
-        else if (scale == 96.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_96x");
-        }
-        else if (scale > 96.0f) {
-            return Runtime::GetSound("GTSSoundFootstepLandNormal_Mega");
+    BSISoundDescriptor* GetNormalSound_Jump(const int scale) {
+        switch (scale) {
+            case 2:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_2x");
+            case 4:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_4x");
+            case 8:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_8x");
+            case 12:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_12x");
+            case 24:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_24x");
+            case 48:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_48x");
+            case 96:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_96x");
+            case 128:
+                return Runtime::GetSound("GTSSoundFootstepLandNormal_Mega");
+            break;
         }
         return nullptr;
     }
@@ -323,6 +318,17 @@ namespace GTS {
             case 128:
                 return Runtime::GetSound("GTSSoundFootstepLandHighHeels_Mega");
             break;
+        }
+        return nullptr;
+    }
+
+    BSISoundDescriptor* GetJumpLandSounds(const int scale, bool UseHeelSet) {
+        if (UseHeelSet) {
+            log::info("Obtaining High Heel jump Lands");
+            return GetHHSound_JumpAlt(scale);
+        } else {
+            //return GetHHSound_Jump(scale);
+            return get_lJumpLand_sounddesc(FootEvent::JumpLand); // To be updated with non hh sounds
         }
         return nullptr;
     }

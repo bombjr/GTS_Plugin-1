@@ -531,24 +531,18 @@ namespace GTS {
             {
                 .Event = "GrabPlay_GrindStart",
                 .Keys = {"W"},
-                .Trigger = "Continous",
-                .Duration = 0.5f,
+                .Trigger = "Once",
+                .Duration = 0.0f,
                 .BlockInput = "Never"
             },
             {
                 .Event = "GrabPlay_GrindStop",
                 .Keys = {"W"},
-                .Trigger = "Release",
-                .Duration = 0.0f,
-                .BlockInput = "Never"
-            },
-            {
-                .Event = "GrabPlay_ToBoobs",
-                .Keys = {"LSHIFT","B"},
                 .Trigger = "Once",
                 .Duration = 0.0f,
                 .BlockInput = "Never"
             },
+
 
             //========================================================
             //========================= C A M E R A

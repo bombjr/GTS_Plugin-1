@@ -79,7 +79,7 @@ namespace GTS {
 			static void RecordOriginalScale(Actor* tiny);
 			static float ReadOriginalScale(Actor* tiny);
 
-			static void ShrinkOverTime(Actor* giant, Actor* tiny, float over_time);
+			static void ShrinkOverTime(Actor* giant, Actor* tiny, float time_mult = 1.0f, float targetscale_mult = 1.0f);
 			
 			// Gets the current vore data of a giant
 			VoreData& GetVoreData(Actor* giant);

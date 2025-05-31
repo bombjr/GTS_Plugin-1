@@ -68,6 +68,7 @@ namespace GTS {
 		bool UsingFurniture = false;
 
 		bool ReattachingTiny = false;
+		bool KissVoring = false;
 
 		NiPoint3 BoundingBoxCache = { 0.0f, 0.0f, 0.0f };
 		NiPoint3 POSLastLegL = { 0.0f, 0.0f, 0.0f };

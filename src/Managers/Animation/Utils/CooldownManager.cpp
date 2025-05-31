@@ -216,6 +216,9 @@ namespace GTS {
             case CooldownSource::Footstep_Left:
                 data.lastFootstepTime_L = Time::WorldTimeElapsed();
                 break; 
+            case CooldownSource::Footstep_JumpLand:
+                data.lastJumplandTime = Time::WorldTimeElapsed();
+                break;
         }
     }
 
@@ -278,6 +281,8 @@ namespace GTS {
                 return (data.lastFootstepTime_R + Calculate_FootstepTimer(giant)) - time;   
             case CooldownSource::Footstep_Left:
                 return (data.lastFootstepTime_L + Calculate_FootstepTimer(giant)) - time; 
+            case CooldownSource::Footstep_JumpLand:
+                return (data.lastJumplandTime + Calculate_FootstepTimer(giant)) - time;
             }
         return 0.0;
     }
@@ -347,6 +352,8 @@ namespace GTS {
                 return time <= (data.lastFootstepTime_R + Calculate_FootstepTimer(giant));    
             case CooldownSource::Footstep_Left:
                 return time <= (data.lastFootstepTime_L + Calculate_FootstepTimer(giant));  
+            case CooldownSource::Footstep_JumpLand:
+                return time <= (data.lastJumplandTime + Calculate_FootstepTimer(giant));
             }
         return false; 
     }

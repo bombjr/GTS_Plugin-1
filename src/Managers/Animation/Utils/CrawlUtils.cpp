@@ -49,7 +49,7 @@ namespace GTS {
 				scale *= 0.75f;
 
 				if (node && Config::GetAudio().bFootstepSounds) {
-					FootStepManager::PlayHighHeelSounds(movement, node, foot_kind, scale, false); // We have only HH sounds for now
+					FootStepManager::PlayHighHeelSounds_Walk(movement, node, foot_kind, scale, false); // We have only HH sounds for now
 				}
 			}
 		}

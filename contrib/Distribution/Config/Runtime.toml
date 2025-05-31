@@ -91,6 +91,8 @@ GTSSoundFootstep_XXL = "GTS.esp|16FB25"
 GTSSoundFootstep_Sprint = "GTS.esp|319060"
 GTSSoundFootstepLand_L = "GTS.esp|183F43"
 
+GTSSoundKissing = "GTS.esp|8DF67E"
+
 GTSSoundRumble = "GTS.esp|36A06D"
 GTSSoundWalkAirRumble = "GTS.esp|50423E"
 

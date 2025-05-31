@@ -415,13 +415,14 @@ namespace GTS {
 		return 1.0f;
 	}
 
-	void VoreController::ShrinkOverTime(Actor* giant, Actor* tiny, float over_time) {
+	void VoreController::ShrinkOverTime(Actor* giant, Actor* tiny, float time_mult, float targetscale_mult) {
 		if (tiny) {
 			float Adjustment_Tiny = GetSizeFromBoundingBox(tiny);
 			float preyscale = get_visual_scale(tiny) * Adjustment_Tiny;
 			float targetScale = std::clamp(preyscale/12.0f * Adjustment_Tiny, 0.01f, 1000000.0f);
+			targetScale *= targetscale_mult;
 
-			float shrink_magnitude = -targetScale;
+			float shrink_magnitude = -targetScale * time_mult;
 
 			ActorHandle tinyHandle = tiny->CreateRefHandle();
 

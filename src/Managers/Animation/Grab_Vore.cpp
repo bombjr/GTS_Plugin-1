@@ -25,7 +25,7 @@ namespace {
 		auto& VoreData = VoreController::GetSingleton().GetVoreData(giant);
 		if (otherActor) {
 			SetBeingEaten(otherActor, true);
-			VoreController::GetSingleton().ShrinkOverTime(giant, otherActor, 0.1f);
+			VoreController::GetSingleton().ShrinkOverTime(giant, otherActor);
 		}
 		Task_FacialEmotionTask_OpenMouth(giant, 1.1f, "GrabVoreOpenMouth", 0.3f);
 		StopLHandRumble("GrabVoreL", data.giant);

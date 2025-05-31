@@ -82,7 +82,7 @@ namespace GTS {
 		const bool UseOtherHeelSet = Config::GetAudio().bUseOtherHighHeelSet;
 		log::info("Trying to do stomps");
 
-		if (UseOtherHeelSet) {
+		if (UseOtherHeelSet && HighHeelManager::IsWearingHH(giant)) {
 			log::info("Other Heel Set True");
 			PlayStompSounds(giant, modifier, find_foot, foot_kind, get_visual_scale(giant), Strong);
 		} else {

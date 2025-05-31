@@ -285,7 +285,7 @@ namespace {
 		auto& VoreData = VoreController::GetSingleton().GetVoreData(giant);
 		if (tiny) {
 			SetBeingEaten(tiny, true);
-			VoreController::GetSingleton().ShrinkOverTime(giant, tiny, 0.1f);
+			VoreController::GetSingleton().ShrinkOverTime(giant, tiny);
 		}
 		Task_FacialEmotionTask_OpenMouth(giant, 0.66f, "PrepareVore");
     }
