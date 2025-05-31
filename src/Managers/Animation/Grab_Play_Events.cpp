@@ -378,7 +378,7 @@ namespace {
 	void GTS_HS_Kiss_Start(AnimationEventData& data) {
 		Rumbling::Once("KissTiny", &data.giant, 2.25f, 0.05f, "NPC Head [Head]", true);
 		Task_FacialEmotionTask_Kiss(&data.giant, 1.25f, "KissTiny", 0.325f);
-		Grab_Fixes::GTSGrab_SpawnHeartsAtHead(&data.giant, 0.0f, 20.45f);
+		Grab_Fixes::GTSGrab_SpawnHeartsAtHead(&data.giant, 0.0f, 0.45f);
 		if (auto tiny = Grab::GetHeldActor(&data.giant)) {
 			Task_FacialEmotionTask_Kiss(tiny, 1.25f, "KissedByGts", 0.325f);
 		}
