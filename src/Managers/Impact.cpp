@@ -34,28 +34,50 @@ namespace {
 
 	FootEvent get_foot_kind(Actor* actor, std::string_view tag) {
 		auto profiler = Profilers::Profile("Impact: GetFootKind");
-		FootEvent foot_kind = FootEvent::Unknown;
+		
+
+		bool hugging = actor ? IsHuggingFriendly(actor) : false; 
 		bool is_jumping = actor ? IsJumping(actor) : false;
 		bool in_air = actor ? actor->IsInMidair() : false;
-		bool hugging = actor ? IsHuggingFriendly(actor) : false; 
+		FootEvent foot_kind = FootEvent::Unknown;
+	
 		// Hugging is needed to fix missing footsteps once we do friendly release
 		// Footsteps aren't seen by the dll without it (because actor is in air)
 
+		bool isSprinting = actor->AsActorState()->IsSprinting();
 		bool allow = (!is_jumping || hugging);
+		
 
+		// Skip regular foot events if sprinting
 		if (matches(tag, ".*Foot.*Left.*") && allow) {
-			foot_kind = FootEvent::Left;
-		} else if (matches(tag, ".*Foot.*Right.*") && allow) {
-			foot_kind = FootEvent::Right;
-		} else if (matches(tag, ".*Foot.*Front.*") && allow) {
+			if (isSprinting) {
+				if (matches(tag, ".*Sprint.*")) {
+					foot_kind = FootEvent::Left;
+				}
+			} else {
+				foot_kind = FootEvent::Left;
+			}
+		}
+		else if (matches(tag, ".*Foot.*Right.*") && allow) {
+			if (isSprinting) {
+				if (matches(tag, ".*Sprint.*")) {
+					foot_kind = FootEvent::Right;
+				}
+			} else {
+				foot_kind = FootEvent::Right;
+			}
+		}
+		else if (!isSprinting && matches(tag, ".*Foot.*Front.*") && allow) {
 			foot_kind = FootEvent::Front;
-		} else if (matches(tag, ".*Foot.*Back.*") && allow) {
+		}
+		else if (!isSprinting && matches(tag, ".*Foot.*Back.*") && allow) {
 			foot_kind = FootEvent::Back;
-		} else if (matches(tag, ".*Jump.*(Down|Land).*") && !in_air) {
+		}
+		else if (matches(tag, ".*Jump.*(Down|Land).*") && !in_air) {
 			foot_kind = FootEvent::JumpLand;
 		}
-		return foot_kind;
-	}
+    return foot_kind;
+}
 
 	std::vector<NiAVObject*> get_landing_nodes(Actor* actor, const FootEvent& foot_kind) {
 		auto profiler = Profilers::Profile("Impact: GetLandingNodes");

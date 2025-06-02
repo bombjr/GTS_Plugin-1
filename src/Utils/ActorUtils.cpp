@@ -3017,14 +3017,14 @@ namespace GTS {
 	}
 
 	float GetGtsSkillLevel(Actor* giant) {
-		if (giant->formID == 0x14) {
-			auto GtsSkillLevel = Runtime::GetGlobal("GTSSkillLevel");
-			return GtsSkillLevel->value;
-		} else {
-			float Alteration = std::clamp(GetAV(giant, ActorValue::kAlteration), 1.0f, 100.0f);
-			return Alteration;
-		}
-	}
+        if (giant->formID == 0x14) {
+            auto GtsSkillLevel = Runtime::GetFloatOr("GTSSkillLevel", 1.0f);
+            return GtsSkillLevel;
+        } else {
+            float Alteration = std::clamp(GetAV(giant, ActorValue::kAlteration), 1.0f, 100.0f);
+            return Alteration;
+        }
+    }
 
 	float GetXpBonus() {
 		return Config::GetBalance().fExpMult;
