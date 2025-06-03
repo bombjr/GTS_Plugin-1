@@ -346,7 +346,7 @@ struct SettingsAudio {
     bool bMuteBreastAbsorptionDeathScreams = true;
 
     bool bMoanLaughSizeVariants = false;
-    bool bUseOtherHighHeelSet = false;
+    bool bUseOtherHighHeelSet = true;
     
     float fMaxVoiceFrequency = 1.0f;
 

@@ -22,7 +22,7 @@ namespace {
         if (!GTS::Plugin::Ready() || GTS::Plugin::AnyMenuOpen() || UI->IsMenuOpen(RE::FaderMenu::MENU_NAME)) {
 
             if (a_IsConsole) {
-                GTS::Cprint("Can not open the settings menu at this time.");
+                GTS::Cprint("Can not open the settings menu at this time. Try again in game.");
             }
 
             return;
