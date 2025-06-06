@@ -12,7 +12,12 @@ namespace GTS {
 	// Random Float
 	// -----------------
 
-	[[nodiscard]] static inline float RandomFloat(const float a_min, const float a_max) {
+	[[nodiscard]] static inline float RandomFloat(float a_min, float a_max) {
+		// If min > max, swap them
+		if (a_min > a_max) {
+			std::swap(a_min, a_max);
+		}
+
 		std::uniform_real_distribution<> dist(a_min, a_max);
 		return static_cast<float>(dist(generator));
 	}
@@ -26,7 +31,13 @@ namespace GTS {
 	// Random Int
 	// -----------------
 
-	[[nodiscard]] static inline int RandomInt(const int a_min, const int a_max) {
+	[[nodiscard]] static inline int RandomInt(int a_min, int a_max) {
+
+		// If min > max, swap them
+		if (a_min > a_max) {
+			std::swap(a_min, a_max);
+		}
+
 		std::uniform_int_distribution<> dist(a_min, a_max);
 		return dist(generator);
 	}
