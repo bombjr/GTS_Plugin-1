@@ -72,7 +72,7 @@ namespace GTS {
             ImGui::Text("Curse Game Modes");
             ImUtil::SliderF("Curse Update Interval", &a_Settings->fGameModeUpdateInterval, 2.0f, 10.0f, T6, "Every %.2f Seconds");
             ImUtil::SliderF("Curse of Growth Limit", &a_Settings->fCurseGrowthSizeLimit, 1.1f, 50.0f, T3, "%.2fx");
-        	ImUtil::SliderF("Target Scale", &a_Settings->fCurseTargetScale, 1.1f, 4.0f, T5, "%.2fx");
+        	ImUtil::SliderF("Target Scale", &a_Settings->fCurseTargetScale, 0.02f, 4.0f, T5, "%.2fx");
 
             ImGui::EndDisabled();
             ImGui::Spacing();
